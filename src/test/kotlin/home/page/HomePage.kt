@@ -18,6 +18,8 @@ class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
+    val profileImage = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
+
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {
         prettyPrint = true
@@ -35,11 +37,13 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isBloodTestCardVisible(): Boolean {
-       return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
+        return page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
     }
 
     fun waitForBloodTestCardToLoad(): HomePage {
-        page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).waitFor()
+        page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view"))
+            .waitFor()
         return this
     }
 
@@ -79,7 +83,8 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun isPhlebotomistAssignedTitleVisible(): Boolean {
-        return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Phlebotomist assigned")).isVisible
+        return page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Phlebotomist assigned")).isVisible
     }
 
     fun isPhlebotomistAssignedDateVisible(): Boolean {
@@ -90,7 +95,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isSampleCollectionTitleVisible(): Boolean {
-        return  page.getByText("Sample collection",Page.GetByTextOptions().setExact(true)).isVisible
+        return page.getByText("Sample collection", Page.GetByTextOptions().setExact(true)).isVisible
     }
 
     fun isSampleCollectionDateVisible(): Boolean {
@@ -119,7 +124,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isTBloodTestCancelled(): Boolean {
-        return   page.getByText("Sample collection",Page.GetByTextOptions().setExact(true)).isVisible &&
+        return page.getByText("Sample collection", Page.GetByTextOptions().setExact(true)).isVisible &&
                 page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Cancelled")).isVisible
     }
 
@@ -149,7 +154,7 @@ class HomePage(page: Page) : BasePage(page) {
 
         val endTime = localDate.plusMinutes(30)
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM, hh:mm",Locale.ENGLISH)
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM, hh:mm", Locale.ENGLISH)
         val endTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
 
         val formattedDateTime = dateTimeFormatter.format(localDate)
@@ -177,5 +182,12 @@ class HomePage(page: Page) : BasePage(page) {
             "getDashBoardReadyToViewDate.....${formattedDateTime}"
         }
         return formattedDateTime
+    }
+
+    fun clickProfile(): profile.page.ProfilePage {
+        profileImage.click()
+        val profilePage = profile.page.ProfilePage(page)
+        profilePage.waitForConfirmation()
+        return profilePage
     }
 }

@@ -51,12 +51,25 @@ class ProfileTest {
     }
 
     @Test
-    fun `login flow`() {
+    fun `profile flow`() {
         val tesUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToProfile(tesUser.otp)
+            .enterOtpAndContinueToHomePage("678901")
+            .clickProfile()
+            .waitForConfirmation()
+        /*   .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
+           .fillAndContinue("Male", "170", "60")
+           .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
+           .selectSlotsAndContinue()
+           .clickContinue()
+           .waitForHomePageConfirmation()*/
+    }
+
+    @Test
+    fun `profile page all information is visible`(){
+
     }
 }
