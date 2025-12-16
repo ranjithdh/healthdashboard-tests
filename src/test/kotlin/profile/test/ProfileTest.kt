@@ -51,23 +51,12 @@ class ProfileTest {
     }
 
     @Test
-    fun `should complete full signup flow`() {
+    fun `login flow`() {
+        val tesUser = TestConfig.TestUsers.EXISTING_USER
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-
-        val homePage = loginPage
-            .clickSignUp()
-            .enterMobileAndContinue("726408358")
-            .enterOtpAndContinueToProfile("678901")
-        /*   .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
-           .fillAndContinue("Male", "170", "60")
-           .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
-           .selectSlotsAndContinue()
-           .clickContinue()
-           .waitForHomePageConfirmation()*/
-
-
-        //  checkBloodTestBookedCardStatus(homePage)
-
-        //homePage.takeScreenshot("signup-order-placed")
+        loginPage
+            .enterMobileAndContinue(tesUser.mobileNumber)
+            .enterOtpAndContinueToProfile(tesUser.otp)
     }
 }

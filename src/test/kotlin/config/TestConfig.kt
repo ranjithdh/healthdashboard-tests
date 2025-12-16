@@ -8,6 +8,7 @@ object TestConfig {
     object Urls {
         val BASE_URL: String = "https://app.stg.deepholistics.com"
         val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
+        val PROFILE_PAGE_URL: String = "https://app.stg.deepholistics.com/profile"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
