@@ -15,7 +15,6 @@ private val logger = KotlinLogging.logger {}
 class OtpPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
-    override val pageLoadedSelector = "text=/Resend code in/"
 
     fun enterOtp(otp: String): OtpPage {
         logger.info { "enterOtp($otp)" }

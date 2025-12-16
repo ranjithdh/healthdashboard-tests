@@ -10,15 +10,17 @@ private val logger = KotlinLogging.logger {}
 
 class PersonalDetailsPage(page: Page) : BasePage(page) {
 
-
-
-
     override val pageUrl = "/login"
-    override val pageLoadedSelector = "text=Date of Birth"
+
+    private val dateOfBirthLabel = byText("Date of Birth")
+    private val genderInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender"))
+    private val heightInput = byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm)"))
+    private val weightInput = byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg)"))
+    private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
     fun selectDateOfBirth(month: String, year: String, day: String): PersonalDetailsPage {
         logger.info { "selectDateOfBirth($month/$day/$year)" }
-        byText("Date of Birth").click()
+        dateOfBirthLabel.click()
         page.getByLabel("Month:").selectOption(month)
         page.getByLabel("Year:").selectOption(year)
         byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day)).click()
@@ -27,20 +29,32 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
 
     fun selectGender(gender: String): PersonalDetailsPage {
         logger.info { "selectGender($gender)" }
-        byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender")).click()
+        genderInput.click()
         byRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(gender).setExact(true)).click()
         return this
     }
 
     fun enterHeight(height: String): PersonalDetailsPage {
         logger.info { "enterHeight($height)" }
-        byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm)")).fill(height)
+        heightInput.fill(height)
+        return this
+    }
+
+    fun clearHeight(): PersonalDetailsPage {
+        logger.info { "clearHeight()" }
+        heightInput.clear()
         return this
     }
 
     fun enterWeight(weight: String): PersonalDetailsPage {
         logger.info { "enterWeight($weight)" }
-        byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg)")).fill(weight)
+        weightInput.fill(weight)
+        return this
+    }
+
+    fun clearWeight(): PersonalDetailsPage {
+        logger.info { "clearWeight()" }
+        weightInput.clear()
         return this
     }
 
@@ -62,7 +76,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
 
     fun clickContinue(): PersonalDetailsPage {
         logger.info { "clickContinue()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+        continueButton.click()
         return this
     }
 
@@ -87,27 +101,27 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): PersonalDetailsPage {
-        byText("Date of Birth").waitFor()
+        dateOfBirthLabel.waitFor()
         return this
     }
 
     fun isDateOfBirthVisible(): Boolean {
-        return byText("Date of Birth").isVisible
+        return dateOfBirthLabel.isVisible
     }
 
     fun isGenderVisible(): Boolean {
-        return byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender")).isVisible
+        return genderInput.isVisible
     }
 
     fun isHeightVisible(): Boolean {
-        return byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm)")).isVisible
+        return heightInput.isVisible
     }
 
     fun isWeightVisible(): Boolean {
-        return byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg)")).isVisible
+        return weightInput.isVisible
     }
 
     fun isContinueButtonEnabled(): Boolean {
-        return byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).isEnabled
+        return continueButton.isEnabled
     }
 }

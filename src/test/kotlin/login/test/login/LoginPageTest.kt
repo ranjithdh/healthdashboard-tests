@@ -6,7 +6,7 @@ import login.page.LoginPage
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginMobileTest {
+class LoginPageTest {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser

@@ -11,8 +11,6 @@ private val logger = KotlinLogging.logger {}
 class TimeSlotPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
-    override val pageLoadedSelector =  byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Schedule your Blood Test")).toString()
-
 
     fun selectDate(day: String): TimeSlotPage {
         logger.info { "selectDate($day)" }

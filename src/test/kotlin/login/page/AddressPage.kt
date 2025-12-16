@@ -11,30 +11,53 @@ private val logger = KotlinLogging.logger {}
 class AddressPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
-    override val pageLoadedSelector =  byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Set up your account")).textContent() ?: ""
+
+    private val addressInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address"))
+    private val cityInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("City"))
+    private val stateInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("State"))
+    private val pinCodeInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code"))
+    private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
     fun enterAddress(address: String): AddressPage {
         logger.info { "enterAddress($address)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address")).fill(address)
+        addressInput.fill(address)
+        return this
+    }
+
+    fun clearAddress(): AddressPage {
+        logger.info { "clearAddress()" }
+        addressInput.clear()
         return this
     }
 
     fun enterCity(city: String): AddressPage {
         logger.info { "enterCity($city)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("City")).fill(city)
+        cityInput.fill(city)
+        return this
+    }
+
+    fun clearCity(): AddressPage {
+        logger.info { "clearCity()" }
+        cityInput.clear()
         return this
     }
 
     fun selectState(state: String): AddressPage {
         logger.info { "selectState($state)" }
-        byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("State")).click()
+        stateInput.click()
         byRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(state)).click()
         return this
     }
 
     fun enterPinCode(pinCode: String): AddressPage {
         logger.info { "enterPinCode($pinCode)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code")).fill(pinCode)
+        pinCodeInput.fill(pinCode)
+        return this
+    }
+
+    fun clearPinCode(): AddressPage {
+        logger.info { "clearPinCode()" }
+        pinCodeInput.clear()
         return this
     }
 
@@ -55,7 +78,7 @@ class AddressPage(page: Page) : BasePage(page) {
 
     fun clickContinue(): AddressPage {
         logger.info { "clickContinue()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+        continueButton.click()
         return this
     }
 
@@ -74,27 +97,27 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): AddressPage {
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address")).waitFor()
+        pinCodeInput.waitFor()
         return this
     }
 
     fun isAddressVisible(): Boolean {
-        return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address")).isVisible
+        return addressInput.isVisible
     }
 
     fun isCityVisible(): Boolean {
-        return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("City")).isVisible
+        return cityInput.isVisible
     }
 
     fun isStateVisible(): Boolean {
-        return byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("State")).isVisible
+        return stateInput.isVisible
     }
 
     fun isPinCodeVisible(): Boolean {
-        return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code")).isVisible
+        return pinCodeInput.isVisible
     }
 
     fun isContinueButtonEnabled(): Boolean {
-        return byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).isEnabled
+        return continueButton.isEnabled
     }
 }

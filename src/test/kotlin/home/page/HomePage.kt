@@ -17,7 +17,6 @@ import java.util.*
 class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
-    override val pageLoadedSelector = ""
 
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {

@@ -14,7 +14,6 @@ private val logger = KotlinLogging.logger {}
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login" // Verify if URL changes
-    override val pageLoadedSelector = byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Order summary")).toString()
 
     fun enterCouponCode(code: String): OrderSummaryPage {
         logger.info { "enterCouponCode($code)" }

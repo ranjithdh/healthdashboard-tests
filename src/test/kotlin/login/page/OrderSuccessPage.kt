@@ -10,7 +10,6 @@ import config.BasePage
 class OrderSuccessPage(page: Page) : BasePage(page) {
     
     override val pageUrl = "/order-confirmed" // Update with actual URL
-    override val pageLoadedSelector = byText("Order Placed Successfully").toString() // Update with actual selector
 
     fun isOrderPlacedSuccessfully(): Boolean {
         // Look for common success indicators
