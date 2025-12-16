@@ -1,0 +1,93 @@
+package config
+
+import com.microsoft.playwright.BrowserType
+
+
+object TestConfig {
+
+    object Urls {
+        val BASE_URL: String = "https://app.stg.deepholistics.com"
+        val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
+
+        val LOGIN_PATH = "/login"
+        val HOME_PATH = "/home"
+    }
+
+    object Browser {
+        val HEADLESS: Boolean = false
+        val SLOW_MO: Double =  (1 * 1000).toDouble()
+        val TIMEOUT: Double = System.getenv("TIMEOUT")?.toDouble() ?: 60000.0
+
+        fun launchOptions(): BrowserType.LaunchOptions {
+            return BrowserType.LaunchOptions()
+                .setHeadless(HEADLESS)
+                .setSlowMo(SLOW_MO)
+        }
+    }
+
+    object Viewports {
+        // Mobile devices
+        val MOBILE_PORTRAIT = Viewport(390, 844, "iPhone 13", true)
+        val MOBILE_LANDSCAPE = Viewport(844, 390, "iPhone 13 Landscape", true)
+        val MOBILE_SMALL = Viewport(320, 568, "iPhone SE", true)
+        val ANDROID = Viewport(412, 915, "Pixel 5", true)
+
+        // Tablets
+        val TABLET_PORTRAIT = Viewport(768, 1024, "iPad", true)
+        val TABLET_LANDSCAPE = Viewport(1024, 768, "iPad Landscape", true)
+        val TABLET_PRO = Viewport(1024, 1366, "iPad Pro", true)
+
+        // Desktop
+        val DESKTOP_HD = Viewport(1280, 720, "Desktop HD", false)
+        val DESKTOP_FHD = Viewport(1920, 1080, "Desktop Full HD", false)
+        val DESKTOP_4K = Viewport(3840, 2160, "Desktop 4K", false)
+        val LAPTOP = Viewport(1366, 768, "Laptop", false)
+
+        // All viewports for comprehensive testing
+        val ALL_MOBILE = listOf(MOBILE_PORTRAIT, MOBILE_LANDSCAPE, ANDROID)
+        val ALL_TABLET = listOf(TABLET_PORTRAIT, TABLET_LANDSCAPE)
+        val ALL_DESKTOP = listOf(DESKTOP_HD, DESKTOP_FHD, LAPTOP)
+        val ALL = ALL_MOBILE + ALL_TABLET + ALL_DESKTOP
+    }
+
+    object TestUsers {
+        val NEW_USER = TestUser(
+            mobileNumber = "726408344",
+            otp = ""
+        )
+
+        val EXISTING_USER = TestUser(
+            mobileNumber = "7373791414",
+            otp = "678901"
+        )
+    }
+
+    object Artifacts {
+        val SCREENSHOT_DIR = "build/screenshots"
+        val VIDEO_DIR = "build/videos"
+        val TRACE_DIR = "build/traces"
+        val SCREENSHOT_ON_FAILURE = true
+        val RECORD_VIDEO = System.getenv("RECORD_VIDEO")?.toBoolean() ?: false
+    }
+
+    object Timeouts {
+        const val DEFAULT_TIMEOUT = 30000L
+        const val NAVIGATION_TIMEOUT = 60000L
+        const val ELEMENT_TIMEOUT = 10000L
+        const val ANIMATION_TIMEOUT = 500L
+    }
+}
+
+data class Viewport(
+    val width: Int,
+    val height: Int,
+    val name: String,
+    val isMobile: Boolean,
+    val hasTouch: Boolean = isMobile,
+    val deviceScaleFactor: Double = if (isMobile) 2.0 else 1.0
+)
+
+data class TestUser(
+    val mobileNumber: String,
+    val otp: String,
+)
