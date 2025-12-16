@@ -69,7 +69,19 @@ class ProfileTest {
     }
 
     @Test
-    fun `profile page all information is visible`(){
+    fun `profile page all information is visible`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage("678901")
+            .clickProfile()
+            .waitForConfirmation()
+
+        assert(profilePage.isHealthMetricEditVisible()) { "Health metric edit not visible" }
+        assert(profilePage.isHealthMetricsHeightVisible()) { "Health metric height not matches from api" }
+        assert(profilePage.isHealthMetricsWeightVisible()) { "Health metric weight not  matches from api" }
 
     }
 }
