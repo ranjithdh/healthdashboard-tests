@@ -1,22 +1,43 @@
 package config
 
 import com.microsoft.playwright.BrowserType
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 
 
 object TestConfig {
 
+
+    @OptIn(ExperimentalSerializationApi::class)
+    val json = Json {
+        prettyPrint = true
+        isLenient = true
+        ignoreUnknownKeys = true
+        explicitNulls = true
+        encodeDefaults = true
+    }
+
     object Urls {
         val BASE_URL: String = "https://app.stg.deepholistics.com"
         val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
-        val PROFILE_PAGE_URL: String = "https://app.stg.deepholistics.com/profile"
+        val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
     }
 
+
+    object APIs {
+        val BASE_URL: String = "https://app.stg.deepholistics.com"
+
+        val API_PI_DATA = "$BASE_URL/v4/human-token/pii-data"
+        val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+    }
+
+
     object Browser {
         val HEADLESS: Boolean = false
-        val SLOW_MO: Double =  (1 * 1000).toDouble()
+        val SLOW_MO: Double = (1 * 1000).toDouble()
         val TIMEOUT: Double = System.getenv("TIMEOUT")?.toDouble() ?: 60000.0
 
         fun launchOptions(): BrowserType.LaunchOptions {
