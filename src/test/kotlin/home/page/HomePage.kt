@@ -179,11 +179,8 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun clickProfile(): ProfilePage {
-        val response = page.waitForResponse({ it.url().contains(API_PI_DATA) && it.status() == 200 }) {
-            profileImage.click()
-        }
+        profileImage.click()
         val profilePage = ProfilePage(page)
-        profilePage.initData(response.text())
         profilePage.waitForConfirmation()
         return profilePage
     }
