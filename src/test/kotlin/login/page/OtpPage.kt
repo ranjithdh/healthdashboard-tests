@@ -5,6 +5,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import mu.KotlinLogging
+import profile.page.HealthMetricPage
 import java.util.Scanner
 
 private val logger = KotlinLogging.logger {}
@@ -47,6 +48,17 @@ class OtpPage(page: Page) : BasePage(page) {
         basicDetailsPage.waitForConfirmation()
         return basicDetailsPage
     }
+
+
+    fun enterOtpAndContinueToProfile(otp: String): HealthMetricPage {
+        enterOtp(otp)
+        clickContinue()
+
+        val healthMetricPage = HealthMetricPage(page)
+        healthMetricPage.waitForConfirmation()
+        return healthMetricPage
+    }
+
 
 
     fun enterOtpAndContinueToHomePage(otp: String): HomePage {
