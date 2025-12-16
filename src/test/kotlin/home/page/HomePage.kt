@@ -4,10 +4,13 @@ import com.microsoft.playwright.*
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import config.TestConfig.json
+import config.TestConfig.APIs.API_PI_DATA
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import model.HomeData
 import model.HomeDataResponse
+import profile.page.ProfilePage
 import utils.DateHelper
 import utils.logger.logger
 import java.time.format.DateTimeFormatter
@@ -18,16 +21,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
-    val profileImage = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
-
-    @OptIn(ExperimentalSerializationApi::class)
-    val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        explicitNulls = true
-        encodeDefaults = true
-    }
+    val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
 
     private var homeData: HomeData? = HomeData()
 
@@ -184,9 +178,12 @@ class HomePage(page: Page) : BasePage(page) {
         return formattedDateTime
     }
 
-    fun clickProfile(): profile.page.ProfilePage {
-        profileImage.click()
-        val profilePage = profile.page.ProfilePage(page)
+    fun clickProfile(): ProfilePage {
+        val response = page.waitForResponse({ it.url().contains(API_PI_DATA) && it.status() == 200 }) {
+            profileImage.click()
+        }
+        val profilePage = ProfilePage(page)
+        profilePage.initData(response.text())
         profilePage.waitForConfirmation()
         return profilePage
     }
