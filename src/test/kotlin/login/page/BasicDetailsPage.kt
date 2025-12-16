@@ -11,27 +11,47 @@ private val logger = KotlinLogging.logger {}
 class BasicDetailsPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
-    override val pageLoadedSelector =  byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Set up your account")).toString()
+
+    private val firstNameInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name"))
+    private val lastNameInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Last name"))
+    private val emailInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email"))
 
 
     fun enterFirstName(firstName: String): BasicDetailsPage {
         logger.info { "enterFirstName($firstName)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name")).fill(firstName)
+        firstNameInput.fill(firstName)
         return this
     }
 
     fun enterLastName(lastName: String): BasicDetailsPage {
         logger.info { "enterLastName($lastName)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Last name")).fill(lastName)
+        lastNameInput.fill(lastName)
         return this
     }
 
     fun enterEmail(email: String): BasicDetailsPage {
         logger.info { "enterEmail($email)" }
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email")).fill(email)
+        emailInput.fill(email)
         return this
     }
 
+    fun clearFirstName(): BasicDetailsPage {
+        logger.info { "clearFirstName()" }
+        firstNameInput.clear()
+        return this
+    }
+
+    fun clearLastName(): BasicDetailsPage {
+        logger.info { "clearLastName()" }
+        lastNameInput.clear()
+        return this
+    }
+
+    fun clearEmail(): BasicDetailsPage {
+        logger.info { "clearEmail()" }
+        emailInput.clear()
+        return this
+    }
 
     fun fillDetails(firstName: String, lastName: String, email: String): BasicDetailsPage {
         logger.info { "fillDetails($firstName, $lastName, $email)" }
@@ -58,13 +78,13 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): BasicDetailsPage {
-        byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name")).waitFor()
+        firstNameInput.waitFor()
         return this
     }
 
 
     fun isFirstNameVisible(): Boolean {
-        return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name")).isVisible
+        return firstNameInput.isVisible
     }
 
     fun isLastNameVisible(): Boolean {
@@ -77,5 +97,9 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
 
     fun isContinueButtonEnabled(): Boolean {
         return byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).isEnabled
+    }
+
+    fun isContinueButtonVisible(): Boolean {
+        return byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).isVisible
     }
 }

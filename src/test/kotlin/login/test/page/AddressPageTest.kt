@@ -120,6 +120,39 @@ class AddressPageTest {
     }
 
     @Test
+    fun `should have Continue disabled with empty address`() {
+        val addressPage = navigateToAddressPage()
+        addressPage.fillAddress("123, Test Street", "Chennai", "Tamil Nadu", "600001")
+        assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        addressPage.clearAddress()
+        assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled when address is empty" }
+        addressPage.takeScreenshot("continue-disabled-empty-address")
+    }
+
+    @Test
+    fun `should have Continue disabled with empty city`() {
+        val addressPage = navigateToAddressPage()
+        addressPage.fillAddress("123, Test Street", "Chennai", "Tamil Nadu", "600001")
+        assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        addressPage.clearCity()
+        assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled when city is empty" }
+        addressPage.takeScreenshot("continue-disabled-empty-city")
+    }
+
+    @Test
+    fun `should have Continue disabled with empty pincode`() {
+        val addressPage = navigateToAddressPage()
+        addressPage.fillAddress("123, Test Street", "Chennai", "Tamil Nadu", "600001")
+        assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        addressPage.clearPinCode()
+        assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled when pincode is empty" }
+        addressPage.takeScreenshot("continue-disabled-empty-pincode")
+    }
+
+    @Test
     fun `should navigate to time slot page on valid submission`() {
         val addressPage = navigateToAddressPage()
 

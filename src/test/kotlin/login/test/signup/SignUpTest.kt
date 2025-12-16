@@ -50,14 +50,15 @@ class SignUpTest {
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue("726408344")
-            .enterOtpAndContinueToAccountCreation("")
-            .fillAndContinue("Play", "Wright", "ranjithkumar.m@mysmitch.com")
-            .fillAndContinue("Male", "170", "70")
+            .enterMobileAndContinue("726408358")
+            .enterOtpAndContinueToAccountCreation("678901")
+            .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
+            .fillAndContinue("Male", "170", "60")
             .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
             .selectSlotsAndContinue()
             .clickContinue()
             .waitForHomePageConfirmation()
+
 
         checkBloodTestBookedCardStatus(homePage)
 

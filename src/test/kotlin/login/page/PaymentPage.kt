@@ -15,7 +15,6 @@ private val logger = KotlinLogging.logger {}
 class PaymentPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login" // URL might remain same if it's an overlay
-    override val pageLoadedSelector = "iframe[src*='razorpay']"
 
     // Razorpay usually loads in an iframe
     private val razorpayFrame: FrameLocator

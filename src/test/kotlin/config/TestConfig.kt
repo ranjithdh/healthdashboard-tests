@@ -52,8 +52,8 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "726408344",
-            otp = ""
+            mobileNumber = "726408358",
+            otp = "678901"
         )
 
         val EXISTING_USER = TestUser(

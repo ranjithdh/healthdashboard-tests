@@ -106,6 +106,28 @@ class PersonalDetailsPageTest {
     }
 
     @Test
+    fun `should have Continue disabled with empty height`() {
+        val personalDetailsPage = navigateToPersonalDetails()
+        personalDetailsPage.fillDetails()
+        assert(personalDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        personalDetailsPage.clearHeight()
+        assert(!personalDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled when height is empty" }
+        personalDetailsPage.takeScreenshot("continue-disabled-empty-height")
+    }
+
+    @Test
+    fun `should have Continue disabled with empty weight`() {
+        val personalDetailsPage = navigateToPersonalDetails()
+        personalDetailsPage.fillDetails()
+        assert(personalDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        personalDetailsPage.clearWeight()
+        assert(!personalDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled when weight is empty" }
+        personalDetailsPage.takeScreenshot("continue-disabled-empty-weight")
+    }
+
+    @Test
     fun `should fill all details correctly`() {
         val personalDetailsPage = navigateToPersonalDetails()
 

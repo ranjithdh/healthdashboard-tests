@@ -15,8 +15,7 @@ private val logger = KotlinLogging.logger {}
 abstract class BasePage(protected val page: Page) {
     
     abstract val pageUrl: String
-    abstract val pageLoadedSelector: String
-    
+
     /**
      * Navigate to this page
      */
@@ -31,21 +30,8 @@ abstract class BasePage(protected val page: Page) {
     /**
      * Wait for page to fully load
      */
-    open fun waitForPageLoad() {
-        page.waitForSelector(pageLoadedSelector, Page.WaitForSelectorOptions()
-                .setState(WaitForSelectorState.VISIBLE)
-                .setTimeout(TestConfig.Timeouts.NAVIGATION_TIMEOUT.toDouble())
-        )
 
-        logger.info { "Page loaded: ${this::class.simpleName}" }
-    }
-    
-    /**
-     * Check if page is currently displayed
-     */
-    open fun isDisplayed(): Boolean {
-        return page.locator(pageLoadedSelector).isVisible
-    }
+
     
     /**
      * Get element with auto-waiting
