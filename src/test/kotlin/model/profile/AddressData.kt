@@ -39,7 +39,7 @@ data class Address(
     val addressLine1: String,
 
     @SerialName("address_line_2")
-    val addressLine2: String?=null,
+    val addressLine2: String?="",
 
     @SerialName("city")
     val city: String,
@@ -51,16 +51,16 @@ data class Address(
     val country: String,
 
     @SerialName("address_type")
-    val addressType: String? = null,
+    val addressType: String? = "",
 
     @SerialName("address_house_no")
-    val addressHouseNo: String? = null,
+    val addressHouseNo: String? = "",
 
     @SerialName("address_mobile")
-    val addressMobile: String? = null,
+    val addressMobile: String? = "",
 
     @SerialName("address_name")
-    val addressName: String? = null,
+    val addressName: String? = "",
 
     @SerialName("is_primary")
     val isPrimary: Boolean

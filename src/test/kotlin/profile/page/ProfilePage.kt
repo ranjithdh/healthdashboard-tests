@@ -15,11 +15,14 @@ import model.profile.AddAddressResponse
 import model.profile.DeleteAddressResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import mu.KotlinLogging
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+
+private val logger = KotlinLogging.logger {}
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -72,6 +75,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     val newAddressDialog: Locator =
         page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Add a new Address"))
+
+
 
 
     fun isSaveAddressDropDownVisible(): Boolean {
@@ -367,6 +372,71 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(parsed.data.isUpdated)
 
     }
+
+    fun editUserAddress() {
+
+        val updateAddressDialog: Locator =
+            page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Update Address"))
+
+        val addresses = addressData?.addressList
+            ?: throw AssertionError("Address list is null from API")
+
+        require(addresses.isNotEmpty()) { "Address list is empty from API" }
+
+        val addressItem = addresses.first()
+        val address = addressItem.address
+
+        val title = address.addressName ?: "Primary"
+        val expectedAddressText = buildAddressText(address)
+
+        /* -------------------------------
+           1️⃣ Locate Address Card
+           ------------------------------- */
+        val addressCard = page
+            .locator("div.border")
+            .filter(
+                Locator.FilterOptions().setHas(
+                    page.getByRole(
+                        AriaRole.HEADING,
+                        Page.GetByRoleOptions().setName(title)
+                    )
+                )
+            )
+            .first()
+
+        addressCard.waitFor()
+
+        /* -------------------------------
+           2️⃣ Validate Address Content
+           ------------------------------- */
+        addressCard
+            .locator("p")
+            .filter(Locator.FilterOptions().setHasText(expectedAddressText))
+            .first()
+            .waitFor()
+
+        /* -------------------------------
+           3️⃣ Click Edit Button
+           ------------------------------- */
+        addressCard.getByText("Edit").first().click()
+        updateAddressDialog.waitFor()
+
+        // Fill inputs (UI)
+
+        nickNameInput.fill(address.addressName.plus(" 103"))
+        mobileNumberInput.fill(address.addressMobile)
+        houseNoInput.fill(address.address)
+        streetAddressInput.fill(address.addressLine1)
+        addressLine2Input.fill(address.addressLine2 ?: "")
+        cityInput.fill(address.city)
+        stateInput.fill(address.state)
+        pincodeInput.fill(address.pincode)
+        countryInput.fill(address.country)
+
+
+        newAddressSubmit.click()
+    }
+
 
 
 

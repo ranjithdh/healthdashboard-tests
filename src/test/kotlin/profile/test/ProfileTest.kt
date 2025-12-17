@@ -161,7 +161,20 @@ class ProfileTest {
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
         profilePage.removeUserAddress()
+    }
 
 
+    @Test
+    fun `profile page edit address`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+        assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
+        profilePage.clickAddressDropDown()
+        profilePage.editUserAddress()
     }
 }
