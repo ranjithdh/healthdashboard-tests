@@ -57,7 +57,7 @@ class SignUpTest {
             .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
             .selectSlotsAndContinue()
             .clickContinue()
-            .waitForHomePageConfirmation()
+            .waitForMobileHomePageConfirmation()
 
 
         checkBloodTestBookedCardStatus(homePage)

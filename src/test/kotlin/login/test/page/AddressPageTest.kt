@@ -163,6 +163,8 @@ class AddressPageTest {
             pinCode = "600001"
         )
 
+        timeSlotPage.waitForConfirmation()
+
         assert(timeSlotPage.hasAvailableSlots()) { "Should be on time slot page" }
         timeSlotPage.takeScreenshot("navigated-to-timeslots")
     }

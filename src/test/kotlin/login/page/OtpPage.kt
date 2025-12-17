@@ -49,12 +49,12 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    fun enterOtpAndContinueToHomePage(otp: String): HomePage {
+    fun enterOtpAndContinueToMobileHomePage(otp: String): HomePage {
         enterOtp(otp)
         clickContinue()
 
         val homePage = HomePage(page)
-        homePage.waitForHomePageConfirmation()
+        homePage.waitForMobileHomePageConfirmation()
 
         return homePage
     }

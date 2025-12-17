@@ -27,7 +27,7 @@ class LoginFlowTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.ANDROID
+        val viewport = TestConfig.Viewports.DESKTOP_HD
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -50,6 +50,8 @@ class LoginFlowTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(tesUser.otp)
+            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+
     }
 }
+

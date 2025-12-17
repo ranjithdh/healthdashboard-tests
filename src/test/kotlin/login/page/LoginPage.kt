@@ -1,5 +1,6 @@
 package login.page
 
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage

@@ -51,7 +51,7 @@ class BloodTestWaitingCardTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val homePage = loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(tesUser.otp)
+            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
 
         if (homePage.isBloodTestCardVisible()){
             checkBloodTestBookedCardStatus(homePage)
