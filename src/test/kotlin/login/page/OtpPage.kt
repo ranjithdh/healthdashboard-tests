@@ -1,17 +1,14 @@
 package login.page
 
-import home.page.HomePage
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import home.page.HomePage
 import mu.KotlinLogging
-import java.util.Scanner
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * OTP Page - handles OTP entry after mobile number submission
- */
+
 class OtpPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
@@ -28,16 +25,6 @@ class OtpPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun enterOtpFromConsole(): BasicDetailsPage {
-        println("\n" + "=".repeat(50))
-        println("📱 Enter the OTP received on your phone:")
-        println("=".repeat(50))
-
-        val scanner = Scanner(System.`in`)
-        val otp = scanner.nextLine().trim()
-
-        return enterOtpAndContinueToAccountCreation(otp)
-    }
 
     fun enterOtpAndContinueToAccountCreation(otp: String): BasicDetailsPage {
         enterOtp(otp)
@@ -71,13 +58,6 @@ class OtpPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun waitAndGetTimerValue(): String? {
-        byText("Resend code in").first().waitFor()
-        return getResendTimerText()
-    }
-
-    // ==================== Visibility Checks ====================
-
     fun isOnConfirmScreen(): Boolean {
         return byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Confirm your number")).isVisible
     }
@@ -88,10 +68,6 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun isResendTimerVisible(): Boolean {
         return byText("Resend code in").first().isVisible
-    }
-
-    fun getTimerText(): String? {
-        return byText("Resend code in").first().textContent()
     }
 
     fun getResendTimerText(): String? {
@@ -110,13 +86,4 @@ class OtpPage(page: Page) : BasePage(page) {
         return byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isVisible
     }
 
-    fun isWhatsAppCheckboxChecked(): Boolean {
-        return byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isChecked
-    }
-
-    fun toggleWhatsAppCheckbox(): OtpPage {
-        logger.info { "toggleWhatsAppCheckbox()" }
-        byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).click()
-        return this
-    }
 }

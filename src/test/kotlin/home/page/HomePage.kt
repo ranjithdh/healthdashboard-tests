@@ -23,9 +23,6 @@ class HomePage(page: Page) : BasePage(page) {
 
     fun waitForMobileHomePageConfirmation(): HomePage {
         logger.info("Waiting for home page confirmation...")
-
-        isLabTestVisible()
-        clickHomeMenu()
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
         return this
     }

@@ -97,27 +97,21 @@ class OrderSummaryPageTest {
     fun `should apply valid coupon and verify discount`() {
         val orderSummaryPage = navigateToOrderSummaryPage()
 
-        // 1. Check initial total
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
 
-        // 2. Apply valid coupon
         val couponCode = "D261C0"
         orderSummaryPage.enterCouponCode(couponCode)
         orderSummaryPage.clickApplyCoupon()
 
-        // 3. Check success checks
         assert(orderSummaryPage.isCouponAppliedSuccessVisible()) { "Success message should be visible" }
         assert(orderSummaryPage.isCouponCodeAppliedVisible(couponCode)) { "Coupon applied text should be visible" }
 
-        // 4. Check new total (1000 minus)
         assert(orderSummaryPage.isTotalAmountVisible("₹8,999")) { "Total should be discounted to ₹8,999" }
 
         orderSummaryPage.takeScreenshot("coupon-applied-successfully")
 
-        // 5. Remove coupon
         orderSummaryPage.removeCoupon()
 
-        // 6. Check empty coupon field / zero discount
         assert(orderSummaryPage.isCouponValueVisible("- ₹0")) { "Coupon discount should be 0 after removal" }
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
         

@@ -1,15 +1,15 @@
 package login.page
 
-import home.page.HomePage
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import home.page.HomePage
 import utils.logger.logger
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login" // Verify if URL changes
+    override val pageUrl = "/login"
 
     fun enterCouponCode(code: String): OrderSummaryPage {
         logger.info { "enterCouponCode($code)" }
@@ -68,15 +68,6 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return byText("Total").isVisible
     }
 
-    fun isReferralDiscountVisible(): Boolean {
-        return byText("Referral discount").isVisible
-    }
-
-    fun getCouponErrorText(): String? {
-        val errorNode = byText("Invalid Referral Code")
-        return if (errorNode.isVisible) errorNode.textContent() else null
-    }
-
     fun isInvalidCouponErrorVisible(): Boolean {
         return byText("Invalid Referral Code").isVisible
     }
@@ -98,22 +89,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun getTotalAmountText(): String {
-        // Assuming the total amount is text in a specific place or we look for the price pattern
-        // The user said: page.getByText("₹9,999")
-        // We will look for elements containing "₹" and return the visible one(s) or specific logic.
-        // For now, let's just make a method to check visibility of a specific amount string as per request logic,
-        // or return a found amount. 
-        // User request validation style: page.getByText("₹9,999")
-        
-        // Let's rely on checking visibility of specific text for the test as requested.
-        return "" 
-    }
-
     fun isTotalAmountVisible(amount: String): Boolean {
-        // "Total" usually has 'text-xl' class as seen in error loop: <span class="text-foreground text-xl font-medium">₹9,999</span>
-        // The item price has 'text-base'.
-        // So we filter by the class to be specific to the Total.
         return page.locator("span.text-xl").getByText(amount).isVisible
     }
 

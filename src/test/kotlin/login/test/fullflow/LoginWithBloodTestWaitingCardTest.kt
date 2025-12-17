@@ -1,12 +1,13 @@
-package login.test.signup
+package login.test.fullflow
 
 import com.microsoft.playwright.*
 import config.TestConfig
+import home.test.checkBloodTestBookedCardStatus
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SignUpTest {
+class LoginWithBloodTestWaitingCardTest {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -44,22 +45,16 @@ class SignUpTest {
     }
 
     @Test
-    fun `should verify signup page links and texts`() {
+    fun `login flow`() {
+        val tesUser = TestConfig.TestUsers.NEW_USER
+
         val loginPage = LoginPage(page).navigate() as LoginPage
+       val homePage = loginPage
+            .enterMobileAndContinue(tesUser.mobileNumber)
+            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
 
-        loginPage.clickSignUp()
+        checkBloodTestBookedCardStatus(homePage)
 
-        assert(loginPage.isSignUpStatsTextVisible()) { "Stats text should be visible" }
-        assert(loginPage.isLabTestsTextVisible()) { "Lab tests text should be visible" }
-        assert(loginPage.isBloodDrawTextVisible()) { "Blood draw text should be visible" }
-        assert(loginPage.isResultsTrackedTextVisible()) { "Results text should be visible" }
-
-        assert(loginPage.clickPrivacyPolicyAndVerifyPopup()) { "Privacy Policy popup header should be visible" }
-        assert(loginPage.clickTermsOfServiceAndVerifyPopup()) { "Terms of Service popup header should be visible" }
-
-        loginPage.clickLogin()
-        assert(loginPage.isLoginHeaderVisible()) { "Should be back on Login page" }
-
-        loginPage.takeScreenshot("signup-links-verified")
     }
 }
+

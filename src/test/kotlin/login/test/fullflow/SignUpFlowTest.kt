@@ -1,12 +1,13 @@
-package login.test.signup
+package login.test.fullflow
 
 import com.microsoft.playwright.*
 import config.TestConfig
+import home.test.checkBloodTestBookedCardStatus
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SignUpTest {
+class SignUpFlowTest {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -44,22 +45,24 @@ class SignUpTest {
     }
 
     @Test
-    fun `should verify signup page links and texts`() {
+    fun `should complete full signup flow`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        loginPage.clickSignUp()
+        val homePage = loginPage
+            .clickSignUp()
+            .enterMobileAndContinue("726408358")
+            .enterOtpAndContinueToAccountCreation("678901")
+            .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
+            .fillAndContinue("Male", "170", "60")
+            .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
+            .selectSlotsAndContinue()
+            .clickContinue()
+            .waitForMobileHomePageConfirmation()
 
-        assert(loginPage.isSignUpStatsTextVisible()) { "Stats text should be visible" }
-        assert(loginPage.isLabTestsTextVisible()) { "Lab tests text should be visible" }
-        assert(loginPage.isBloodDrawTextVisible()) { "Blood draw text should be visible" }
-        assert(loginPage.isResultsTrackedTextVisible()) { "Results text should be visible" }
 
-        assert(loginPage.clickPrivacyPolicyAndVerifyPopup()) { "Privacy Policy popup header should be visible" }
-        assert(loginPage.clickTermsOfServiceAndVerifyPopup()) { "Terms of Service popup header should be visible" }
+        checkBloodTestBookedCardStatus(homePage)
 
-        loginPage.clickLogin()
-        assert(loginPage.isLoginHeaderVisible()) { "Should be back on Login page" }
-
-        loginPage.takeScreenshot("signup-links-verified")
+        homePage.takeScreenshot("signup-order-placed")
     }
+
 }
