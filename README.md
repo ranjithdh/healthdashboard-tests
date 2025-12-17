@@ -17,8 +17,8 @@ Playwright + Kotlin test automation framework for the HealthDashboard applicatio
 git clone <your-repo-url>
 cd healthdashboard-tests
 
-# Install Playwright browsers
-npx playwright install --with-deps
+# Install Playwright browsers (using Gradle task)
+./gradlew installPlaywright
 
 # Run all tests
 ./gradlew test
@@ -267,7 +267,13 @@ fun myCustomAction(): HealthDashboardDsl {
 
 ### Browser not found
 ```bash
-npx playwright install --with-deps
+# Install browsers using Gradle task
+./gradlew installPlaywright
+
+# If that fails, browsers will be downloaded automatically on first test run
+# You can also try clearing Playwright cache:
+rm -rf ~/.cache/ms-playwright
+./gradlew installPlaywright
 ```
 
 ### Tests timing out
