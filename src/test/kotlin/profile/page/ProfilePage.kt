@@ -12,7 +12,6 @@ import config.TestConfig.ACCESS_TOKEN
 import config.TestConfig.CLIENT_ID
 import config.TestConfig.json
 import model.profile.AddAddressResponse
-import model.profile.DeleteAddressResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import mu.KotlinLogging
@@ -22,7 +21,8 @@ import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-private val logger = KotlinLogging.logger {}
+ private val logger = KotlinLogging.logger {}
+const val TAG = "ProfilePage...."
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -75,8 +75,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     val newAddressDialog: Locator =
         page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Add a new Address"))
-
-
 
 
     fun isSaveAddressDropDownVisible(): Boolean {
@@ -400,8 +398,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         updateAddressDialog.waitFor()
 
         // Fill inputs (UI)
-
-        val updatedNickName = address.addressName.plus(" Updated")
+        val number = (0..100).random()
+        val updatedNickName = address.addressName.plus(" Updated").plus(number)
         nickNameInput.fill(updatedNickName)
         mobileNumberInput.fill(address.addressMobile)
         houseNoInput.fill(address.address)
@@ -424,8 +422,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertEquals(address.addressMobile, updatedAddress?.address?.addressMobile)
         assertEquals(address.city, updatedAddress?.address?.city)
     }
-
-
 
 
 }
