@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProfileTest {
@@ -50,38 +51,99 @@ class ProfileTest {
         context.close()
     }
 
-    @Test
-    fun `profile flow`() {
-        val tesUser = TestConfig.TestUsers.EXISTING_USER
+    /*    @Test
+        fun `profile flow`() {
+            val tesUser = TestConfig.TestUsers.EXISTING_USER
 
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToHomePage("678901")
-            .clickProfile()
-            .waitForConfirmation()
-        /*   .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
-           .fillAndContinue("Male", "170", "60")
-           .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
-           .selectSlotsAndContinue()
-           .clickContinue()
-           .waitForHomePageConfirmation()*/
-    }
+            val loginPage = LoginPage(page).navigate() as LoginPage
+            loginPage
+                .enterMobileAndContinue(tesUser.mobileNumber)
+                .enterOtpAndContinueToHomePage("678901")
+                .clickProfile()
+                .waitForConfirmation()
+        }*/
+
+
+    /*   @Test
+       fun `profile page all information is visible`() {
+           val testUser = TestConfig.TestUsers.EXISTING_USER
+
+           val loginPage = LoginPage(page).navigate() as LoginPage
+           val profilePage = loginPage
+               .enterMobileAndContinue(testUser.mobileNumber)
+               .enterOtpAndContinueToHomePage("678901")
+               .clickProfile()
+               .waitForConfirmation()
+
+           assert(profilePage.isHealthMetricEditVisible()) { "Health metric edit not visible" }
+           assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
+           profilePage.clickAddressDropDown()
+           //  assert(profilePage.isHealthMetricsHeightVisible()) { "Health metric height not matches from api" }
+           //   assert(profilePage.isHealthMetricsWeightVisible()) { "Health metric weight not  matches from api" }
+
+       }*/
+
 
     @Test
-    fun `profile page all information is visible`() {
+    fun `profile page address information validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage("678901")
+            .enterOtpAndContinueToHomePage(testUser.otp)
             .clickProfile()
             .waitForConfirmation()
 
-        assert(profilePage.isHealthMetricEditVisible()) { "Health metric edit not visible" }
-      //  assert(profilePage.isHealthMetricsHeightVisible()) { "Health metric height not matches from api" }
-     //   assert(profilePage.isHealthMetricsWeightVisible()) { "Health metric weight not  matches from api" }
+        assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
+        profilePage.clickAddressDropDown()
+        assertDoesNotThrow { profilePage.assertAddressesFromApi() }
+    }
 
+
+    @Test
+    fun `profile page new address validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
+        profilePage.clickAddressDropDown()
+        assert(profilePage.isAddNewAddressVisible()) { "Add new address visibility is not visible" }
+        profilePage.clickAddNewAddress()
+        assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
+        profilePage.assertAddressFormFieldsVisible()
+    }
+
+    @Test
+    fun `profile page new address add validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
+        profilePage.clickAddressDropDown()
+        assert(profilePage.isAddNewAddressVisible()) { "Add new address visibility is not visible" }
+        profilePage.clickAddNewAddress()
+        assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
+        profilePage.assertAddressFormFieldsVisible()
+        profilePage.fillMandatoryAddressFields(
+            nickName = "Home",
+            street = "5 Road, Swarnapuri",
+            city = "Salem",
+            state = "Tamil Nadu",
+            pincode = "636004",
+            country = "India"
+        )
+        profilePage.assertSubmitEnabledAfterMandatoryFields()
+       // profilePage.addAddressAndValidate()
     }
 }

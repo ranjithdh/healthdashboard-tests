@@ -28,10 +28,11 @@ object TestConfig {
 
 
     object APIs {
-        val BASE_URL: String = "https://app.stg.deepholistics.com"
+        val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
 
         val API_PI_DATA = "$BASE_URL/v4/human-token/pii-data"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+        val API_ADD_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
     }
 
 
