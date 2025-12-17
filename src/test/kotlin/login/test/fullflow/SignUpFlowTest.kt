@@ -5,6 +5,7 @@ import config.TestConfig
 import home.test.checkBloodTestBookedCardStatus
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import java.nio.file.Paths
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SignUpFlowTest {
@@ -34,9 +35,15 @@ class SignUpFlowTest {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
+            .setRecordVideoDir(Paths.get(TestConfig.Artifacts.VIDEO_DIR))
+            .setRecordVideoSize(390, 844)
 
         context = browser.newContext(contextOptions)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT)
         page = context.newPage()
+
+        val videoPath = page.video()?.path()
+        println("📹 Video saved to: $videoPath")
     }
 
     @AfterEach
@@ -50,11 +57,11 @@ class SignUpFlowTest {
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue("726408358")
-            .enterOtpAndContinueToAccountCreation("678901")
+            .enterMobileAndContinue("726408303")
+            .enterOtpAndContinueToAccountCreation("")
             .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
             .fillAndContinue("Male", "170", "60")
-            .fillAndContinue("456 Main Road", "Delhi", "Delhi", "110001")
+            .fillAndContinue("Flat 101","456 Main Road", "Delhi", "Delhi", "110001")
             .selectSlotsAndContinue()
             .clickContinue()
             .waitForMobileHomePageConfirmation()

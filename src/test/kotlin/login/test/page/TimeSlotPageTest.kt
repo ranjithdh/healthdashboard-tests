@@ -60,7 +60,7 @@ class TimeSlotPageTest {
             .enterOtpAndContinueToAccountCreation(testUser.otp)
             .fillAndContinue("Test", "User", "test@test.com")
             .fillAndContinue()
-            .fillAndContinue("Test Address", "Chennai", "Tamil Nadu", "600001")
+            .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
     }
 
     @Test

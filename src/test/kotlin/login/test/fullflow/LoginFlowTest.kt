@@ -4,6 +4,10 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.TestUtils
+import java.nio.file.Paths
+
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginFlowTest {
@@ -27,20 +31,31 @@ class LoginFlowTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.DESKTOP_HD
+        val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
+            .setRecordVideoDir(Paths.get(TestConfig.Artifacts.VIDEO_DIR))
+            .setRecordVideoSize(390, 844)
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+
+        val videoPath = page.video()?.path()
+        println("📹 Video saved to: $videoPath")
+
     }
 
     @AfterEach
     fun closeContext() {
         context.close()
+//        TestUtils.closeContextAndSaveVideo(
+//            page = page,
+//            context = context,
+//            "login flow"
+//        )
     }
 
     @Test
@@ -51,6 +66,8 @@ class LoginFlowTest {
         loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
             .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+
+
 
     }
 }

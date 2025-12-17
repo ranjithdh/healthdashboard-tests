@@ -1,5 +1,6 @@
 package login.page
 
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
@@ -45,6 +46,12 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         homePage.waitForMobileHomePageConfirmation()
 
         return homePage
+    }
+
+    fun clickContinueToPayment(): PaymentPage {
+        logger.info { "clickContinueToPayment()" }
+        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+        return PaymentPage(page)
     }
 
     fun waitForConfirmation(): OrderSummaryPage {

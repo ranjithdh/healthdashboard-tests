@@ -40,7 +40,7 @@ healthdashboard-tests/
 │   │   └── HealthDashboardDsl.kt  # Fluent DSL for tests
 │   ├── tests/
 │   │   ├── LoginTest.kt           # Desktop login tests
-│   │   ├── LoginMobileTest.kt     # Mobile login tests
+│   │   ├── LoginMobileTest.kt     # mobileView login tests
 │   │   ├── LoginTabletTest.kt     # Tablet login tests
 │   │   ├── ResponsiveTest.kt      # Cross-viewport tests
 │   │   └── DslExampleTest.kt      # DSL example tests
@@ -58,11 +58,11 @@ healthdashboard-tests/
 ./gradlew test
 ```
 
-### Mobile Tests Only
+### mobileView Tests Only
 ```bash
 ./gradlew mobileTests
 # or
-./gradlew test -Dkotest.tags=Mobile
+./gradlew test -Dkotest.tags=mobileView
 ```
 
 ### Desktop Tests Only
@@ -97,8 +97,8 @@ SLOW_MO=100 ./gradlew test
 
 | Name | Dimensions | Type |
 |------|------------|------|
-| iPhone 13 | 390x844 | Mobile |
-| iPhone SE | 320x568 | Mobile Small |
+| iPhone 13 | 390x844 | mobileView |
+| iPhone SE | 320x568 | mobileView Small |
 | Pixel 5 | 412x915 | Android |
 | iPad | 768x1024 | Tablet |
 | iPad Pro | 1024x1366 | Tablet |
@@ -137,7 +137,7 @@ class MyTest : BaseTest({
 })
 ```
 
-### Mobile-Specific Tests
+### mobileView-Specific Tests
 ```kotlin
 class MyMobileTest : MobileTest({
     
@@ -261,7 +261,7 @@ fun myCustomAction(): HealthDashboardDsl {
 2. **Keep tests independent** - each test should be able to run in isolation
 3. **Use the DSL** for readable, maintainable tests
 4. **Take screenshots** at key points for visual regression
-5. **Tag tests appropriately** (Mobile, Desktop, Tablet) for selective runs
+5. **Tag tests appropriately** (mobileView, Desktop, Tablet) for selective runs
 
 ## 🐛 Troubleshooting
 

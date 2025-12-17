@@ -18,6 +18,20 @@ class AddressPage(page: Page) : BasePage(page) {
     private val pinCodeInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code"))
     private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
+    private val flatHouseNoOrBuildingInput = page.getByText("Flat, House no., Building,")
+
+    fun enterFlatHouseNoOrBuilding(value: String): AddressPage {
+        logger.info { "enterFlatHouseNoOrBuilding($value)" }
+        flatHouseNoOrBuildingInput.fill(value)
+        return this
+    }
+
+    fun clearFlatHouseNoOrBuilding(): AddressPage {
+        logger.info { "clearFlatHouseNoOrBuilding()" }
+        flatHouseNoOrBuildingInput.clear()
+        return this
+    }
+
     fun enterAddress(address: String): AddressPage {
         logger.info { "enterAddress($address)" }
         addressInput.fill(address)
@@ -62,12 +76,14 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
     fun fillAddress(
+        flatHouseNoOrBuilding: String,
         address: String,
         city: String,
         state: String,
         pinCode: String
     ): AddressPage {
-        logger.info { "fillAddress($address, $city, $state, $pinCode)" }
+        logger.info { "fillAddress($flatHouseNoOrBuilding, $address, $city, $state, $pinCode)" }
+        enterFlatHouseNoOrBuilding(flatHouseNoOrBuilding)
         enterAddress(address)
         enterCity(city)
         selectState(state)
@@ -83,13 +99,14 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
     fun fillAndContinue(
+        flatHouseNoOrBuilding: String,
         address: String,
         city: String,
         state: String,
         pinCode: String
     ): TimeSlotPage {
         logger.info { "fillAndContinue()" }
-        fillAddress(address, city, state, pinCode)
+        fillAddress(flatHouseNoOrBuilding, address, city, state, pinCode)
         clickContinue()
         val timeSlotPage = TimeSlotPage(page)
         timeSlotPage.waitForConfirmation()
@@ -97,12 +114,16 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): AddressPage {
-        pinCodeInput.waitFor()
+        flatHouseNoOrBuildingInput.waitFor()
         return this
     }
 
     fun isAddressVisible(): Boolean {
         return addressInput.isVisible
+    }
+
+    fun isFlatHouseNoOrBuildingVisible(): Boolean {
+        return flatHouseNoOrBuildingInput.isVisible
     }
 
     fun isCityVisible(): Boolean {

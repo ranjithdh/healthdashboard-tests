@@ -50,7 +50,8 @@ class HomePage(page: Page) : BasePage(page) {
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
-            }
+                Page.WaitForResponseOptions().setTimeout(TestConfig.Browser.TIMEOUT * 2)
+            },
         )
 
         val responseBody = response.text()
