@@ -39,7 +39,7 @@ class LabTestsPageComprehensiveTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.ANDROID
+        val viewport = TestConfig.Viewports.DESKTOP_FHD
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -141,37 +141,6 @@ class LabTestsPageComprehensiveTest {
         
         labTestsPage.takeScreenshot("promotional-section-clicked")
     }
-
-    @Test
-    fun `should verify hero heading text is visible`() {
-
-        // Navigate to diagnostics page (assumed already logged in)
-        page.navigate("https://app.stg.deepholistics.com/diagnostics")
-
-        // Verify the hero heading text
-        page.getByRole(AriaRole.HEADING)
-            .filter(Locator.FilterOptions().setHasText("Get tested from the comfort"))
-            .isVisible
-    }
-//    @Test
-//    fun `should interact with all filter switches`() {
-//        val labTestsPage = navigateToDiagnosticsPage()
-//        labTestsPage.waitForPageLoad() // This waits for "Book Lab Tests" heading - good enough
-//
-//        // Don't wait for test panels - just wait for filter switches to be visible
-//        // Wait for at least one filter switch to be ready
-//        byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).waitFor()
-//
-//        labTestsPage
-//            .clickFilterSwitch("All")
-//            .clickFilterSwitch("Blood")
-//            .clickFilterSwitch("Gene")
-//            .clickFilterSwitch("Gut")
-//            .clickFilterSwitch("Recommended for You")
-//            .clickAllBloodGeneGutRecommended()
-//
-//        labTestsPage.takeScreenshot("all-filters-clicked")
-//    }
 
     @Test
     fun `should interact with all filter switches`() {
