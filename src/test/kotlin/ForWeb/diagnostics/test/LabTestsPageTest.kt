@@ -1,8 +1,8 @@
-package diagnostics.test
+package forWeb.diagnostics.test
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import diagnostics.page.LabTestsPage
+import forWeb.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
@@ -53,6 +53,7 @@ class LabTestsPageTest {
 //            .enterOtpAndContinueToHomePage(testUser.otp)
             .enterOtpAndContinueToLabTestForWeb((testUser.otp))
     }
+
 
     /**
      * Helper method to login and navigate to ForWeb.diagnostics page
