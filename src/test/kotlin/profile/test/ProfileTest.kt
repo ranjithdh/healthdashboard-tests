@@ -51,19 +51,6 @@ class ProfileTest {
         context.close()
     }
 
-    /*    @Test
-        fun `profile flow`() {
-            val tesUser = TestConfig.TestUsers.EXISTING_USER
-
-            val loginPage = LoginPage(page).navigate() as LoginPage
-            loginPage
-                .enterMobileAndContinue(tesUser.mobileNumber)
-                .enterOtpAndContinueToHomePage("678901")
-                .clickProfile()
-                .waitForConfirmation()
-        }*/
-
-
     /*   @Test
        fun `profile page all information is visible`() {
            val testUser = TestConfig.TestUsers.EXISTING_USER
