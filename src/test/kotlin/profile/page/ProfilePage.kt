@@ -21,7 +21,7 @@ import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
- private val logger = KotlinLogging.logger {}
+ private val Logger = KotlinLogging.logger {}
 const val TAG = "ProfilePage...."
 
 class ProfilePage(page: Page) : BasePage(page) {
@@ -42,7 +42,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         try {
             val response = page.waitForResponse(
                 { response: Response? ->
-                    response?.url()?.contains(TestConfig.APIs.API_ADDRESS) == true && response.status() == 200
+                    response?.url()?.contains(TestConfig.APIs.API_ADDRESS) == true &&
+                            response.status() == 200 &&
+                            response.request().method() == "GET"
                 }, action
             )
 
@@ -286,9 +288,13 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Address list is empty from API"
         }
 
+
+
         val addressItem = addresses.first()
         val address = addressItem.address
         val addressId = addressItem.addressId
+
+        Logger.info { "$TAG {addressId:$addressId}" }
 
         val title = address.addressName ?: "Primary"
         val expectedAddressText = buildAddressText(address)
@@ -344,6 +350,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            6️⃣ Verify Removal
            ------------------------------- */
         val updatedList = addressData?.addressList ?: emptyList()
+        Logger.info { "$TAG {updatedList:$updatedList}" }
         val isRemoved = updatedList.none { it.addressId == addressId }
 
         assertTrue(isRemoved, "Address with ID $addressId was not removed from the list")
