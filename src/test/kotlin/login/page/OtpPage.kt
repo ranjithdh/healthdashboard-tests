@@ -2,9 +2,10 @@ package login.page
 
 import home.page.HomePage
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
-import diagnostics.page.LabTestsPage
+import forWeb.diagnostics.page.LabTestsPage
 import mu.KotlinLogging
 import java.util.Scanner
 
@@ -125,14 +126,31 @@ class OtpPage(page: Page) : BasePage(page) {
         enterOtp(otp)
         clickContinue()
 
+        // Create LabTestsPage instance BEFORE navigation to set up response listener
+        val labTestPage = LabTestsPage(page)
+        
+        // Set up response listener BEFORE navigation to capture API response
+        var capturedResponse: Response? = null
+        val listener = page.onResponse { response ->
+            if (response.url().contains("https://api.stg.dh.deepholistics.com/v4/human-token/lab-test") && response.status() == 200) {
+                capturedResponse = response
+            }
+        }
+
+        // Navigate to diagnostics (API call happens during this navigation)
         page.navigate("https://app.stg.deepholistics.com/diagnostics")
 
-        val labTestPage = LabTestsPage(page)
+        // Remove listener
+//        listener.close()
+
+        // Process captured response if available
+        if (capturedResponse != null) {
+            labTestPage.processApiResponse(capturedResponse!!)
+        }
 
         labTestPage.waitForConfirmation()
 
         logger.info { "enterOtpAndContinueToHomePage($otp)...${page.url()}" }
-
 
         return labTestPage
     }
