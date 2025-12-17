@@ -83,29 +83,59 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun assertAddressesFromApi() {
-        val addresses = addressData?.addressList ?: throw AssertionError("Address list is null from API")
+        val addresses = addressData?.addressList
+            ?: throw AssertionError("Address list is null from API")
 
         addresses.forEach { item ->
             val address = item.address
 
-            // Address title (Primary fallback)
             val title = address.addressName ?: "Primary"
-            page.getByRole(
-                AriaRole.HEADING, Page.GetByRoleOptions().setName(title)
-            ).first().waitFor()
-
-            // Full address text
             val expectedAddressText = buildAddressText(address)
-            page.getByText(expectedAddressText).waitFor()
 
-            // Mobile (only if exists)
+            // Unique address card
+            val addressCard = page
+                .locator("div.border")
+                .filter(
+                    Locator.FilterOptions().setHas(
+                        page.getByRole(
+                            AriaRole.HEADING,
+                            Page.GetByRoleOptions().setName(title)
+                        )
+                    )
+                )
+                .first()
+
+            addressCard.waitFor()
+
+            // ✅ Address text (handles duplicates)
+            addressCard
+                .locator("p")
+                .filter(
+                    Locator.FilterOptions().setHasText(expectedAddressText)
+                )
+                .first()
+                .waitFor()
+
+            // Mobile (optional)
             address.addressMobile?.let {
-                page.getByText("Mobile number: $it").waitFor()
+                addressCard
+                    .locator("p")
+                    .filter(
+                        Locator.FilterOptions().setHasText("Mobile number: $it")
+                    )
+                    .first()
+                    .waitFor()
             }
+
+            // Edit & Remove
+            addressCard.getByText("Edit").first().waitFor()
+            addressCard.getByText("Remove").first().waitFor()
         }
 
-        addNewAddress.waitFor()
+        // Add new address CTA
+        page.getByText("Add a new address").waitFor()
     }
+
 
     fun isAddNewAddressVisible(): Boolean {
         addNewAddress.waitFor()
