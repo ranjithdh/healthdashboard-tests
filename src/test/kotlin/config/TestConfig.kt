@@ -7,10 +7,13 @@ object TestConfig {
 
     object Urls {
         val BASE_URL: String = "https://app.stg.deepholistics.com"
-        val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
+        val HOME_PAGE_URL: String =  "https://app.stg.deepholistics.com/home" //"https://app.stg.deepholistics.com/home"
+        val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
+        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
     }
 
     object Browser {

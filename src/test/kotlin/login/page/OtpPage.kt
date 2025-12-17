@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import home.page.HomePage
+import diagnostics.page.LabTestsPage
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -85,5 +86,32 @@ class OtpPage(page: Page) : BasePage(page) {
     fun isWhatsAppCheckboxVisible(): Boolean {
         return byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isVisible
     }
+
+    fun isWhatsAppCheckboxChecked(): Boolean {
+        return byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isChecked
+    }
+
+    fun toggleWhatsAppCheckbox(): OtpPage {
+        logger.info { "toggleWhatsAppCheckbox()" }
+        byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).click()
+        return this
+    }
+
+    fun enterOtpAndContinueToLabTestForWeb(otp: String): LabTestsPage {
+        enterOtp(otp)
+        clickContinue()
+
+        page.navigate("https://app.stg.deepholistics.com/diagnostics")
+
+        val labTestPage = LabTestsPage(page)
+
+        labTestPage.waitForConfirmation()
+
+        logger.info { "enterOtpAndContinueToHomePage($otp)...${page.url()}" }
+
+
+        return labTestPage
+    }
+
 
 }
