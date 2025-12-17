@@ -332,45 +332,23 @@ class ProfilePage(page: Page) : BasePage(page) {
         val dialog = page.getByRole(AriaRole.DIALOG)
         dialog.waitFor()
 
-        dialog.getByRole(
-            AriaRole.BUTTON,
-            Locator.GetByRoleOptions().setName("Yes, delete")
-        ).click()
+        /* -------------------------------
+           5️⃣ DELETE API CALL (Intercepted)
+           ------------------------------- */
+        captureAddressData {
+             dialog.getByRole(
+                AriaRole.BUTTON,
+                Locator.GetByRoleOptions().setName("Yes, delete")
+            ).click()
+        }
 
         /* -------------------------------
-           5️⃣ DELETE API CALL
+           6️⃣ Verify Removal
            ------------------------------- */
-        val deleteUrl =
-            "${TestConfig.APIs.API_DELETE_ADDRESS}/$addressId"
+        val updatedList = addressData?.addressList ?: emptyList()
+        val isRemoved = updatedList.none { it.addressId == addressId }
 
-        val response = page.request().delete(
-            deleteUrl,
-            RequestOptions.create()
-                .setHeader("access_token", ACCESS_TOKEN)
-                .setHeader("client_id", CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Calcutta")
-                .setHeader("Content-Type", "application/json")
-                .setData("{}")
-        )
-
-        // 4️⃣ HTTP-level validation
-        assertTrue(response.ok(), "API failed with status ${response.status()}")
-
-        /* -------------------------------
-           7️⃣ Parse Response
-           ------------------------------- */
-        val responseBody = response.text()
-
-        val parsed = json.decodeFromString<DeleteAddressResponse>(
-            responseBody
-        )
-
-        /* -------------------------------
-           8️⃣ Business Validation
-           ------------------------------- */
-        assertEquals("success", parsed.status)
-        assertTrue(parsed.data.isUpdated)
-
+        assertTrue(isRemoved, "Address with ID $addressId was not removed from the list")
     }
 
     fun editUserAddress() {
@@ -423,7 +401,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // Fill inputs (UI)
 
-        nickNameInput.fill(address.addressName.plus(" 103"))
+        val updatedNickName = address.addressName.plus(" Updated")
+        nickNameInput.fill(updatedNickName)
         mobileNumberInput.fill(address.addressMobile)
         houseNoInput.fill(address.address)
         streetAddressInput.fill(address.addressLine1)
@@ -434,7 +413,16 @@ class ProfilePage(page: Page) : BasePage(page) {
         countryInput.fill(address.country)
 
 
-        newAddressSubmit.click()
+        captureAddressData {
+            newAddressSubmit.click()
+        }
+
+        val updatedList = addressData?.addressList ?: throw AssertionError("Address list not updated")
+        val updatedAddress = updatedList.find { it.address.addressName == updatedNickName }
+
+        assertEquals(updatedNickName, updatedAddress?.address?.addressName)
+        assertEquals(address.addressMobile, updatedAddress?.address?.addressMobile)
+        assertEquals(address.city, updatedAddress?.address?.city)
     }
 
 
