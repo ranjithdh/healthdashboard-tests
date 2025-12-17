@@ -39,7 +39,7 @@ data class Address(
     val addressLine1: String,
 
     @SerialName("address_line_2")
-    val addressLine2: String,
+    val addressLine2: String?=null,
 
     @SerialName("city")
     val city: String,

@@ -7,6 +7,9 @@ import kotlinx.serialization.json.Json
 
 object TestConfig {
 
+    const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiRkhlRzZ5cTNBWXZtdTR0eGN3OFVqN0VUcmFTMk5LUGsiLCJzZXNzaW9uX2lkIjoiZGNlOTBiNGItODJiMC00Mjc3LWE4NjQtZDdmNWI4MWZjZjc2IiwidXNlcl9pbnRfaWQiOiI0MSIsInByb2ZpbGVfaWQiOiIzMCIsImxlYWRfaWQiOiI2MjBkMTExNi0zMjI3LTQyMjctYWE4OS05OWJkMzgxZDJiIiwiaWF0IjoxNzY1OTUxMzY1LCJleHAiOjE3NjY1NTYxNjV9.7Cv91aR_QGzcTT1BXRnvf8AZ1zToSCPM60ZrzbamZ2E"
+    const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+
 
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {

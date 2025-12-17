@@ -5,10 +5,11 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
-import com.microsoft.playwright.options.LoadState
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import config.TestConfig.ACCESS_TOKEN
+import config.TestConfig.CLIENT_ID
 import config.TestConfig.json
 import model.AddAddressResponse
 import model.UserAddressData
@@ -16,7 +17,6 @@ import model.UserAddressResponse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
-import kotlin.test.DefaultAsserter.assertEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -199,13 +199,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun addAddressAndValidate() {
-        // 1️⃣ Read auth values from browser (same as Network tab)
-        val accessToken = page.evaluate("() => localStorage.getItem('access_token')") as String
-        val clientId = page.evaluate("() => localStorage.getItem('client_id')") as String
-
-        require(accessToken.isNotBlank()) { "access_token is missing" }
-        require(clientId.isNotBlank()) { "client_id is missing" }
-
         // 2️⃣ Prepare request payload
         val payload = mapOf(
             "address_name" to "Home",
@@ -221,8 +214,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         val response = page.request().post(
             TestConfig.APIs.API_ADD_ADDRESS,
             RequestOptions.create()
-                .setHeader("access_token", accessToken)
-                .setHeader("client_id", clientId)
+                .setHeader("access_token", ACCESS_TOKEN)
+                .setHeader("client_id", CLIENT_ID)
                 .setHeader("user_timezone", "Asia/Calcutta")
                 .setHeader("Content-Type", "application/json")
                 .setData(payload)

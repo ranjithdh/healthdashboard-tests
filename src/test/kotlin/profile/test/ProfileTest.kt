@@ -144,6 +144,6 @@ class ProfileTest {
             country = "India"
         )
         profilePage.assertSubmitEnabledAfterMandatoryFields()
-       // profilePage.addAddressAndValidate()
+        profilePage.addAddressAndValidate()
     }
 }
