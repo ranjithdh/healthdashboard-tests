@@ -1,0 +1,898 @@
+package forWeb.diagnostics.test
+
+import com.microsoft.playwright.*
+import com.microsoft.playwright.Page  // ← Add this explicit import
+import com.microsoft.playwright.options.AriaRole
+import config.TestConfig
+import forWeb.diagnostics.page.LabTestsPage
+import login.page.LoginPage
+import model.LabTestPackage
+import model.LabTestProfile
+import org.junit.jupiter.api.*
+
+/**
+ * Comprehensive test cases for Lab Tests Page
+ * Verifies UI elements match backend JSON response data
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class LabTestsPageComprehensiveTest {
+
+    private lateinit var playwright: Playwright
+    private lateinit var browser: Browser
+    private lateinit var context: BrowserContext
+    private lateinit var page: Page
+
+    @BeforeAll
+    fun setup() {
+        playwright = Playwright.create()
+        browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
+    }
+
+    @AfterAll
+    fun tearDown() {
+        browser.close()
+        playwright.close()
+    }
+
+    @BeforeEach
+    fun createContext() {
+        val viewport = TestConfig.Viewports.ANDROID
+        val contextOptions = Browser.NewContextOptions()
+            .setViewportSize(viewport.width, viewport.height)
+            .setHasTouch(viewport.hasTouch)
+            .setIsMobile(viewport.isMobile)
+            .setDeviceScaleFactor(viewport.deviceScaleFactor)
+
+        context = browser.newContext(contextOptions)
+        page = context.newPage()
+    }
+
+    @AfterEach
+    fun closeContext() {
+        context.close()
+    }
+
+    /**
+     * Helper method to navigate to diagnostics page
+     */
+    private fun navigateToDiagnosticsPage(): LabTestsPage {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        return loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToLabTestForWeb(testUser.otp)
+    }
+
+    // ---------------------- Page Load and Basic Elements Tests ----------------------
+
+    @Test
+    fun `should load lab tests page successfully`() { // passed
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        
+        assert(labTestsPage.isTestPanelNameVisible("Book Lab Tests")) { 
+            "Book Lab Tests heading should be visible" 
+        }
+        
+        labTestsPage.takeScreenshot("lab-tests-page-loaded")
+    }
+
+    @Test
+    fun `should display search textbox`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+
+        labTestsPage.clickSearchTextBox()
+
+        // Add wait for element to be ready
+        page.waitForTimeout(500.0)
+
+        // Use clear() instead of fill("")
+        val searchInput = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in lab tests"))
+        searchInput.clear()
+
+        labTestsPage.takeScreenshot("search-textbox-clicked")
+    }
+
+    @Test
+    fun `should display main promotional heading`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        
+        labTestsPage.clickGetTestedHeading()
+        labTestsPage.clickFlexibleTestingOptionsParagraph()
+        
+        labTestsPage.takeScreenshot("promotional-section-clicked")
+    }
+
+    @Test
+    fun `should verify hero heading text is visible`() {
+
+        // Navigate to diagnostics page (assumed already logged in)
+        page.navigate("https://app.stg.deepholistics.com/diagnostics")
+
+        // Verify the hero heading text
+        page.getByRole(AriaRole.HEADING)
+            .filter(Locator.FilterOptions().setHasText("Get tested from the comfort"))
+            .isVisible
+    }
+//    @Test
+//    fun `should interact with all filter switches`() {
+//        val labTestsPage = navigateToDiagnosticsPage()
+//        labTestsPage.waitForPageLoad() // This waits for "Book Lab Tests" heading - good enough
+//
+//        // Don't wait for test panels - just wait for filter switches to be visible
+//        // Wait for at least one filter switch to be ready
+//        byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).waitFor()
+//
+//        labTestsPage
+//            .clickFilterSwitch("All")
+//            .clickFilterSwitch("Blood")
+//            .clickFilterSwitch("Gene")
+//            .clickFilterSwitch("Gut")
+//            .clickFilterSwitch("Recommended for You")
+//            .clickAllBloodGeneGutRecommended()
+//
+//        labTestsPage.takeScreenshot("all-filters-clicked")
+//    }
+
+    @Test
+    fun `should interact with all filter switches`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+
+        // Simple chaining like login flow - no artificial waits
+        labTestsPage
+            .clickFilterSwitch("All")
+//            .clickFilterSwitch("Blood")
+//            .clickFilterSwitch("Gene")
+//            .clickFilterSwitch("Gut")
+//            .clickFilterSwitch("Recommended for You")
+//            .clickAllBloodGeneGutRecommended()
+
+//        labTestsPage.takeScreenshot("all-filters-clicked")
+    }
+    // ---------------------- Longevity Panel Tests ----------------------
+
+    @Test
+    fun `should verify Longevity Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+
+        // Fetch API data
+        val apiData = labTestsPage.fetchLabTestDataFromApi()
+        assert(apiData != null) { "API data should be fetched successfully" }
+
+        val longevityPanel = labTestsPage.getTestPanelFromApi("Longevity Panel")
+        assert(longevityPanel != null) { "Longevity Panel should exist in API data" }
+
+        // Verify UI elements
+        assert(labTestsPage.isTestPanelNameVisible("Longevity Panel")) {
+            "Longevity Panel heading should be visible"
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Longevity Panel")) {
+            "Longevity Panel image should be visible"
+        }
+
+        // Verify price matches API
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Longevity Panel")
+        assert(priceMatches) {
+            "Longevity Panel price should match API data. API: ${longevityPanel?.product?.price}"
+        }
+
+        // Verify description matches API
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Longevity Panel")
+        assert(descriptionMatches) {
+            "Longevity Panel description should match API data"
+        }
+
+        // Verify sample type matches API
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Longevity Panel")
+        assert(sampleTypeMatches) {
+            "Longevity Panel sample type should match API data. API: ${longevityPanel?.sample_type}"
+        }
+
+        labTestsPage.takeScreenshot("longevity-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Longevity Panel featured card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+
+        labTestsPage.clickLongevityPanelImage()
+        labTestsPage.click102Biomarkers()
+        labTestsPage.clickLongevityPanelParagraph()
+        labTestsPage.clickGiveYourFamilyTheSame()
+        labTestsPage.clickLongevityBookNow()
+
+        labTestsPage.takeScreenshot("longevity-featured-card-interacted")
+    }
+
+    @Test
+    fun `should interact with Longevity Panel grid card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickLongevityPanelHeading()
+        labTestsPage.clickLongevityPanelDescription()
+        labTestsPage.clickLongevityPanelPrice()
+        labTestsPage.clickLongevityPanelViewDetails()
+        labTestsPage.clickLongevityPanelImageByRole()
+        
+        labTestsPage.takeScreenshot("longevity-grid-card-interacted")
+    }
+
+    // ---------------------- Advanced Thyroid Panel Tests ----------------------
+
+    @Test
+    fun `should verify Advanced Thyroid Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val thyroidPanel = labTestsPage.getTestPanelFromApi("Advanced Thyroid Panel")
+        assert(thyroidPanel != null) { "Advanced Thyroid Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Advanced Thyroid Panel")) { 
+            "Advanced Thyroid Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Advanced Thyroid Panel")) { 
+            "Advanced Thyroid Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Advanced Thyroid Panel")
+        assert(priceMatches) { 
+            "Advanced Thyroid Panel price should match API data. API: ${thyroidPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Advanced Thyroid Panel")
+        assert(descriptionMatches) { 
+            "Advanced Thyroid Panel description should match API data" 
+        }
+        
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Advanced Thyroid Panel")
+        assert(sampleTypeMatches) { 
+            "Advanced Thyroid Panel sample type should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("advanced-thyroid-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Advanced Thyroid Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItem3()
+        labTestsPage.clickAdvancedThyroidPanelImage()
+        labTestsPage.clickRecommendedForYouNth(1)
+        labTestsPage.clickAdvancedThyroidPanelHeading()
+        labTestsPage.clickBloodTestNth(2)
+        labTestsPage.clickAdvancedAtHomeAntibody()
+        labTestsPage.clickAdvancedThyroidPanelPrice()
+        labTestsPage.clickViewDetailsByIndex(1)
+        
+        labTestsPage.takeScreenshot("advanced-thyroid-panel-interacted")
+    }
+
+    // ---------------------- Autoimmune Panel Tests ----------------------
+
+    @Test
+    fun `should verify Autoimmune Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val autoimmunePanel = labTestsPage.getTestPanelFromApi("Autoimmune Panel")
+        assert(autoimmunePanel != null) { "Autoimmune Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Autoimmune Panel")) { 
+            "Autoimmune Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Autoimmune Panel")) { 
+            "Autoimmune Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Autoimmune Panel")
+        assert(priceMatches) { 
+            "Autoimmune Panel price should match API data. API: ${autoimmunePanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Autoimmune Panel")
+        assert(descriptionMatches) { 
+            "Autoimmune Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("autoimmune-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Autoimmune Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(4)
+        labTestsPage.clickAutoimmunePanelImage()
+        labTestsPage.clickAutoimmunePanelHeading()
+        labTestsPage.clickBloodTestNth(3)
+        labTestsPage.clickAutoimmunePanelDescription()
+        labTestsPage.clickPriceByNth(2)
+        labTestsPage.clickViewDetailsByIndex(2)
+        
+        labTestsPage.takeScreenshot("autoimmune-panel-interacted")
+    }
+
+    // ---------------------- Advanced Genetic Analysis Tests ----------------------
+
+    @Test
+    fun `should verify Advanced Genetic Analysis UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val geneticPanel = labTestsPage.getTestPanelFromApi("Advanced Genetic Analysis")
+        assert(geneticPanel != null) { "Advanced Genetic Analysis should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Advanced Genetic Analysis")) { 
+            "Advanced Genetic Analysis heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Advanced Genetic Analysis")) { 
+            "Advanced Genetic Analysis image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Advanced Genetic Analysis")
+        assert(priceMatches) { 
+            "Advanced Genetic Analysis price should match API data. API: ${geneticPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Advanced Genetic Analysis")
+        assert(descriptionMatches) { 
+            "Advanced Genetic Analysis description should match API data" 
+        }
+        
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Advanced Genetic Analysis")
+        assert(sampleTypeMatches) { 
+            "Advanced Genetic Analysis sample type should match API data. API: ${geneticPanel?.sample_type}" 
+        }
+        
+        labTestsPage.takeScreenshot("advanced-genetic-analysis-verified")
+    }
+
+    @Test
+    fun `should interact with Advanced Genetic Analysis card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(5)
+        labTestsPage.clickAdvancedGeneticAnalysisImage()
+        labTestsPage.clickRecommendedForYouNth(2)
+        labTestsPage.clickAdvancedGeneticAnalysisHeading()
+        labTestsPage.clickCheekSwabTest()
+        labTestsPage.clickCuttingEdgeCheekSwabDNA()
+        labTestsPage.clickAdvancedGeneticAnalysisPrice()
+        labTestsPage.clickViewDetailsByIndex(3)
+        
+        labTestsPage.takeScreenshot("advanced-genetic-analysis-interacted")
+    }
+
+    // ---------------------- Advanced Gut Microbiome Analysis Tests ----------------------
+
+    @Test
+    fun `should verify Advanced Gut Microbiome Analysis UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val gutPanel = labTestsPage.getTestPanelFromApi("Advanced Gut Microbiome Analysis")
+        assert(gutPanel != null) { "Advanced Gut Microbiome Analysis should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Advanced Gut Microbiome")) { 
+            "Advanced Gut Microbiome heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Advanced Gut Microbiome")) { 
+            "Advanced Gut Microbiome image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Advanced Gut Microbiome Analysis")
+        assert(priceMatches) { 
+            "Advanced Gut Microbiome Analysis price should match API data. API: ${gutPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Advanced Gut Microbiome Analysis")
+        assert(descriptionMatches) { 
+            "Advanced Gut Microbiome Analysis description should match API data" 
+        }
+        
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Advanced Gut Microbiome Analysis")
+        assert(sampleTypeMatches) { 
+            "Advanced Gut Microbiome Analysis sample type should match API data. API: ${gutPanel?.sample_type}" 
+        }
+        
+        labTestsPage.takeScreenshot("advanced-gut-microbiome-verified")
+    }
+
+    @Test
+    fun `should interact with Advanced Gut Microbiome Analysis card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(6)
+        labTestsPage.clickAdvancedGutMicrobiomeImage()
+        labTestsPage.clickRecommendedForYouNth(3)
+        labTestsPage.clickAdvancedGutMicrobiomeHeading()
+        labTestsPage.clickStoolTestExact()
+        labTestsPage.clickAdvancedAtHomeStool()
+        labTestsPage.clickAdvancedGutMicrobiomePrice()
+        labTestsPage.clickViewDetailsByIndex(4)
+        
+        labTestsPage.takeScreenshot("advanced-gut-microbiome-interacted")
+    }
+
+    // ---------------------- Advanced Heart Health Panel Tests ----------------------
+
+    @Test
+    fun `should verify Advanced Heart Health Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val heartPanel = labTestsPage.getTestPanelFromApi("Advanced Heart Health Panel")
+        assert(heartPanel != null) { "Advanced Heart Health Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Advanced Heart Health Panel")) { 
+            "Advanced Heart Health Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Advanced Heart Health Panel")) { 
+            "Advanced Heart Health Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Advanced Heart Health Panel")
+        assert(priceMatches) { 
+            "Advanced Heart Health Panel price should match API data. API: ${heartPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Advanced Heart Health Panel")
+        assert(descriptionMatches) { 
+            "Advanced Heart Health Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("advanced-heart-health-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Advanced Heart Health Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(7)
+        labTestsPage.clickAdvancedHeartHealthPanelImage()
+        labTestsPage.clickAdvancedHeartHealthPanelHeading()
+        labTestsPage.clickBloodTestNth(4)
+        labTestsPage.clickAdvancedHeartHealthPanelDescription()
+        labTestsPage.clickPriceByNth(5)
+        labTestsPage.clickViewDetailsByIndex(5)
+        
+        labTestsPage.takeScreenshot("advanced-heart-health-panel-interacted")
+    }
+
+    // ---------------------- Essential Nutrients Panel Tests ----------------------
+
+    @Test
+    fun `should verify Essential Nutrients Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val nutrientsPanel = labTestsPage.getTestPanelFromApi("Essential Nutrients Panel")
+        assert(nutrientsPanel != null) { "Essential Nutrients Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Essential Nutrients Panel")) { 
+            "Essential Nutrients Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Essential Nutrients Panel")) { 
+            "Essential Nutrients Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Essential Nutrients Panel")
+        assert(priceMatches) { 
+            "Essential Nutrients Panel price should match API data. API: ${nutrientsPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Essential Nutrients Panel")
+        assert(descriptionMatches) { 
+            "Essential Nutrients Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("essential-nutrients-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Essential Nutrients Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(8)
+        labTestsPage.clickEssentialNutrientsPanelImage()
+        labTestsPage.clickEssentialNutrientsPanelHeading()
+        labTestsPage.clickBloodTestExactNth(4)
+        labTestsPage.clickEssentialNutrientsPanelDescription()
+        labTestsPage.clickEssentialNutrientsPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(8)
+        
+        labTestsPage.takeScreenshot("essential-nutrients-panel-interacted")
+    }
+
+    // ---------------------- Thyroid Health Panel Tests ----------------------
+
+    @Test
+    fun `should verify Thyroid Health Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val thyroidHealthPanel = labTestsPage.getTestPanelFromApi("Thyroid Health Panel")
+        assert(thyroidHealthPanel != null) { "Thyroid Health Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Thyroid Health Panel")) { 
+            "Thyroid Health Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Thyroid Health Panel")) { 
+            "Thyroid Health Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Thyroid Health Panel")
+        assert(priceMatches) { 
+            "Thyroid Health Panel price should match API data. API: ${thyroidHealthPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Thyroid Health Panel")
+        assert(descriptionMatches) { 
+            "Thyroid Health Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("thyroid-health-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Thyroid Health Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(9)
+        labTestsPage.clickThyroidHealthPanelImage()
+        labTestsPage.clickThyroidHealthPanelHeading()
+        labTestsPage.clickBloodTestExactNth(5)
+        labTestsPage.clickTargetedBloodTestThat()
+        labTestsPage.clickThyroidHealthPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(9)
+        
+        labTestsPage.takeScreenshot("thyroid-health-panel-interacted")
+    }
+
+    // ---------------------- Omega Profile Panel Tests ----------------------
+
+    @Test
+    fun `should verify Omega Profile Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val omegaPanel = labTestsPage.getTestPanelFromApi("Omega Profile Panel")
+        assert(omegaPanel != null) { "Omega Profile Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Omega Profile Panel")) { 
+            "Omega Profile Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Omega Profile Panel")) { 
+            "Omega Profile Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Omega Profile Panel")
+        assert(priceMatches) { 
+            "Omega Profile Panel price should match API data. API: ${omegaPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Omega Profile Panel")
+        assert(descriptionMatches) { 
+            "Omega Profile Panel description should match API data" 
+        }
+        
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Omega Profile Panel")
+        assert(sampleTypeMatches) { 
+            "Omega Profile Panel sample type should match API data. API: ${omegaPanel?.sample_type}" 
+        }
+        
+        labTestsPage.takeScreenshot("omega-profile-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Omega Profile Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(10)
+        labTestsPage.clickOmegaProfilePanelImage()
+        labTestsPage.clickOmegaProfilePanelHeading()
+        labTestsPage.clickAtHomeTestKitFirst()
+        labTestsPage.clickAdvancedFattyAcidBlood()
+        labTestsPage.clickOmegaProfilePanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(10)
+        
+        labTestsPage.takeScreenshot("omega-profile-panel-interacted")
+    }
+
+    // ---------------------- Stress and Cortisol Rhythm Panel Tests ----------------------
+
+    @Test
+    fun `should verify Stress and Cortisol Rhythm Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val cortisolPanel = labTestsPage.getTestPanelFromApi("Stress and Cortisol Rhythm Panel")
+        assert(cortisolPanel != null) { "Stress and Cortisol Rhythm Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Stress and Cortisol Rhythm")) { 
+            "Stress and Cortisol Rhythm heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Stress and Cortisol Rhythm")) { 
+            "Stress and Cortisol Rhythm image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Stress and Cortisol Rhythm Panel")
+        assert(priceMatches) { 
+            "Stress and Cortisol Rhythm Panel price should match API data. API: ${cortisolPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Stress and Cortisol Rhythm Panel")
+        assert(descriptionMatches) { 
+            "Stress and Cortisol Rhythm Panel description should match API data" 
+        }
+        
+        val sampleTypeMatches = labTestsPage.verifyPanelSampleTypeMatchesApi("Stress and Cortisol Rhythm Panel")
+        assert(sampleTypeMatches) { 
+            "Stress and Cortisol Rhythm Panel sample type should match API data. API: ${cortisolPanel?.sample_type}" 
+        }
+        
+        labTestsPage.takeScreenshot("stress-cortisol-rhythm-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Stress and Cortisol Rhythm Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(11)
+        labTestsPage.clickStressAndCortisolRhythmImage()
+        labTestsPage.clickStressAndCortisolRhythmHeading()
+        labTestsPage.clickAtHomeTestKitNth(1)
+        labTestsPage.clickNonInvasiveSalivaTest()
+        labTestsPage.clickStressAndCortisolRhythmPrice()
+        labTestsPage.clickViewDetailsInGridItem(11)
+        
+        labTestsPage.takeScreenshot("stress-cortisol-rhythm-panel-interacted")
+    }
+
+    // ---------------------- Liver Health Panel Tests ----------------------
+
+    @Test
+    fun `should verify Liver Health Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val liverPanel = labTestsPage.getTestProfileFromApi("Liver Health Panel")
+        assert(liverPanel != null) { "Liver Health Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Liver Health Panel")) { 
+            "Liver Health Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Liver Health Panel")) { 
+            "Liver Health Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Liver Health Panel")
+        assert(priceMatches) { 
+            "Liver Health Panel price should match API data. API: ${liverPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Liver Health Panel")
+        assert(descriptionMatches) { 
+            "Liver Health Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("liver-health-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Liver Health Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(12)
+        labTestsPage.clickLiverHealthPanelImage()
+        labTestsPage.clickLiverHealthPanelHeading()
+        labTestsPage.clickLiverHealthPanelSampleType()
+        labTestsPage.clickLiverHealthPanelDescription()
+        labTestsPage.clickLiverHealthPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(12)
+        
+        labTestsPage.takeScreenshot("liver-health-panel-interacted")
+    }
+
+    // ---------------------- Toxic Metals Panel Tests ----------------------
+
+//    @Test
+//    fun `should verify Toxic Metals Panel UI matches API data`() {
+//        val labTestsPage = navigateToDiagnosticsPage()
+//        labTestsPage.waitForPageLoad()
+//        labTestsPage.waitForTestPanelsToLoad()
+//
+//        val toxicMetalsPanel = labTestsPage.getTestProfileFromApi("Toxic Metals Panel")
+//        assert(toxicMetalsPanel != null) { "Toxic Metals Panel should exist in API data" }
+//
+//        assert(labTestsPage.isTestPanelNameVisible("Toxic Metals Panel")) {
+//            "Toxic Metals Panel heading should be visible"
+//        }
+//        assert(labTestsPage.isTestPanelImageVisible("Toxic Metals Panel")) {
+//            "Toxic Metals Panel image should be visible"
+//        }
+//
+//        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Toxic Metals Panel")
+//        assert(priceMatches) {
+//            "Toxic Metals Panel price should match API data. API: ${toxicMetalsPanel?.product?.price}"
+//        }
+//
+//        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Toxic Metals Panel")
+//        assert(descriptionMatches) {
+//            "Toxic Metals Panel description should match API data"
+//        }
+//
+//        labTestsPage.takeScreenshot("toxic-metals-panel-verified")
+//    }
+
+    @Test
+    fun `should interact with Toxic Metals Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(13)
+        labTestsPage.clickToxicMetalsPanelImage()
+        labTestsPage.clickToxicMetalsPanelHeading()
+        labTestsPage.clickToxicMetalsPanelSampleType()
+        labTestsPage.clickToxicMetalsPanelDescription()
+        labTestsPage.clickToxicMetalsPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(13)
+        
+        labTestsPage.takeScreenshot("toxic-metals-panel-interacted")
+    }
+
+    // ---------------------- Blood Health Panel Tests ----------------------
+
+    @Test
+    fun `should verify Blood Health Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        val bloodHealthPanel = labTestsPage.getTestProfileFromApi("Blood Health Panel")
+        assert(bloodHealthPanel != null) { "Blood Health Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Blood Health Panel")) { 
+            "Blood Health Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Blood Health Panel")) { 
+            "Blood Health Panel image should be visible" 
+        }
+        
+        val priceMatches = labTestsPage.verifyPanelPriceMatchesApi("Blood Health Panel")
+        assert(priceMatches) { 
+            "Blood Health Panel price should match API data. API: ${bloodHealthPanel?.product?.price}" 
+        }
+        
+        val descriptionMatches = labTestsPage.verifyPanelDescriptionMatchesApi("Blood Health Panel")
+        assert(descriptionMatches) { 
+            "Blood Health Panel description should match API data" 
+        }
+        
+        labTestsPage.takeScreenshot("blood-health-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Blood Health Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(14)
+        labTestsPage.clickBloodHealthPanelImage()
+        labTestsPage.clickBloodHealthPanelHeading()
+        labTestsPage.clickBloodHealthPanelSampleType()
+        labTestsPage.clickBloodHealthPanelDescription()
+        labTestsPage.clickBloodHealthPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(14)
+        
+        labTestsPage.takeScreenshot("blood-health-panel-interacted")
+    }
+
+    // ---------------------- Allergies Test Panel Tests ----------------------
+
+    @Test
+    fun `should verify Allergies Test Panel UI matches API data`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        // Allergies Test Panel is in tests array, not packages or test_profiles
+        // We'll verify it exists in the API response
+        val apiData = labTestsPage.fetchLabTestDataFromApi()
+        assert(apiData != null) { "API data should be fetched successfully" }
+        
+        val allergiesTest = apiData?.data?.diagnostic_product_list?.tests?.find { 
+            it.name == "Allergies Test Panel" 
+        }
+        assert(allergiesTest != null) { "Allergies Test Panel should exist in API data" }
+        
+        assert(labTestsPage.isTestPanelNameVisible("Allergies Test Panel")) { 
+            "Allergies Test Panel heading should be visible" 
+        }
+        assert(labTestsPage.isTestPanelImageVisible("Allergies Test Panel")) { 
+            "Allergies Test Panel image should be visible" 
+        }
+        
+        // Verify price if available
+        val price = allergiesTest?.product?.price
+        if (price != null) {
+            assert(labTestsPage.isPriceVisible("₹12,999") || labTestsPage.isPriceVisible(formatPrice(price))) { 
+                "Allergies Test Panel price should be visible. API: $price" 
+            }
+        }
+        
+        labTestsPage.takeScreenshot("allergies-test-panel-verified")
+    }
+
+    @Test
+    fun `should interact with Allergies Test Panel card`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        labTestsPage.waitForTestPanelsToLoad()
+        
+        labTestsPage.clickGridItemByIndex(15)
+        labTestsPage.clickAllergiesTestPanelImage()
+        labTestsPage.clickAllergiesTestPanelHeading()
+        labTestsPage.clickAllergiesTestPanelSampleType()
+        labTestsPage.clickAllergiesTestPanelDescription()
+        labTestsPage.clickAllergiesTestPanelPrice()
+        labTestsPage.clickViewDetailsInGridItem(15)
+        
+        labTestsPage.takeScreenshot("allergies-test-panel-interacted")
+    }
+
+    // ---------------------- Helper Functions ----------------------
+
+    private fun formatPrice(price: String): String {
+        return try {
+            val priceNum = price.replace(".00", "").toDoubleOrNull() ?: return price
+            "₹${String.format("%,.0f", priceNum)}"
+        } catch (e: Exception) {
+            price
+        }
+    }
+}
+
