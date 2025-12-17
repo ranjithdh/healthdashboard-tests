@@ -71,7 +71,7 @@ class ProfileTest {
        }*/
 
 
-    @Test
+   @Test
     fun `profile page address information validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 

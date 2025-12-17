@@ -3,15 +3,10 @@ package profile.page
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
-import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
-import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
-import config.TestConfig.ACCESS_TOKEN
-import config.TestConfig.CLIENT_ID
 import config.TestConfig.json
-import model.profile.AddAddressResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import mu.KotlinLogging
@@ -21,7 +16,7 @@ import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
- private val Logger = KotlinLogging.logger {}
+private val Logger = KotlinLogging.logger {}
 const val TAG = "ProfilePage...."
 
 class ProfilePage(page: Page) : BasePage(page) {
@@ -123,11 +118,12 @@ class ProfilePage(page: Page) : BasePage(page) {
                 .waitFor()
 
             // Mobile (optional)
-            address.addressMobile?.let {
+            // Mobile (optional)
+            if (!address.addressMobile.isNullOrBlank()) {
                 addressCard
                     .locator("p")
                     .filter(
-                        Locator.FilterOptions().setHasText("Mobile number: $it")
+                        Locator.FilterOptions().setHasText("Mobile number: ${address.addressMobile}")
                     )
                     .first()
                     .waitFor()
