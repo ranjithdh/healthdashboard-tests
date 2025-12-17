@@ -36,6 +36,7 @@ object TestConfig {
         val API_PI_DATA = "$BASE_URL/v4/human-token/pii-data"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_ADD_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+        val API_DELETE_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
     }
 
 

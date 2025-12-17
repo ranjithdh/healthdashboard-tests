@@ -11,9 +11,10 @@ import config.TestConfig
 import config.TestConfig.ACCESS_TOKEN
 import config.TestConfig.CLIENT_ID
 import config.TestConfig.json
-import model.AddAddressResponse
-import model.UserAddressData
-import model.UserAddressResponse
+import model.profile.AddAddressResponse
+import model.profile.DeleteAddressResponse
+import model.profile.UserAddressData
+import model.profile.UserAddressResponse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -270,6 +271,103 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertEquals("India", address.country)
         assertEquals("communication", address.addressType)
     }
+
+
+
+    fun removeUserAddress() {
+
+        val addresses = addressData?.addressList
+            ?: throw AssertionError("Address list is null from API")
+
+        require(addresses.isNotEmpty()) {
+            "Address list is empty from API"
+        }
+
+        val addressItem = addresses.first()
+        val address = addressItem.address
+        val addressId = addressItem.addressId
+
+        val title = address.addressName ?: "Primary"
+        val expectedAddressText = buildAddressText(address)
+
+        /* -------------------------------
+           1️⃣ Locate Address Card
+           ------------------------------- */
+        val addressCard = page
+            .locator("div.border")
+            .filter(
+                Locator.FilterOptions().setHas(
+                    page.getByRole(
+                        AriaRole.HEADING,
+                        Page.GetByRoleOptions().setName(title)
+                    )
+                )
+            )
+            .first()
+
+        addressCard.waitFor()
+
+        /* -------------------------------
+           2️⃣ Validate Address Content
+           ------------------------------- */
+        addressCard
+            .locator("p")
+            .filter(Locator.FilterOptions().setHasText(expectedAddressText))
+            .first()
+            .waitFor()
+
+        /* -------------------------------
+           3️⃣ Click Remove Button
+           ------------------------------- */
+        addressCard.getByText("Remove").first().click()
+
+        /* -------------------------------
+           4️⃣ Confirm Dialog
+           ------------------------------- */
+        val dialog = page.getByRole(AriaRole.DIALOG)
+        dialog.waitFor()
+
+        dialog.getByRole(
+            AriaRole.BUTTON,
+            Locator.GetByRoleOptions().setName("Yes, delete")
+        ).click()
+
+        /* -------------------------------
+           5️⃣ DELETE API CALL
+           ------------------------------- */
+        val deleteUrl =
+            "${TestConfig.APIs.API_DELETE_ADDRESS}/$addressId"
+
+        val response = page.request().delete(
+            deleteUrl,
+            RequestOptions.create()
+                .setHeader("access_token", ACCESS_TOKEN)
+                .setHeader("client_id", CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Calcutta")
+                .setHeader("Content-Type", "application/json")
+                .setData("{}")
+        )
+
+        // 4️⃣ HTTP-level validation
+        assertTrue(response.ok(), "API failed with status ${response.status()}")
+
+        /* -------------------------------
+           7️⃣ Parse Response
+           ------------------------------- */
+        val responseBody = response.text()
+
+        val parsed = json.decodeFromString<DeleteAddressResponse>(
+            responseBody
+        )
+
+        /* -------------------------------
+           8️⃣ Business Validation
+           ------------------------------- */
+        assertEquals("success", parsed.status)
+        assertTrue(parsed.data.isUpdated)
+
+    }
+
 
 
 }

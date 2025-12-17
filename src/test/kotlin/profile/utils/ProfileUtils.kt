@@ -1,6 +1,6 @@
 package profile.utils
 
-import model.Address
+import model.profile.Address
 
 object ProfileUtils {
 
