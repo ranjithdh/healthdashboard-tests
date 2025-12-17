@@ -8,7 +8,10 @@ import forWeb.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 import model.LabTestPackage
 import model.LabTestProfile
+import mu.KotlinLogging
 import org.junit.jupiter.api.*
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Comprehensive test cases for Lab Tests Page
@@ -140,18 +143,35 @@ class LabTestsPageComprehensiveTest {
     fun `should interact with all filter switches`() {
         val labTestsPage = navigateToDiagnosticsPage()
         labTestsPage.waitForPageLoad()
+        // waitForTestPanelsToLoad() will fetch API data during page load
         labTestsPage.waitForTestPanelsToLoad()
 
-        // Simple chaining like login flow - no artificial waits
+        // Check if "Recommended for You" filter should be available based on API data
+        // Filter should be shown if any item has content.why_test with length > 0
+        // This uses cached API data from waitForTestPanelsToLoad()
+        val hasRecommended = labTestsPage.hasRecommendedFilterAvailable()
+        
+        // Verify UI matches API logic: if API says it should be available, it should be visible
+        val isRecommendedVisible = labTestsPage.isRecommendedFilterVisible()
+        assert(hasRecommended == isRecommendedVisible) {
+            "Recommended filter visibility should match API data. API indicates available: $hasRecommended, UI shows visible: $isRecommendedVisible"
+        }
+
+        // Now interact with all filter switches
         labTestsPage
             .clickFilterSwitch("All")
-//            .clickFilterSwitch("Blood")
-//            .clickFilterSwitch("Gene")
-//            .clickFilterSwitch("Gut")
-//            .clickFilterSwitch("Recommended for You")
-//            .clickAllBloodGeneGutRecommended()
+            .clickFilterSwitch("Blood")
+            .clickFilterSwitch("Gene")
+            .clickFilterSwitch("Gut")
+        
+        // Only click "Recommended for You" if it's available (matches web logic)
+        if (hasRecommended && isRecommendedVisible) {
+            labTestsPage.clickFilterSwitch("Recommended for You")
+        } else {
+            logger.info { "Skipping 'Recommended for You' filter - not available based on API data" }
+        }
 
-//        labTestsPage.takeScreenshot("all-filters-clicked")
+        labTestsPage.takeScreenshot("all-filters-clicked")
     }
     // ---------------------- Longevity Panel Tests ----------------------
 

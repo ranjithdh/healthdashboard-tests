@@ -42,37 +42,102 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation() {
-        page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
+        // Use waitForResponse with callback (matching HomePage.kt pattern)
+        // This will capture the API response that comes during URL wait
+        try {
+            val response = page.waitForResponse(
+                { response: Response? ->
+                    response?.url()
+                        ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
+                },
+                {
+                    // Callback: wait for diagnostics URL
+                    // The API response will come during this wait
+                    page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
+                }
+            )
+
+            // Process the captured response
+            val responseBodyBytes = response.body()
+            if (responseBodyBytes != null && responseBodyBytes.isNotEmpty()) {
+                val responseBody = String(responseBodyBytes)
+                try {
+                    val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
+                    labTestData = responseObj
+                    logger.info { "API data captured during waitForConfirmation" }
+                } catch (e: Exception) {
+                    logger.warn { "Failed to parse API response: ${e.message}" }
+                }
+            }
+        } catch (e: Exception) {
+            logger.warn { "Could not capture API response in waitForConfirmation: ${e.message}" }
+            // Fallback: ensure URL is loaded even if API capture failed
+            page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
+        }
+    }
+
+    /**
+     * Process API response that was captured externally (e.g., via onResponse listener)
+     */
+    fun processApiResponse(response: Response) {
+        try {
+            val responseBodyBytes = response.body()
+            if (responseBodyBytes != null && responseBodyBytes.isNotEmpty()) {
+                val responseBody = String(responseBodyBytes)
+                val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
+                labTestData = responseObj
+                logger.info { "API data processed from captured response" }
+            }
+        } catch (e: Exception) {
+            logger.warn { "Failed to process captured API response: ${e.message}" }
+        }
     }
 
     /**
      * Fetch lab test data from API
+     * Returns cached data if available, otherwise waits for API response
      */
     fun fetchLabTestDataFromApi(): LabTestResponse? {
-        val response = page.waitForResponse(
-            { response: Response? ->
-                response?.url()
-                    ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
-            },
-            {
-                page.waitForURL(TestConfig.Urls.DIAGNOSTICS_URL)
-            }
-        )
-
-        val responseBody = response.text()
-        if (responseBody.isNullOrBlank()) {
-            logger.info { "API response body is empty" }
-            return null
+        // Return cached data if already fetched
+        if (labTestData != null) {
+            logger.info { "Using cached API data" }
+            return labTestData
         }
 
-        logger.info { "API response received" }
-
+        // Wait for API response using Runnable callback pattern (matching HomePage.kt)
         try {
-            val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
-            labTestData = responseObj
-            return responseObj
+            val response = page.waitForResponse(
+                { response: Response? ->
+                    response?.url()
+                        ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
+                },
+                {
+                    // Callback - wait for diagnostics URL to ensure page is loaded
+                    page.waitForURL(TestConfig.Urls.DIAGNOSTICS_URL)
+                }
+            )
+
+            val responseBodyBytes = response.body()
+            if (responseBodyBytes == null || responseBodyBytes.isEmpty()) {
+                logger.info { "API response body is empty" }
+                return null
+            }
+
+            logger.info { "API response received" }
+
+            try {
+                val responseBody = String(responseBodyBytes)
+                val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
+                labTestData = responseObj
+                return responseObj
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response: ${e.message}" }
+                return null
+            }
         } catch (e: Exception) {
-            logger.error { "Failed to parse API response: ${e.message}" }
+            logger.warn { "Could not wait for API response (may have already been received): ${e.message}" }
+            // If waitForResponse times out, the response may have already been received
+            // In this case, we'll return null and the test should handle it gracefully
             return null
         }
     }
@@ -95,11 +160,19 @@ class LabTestsPage(page: Page) : BasePage(page) {
 //        return this
 //    }
     /**
-     * Wait for test panels to load
+     * Wait for test panels to load and fetch API data
      */
     fun waitForTestPanelsToLoad(): LabTestsPage {
         // Wait for filter switches instead - they're more reliable
         byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).waitFor()
+
+        // Fetch API data during page load (before it times out)
+        // This ensures we capture the API response that happens during initial page load
+        try {
+            fetchLabTestDataFromApi()
+        } catch (e: Exception) {
+            logger.warn { "Could not fetch API data during page load: ${e.message}" }
+        }
 
         // Optionally check for test panels, but don't fail if they don't exist
         try {
@@ -1325,6 +1398,56 @@ class LabTestsPage(page: Page) : BasePage(page) {
         val panel = getTestPanelByName(testName)
         panel?.scrollIntoViewIfNeeded()
         return this
+    }
+
+    /**
+     * Check if "Recommended for You" filter should be available
+     * Based on web logic: filter should be shown if any item has content.why_test with length > 0
+     */
+    fun hasRecommendedFilterAvailable(): Boolean {
+        val apiData = labTestData ?: fetchLabTestDataFromApi()
+        if (apiData == null || apiData.data == null) {
+            logger.warn { "API data not available, cannot determine if Recommended filter should be shown" }
+            return false
+        }
+
+        val diagnosticProductList = apiData.data.diagnostic_product_list ?: return false
+        
+        // Check packages - filter should be shown if any item has content.why_test with length > 0
+        val packages = diagnosticProductList.packages ?: emptyList()
+        val hasRecommendedInPackages = packages.any { packageItem ->
+            !packageItem.content?.why_test.isNullOrEmpty()
+        }
+        
+        // Check test_profiles
+        val testProfiles = diagnosticProductList.test_profiles ?: emptyList()
+        val hasRecommendedInProfiles = testProfiles.any { profile ->
+            !profile.content?.why_test.isNullOrEmpty()
+        }
+        
+        // Check tests
+        val tests = diagnosticProductList.tests ?: emptyList()
+        val hasRecommendedInTests = tests.any { test ->
+            !test.content?.why_test.isNullOrEmpty()
+        }
+        
+        val hasRecommended = hasRecommendedInPackages || hasRecommendedInProfiles || hasRecommendedInTests
+        
+        logger.info { "Recommended filter available: $hasRecommended (packages: $hasRecommendedInPackages, profiles: $hasRecommendedInProfiles, tests: $hasRecommendedInTests)" }
+        
+        return hasRecommended
+    }
+
+    /**
+     * Check if "Recommended for You" filter switch is visible on the page
+     */
+    fun isRecommendedFilterVisible(): Boolean {
+        return try {
+            val recommendedSwitch = byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Recommended for You"))
+            recommendedSwitch.isVisible
+        } catch (e: Exception) {
+            false
+        }
     }
 }
 
