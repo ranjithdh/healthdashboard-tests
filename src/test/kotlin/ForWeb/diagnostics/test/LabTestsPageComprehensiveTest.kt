@@ -81,6 +81,40 @@ class LabTestsPageComprehensiveTest {
     }
 
     @Test
+    fun `should display all static page elements`() {
+        val labTestsPage = navigateToDiagnosticsPage()
+        labTestsPage.waitForPageLoad()
+        
+        // Verify "Book Lab Tests" heading is visible
+        val bookLabTestsHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests"))
+        bookLabTestsHeading.waitFor()
+        assert(bookLabTestsHeading.isVisible) {
+            "Static element 'Book Lab Tests' heading should be visible"
+        }
+        logger.info { "✓ 'Book Lab Tests' heading is visible" }
+        
+        // Verify "Get tested from the comfort of your home" heading is visible
+        val heroHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Get tested from the comfort"))
+        heroHeading.waitFor()
+        assert(heroHeading.isVisible) {
+            "Static element 'Get tested from the comfort of your home' heading should be visible"
+        }
+        logger.info { "✓ 'Get tested from the comfort of your home' heading is visible" }
+        
+        // Verify "With flexible testing options..." paragraph is visible
+        val flexibleOptionsParagraph = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("With flexible testing options"))
+        flexibleOptionsParagraph.waitFor()
+        assert(flexibleOptionsParagraph.isVisible) {
+            "Static element 'With flexible testing options' paragraph should be visible"
+        }
+        logger.info { "✓ 'With flexible testing options' paragraph is visible" }
+        
+        labTestsPage.takeScreenshot("static-elements-verified")
+        logger.info { "All 3 static elements verified successfully" }
+    }
+
+    @Test
     fun `should display search textbox`() {
         val labTestsPage = navigateToDiagnosticsPage()
         labTestsPage.waitForPageLoad()
