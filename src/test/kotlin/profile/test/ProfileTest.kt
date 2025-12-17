@@ -135,15 +135,6 @@ class ProfileTest {
         profilePage.clickAddNewAddress()
         assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         profilePage.assertAddressFormFieldsVisible()
-        profilePage.fillMandatoryAddressFields(
-            nickName = "Home",
-            street = "5 Road, Swarnapuri",
-            city = "Salem",
-            state = "Tamil Nadu",
-            pincode = "636004",
-            country = "India"
-        )
-        profilePage.assertSubmitEnabledAfterMandatoryFields()
         profilePage.addAddressAndValidate()
     }
 

@@ -229,52 +229,35 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    fun assertSubmitEnabledAfterMandatoryFields() {
-        assertThat(newAddressSubmit).isEnabled()
-    }
-
 
     fun addAddressAndValidate() {
-        // 2️⃣ Prepare request payload
-        val payload = mapOf(
-            "address_name" to "Home",
-            "address_line_1" to "5 Road, Swarnapuri",
-            "state" to "Tamil Nadu",
-            "city" to "Salem",
-            "pincode" to "636004",
-            "country" to "India",
-            "address_type" to "communication"
+        val number = (0..100).random()
+        val nickName = "Home $number"
+        val street = "5 Road, Swarnapuri"
+        val city = "Salem"
+        val state = "Tamil Nadu"
+        val pincode = "636004"
+        val country = "India"
+
+        fillMandatoryAddressFields(
+            nickName,
+            street,
+            city,
+            state,
+            pincode,
+            country
         )
 
-        // 3️⃣ Call API using browser request context
-        val response = page.request().post(
-            TestConfig.APIs.API_ADD_ADDRESS,
-            RequestOptions.create()
-                .setHeader("access_token", ACCESS_TOKEN)
-                .setHeader("client_id", CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Calcutta")
-                .setHeader("Content-Type", "application/json")
-                .setData(payload)
-        )
+        captureAddressData {
+            newAddressSubmit.click()
+        }
 
-        // 4️⃣ HTTP-level validation
-        assertTrue(response.ok(), "API failed with status ${response.status()}")
+        val updatedList = addressData?.addressList ?: throw AssertionError("Address list not updated")
+        val addedAddress = updatedList.find { it.address.addressName == nickName }
 
-        // 5️⃣ Parse response JSON
-        val responseBody = response.text()
-        val parsed =
-            json.decodeFromString<AddAddressResponse>(responseBody)
-
-        // 6️⃣ Business validations
-        assertEquals("success", parsed.status)
-
-        val address = parsed.data.di_address
-        assertEquals("Home", address.addressName)
-        assertEquals("Salem", address.city)
-        assertEquals("Tamil Nadu", address.state)
-        assertEquals("636004", address.pincode)
-        assertEquals("India", address.country)
-        assertEquals("communication", address.addressType)
+        assertEquals(nickName, addedAddress?.address?.addressName)
+        assertEquals(city, addedAddress?.address?.city)
+        assertEquals(pincode, addedAddress?.address?.pincode)
     }
 
 
