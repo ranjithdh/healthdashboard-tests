@@ -1,14 +1,15 @@
 package home.page
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import model.HomeData
-import model.HomeDataResponse
+import model.home.HomeData
+import model.home.HomeDataResponse
 import utils.DateHelper
+import utils.json.json
 import utils.logger.logger
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -18,28 +19,22 @@ class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
-    @OptIn(ExperimentalSerializationApi::class)
-    val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        explicitNulls = true
-        encodeDefaults = true
-    }
-
     private var homeData: HomeData? = HomeData()
 
-    fun waitForHomePageConfirmation(): HomePage {
+    fun waitForMobileHomePageConfirmation(): HomePage {
+        logger.info("Waiting for home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
         return this
     }
 
     fun isBloodTestCardVisible(): Boolean {
-       return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
+        return page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
     }
 
     fun waitForBloodTestCardToLoad(): HomePage {
-        page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).waitFor()
+        page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view"))
+            .waitFor()
         return this
     }
 
@@ -55,7 +50,8 @@ class HomePage(page: Page) : BasePage(page) {
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
-            }
+                Page.WaitForResponseOptions().setTimeout(TestConfig.Browser.TIMEOUT * 2)
+            },
         )
 
         val responseBody = response.text()
@@ -79,7 +75,8 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun isPhlebotomistAssignedTitleVisible(): Boolean {
-        return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Phlebotomist assigned")).isVisible
+        return page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Phlebotomist assigned")).isVisible
     }
 
     fun isPhlebotomistAssignedDateVisible(): Boolean {
@@ -90,7 +87,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isSampleCollectionTitleVisible(): Boolean {
-        return  page.getByText("Sample collection",Page.GetByTextOptions().setExact(true)).isVisible
+        return page.getByText("Sample collection", Page.GetByTextOptions().setExact(true)).isVisible
     }
 
     fun isSampleCollectionDateVisible(): Boolean {
@@ -119,7 +116,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isTBloodTestCancelled(): Boolean {
-        return   page.getByText("Sample collection",Page.GetByTextOptions().setExact(true)).isVisible &&
+        return page.getByText("Sample collection", Page.GetByTextOptions().setExact(true)).isVisible &&
                 page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Cancelled")).isVisible
     }
 
@@ -149,7 +146,7 @@ class HomePage(page: Page) : BasePage(page) {
 
         val endTime = localDate.plusMinutes(30)
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM, hh:mm",Locale.ENGLISH)
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd MMMM, hh:mm", Locale.ENGLISH)
         val endTimeFormatter = DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
 
         val formattedDateTime = dateTimeFormatter.format(localDate)
@@ -178,4 +175,18 @@ class HomePage(page: Page) : BasePage(page) {
         }
         return formattedDateTime
     }
+
+
+    fun isLabTestVisible() {
+        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Home")).waitFor()
+    }
+
+    fun clickHomeMenu(): HomePage {
+        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Home")).click()
+
+        logger.info("" +
+                "page url.........${page.url()}")
+        return this
+    }
+
 }

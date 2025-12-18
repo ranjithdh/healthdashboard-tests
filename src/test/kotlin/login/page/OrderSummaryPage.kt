@@ -1,19 +1,16 @@
 package login.page
 
-import home.page.HomePage
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
-import mu.KotlinLogging
+import home.page.HomePage
+import utils.logger.logger
 
-private val logger = KotlinLogging.logger {}
 
-/**
- * OrderSummaryPage - Handles order review, coupon application, and final continuation.
- */
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login" // Verify if URL changes
+    override val pageUrl = "/login"
 
     fun enterCouponCode(code: String): OrderSummaryPage {
         logger.info { "enterCouponCode($code)" }
@@ -46,9 +43,15 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
 
         val homePage = HomePage(page)
-        homePage.waitForHomePageConfirmation()
+        homePage.waitForMobileHomePageConfirmation()
 
         return homePage
+    }
+
+    fun clickContinueToPayment(): PaymentPage {
+        logger.info { "clickContinueToPayment()" }
+        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+        return PaymentPage(page)
     }
 
     fun waitForConfirmation(): OrderSummaryPage {
@@ -72,16 +75,32 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return byText("Total").isVisible
     }
 
-    fun isReferralDiscountVisible(): Boolean {
-        return byText("Referral discount").isVisible
-    }
-
-    fun getCouponErrorText(): String? {
-        val errorNode = byText("Invalid Referral Code")
-        return if (errorNode.isVisible) errorNode.textContent() else null
-    }
-
     fun isInvalidCouponErrorVisible(): Boolean {
         return byText("Invalid Referral Code").isVisible
+    }
+
+    fun isCouponAppliedSuccessVisible(): Boolean {
+        return byText("Offer has been successfully").isVisible
+    }
+
+    fun isCouponCodeAppliedVisible(code: String): Boolean {
+        return page.locator("div")
+            .filter(com.microsoft.playwright.Locator.FilterOptions().setHasText(java.util.regex.Pattern.compile("^$code applied$")))
+            .nth(1)
+            .isVisible
+    }
+    
+    fun removeCoupon(): OrderSummaryPage {
+        logger.info { "removeCoupon()" }
+        byRole(AriaRole.IMG).nth(3).click()
+        return this
+    }
+
+    fun isTotalAmountVisible(amount: String): Boolean {
+        return page.locator("span.text-xl").getByText(amount).isVisible
+    }
+
+    fun isCouponValueVisible(value: String): Boolean {
+        return byText(value).isVisible
     }
 }
