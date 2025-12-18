@@ -766,6 +766,43 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     }
 
+    fun accountInformationEditClose() {
+        fetchAccountInformation()
+        waitForViewProfileLoaded()
+
+        val editProfile = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Edit Profile"))
+        val close = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close"))
+
+        editProfile.waitFor()
+        editProfile.click()
+        waitForEditProfileLoaded()
+
+
+        val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
+        val editDob = formatDobToDdMmYyyy(piiData?.dob)
+        val viewDob = formatDobWithAge(piiData?.dob)
+
+
+        assertEditProfileDetails(
+            name = piiData?.name ?: "",
+            email = piiData?.email ?: "",
+            dob = editDob,
+            countryCode = mobileNumber
+        )
+
+        close.click()
+
+        waitForViewProfileLoaded()
+
+        assertViewProfileDetails(
+            name = piiData?.name ?: "",
+            email = piiData?.email ?: "",
+            dob = viewDob,
+            countryCode = mobileNumber
+        )
+
+    }
+
     private fun fieldContainer(label: String): Locator {
         return page.locator("h5", Page.LocatorOptions().setHasText(label))
             .locator("xpath=ancestor::div[.//h5][1]")

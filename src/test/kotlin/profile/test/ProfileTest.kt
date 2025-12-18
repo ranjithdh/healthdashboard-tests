@@ -175,4 +175,19 @@ class ProfileTest {
 
         profilePage.accountInformationEdit()
     }
+
+    @Test
+    fun `account information edit with close`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        profilePage.accountInformationEditClose()
+    }
 }
