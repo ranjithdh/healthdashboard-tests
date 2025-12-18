@@ -7,13 +7,9 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
-import model.profile.PiiData
-import model.profile.PiiUserResponse
-import model.profile.UserAddressData
-import model.profile.UserAddressResponse
-import model.profile.PreferenceUpdateResponse
-import model.profile.UserPreferenceResponse
+import model.profile.*
 import profile.utils.ProfileUtils.buildAddressText
+import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -663,14 +659,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
+    //validation
     fun accountInformationValidation() {
         fetchAccountInformation()
-        waitForProfileLoaded()
+        waitForViewProfileLoaded()
 
         val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
         val dob = formatDobWithAge(piiData?.dob)
 
-        assertProfileDetails(
+        assertViewProfileDetails(
             name = piiData?.name ?: "",
             email = piiData?.email ?: "",
             dob = dob,
@@ -678,6 +675,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
     }
+
+
 
 
     private fun valueByLabel(label: String): Locator {
@@ -689,15 +688,14 @@ class ProfilePage(page: Page) : BasePage(page) {
             .first()
     }
 
-    fun waitForProfileLoaded() {
+    fun waitForViewProfileLoaded() {
         valueByLabel("Name").waitFor()
         valueByLabel("Email").waitFor()
         valueByLabel("Date of Birth").waitFor()
         valueByLabel("Mobile Number").waitFor()
     }
 
-
-    fun assertProfileDetails(
+    fun assertViewProfileDetails(
         name: String,
         email: String,
         dob: String,
@@ -708,14 +706,94 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(valueByLabel("Email").innerText().equals(email))
         assertTrue(valueByLabel("Date of Birth").innerText().equals(dob))
         assertTrue(valueByLabel("Mobile Number").innerText().equals(countryCode))
+
         logger.info {
-            "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${valueByLabel("Date of Birth").innerText()} : $dob, ${
+            "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${
+                valueByLabel(
+                    "Date of Birth"
+                ).innerText()
+            } : $dob, ${
                 valueByLabel(
                     "Mobile Number"
                 ).innerText()
             } : $countryCode"
         }
     }
+
+
+    //edit
+    fun accountInformationEdit() {
+        fetchAccountInformation()
+        waitForViewProfileLoaded()
+
+        val editProfile = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Edit Profile"))
+        editProfile.waitFor()
+        editProfile.click()
+        waitForEditProfileLoaded()
+
+
+        /*  val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
+          val dob = formatDobToDdMmYyyy(piiData?.dob)
+
+          assertEditProfileDetails(
+              name = piiData?.name ?: "",
+              email = piiData?.email ?: "",
+              dob = dob,
+              countryCode = mobileNumber
+          )*/
+    }
+
+    private fun fieldContainer(label: String): Locator {
+        return page.locator("h5", Page.LocatorOptions().setHasText(label))
+            .locator("xpath=ancestor::div[.//h5][1]")
+    }
+
+    fun editableInputByLabel(label: String): Locator {
+        return fieldContainer(label)
+            .locator("input")
+            .first()
+    }
+
+
+    fun waitForEditProfileLoaded() {
+        editableInputByLabel("Name").waitFor()
+        editableInputByLabel("Email").waitFor()
+        editableInputByLabel("Date of Birth").waitFor()
+
+        // Mobile Number is read-only
+        readOnlyValueByLabel("Mobile Number").waitFor()
+    }
+
+    fun readOnlyValueByLabel(label: String): Locator {
+        return fieldContainer(label)
+            .locator("p")
+    }
+
+
+    /*  fun assertEditProfileDetails(
+          name: String,
+          email: String,
+          dob: String,
+          countryCode: String
+      ) {
+
+          assertTrue(inputByHeading("Name").innerText().equals(name))
+          assertTrue(inputByHeading("Email").innerText().equals(email))
+          assertTrue(inputByHeading("Date of Birth").innerText().equals(dob))
+          assertTrue(inputByHeading("Mobile Number").innerText().equals(countryCode))
+
+          logger.info {
+              "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${
+                  valueByLabel(
+                      "Date of Birth"
+                  ).innerText()
+              } : $dob, ${
+                  valueByLabel(
+                      "Mobile Number"
+                  ).innerText()
+              } : $countryCode"
+          }
+      }*/
 
 }
 

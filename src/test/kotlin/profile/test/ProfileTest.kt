@@ -173,6 +173,6 @@ class ProfileTest {
             .clickProfile()
             .waitForConfirmation()
 
-        profilePage.accountInformationValidation()
+        profilePage.accountInformationEdit()
     }
 }

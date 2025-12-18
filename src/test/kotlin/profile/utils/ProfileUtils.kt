@@ -48,4 +48,26 @@ object ProfileUtils {
         return "$formattedDate ($age Years)"
     }
 
+
+    fun formatDobToDdMmYyyy(
+        utcIso: String?,
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): String {
+        if (utcIso.isNullOrBlank()) return ""
+
+        // 1️⃣ Parse UTC ISO
+        val instant = Instant.parse(utcIso)
+
+        // 2️⃣ Convert to local timezone
+        val localDate = instant.atZone(zoneId).toLocalDate()
+
+        // 3️⃣ Format as dd/MM/yyyy
+        val formatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
+
+        return localDate.format(formatter)
+    }
+
+
+
 }
