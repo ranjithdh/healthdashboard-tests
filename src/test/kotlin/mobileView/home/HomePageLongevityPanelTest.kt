@@ -1,10 +1,10 @@
-package home.test
+package mobileView.home
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import home.page.HomePage
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BloodTestWaitingCardTest {
@@ -57,19 +57,38 @@ class BloodTestWaitingCardTest {
             checkBloodTestBookedCardStatus(homePage)
         }
     }
+
+    @Test
+    fun `login and check the blood test status cancelled state`() {
+        val tesUser = TestConfig.TestUsers.NEW_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val homePage = loginPage
+            .enterMobileAndContinue(tesUser.mobileNumber)
+            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+
+        if (homePage.isBloodTestCardVisible()){
+            if (homePage.isTBloodTestCancelled()){
+                assertTrue(!homePage.isPhlebotomistAssignedDateVisible())
+                assertTrue(!homePage.isSampleCollectionDateVisible())
+                assertTrue(!homePage.isLabProcessingTimeVisible())
+                assertTrue(!homePage.isDashBoardReadyToViewDateVisible())
+            }
+        }
+    }
 }
 
 fun checkBloodTestBookedCardStatus(homePage: HomePage) {
     homePage.waitForBloodTestCardToLoad()
-    assert(homePage.isPhlebotomistAssignedTitleVisible())
-    assert(homePage.isPhlebotomistAssignedDateVisible())
+    assertTrue(homePage.isPhlebotomistAssignedTitleVisible())
+    assertTrue(homePage.isPhlebotomistAssignedDateVisible())
 
-    assert(homePage.isSampleCollectionTitleVisible())
-    assert(homePage.isSampleCollectionDateVisible())
+    assertTrue(homePage.isSampleCollectionTitleVisible())
+    assertTrue(homePage.isSampleCollectionDateVisible())
 
-    assert(homePage.isLabProcessingTitleVisible())
-    assert(homePage.isLabProcessingTimeVisible())
+    assertTrue(homePage.isLabProcessingTitleVisible())
+    assertTrue(homePage.isLabProcessingTimeVisible())
 
-    assert(homePage.isDashBoardReadyToViewTitleVisible())
-    assert(homePage.isDashBoardReadyToViewDateVisible())
+    assertTrue(homePage.isDashBoardReadyToViewTitleVisible())
+    assertTrue(homePage.isDashBoardReadyToViewDateVisible())
 }

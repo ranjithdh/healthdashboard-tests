@@ -1,17 +1,15 @@
 package model.orders
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class OrderItem(
-    val amount: Int,
-    val cancel_reason: Any,
-    val cancelled_at: Any,
-    val consultations: List<Consultation>,
-    val di_order_id: String,
-    val id: String,
-    val order_item_id: String,
-    val order_refund_timeline: List<Any>,
-    val order_status_timeline: List<OrderStatusTimeline>,
-    val product: Product,
-    val product_id: String,
-    val quantity: Int,
-    val vendor_order_status: String
+    val amount: Int?=null,
+    val di_order_id: String?=null,
+    val id: String?=null,
+    val order_item_id: String?=null,
+    val product: Product?=null,
+    val product_id: String?=null,
+    val quantity: Int?=null,
+    val vendor_order_status: String?=null
 )

@@ -62,4 +62,6 @@ class SignUpTest {
 
         loginPage.takeScreenshot("signup-links-verified")
     }
+
+
 }

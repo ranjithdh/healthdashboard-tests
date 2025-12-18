@@ -30,21 +30,18 @@ cd healthdashboard-tests
 healthdashboard-tests/
 ├── src/test/kotlin/
 │   ├── config/
-│   │   ├── TestConfig.kt      # Configuration & viewports
-│   │   └── BaseTest.kt        # Base test classes
-│   ├── pages/
 │   │   ├── BasePage.kt        # Base page object
-│   │   ├── LoginPage.kt       # Login page object
-│   │   └── DashboardPage.kt   # Dashboard page object
-│   ├── dsl/
-│   │   └── HealthDashboardDsl.kt  # Fluent DSL for tests
-│   ├── tests/
-│   │   ├── LoginTest.kt           # Desktop login tests
-│   │   ├── LoginMobileTest.kt     # mobileView login tests
-│   │   ├── LoginTabletTest.kt     # Tablet login tests
-│   │   ├── ResponsiveTest.kt      # Cross-viewport tests
-│   │   └── DslExampleTest.kt      # DSL example tests
-│   └── utils/
+│   │   └── TestConfig.kt      # Configuration & viewports
+│   ├── login/
+│   │   ├── page/              # Login-related POMs
+│   │   └── test/              # Login & Signup tests (fullflow, signup, etc.)
+│   ├── mobileView/
+│   │   ├── home/              # Mobile home page & tests
+│   │   └── orders/            # Mobile orders page & tests
+│   ├── model/                 # Data models for API/JSON parsing
+│   ├── profile/               # Profile-related POMs
+│   ├── ForWeb/                # Web diagnostic tests
+│   └── utils/                 # Utilities (JSON, Logger, DateHelper, etc.)
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── .github/workflows/
@@ -58,29 +55,20 @@ healthdashboard-tests/
 ./gradlew test
 ```
 
-### mobileView Tests Only
+### Mobile Tests Only
 ```bash
 ./gradlew mobileTests
-# or
-./gradlew test -Dkotest.tags=mobileView
 ```
 
 ### Desktop Tests Only
 ```bash
 ./gradlew desktopTests
-# or
-./gradlew test -Dkotest.tags=Desktop
-```
-
-### Tablet Tests Only
-```bash
-./gradlew test -Dkotest.tags=Tablet
 ```
 
 ### Specific Test Class
 ```bash
-./gradlew test --tests "LoginTest"
-./gradlew test --tests "LoginMobileTest"
+./gradlew test --tests "login.test.fullflow.SignUpFlowTest"
+./gradlew test --tests "login.test.fullflow.LoginFlowTest"
 ```
 
 ### With Browser UI (Non-Headless)
@@ -88,78 +76,46 @@ healthdashboard-tests/
 HEADLESS=false ./gradlew test
 ```
 
-### With Slow Motion (Debugging)
-```bash
-SLOW_MO=100 ./gradlew test
-```
-
 ## 📱 Viewport Configurations
 
 | Name | Dimensions | Type |
 |------|------------|------|
-| iPhone 13 | 390x844 | mobileView |
-| iPhone SE | 320x568 | mobileView Small |
-| Pixel 5 | 412x915 | Android |
-| iPad | 768x1024 | Tablet |
-| iPad Pro | 1024x1366 | Tablet |
+| Android | 390x844 | Mobile |
 | Laptop | 1366x768 | Desktop |
-| Desktop HD | 1280x720 | Desktop |
-| Desktop FHD | 1920x1080 | Desktop |
 
 ## ✍️ Writing Tests
 
-### Using Page Objects (Traditional)
+### Using Page Objects with Method Chaining
 ```kotlin
-class MyTest : BaseTest({
-    
-    test("user can login") {
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        val dashboard = loginPage.loginAs(TestConfig.TestUsers.VALID_USER)
-        
-        dashboard.isDashboardLoaded().shouldBeTrue()
-    }
-})
+@Test
+fun `should complete full signup flow`() {
+    val loginPage = LoginPage(page).navigate() as LoginPage
+
+    val homePage = loginPage
+        .clickSignUp()
+        .enterMobileAndContinue("XXXXXXXXX")
+        .enterOtpAndContinueToAccountCreation("XXXX")
+        .fillAndContinue("First", "Last", "test@test.com")
+        // ... continue through flow ...
+        .waitForMobileHomePageConfirmation()
+
+    assertTrue(homePage.isSavedFullSlotMatchingApi())
+}
 ```
 
-### Using Fluent DSL (Recommended)
+### Mobile-Specific Tests
 ```kotlin
-class MyTest : BaseTest({
+@Test
+fun `login and check blood test status`() {
+    val user = TestConfig.TestUsers.NEW_USER
+    val loginPage = LoginPage(page).navigate() as LoginPage
     
-    test("user can login on mobile") {
-        page.healthDashboard()
-            .onMobile()
-            .goToLogin()
-            .shouldBeOnLogin()
-            .loginAsValidUser()
-            .shouldBeOnDashboard()
-            .takeScreenshot("login-success")
-    }
-})
-```
+    val homePage = loginPage
+        .enterMobileAndContinue(user.mobileNumber)
+        .enterOtpAndContinueToMobileHomePage(user.otp)
 
-### mobileView-Specific Tests
-```kotlin
-class MyMobileTest : MobileTest({
-    
-    test("shows mobile navigation") {
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.isMobileMenuVisible().shouldBeTrue()
-    }
-})
-```
-
-### Data-Driven Tests (Multiple Viewports)
-```kotlin
-class ResponsiveTest : FunSpec({
-    
-    context("Login form displays on all viewports") {
-        withData(TestConfig.Viewports.ALL) { viewport ->
-            // Test runs for each viewport
-            val page = createPageWithViewport(viewport)
-            LoginPage(page).isLoginFormDisplayed().shouldBeTrue()
-        }
-    }
-})
+    assertTrue(homePage.isBloodTestCardVisible())
+}
 ```
 
 ## 🔧 Configuration
@@ -244,24 +200,13 @@ val MY_CUSTOM_VIEWPORT = Viewport(
 )
 ```
 
-### Extending the DSL
-
-In `HealthDashboardDsl.kt`:
-
-```kotlin
-fun myCustomAction(): HealthDashboardDsl {
-    // Your action
-    return this
-}
-```
-
 ## 📝 Best Practices
 
-1. **Use data-testid attributes** in your React app for reliable selectors
-2. **Keep tests independent** - each test should be able to run in isolation
-3. **Use the DSL** for readable, maintainable tests
-4. **Take screenshots** at key points for visual regression
-5. **Tag tests appropriately** (mobileView, Desktop, Tablet) for selective runs
+1. **Use data-testids** for reliable selectors.
+2. **Method Chaining**: Use the page object method chaining for readable, maintainable tests.
+3. **Independent Tests**: Each test should be able to run in isolation.
+4. **Visual Verification**: Take screenshots at key points.
+5. **Tagging**: Tag tests appropriately for selective execution.
 
 ## 🐛 Troubleshooting
 

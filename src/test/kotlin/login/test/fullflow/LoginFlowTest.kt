@@ -51,11 +51,6 @@ class LoginFlowTest {
     @AfterEach
     fun closeContext() {
         context.close()
-//        TestUtils.closeContextAndSaveVideo(
-//            page = page,
-//            context = context,
-//            "login flow"
-//        )
     }
 
     @Test

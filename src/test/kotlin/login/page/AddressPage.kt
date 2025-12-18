@@ -83,6 +83,13 @@ class AddressPage(page: Page) : BasePage(page) {
         pinCode: String
     ): AddressPage {
         logger.info { "fillAddress($flatHouseNoOrBuilding, $address, $city, $state, $pinCode)" }
+        utils.SignupDataStore.update {
+            this.flatHouseNoOrBuilding = flatHouseNoOrBuilding
+            this.address = address
+            this.city = city
+            this.state = state
+            this.pinCode = pinCode
+        }
         enterFlatHouseNoOrBuilding(flatHouseNoOrBuilding)
         enterAddress(address)
         enterCity(city)

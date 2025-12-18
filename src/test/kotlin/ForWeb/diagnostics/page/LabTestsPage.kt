@@ -414,11 +414,11 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     /**
-     * Click on "An advanced at-home antibody" text
+     * Click on "An advanced at-mobileView.home antibody" text
      */
     fun clickAdvancedAtHomeAntibody(): LabTestsPage {
-        logger.info { "Clicking 'An advanced at-home antibody' text" }
-        byText("An advanced at-home antibody").click()
+        logger.info { "Clicking 'An advanced at-mobileView.home antibody' text" }
+        byText("An advanced at-mobileView.home antibody").click()
         return this
     }
 
@@ -465,7 +465,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      */
     fun clickAutoimmunePanelDescription(): LabTestsPage {
         logger.info { "Clicking Autoimmune Panel description" }
-        byText("A comprehensive at-home test that screens for autoimmune activity by measuring").click()
+        byText("A comprehensive at-mobileView.home test that screens for autoimmune activity by measuring").click()
         return this
     }
 
@@ -555,11 +555,11 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     /**
-     * Click on "An advanced at-home stool" text
+     * Click on "An advanced at-mobileView.home stool" text
      */
     fun clickAdvancedAtHomeStool(): LabTestsPage {
-        logger.info { "Clicking 'An advanced at-home stool' text" }
-        byText("An advanced at-home stool").click()
+        logger.info { "Clicking 'An advanced at-mobileView.home stool' text" }
+        byText("An advanced at-mobileView.home stool").click()
         return this
     }
 
@@ -870,7 +870,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      */
     fun clickToxicMetalsPanelDescription(): LabTestsPage {
         logger.info { "Clicking Toxic Metals Panel description" }
-        byText("A comprehensive at-home test that screens for toxic and heavy metal exposure,").click()
+        byText("A comprehensive at-mobileView.home test that screens for toxic and heavy metal exposure,").click()
         return this
     }
 

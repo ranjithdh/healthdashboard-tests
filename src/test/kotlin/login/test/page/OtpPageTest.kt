@@ -5,9 +5,7 @@ import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
-/**
- * Tests for OTP Page functionality
- */
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OtpPageTest {
 
@@ -166,5 +164,18 @@ class OtpPageTest {
 
         assert(basicDetailsPage.isFirstNameVisible()) { "First name should be visible" }
         basicDetailsPage.takeScreenshot("navigated-to-basic-details")
+    }
+
+    @Test
+    fun `should show error message for incorrect OTP`() {
+        val testUser = TestConfig.TestUsers.NEW_USER
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val otpPage = loginPage.enterMobileAndContinue(testUser.mobileNumber)
+
+        otpPage.enterOtp("123456")
+        otpPage.clickContinue()
+
+        assert(otpPage.isIncorrectOtpMessageVisible()) { "Error message 'Incorrect OTP' should be visible" }
+        otpPage.takeScreenshot("incorrect-otp-error")
     }
 }
