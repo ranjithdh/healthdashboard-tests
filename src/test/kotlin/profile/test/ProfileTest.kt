@@ -52,8 +52,9 @@ class ProfileTest {
     }
 
 
-   @Test
-    fun `profile page address information validation`() {
+    /**-----------Address----------------*/
+    @Test
+    fun `address information validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -70,9 +71,11 @@ class ProfileTest {
 
 
     @Test
-    fun `profile page new address add validation`() {
+    fun `new address add`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
+
         val loginPage = LoginPage(page).navigate() as LoginPage
+
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
@@ -90,11 +93,12 @@ class ProfileTest {
     }
 
 
-
     @Test
-    fun `profile page remove address`(){
+    fun `remove address`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
+
         val loginPage = LoginPage(page).navigate() as LoginPage
+
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
@@ -107,9 +111,11 @@ class ProfileTest {
 
 
     @Test
-    fun `profile page edit address`() {
+    fun `edit address`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
+
         val loginPage = LoginPage(page).navigate() as LoginPage
+
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
@@ -119,5 +125,22 @@ class ProfileTest {
         profilePage.clickAddressDropDown()
         profilePage.editUserAddress()
         assertDoesNotThrow { profilePage.assertAddressesFromApi() }
+    }
+
+    /**-----------Tone Preference----------------*/
+    @Test
+    fun `tone preference selection`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        profilePage.tonePreferenceSelection()
+
     }
 }

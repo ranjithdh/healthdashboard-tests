@@ -4,11 +4,13 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.WaitForSelectorState
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import org.junit.jupiter.api.Assertions.assertFalse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -24,6 +26,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     val tonePreference: Locator = byText("Tone Preference")
 
+    val tonePreferenceKeyList = listOf("doctor", "friend", "bio_hacker")
+
+
     init {
         monitorTraffic()
     }
@@ -35,7 +40,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     private fun monitorTraffic() {
-        // Listener to log all requests to API_ADDRESS during the action
+        //update address
         val updateProfileRequest = { request: com.microsoft.playwright.Request ->
             if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
                 logger.info { "API Request: ${request.method()} ${request.url()}" }
@@ -45,7 +50,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         }
 
-        // Listener to log all responses from API_ADDRESS during the action
         val updateProfileResponse = { response: Response ->
             if (response.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
                 logger.info { "API Response: ${response.status()} ${response.url()}" }
@@ -57,13 +61,37 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         }
 
+        //preference update
+        val preferenceProfileRequest = { request: com.microsoft.playwright.Request ->
+            if (request.url().contains(TestConfig.APIs.API_TONE_PREFERENCE)) {
+                logger.info { "API Request: ${request.method()} ${request.url()}" }
+                request.postData()?.let {
+                    logger.info { "API Request Payload: $it" }
+                }
+            }
+        }
+
+        val preferenceProfileResponse = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_TONE_PREFERENCE)) {
+                logger.info { "API Response: ${response.status()} ${response.url()}" }
+                try {
+                    logger.info { "API Response Body: ${response.text()}" }
+                } catch (e: Exception) {
+                    logger.warn { "Could not read response body: ${e.message}" }
+                }
+            }
+        }
+
         page.onRequest(updateProfileRequest)
         page.onResponse(updateProfileResponse)
-
+        page.onRequest(preferenceProfileRequest)
+        page.onResponse(preferenceProfileResponse)
         try {
         } finally {
             page.offRequest(updateProfileRequest)
             page.offResponse(updateProfileResponse)
+            page.offRequest(preferenceProfileRequest)
+            page.offResponse(preferenceProfileResponse)
         }
     }
 
@@ -437,6 +465,122 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertEquals(updatedNickName, updatedAddress?.address?.addressName)
     }
 
+    /**--------Communication Preference------------*/
+
+
+    /* fun tonePreferenceSelection() {
+         val alreadySelectedPreference = tonePreferenceKeyList.random()
+         val doctor = "Doctor"
+         val friend = "Friend"
+         val biohacker = "Biohacker"
+
+         val doctorHeading = communicationCardByTitle(doctor)
+         doctorHeading.waitFor()
+
+         val friendHeading = communicationCardByTitle(friend)
+         friendHeading.waitFor()
+
+         val biohackerHeading = communicationCardByTitle(biohacker)
+         biohackerHeading.waitFor()
+
+         if (alreadySelectedPreference == tonePreferenceKeyList[0]) {
+             assertEquals(true, isCheckIconVisible(doctor))
+         }
+
+         if (alreadySelectedPreference == tonePreferenceKeyList[1]) {
+             assertEquals(true, isCheckIconVisible(friend))
+         }
+
+         if (alreadySelectedPreference == tonePreferenceKeyList[2]) {
+             assertEquals(true, isCheckIconVisible(biohacker))
+         }
+
+
+       //  biohackerHeading.scrollIntoViewIfNeeded()
+         //biohackerHeading.click()
+
+     }
+
+     fun communicationCardByTitle(title: String): Locator {
+         return page.getByRole(
+             AriaRole.HEADING,
+             Page.GetByRoleOptions().setName(title)
+         )
+     }
+
+     fun isCheckIconVisible(title: String): Boolean {
+         val card = communicationCardByTitle(title)
+         return card.locator("svg").isVisible
+     }
+
+
+     fun waitForCommunicationSelected(title: String) {
+         val card = communicationCardByTitle(title)
+
+         page.waitForCondition(
+             { card.getAttribute("class")?.contains("border-primary") == true },
+             Page.WaitForConditionOptions().setTimeout(5000.0)
+         )
+     }
+ */
+
+    fun tonePreferenceSelection() {
+
+        val options = listOf("Doctor", "Friend", "Biohacker")
+
+        val alreadySelectedPreference = tonePreferenceKeyList[0]
+
+        val selectedOption = when (alreadySelectedPreference) {
+            tonePreferenceKeyList[0] -> "Doctor"
+            tonePreferenceKeyList[1] -> "Friend"
+            else -> "Biohacker"
+        }
+
+        // Ensure all cards are rendered
+        options.forEach {
+            communicationCard(it).waitFor()
+        }
+
+
+        assertTrue(
+            isCheckIconVisible(selectedOption),
+            "$selectedOption should show check icon"
+        )
+
+        val newSelectedPreference = tonePreferenceKeyList.random()
+
+        val newSelectedOption = when (newSelectedPreference) {
+            tonePreferenceKeyList[0] -> "Doctor"
+            tonePreferenceKeyList[1] -> "Friend"
+            else -> "Biohacker"
+        }
+
+        selectCommunicationOption(newSelectedOption)
+    }
+
+
+    fun communicationCard(title: String): Locator {
+        return page.locator("div.cursor-pointer.border").filter(
+            Locator.FilterOptions().setHas(
+                page.getByRole(
+                    AriaRole.HEADING,
+                    Page.GetByRoleOptions().setName(title)
+                )
+            )
+        )
+    }
+
+    fun isCheckIconVisible(title: String): Boolean {
+        val card = communicationCard(title)
+        card.waitFor()
+        return card.locator("svg").first().isVisible
+    }
+
+    fun selectCommunicationOption(title: String) {
+        val card = communicationCard(title)
+        card.waitFor()
+        card.click()
+    }
 
 }
 
