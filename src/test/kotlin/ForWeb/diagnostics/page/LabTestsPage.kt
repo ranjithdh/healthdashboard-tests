@@ -1580,10 +1580,27 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     /**
      * Get test panel description from a card Locator
+     * Note: This should extract the actual description text, not the sample type
      */
     fun getTestPanelDescriptionFromCard(card: Locator): String? {
         return try {
-            card.locator("p").first().textContent()?.trim()
+            // Try to find description paragraph (usually longer text, not sample type)
+            // Sample type is usually short like "Blood test", "Stool test", etc.
+            // Description is usually longer text
+            val paragraphs = card.locator("p").all()
+            for (p in paragraphs) {
+                val text = p.textContent()?.trim() ?: ""
+                // Skip short texts that are likely sample types or badges
+                if (text.length > 20 && 
+                    !text.equals("Blood test", ignoreCase = true) &&
+                    !text.equals("Stool test", ignoreCase = true) &&
+                    !text.equals("Cheek swab test", ignoreCase = true) &&
+                    !text.equals("At-Home Test Kit", ignoreCase = true) &&
+                    !text.equals("Recommended for you", ignoreCase = true)) {
+                    return text
+                }
+            }
+            null
         } catch (e: Exception) {
             null
         }
@@ -1799,15 +1816,25 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     /**
      * Get sample type display text from backend data
+     * Matches web logic:
+     * - If code starts with "CORTISOL" → "At-Home Test Kit"
+     * - If code starts with "OMEGA" → "At-Home Test Kit"
+     * - Otherwise based on sample_type: saliva → "Cheek swab test", stool → "Stool test", default → "Blood test"
      */
-    fun getSampleTypeDisplayText(sampleType: String?): String {
+    fun getSampleTypeDisplayText(sampleType: String?, code: String? = null): String {
+        // Check code first (matching web logic)
+        if (code != null) {
+            when {
+                code.startsWith("CORTISOL") -> return "At-Home Test Kit"
+                code.startsWith("OMEGA") -> return "At-Home Test Kit"
+            }
+        }
+        
+        // Then check sample_type
         return when (sampleType?.lowercase()) {
-            "blood" -> "Blood test"
-            "stool" -> "Stool test"
             "saliva" -> "Cheek swab test"
-            "saliva_stress" -> "At-Home Test Kit"
-            "dried_blood_spot" -> "At-Home Test Kit"
-            else -> sampleType ?: "Unknown"
+            "stool" -> "Stool test"
+            else -> "Blood test" // Default for blood, dried_blood_spot, etc.
         }
     }
 }
