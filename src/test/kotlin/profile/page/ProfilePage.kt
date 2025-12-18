@@ -10,6 +10,7 @@ import config.TestConfig.json
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import model.profile.PreferenceUpdateResponse
+import model.profile.UserPreferenceResponse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -22,6 +23,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.PROFILE_PAGE_URL
 
     private var addressData: UserAddressData? = null
+    private var currentPreference: String? = null
 
     val tonePreference: Locator = byText("Tone Preference")
 
@@ -75,7 +77,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 logger.info { "API Response: ${response.status()} ${response.url()}" }
                 try {
                     logger.info { "API Response Body: ${response.text()}" }
-                    if (response.status()==200){
+                    if (response.status() == 200) {
 
                     }
                 } catch (e: Exception) {
@@ -501,17 +503,59 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /**--------Communication Preference------------*/
 
+    fun fetchCurrentPreference() {
+        try {
+            logger.info { "Fetching current preference from API..." }
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_PREFERENCE,
+                com.microsoft.playwright.options.RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", "Asia/Calcutta")
+            )
+
+            if (response.status() != 200) {
+                logger.error { "API returned status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            logger.info { "API response...${responseBody}" }
+
+            val responseObj = json.decodeFromString<UserPreferenceResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                currentPreference = responseObj.data.preference.communicationPreference
+                logger.info { "Current preference from API: $currentPreference" }
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch current preference: ${e.message}" }
+        }
+    }
+
 
     fun selectCommunicationOption() {
 
+        // Fetch current preference from API
+        fetchCurrentPreference()
+
         val options = listOf("Doctor", "Friend", "Biohacker")
 
-        val alreadySelectedPreference = tonePreferenceKeyList[0]
+        // Get current preference from API instead of hardcoded value
+        val alreadySelectedPreference = currentPreference ?: tonePreferenceKeyList[0]
 
         val selectedOption = when (alreadySelectedPreference) {
             tonePreferenceKeyList[0] -> "Doctor"
             tonePreferenceKeyList[1] -> "Friend"
-            else -> "Biohacker"
+            tonePreferenceKeyList[2] -> "Biohacker"
+            else -> "Doctor" // Default fallback
         }
 
         // Ensure all cards are rendered
@@ -525,7 +569,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "$selectedOption should show check icon"
         )
 
-        val newSelectedPreference = tonePreferenceKeyList.random()
+        val newSelectedPreference = tonePreferenceKeyList[2]
 
         val newSelectedOption = when (newSelectedPreference) {
             tonePreferenceKeyList[0] -> "Doctor"
@@ -540,6 +584,12 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // Verify the API call was successful
         assertTrue(isSuccess, "Preference update API call failed")
+
+        // Fetch current preference from API
+        fetchCurrentPreference()
+
+        // Verify the selected option from the backend
+        assertEquals(currentPreference, newSelectedPreference)
 
         // Verify the selected option is now checked
         assertTrue(
