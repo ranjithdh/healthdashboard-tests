@@ -9,6 +9,7 @@ import config.TestConfig
 import config.TestConfig.json
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import model.profile.PreferenceUpdateResponse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -125,6 +126,38 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
+
+    fun capturePreferenceUpdate(selectedOption: String, action: () -> Unit): Boolean {
+        try {
+            val response = page.waitForResponse(
+                { response: Response? ->
+                    response?.url()?.contains(TestConfig.APIs.API_PREFERENCE_UPDATE) == true &&
+                            response.status() == 200 &&
+                            response.request().method() == "PUT"
+                }, action
+            )
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return false
+            }
+
+            logger.info { "API response...${responseBody}" }
+
+            val responseObj = json.decodeFromString<PreferenceUpdateResponse>(responseBody)
+
+            if (responseObj.status == "success" && responseObj.data.isUpdated) {
+                logger.info { "Preference updated successfully to: $selectedOption" }
+                return true
+            }
+
+            return false
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            return false
+        }
+    }
 
     /**------Address Flied------*/
 
@@ -469,63 +502,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     /**--------Communication Preference------------*/
 
 
-    /* fun tonePreferenceSelection() {
-         val alreadySelectedPreference = tonePreferenceKeyList.random()
-         val doctor = "Doctor"
-         val friend = "Friend"
-         val biohacker = "Biohacker"
-
-         val doctorHeading = communicationCardByTitle(doctor)
-         doctorHeading.waitFor()
-
-         val friendHeading = communicationCardByTitle(friend)
-         friendHeading.waitFor()
-
-         val biohackerHeading = communicationCardByTitle(biohacker)
-         biohackerHeading.waitFor()
-
-         if (alreadySelectedPreference == tonePreferenceKeyList[0]) {
-             assertEquals(true, isCheckIconVisible(doctor))
-         }
-
-         if (alreadySelectedPreference == tonePreferenceKeyList[1]) {
-             assertEquals(true, isCheckIconVisible(friend))
-         }
-
-         if (alreadySelectedPreference == tonePreferenceKeyList[2]) {
-             assertEquals(true, isCheckIconVisible(biohacker))
-         }
-
-
-       //  biohackerHeading.scrollIntoViewIfNeeded()
-         //biohackerHeading.click()
-
-     }
-
-     fun communicationCardByTitle(title: String): Locator {
-         return page.getByRole(
-             AriaRole.HEADING,
-             Page.GetByRoleOptions().setName(title)
-         )
-     }
-
-     fun isCheckIconVisible(title: String): Boolean {
-         val card = communicationCardByTitle(title)
-         return card.locator("svg").isVisible
-     }
-
-
-     fun waitForCommunicationSelected(title: String) {
-         val card = communicationCardByTitle(title)
-
-         page.waitForCondition(
-             { card.getAttribute("class")?.contains("border-primary") == true },
-             Page.WaitForConditionOptions().setTimeout(5000.0)
-         )
-     }
- */
-
-    fun tonePreferenceSelection() {
+    fun selectCommunicationOption() {
 
         val options = listOf("Doctor", "Friend", "Biohacker")
 
@@ -556,7 +533,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             else -> "Biohacker"
         }
 
-        selectCommunicationOption(newSelectedOption)
+        // Capture the preference update API call
+        val isSuccess = capturePreferenceUpdate(newSelectedOption) {
+            communicationCard(newSelectedOption).click()
+        }
+
+        // Verify the API call was successful
+        assertTrue(isSuccess, "Preference update API call failed")
+
+        // Verify the selected option is now checked
+        assertTrue(
+            isCheckIconVisible(newSelectedOption),
+            "$newSelectedOption should show check icon after selection"
+        )
+
+        logger.info { "Successfully selected and verified preference: $newSelectedOption" }
     }
 
 
@@ -577,7 +568,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         return card.locator("svg").first().isVisible
     }
 
-    fun selectCommunicationOption(title: String) {
+    fun clickCommunicationCard(title: String) {
         val card = communicationCard(title)
         card.waitFor()
         card.click()

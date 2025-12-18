@@ -140,7 +140,7 @@ class ProfileTest {
             .clickProfile()
             .waitForConfirmation()
 
-        profilePage.tonePreferenceSelection()
+        profilePage.selectCommunicationOption()
 
     }
 }
