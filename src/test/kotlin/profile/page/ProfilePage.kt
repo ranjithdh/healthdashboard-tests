@@ -9,14 +9,12 @@ import config.TestConfig
 import config.TestConfig.json
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
-import mu.KotlinLogging
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-const val TAG = "ProfilePage...."
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -306,7 +304,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         val address = addressItem.address
         val addressId = addressItem.addressId
 
-        logger.info { "$TAG {addressId:$addressId}" }
 
         val title = address.addressName ?: "Primary"
         val expectedAddressText = buildAddressText(address)
@@ -362,7 +359,6 @@ class ProfilePage(page: Page) : BasePage(page) {
            6️⃣ Verify Removal
            ------------------------------- */
         val updatedList = addressData?.addressList ?: emptyList()
-        logger.info { "$TAG {updatedList:$updatedList}" }
         val isRemoved = updatedList.none { it.addressId == addressId }
 
         assertTrue(isRemoved, "Address with ID $addressId was not removed from the list")
