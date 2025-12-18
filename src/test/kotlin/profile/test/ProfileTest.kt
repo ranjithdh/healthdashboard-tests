@@ -88,24 +88,6 @@ class ProfileTest {
     }
 
 
-  /*  @Test
-    fun `profile page new address validation`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
-            .waitForConfirmation()
-
-        assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
-        profilePage.clickAddressDropDown()
-        assert(profilePage.isAddNewAddressVisible()) { "Add new address visibility is not visible" }
-        profilePage.clickAddNewAddress()
-        assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
-        profilePage.assertAddressFormFieldsVisible()
-    }*/
-
     @Test
     fun `profile page new address add validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
