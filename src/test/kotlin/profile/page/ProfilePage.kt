@@ -26,13 +26,17 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     val tonePreference: Locator = byText("Tone Preference")
 
+    init {
+        monitorTraffic()
+    }
+
     fun waitForConfirmation(): ProfilePage {
         tonePreference.waitFor()
         return this
     }
 
 
-    private fun monitorTraffic(urlPattern: String) {
+    private fun monitorTraffic() {
         // Listener to log all requests to API_ADDRESS during the action
         val requestHandler = { request: com.microsoft.playwright.Request ->
             if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
@@ -67,8 +71,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun captureAddressData(action: () -> Unit) {
-
-
         try {
             val response = page.waitForResponse(
                 { response: Response? ->
