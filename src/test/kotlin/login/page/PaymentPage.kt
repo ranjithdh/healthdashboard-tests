@@ -4,6 +4,7 @@ import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import mobileView.home.HomePage
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -33,9 +34,9 @@ class PaymentPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun manuallyNavigateToHome(): home.page.HomePage {
+    fun manuallyNavigateToHome(): HomePage {
         logger.info { "manuallyNavigateToHome()" }
         page.navigate("https://app.stg.deepholistics.com/home")
-        return home.page.HomePage(page)
+        return HomePage(page)
     }
 }

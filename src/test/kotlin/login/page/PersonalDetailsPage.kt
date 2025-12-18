@@ -67,6 +67,14 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         day: String = "12"
     ): PersonalDetailsPage {
         logger.info { "fillDetails()" }
+        utils.SignupDataStore.update {
+            this.gender = gender
+            this.height = height
+            this.weight = weight
+            this.month = month
+            this.year = year
+            this.day = day
+        }
         selectDateOfBirth(month, year, day)
         selectGender(gender)
         enterHeight(height)

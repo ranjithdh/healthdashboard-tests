@@ -57,7 +57,7 @@ class LabTestsPageTest {
 
     /**
      * Helper method to login and navigate to ForWeb.diagnostics page
-     * Uses the EXACT same pattern as LoginFlowTest.login flow, then clicks "Book lab test" from home page
+     * Uses the EXACT same pattern as LoginFlowTest.login flow, then clicks "Book lab test" from mobileView.home page
      */
 
 

@@ -94,13 +94,13 @@ class LabTestsPageComprehensiveTest {
         }
         logger.info { "✓ 'Book Lab Tests' heading is visible" }
         
-        // Verify "Get tested from the comfort of your home" heading is visible
+        // Verify "Get tested from the comfort of your mobileView.home" heading is visible
         val heroHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Get tested from the comfort"))
         heroHeading.waitFor()
         assert(heroHeading.isVisible) {
-            "Static element 'Get tested from the comfort of your home' heading should be visible"
+            "Static element 'Get tested from the comfort of your mobileView.home' heading should be visible"
         }
-        logger.info { "✓ 'Get tested from the comfort of your home' heading is visible" }
+        logger.info { "✓ 'Get tested from the comfort of your mobileView.home' heading is visible" }
         
         // Verify "With flexible testing options..." paragraph is visible
         val flexibleOptionsParagraph = page.getByRole(AriaRole.PARAGRAPH)
