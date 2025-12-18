@@ -154,5 +154,6 @@ class ProfileTest {
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
         profilePage.editUserAddress()
+        assertDoesNotThrow { profilePage.assertAddressesFromApi() }
     }
 }

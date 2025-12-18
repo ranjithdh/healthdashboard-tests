@@ -68,7 +68,7 @@ class OtpPage(page: Page) : BasePage(page) {
         clickContinue()
 
         val homePage = HomePage(page)
-        homePage.waitForHomePageConfirmation()
+        homePage.waitForMobileHomePageConfirmation()
 
         return homePage
     }
