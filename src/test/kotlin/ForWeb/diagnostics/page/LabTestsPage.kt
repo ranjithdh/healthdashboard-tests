@@ -8,6 +8,9 @@ import config.TestConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import model.LabTestResponse
+import model.LabTestPackage
+import model.LabTestProfile
+import model.LabTestItem
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
 import java.util.regex.Pattern
@@ -1041,7 +1044,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     /**
      * Get test panel from API data by name
      */
-    fun getTestPanelFromApi(panelName: String): model.LabTestPackage? {
+    fun getTestPanelFromApi(panelName: String): LabTestPackage? {
         val apiData = labTestData ?: fetchLabTestDataFromApi()
         if (apiData == null || apiData.data == null) {
             return null
@@ -1054,7 +1057,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     /**
      * Get test profile from API data by name
      */
-    fun getTestProfileFromApi(profileName: String): model.LabTestProfile? {
+    fun getTestProfileFromApi(profileName: String): LabTestProfile? {
         val apiData = labTestData ?: fetchLabTestDataFromApi()
         if (apiData == null || apiData.data == null) {
             return null
@@ -1447,6 +1450,364 @@ class LabTestsPage(page: Page) : BasePage(page) {
             recommendedSwitch.isVisible
         } catch (e: Exception) {
             false
+        }
+    }
+
+    /**
+     * Get all test panel cards from the grid (excluding featured Longevity Panel in hero section)
+     * Returns list of Locators for each card
+     */
+    fun getAllTestPanelCards(): List<Locator> {
+        // Get all cards from the grid layout
+        // Try multiple selectors to find the card container
+        val cardSelectors = listOf(
+            "[class*='grid'] > div:has([role='heading'])",
+            "[data-testid='test-card']",
+            "[class*='test-card']",
+            "[class*='grid'] > div:has(button:has-text('View Details'))",
+            "div:has([role='heading']):has(button:has-text('View Details'))"
+        )
+        
+        val allCards = mutableListOf<Locator>()
+        for (selector in cardSelectors) {
+            try {
+                val cards = page.locator(selector).all()
+                if (cards.isNotEmpty()) {
+                    allCards.addAll(cards)
+                    break
+                }
+            } catch (e: Exception) {
+                // Try next selector
+                continue
+            }
+        }
+        
+        // Filter out the featured Longevity Panel card (usually larger, in hero section)
+        // The featured card typically doesn't have "View Details" button or is in a different container
+        return allCards.filter { card ->
+            try {
+                val cardText = card.textContent() ?: ""
+                val hasViewDetails = card.locator("button:has-text('View Details')").count() > 0
+                // Include card if it has "View Details" button (regular grid cards)
+                // Exclude if it's the featured Longevity Panel (usually has "Book Now" instead)
+                hasViewDetails && !(cardText.contains("Longevity Panel") && card.locator("button:has-text('Book Now')").count() > 0)
+            } catch (e: Exception) {
+                // If we can't determine, include it
+                true
+            }
+        }
+    }
+
+    /**
+     * Get test panel name from a card Locator
+     */
+    fun getTestPanelNameFromCard(card: Locator): String? {
+        return try {
+            // First, try to find heading using getByRole (matching Playwright pattern)
+            try {
+                val headings = card.locator("[role='heading']").all()
+                for (heading in headings) {
+                    val text = heading.textContent()?.trim()
+                    if (!text.isNullOrEmpty() && text.length > 3) {
+                        // Check if it matches a known panel name
+                        val knownPanels = listOf(
+                            "Longevity Panel", "Advanced Thyroid Panel", "Autoimmune Panel",
+                            "Advanced Genetic Analysis", "Advanced Gut Microbiome Analysis", "Advanced Gut Microbiome",
+                            "Advanced Heart Health Panel", "Essential Nutrients Panel", "Thyroid Health Panel",
+                            "Omega Profile Panel", "Stress and Cortisol Rhythm Panel", "Stress and Cortisol Rhythm",
+                            "Liver Health Panel", "Toxic Metals Panel", "Blood Health Panel", "Allergies Test Panel"
+                        )
+                        
+                        // Find exact match or partial match
+                        for (panelName in knownPanels) {
+                            if (text == panelName || text.contains(panelName) || panelName.contains(text)) {
+                                return panelName
+                            }
+                        }
+                        
+                        // If no match found but text looks like a panel name, return it
+                        if (text.length > 5 && text.length < 100) {
+                            return text
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                logger.debug { "Could not find heading with role='heading': ${e.message}" }
+            }
+            
+            // Try other heading selectors
+            val selectors = listOf("h2", "h3", "h4", "[class*='heading']", "[class*='title']", "[class*='name']")
+            for (selector in selectors) {
+                try {
+                    val heading = card.locator(selector).first()
+                    val text = heading.textContent()?.trim()
+                    if (!text.isNullOrEmpty() && text.length > 3 && text.length < 100) {
+                        return text
+                    }
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+            
+            // Fallback: try to find text that matches known panel names from card content
+            val cardText = card.textContent() ?: ""
+            val knownPanels = listOf(
+                "Longevity Panel", "Advanced Thyroid Panel", "Autoimmune Panel",
+                "Advanced Genetic Analysis", "Advanced Gut Microbiome Analysis", "Advanced Gut Microbiome",
+                "Advanced Heart Health Panel", "Essential Nutrients Panel", "Thyroid Health Panel",
+                "Omega Profile Panel", "Stress and Cortisol Rhythm Panel", "Stress and Cortisol Rhythm",
+                "Liver Health Panel", "Toxic Metals Panel", "Blood Health Panel", "Allergies Test Panel"
+            )
+            
+            for (panelName in knownPanels) {
+                if (cardText.contains(panelName)) {
+                    // Return the full name from knownPanels list
+                    return when {
+                        panelName.contains("Advanced Gut Microbiome") -> "Advanced Gut Microbiome Analysis"
+                        panelName.contains("Stress and Cortisol") -> "Stress and Cortisol Rhythm Panel"
+                        else -> panelName
+                    }
+                }
+            }
+            
+            logger.warn { "Could not extract panel name from card. Card text preview: ${cardText.take(200)}" }
+            null
+        } catch (e: Exception) {
+            logger.warn { "Failed to get test panel name from card: ${e.message}" }
+            null
+        }
+    }
+
+    /**
+     * Get test panel description from a card Locator
+     */
+    fun getTestPanelDescriptionFromCard(card: Locator): String? {
+        return try {
+            card.locator("p").first().textContent()?.trim()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Get test panel price from a card Locator
+     */
+    fun getTestPanelPriceFromCard(card: Locator): String? {
+        return try {
+            card.locator("text=/₹[\\d,]+/").first().textContent()?.trim()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Get test panel type (sample type) from a card Locator
+     */
+    fun getTestPanelTypeFromCard(card: Locator): String? {
+        return try {
+            // Look for text like "Blood test", "Stool test", "Cheek swab test", "At-Home Test Kit"
+            val typeText = card.locator("text=/Blood test|Stool test|Cheek swab test|At-Home Test Kit|Saliva test|Dried Blood Spot test/").first().textContent()?.trim()
+            typeText
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Click on test panel image by name
+     */
+    fun clickTestPanelImage(panelName: String): LabTestsPage {
+        logger.info { "Clicking image for: $panelName" }
+        byRole(AriaRole.IMG, Page.GetByRoleOptions().setName(panelName)).click()
+        return this
+    }
+
+    /**
+     * Click on test panel heading by name
+     */
+    fun clickTestPanelHeading(panelName: String): LabTestsPage {
+        logger.info { "Clicking heading for: $panelName" }
+        byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(panelName)).click()
+        return this
+    }
+
+    /**
+     * Click on "Recommended for you" badge for a specific panel (by index)
+     */
+    fun clickRecommendedBadge(index: Int): LabTestsPage {
+        logger.info { "Clicking 'Recommended for you' badge at index: $index" }
+        byText("Recommended for you").nth(index).click()
+        return this
+    }
+
+    /**
+     * Click on sample type text (Blood test, Stool test, etc.) with exact match option
+     */
+    fun clickSampleType(sampleType: String, exact: Boolean = false, index: Int = 0): LabTestsPage {
+        logger.info { "Clicking sample type: $sampleType (exact=$exact, index=$index)" }
+        if (exact) {
+            page.getByText(sampleType, Page.GetByTextOptions().setExact(true)).nth(index).click()
+        } else {
+            byText(sampleType).nth(index).click()
+        }
+        return this
+    }
+
+    /**
+     * Click on description text (truncated version)
+     */
+    fun clickDescription(descriptionSnippet: String): LabTestsPage {
+        logger.info { "Clicking description snippet: $descriptionSnippet" }
+        byText(descriptionSnippet).click()
+        return this
+    }
+
+    /**
+     * Click on price text
+     */
+    fun clickPrice(price: String, index: Int = 0, useFirst: Boolean = false): LabTestsPage {
+        logger.info { "Clicking price: $price (index=$index, useFirst=$useFirst)" }
+        if (price == "₹") {
+            // Special case for just the rupee symbol
+            page.getByText("₹").nth(index).click()
+        } else {
+            if (useFirst) {
+                byText(price).first().click()
+            } else {
+                byText(price).nth(index).click()
+            }
+        }
+        return this
+    }
+
+    /**
+     * Click on "View Details" button for a specific panel (by index)
+     */
+    fun clickViewDetailsButton(index: Int): LabTestsPage {
+        logger.info { "Clicking 'View Details' button at index: $index" }
+        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).nth(index).click()
+        return this
+    }
+
+    /**
+     * Check if "View Details" button is enabled for a specific panel (by index)
+     */
+    fun isViewDetailsButtonEnabled(index: Int): Boolean {
+        return try {
+            val button = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).nth(index)
+            button.isEnabled
+        } catch (e: Exception) {
+            logger.warn { "Failed to check if View Details button is enabled at index $index: ${e.message}" }
+            false
+        }
+    }
+
+    /**
+     * Get "View Details" button locator for a specific panel (by index)
+     */
+    fun getViewDetailsButton(index: Int): Locator {
+        return byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).nth(index)
+    }
+
+    /**
+     * Check if "Recommended for you" badge is visible for a panel
+     */
+    fun hasRecommendedBadge(panelName: String): Boolean {
+        return try {
+            val panel = getTestPanelByName(panelName)
+            panel?.locator("text=Recommended for you")?.isVisible ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Get the index of a panel in the grid (for nth() selectors)
+     * Returns -1 if not found
+     */
+    fun getPanelIndex(panelName: String): Int {
+        val allCards = getAllTestPanelCards()
+        return allCards.indexOfFirst { card ->
+            getTestPanelNameFromCard(card) == panelName
+        }
+    }
+
+    /**
+     * Get all items from backend API (packages + test_profiles + tests)
+     * Returns a list of item names
+     */
+    fun getAllBackendItems(): List<String> {
+        val apiData = labTestData ?: fetchLabTestDataFromApi()
+        if (apiData == null || apiData.data == null) {
+            logger.warn { "API data not available" }
+            return emptyList()
+        }
+
+        val diagnosticProductList = apiData.data.diagnostic_product_list ?: return emptyList()
+        val items = mutableListOf<String>()
+
+        // Add packages
+        diagnosticProductList.packages?.forEach { pkg ->
+            pkg.name?.let { items.add(it) }
+        }
+
+        // Add test_profiles
+        diagnosticProductList.test_profiles?.forEach { profile ->
+            profile.name?.let { items.add(it) }
+        }
+
+        // Add tests
+        diagnosticProductList.tests?.forEach { test ->
+            test.name?.let { items.add(it) }
+        }
+
+        return items
+    }
+
+    /**
+     * Get backend item details by name
+     * Returns a triple: (package, profile, test)
+     */
+    fun getBackendItemByName(name: String): Triple<LabTestPackage?, LabTestProfile?, LabTestItem?>? {
+        val apiData = labTestData ?: fetchLabTestDataFromApi()
+        if (apiData == null || apiData.data == null) {
+            return null
+        }
+
+        val diagnosticProductList = apiData.data.diagnostic_product_list ?: return null
+
+        // Check in packages
+        val packageItem = diagnosticProductList.packages?.find { it.name == name }
+        if (packageItem != null) {
+            return Triple(packageItem, null, null)
+        }
+
+        // Check in test_profiles
+        val profileItem = diagnosticProductList.test_profiles?.find { it.name == name }
+        if (profileItem != null) {
+            return Triple(null, profileItem, null)
+        }
+
+        // Check in tests
+        val testItem = diagnosticProductList.tests?.find { it.name == name }
+        if (testItem != null) {
+            return Triple(null, null, testItem)
+        }
+
+        return null
+    }
+
+    /**
+     * Get sample type display text from backend data
+     */
+    fun getSampleTypeDisplayText(sampleType: String?): String {
+        return when (sampleType?.lowercase()) {
+            "blood" -> "Blood test"
+            "stool" -> "Stool test"
+            "saliva" -> "Cheek swab test"
+            "saliva_stress" -> "At-Home Test Kit"
+            "dried_blood_spot" -> "At-Home Test Kit"
+            else -> sampleType ?: "Unknown"
         }
     }
 }
