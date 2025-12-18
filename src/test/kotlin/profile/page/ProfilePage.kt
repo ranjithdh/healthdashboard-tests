@@ -32,7 +32,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    fun captureAddressData(action: () -> Unit) {
+    private fun monitorTraffic(urlPattern: String) {
         // Listener to log all requests to API_ADDRESS during the action
         val requestHandler = { request: com.microsoft.playwright.Request ->
             if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
@@ -59,6 +59,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.onResponse(responseHandler)
 
         try {
+        } finally {
+            page.offRequest(requestHandler)
+            page.offResponse(responseHandler)
+        }
+    }
+
+
+    fun captureAddressData(action: () -> Unit) {
+
+
+        try {
             val response = page.waitForResponse(
                 { response: Response? ->
                     response?.url()?.contains(TestConfig.APIs.API_ADDRESS) == true &&
@@ -82,9 +93,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
-        } finally {
-            page.offRequest(requestHandler)
-            page.offResponse(responseHandler)
         }
     }
 
@@ -251,7 +259,6 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-
     fun addAddressAndValidate() {
         val number = (0..100).random()
         val nickName = "Home $number"
@@ -283,7 +290,6 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-
     fun removeUserAddress() {
 
         val addresses = addressData?.addressList
@@ -292,7 +298,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         require(addresses.isNotEmpty()) {
             "Address list is empty from API"
         }
-
 
 
         val addressItem = addresses.first()
@@ -345,7 +350,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            5️⃣ DELETE API CALL (Intercepted)
            ------------------------------- */
         captureAddressData {
-             dialog.getByRole(
+            dialog.getByRole(
                 AriaRole.BUTTON,
                 Locator.GetByRoleOptions().setName("Yes, delete")
             ).click()
