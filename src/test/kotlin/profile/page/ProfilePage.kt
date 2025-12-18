@@ -36,7 +36,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun monitorTraffic() {
         // Listener to log all requests to API_ADDRESS during the action
-        val requestHandler = { request: com.microsoft.playwright.Request ->
+        val updateProfileRequest = { request: com.microsoft.playwright.Request ->
             if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
                 logger.info { "API Request: ${request.method()} ${request.url()}" }
                 request.postData()?.let {
@@ -46,7 +46,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         // Listener to log all responses from API_ADDRESS during the action
-        val responseHandler = { response: Response ->
+        val updateProfileResponse = { response: Response ->
             if (response.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
                 logger.info { "API Response: ${response.status()} ${response.url()}" }
                 try {
@@ -57,13 +57,13 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         }
 
-        page.onRequest(requestHandler)
-        page.onResponse(responseHandler)
+        page.onRequest(updateProfileRequest)
+        page.onResponse(updateProfileResponse)
 
         try {
         } finally {
-            page.offRequest(requestHandler)
-            page.offResponse(responseHandler)
+            page.offRequest(updateProfileRequest)
+            page.offResponse(updateProfileResponse)
         }
     }
 
