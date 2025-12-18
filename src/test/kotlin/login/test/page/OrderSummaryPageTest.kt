@@ -53,7 +53,7 @@ class OrderSummaryPageTest {
             .enterOtpAndContinueToAccountCreation(testUser.otp)
             .fillAndContinue("Test", "User", "test@test.com")
             .fillAndContinue()
-            .fillAndContinue("Test Address", "Chennai", "Tamil Nadu", "600001")
+            .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
             .selectSlotsAndContinue()
 
         return orderSummaryPage
@@ -90,5 +90,31 @@ class OrderSummaryPageTest {
         orderSummaryPage.clearCouponCode()
 
         orderSummaryPage.takeScreenshot("cleared-coupon-code")
+    }
+
+
+    @Test
+    fun `should apply valid coupon and verify discount`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
+
+        val couponCode = "D261C0"
+        orderSummaryPage.enterCouponCode(couponCode)
+        orderSummaryPage.clickApplyCoupon()
+
+        assert(orderSummaryPage.isCouponAppliedSuccessVisible()) { "Success message should be visible" }
+        assert(orderSummaryPage.isCouponCodeAppliedVisible(couponCode)) { "Coupon applied text should be visible" }
+
+        assert(orderSummaryPage.isTotalAmountVisible("₹8,999")) { "Total should be discounted to ₹8,999" }
+
+        orderSummaryPage.takeScreenshot("coupon-applied-successfully")
+
+        orderSummaryPage.removeCoupon()
+
+        assert(orderSummaryPage.isCouponValueVisible("- ₹0")) { "Coupon discount should be 0 after removal" }
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+        
+        orderSummaryPage.takeScreenshot("coupon-removed")
     }
 }

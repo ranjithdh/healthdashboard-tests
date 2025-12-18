@@ -1,9 +1,13 @@
 package home.page
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import model.home.HomeData
+import model.home.HomeDataResponse
 import config.TestConfig.json
 import config.TestConfig.APIs.API_PI_DATA
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -12,6 +16,7 @@ import model.HomeData
 import model.HomeDataResponse
 import profile.page.ProfilePage
 import utils.DateHelper
+import utils.json.json
 import utils.logger.logger
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -25,14 +30,14 @@ class HomePage(page: Page) : BasePage(page) {
 
     private var homeData: HomeData? = HomeData()
 
-    fun waitForHomePageConfirmation(): HomePage {
+    fun waitForMobileHomePageConfirmation(): HomePage {
+        logger.info("Waiting for home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
         return this
     }
 
     fun isBloodTestCardVisible(): Boolean {
-        return page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
+       return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
     }
 
     fun waitForBloodTestCardToLoad(): HomePage {
@@ -53,7 +58,8 @@ class HomePage(page: Page) : BasePage(page) {
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
-            }
+                Page.WaitForResponseOptions().setTimeout(TestConfig.Browser.TIMEOUT * 2)
+            },
         )
 
         val responseBody = response.text()
@@ -186,4 +192,18 @@ class HomePage(page: Page) : BasePage(page) {
         profilePage.waitForConfirmation()
         return profilePage
     }
+
+
+    fun isLabTestVisible() {
+        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Home")).waitFor()
+    }
+
+    fun clickHomeMenu(): HomePage {
+        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Home")).click()
+
+        logger.info("" +
+                "page url.........${page.url()}")
+        return this
+    }
+
 }

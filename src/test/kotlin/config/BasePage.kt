@@ -113,6 +113,7 @@ abstract class BasePage(protected val page: Page) {
             .setPath(Paths.get(path))
             .setFullPage(true))
         logger.info { "Screenshot saved: $path" }
+
         return path
     }
     

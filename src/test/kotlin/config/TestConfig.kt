@@ -22,11 +22,15 @@ object TestConfig {
 
     object Urls {
         val BASE_URL: String = "https://app.stg.deepholistics.com"
+        val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home" //"https://app.stg.deepholistics.com/home"
+        val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
         val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
+        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
     }
 
 
@@ -43,7 +47,7 @@ object TestConfig {
     object Browser {
         val HEADLESS: Boolean = false
         val SLOW_MO: Double = (1 * 1000).toDouble()
-        val TIMEOUT: Double = System.getenv("TIMEOUT")?.toDouble() ?: 60000.0
+        val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
@@ -79,7 +83,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "726408358",
+            mobileNumber = "726408324",
             otp = "678901"
         )
 
@@ -94,7 +98,7 @@ object TestConfig {
         val VIDEO_DIR = "build/videos"
         val TRACE_DIR = "build/traces"
         val SCREENSHOT_ON_FAILURE = true
-        val RECORD_VIDEO = System.getenv("RECORD_VIDEO")?.toBoolean() ?: false
+        val RECORD_VIDEO = true
     }
 
     object Timeouts {

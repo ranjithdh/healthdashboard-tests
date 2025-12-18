@@ -1,13 +1,13 @@
-package home.test
+package login.test.fullflow
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import home.page.HomePage
+import home.test.checkBloodTestBookedCardStatus
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BloodTestWaitingCardTest {
+class LoginWithBloodTestWaitingCardTest {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -45,31 +45,16 @@ class BloodTestWaitingCardTest {
     }
 
     @Test
-    fun `login and check the blood test status booked state`() {
+    fun `login flow`() {
         val tesUser = TestConfig.TestUsers.NEW_USER
-        
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val homePage = loginPage
+       val homePage = loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
             .enterOtpAndContinueToMobileHomePage(tesUser.otp)
 
-        if (homePage.isBloodTestCardVisible()){
-            checkBloodTestBookedCardStatus(homePage)
-        }
+        checkBloodTestBookedCardStatus(homePage)
+
     }
 }
 
-fun checkBloodTestBookedCardStatus(homePage: HomePage) {
-    homePage.waitForBloodTestCardToLoad()
-    assert(homePage.isPhlebotomistAssignedTitleVisible())
-    assert(homePage.isPhlebotomistAssignedDateVisible())
-
-    assert(homePage.isSampleCollectionTitleVisible())
-    assert(homePage.isSampleCollectionDateVisible())
-
-    assert(homePage.isLabProcessingTitleVisible())
-    assert(homePage.isLabProcessingTimeVisible())
-
-    assert(homePage.isDashBoardReadyToViewTitleVisible())
-    assert(homePage.isDashBoardReadyToViewDateVisible())
-}
