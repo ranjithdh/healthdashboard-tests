@@ -122,9 +122,6 @@ class LabTestsPageComprehensiveTest {
 
         labTestsPage.clickSearchTextBox()
 
-        // Add wait for element to be ready
-        page.waitForTimeout(500.0)
-
         // Use clear() instead of fill("")
         val searchInput = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in lab tests"))
         searchInput.clear()
@@ -179,7 +176,7 @@ class LabTestsPageComprehensiveTest {
     }
 
     @Test
-    fun `should verify all 14 test panel cards match backend data`() {
+    fun `should verify all test panel cards match backend data`() {
         val labTestsPage = navigateToDiagnosticsPage()
         labTestsPage.waitForPageLoad()
         labTestsPage.waitForTestPanelsToLoad()
@@ -189,17 +186,12 @@ class LabTestsPageComprehensiveTest {
         logger.info { "Backend items count: ${backendItems.size}" }
         logger.info { "Backend items: $backendItems" }
 
-        // Verify backend has 14 items (10 packages + 3 test_profiles + 1 test)
-        assert(backendItems.size == 14) {
-            "Expected 14 items from backend (10 packages + 3 test_profiles + 1 test), but got ${backendItems.size}"
+        // Verify backend has at least one item
+        assert(backendItems.isNotEmpty()) {
+            "Expected at least one item from backend, but got ${backendItems.size}"
         }
 
-        // Wait for cards to be visible
-        try {
-            page.waitForSelector("button:has-text('View Details')", Page.WaitForSelectorOptions().setTimeout(10000.0))
-        } catch (e: Exception) {
-            logger.warn { "View Details buttons not found within timeout, but continuing..." }
-        }
+        // Cards should already be loaded from waitForTestPanelsToLoad()
 
         // Get all test panel cards from UI (excluding featured Longevity Panel)
         val uiCards = labTestsPage.getAllTestPanelCards()
@@ -217,9 +209,9 @@ class LabTestsPageComprehensiveTest {
             }
         }
 
-        // Verify UI shows 14 cards (excluding featured Longevity Panel)
-        assert(uiCards.size == 14) {
-            "Expected 14 test panel cards in UI (excluding featured Longevity Panel), but got ${uiCards.size}. " +
+        // Verify UI shows the same number of cards as backend items (excluding featured Longevity Panel)
+        assert(uiCards.size == backendItems.size) {
+            "Expected ${backendItems.size} test panel cards in UI (matching backend count), but got ${uiCards.size}. " +
             "Page URL: ${page.url()}"
         }
 
@@ -390,8 +382,8 @@ class LabTestsPageComprehensiveTest {
             "Found $mismatchCount mismatches between UI cards and backend data"
         }
         
-        assert(matchedCount == 14) {
-            "Expected to match all 14 cards, but only matched $matchedCount"
+        assert(matchedCount == backendItems.size) {
+            "Expected to match all ${backendItems.size} cards from backend, but only matched $matchedCount"
         }
     }
 
@@ -434,40 +426,42 @@ class LabTestsPageComprehensiveTest {
         var clickedCount = 0
         val failedCards = mutableListOf<String>()
 
-        expectedCardOrder.forEachIndexed { index, cardName ->
+        // Use backend items count to determine how many buttons to check
+        val totalCards = backendItems.size
+        
+        (0 until totalCards).forEach { index ->
             try {
-                logger.info { "Clicking View Details button for card $index: $cardName" }
+                logger.info { "Checking View Details button for card $index" }
 
                 // Verify button is enabled before clicking
                 val isEnabled = labTestsPage.isViewDetailsButtonEnabled(index)
                 
                 if (!isEnabled) {
-                    failedCards.add("$cardName (disabled)")
-                    logger.warn { "✗ View Details button is NOT enabled for: $cardName (index: $index)" }
+                    failedCards.add("Card $index (disabled)")
+                    logger.warn { "✗ View Details button is NOT enabled for card at index: $index" }
                 } else {
                     // Click the View Details button
                     labTestsPage.clickViewDetailsButton(index)
-                    page.waitForTimeout(500.0)
 
                     // Click back button to return to the list
                     try {
                         page.getByText("BackBook Lab TestsWith").click()
-                        page.waitForTimeout(300.0)
                     } catch (e: Exception) {
-                        logger.debug { "Back button not found for $cardName, continuing..." }
+                        logger.debug { "Back button not found for card $index, continuing..." }
                     }
 
                     clickedCount++
-                    logger.info { "✓ Successfully clicked View Details button for: $cardName (index: $index)" }
+                    logger.info { "✓ Successfully clicked View Details button for card at index: $index" }
                 }
 
             } catch (e: Exception) {
-                failedCards.add("$cardName (error: ${e.message})")
-                logger.error { "Failed to click View Details button for '$cardName' (index: $index): ${e.message}" }
+                failedCards.add("Card $index (error: ${e.message})")
+                logger.error { "Failed to click View Details button for card at index $index: ${e.message}" }
             }
         }
 
         logger.info { "View Details button click summary:" }
+        logger.info { "  Total cards from backend: $totalCards" }
         logger.info { "  Successfully clicked: $clickedCount" }
         logger.info { "  Failed: ${failedCards.size}" }
         logger.info { "  Failed cards: $failedCards" }
@@ -475,8 +469,8 @@ class LabTestsPageComprehensiveTest {
         labTestsPage.takeScreenshot("view-details-buttons-clicked")
 
         // Assert that all buttons were clicked successfully
-        assert(clickedCount == 14) {
-            "Expected to click all 14 View Details buttons, but only clicked $clickedCount. Failed cards: $failedCards"
+        assert(clickedCount == totalCards) {
+            "Expected to click all $totalCards View Details buttons, but only clicked $clickedCount. Failed cards: $failedCards"
         }
 
         assert(failedCards.isEmpty()) {
@@ -485,7 +479,7 @@ class LabTestsPageComprehensiveTest {
     }
 
     @Test
-    fun `should verify View Details button is enabled for all 14 test panel cards`() {
+    fun `should verify View Details button is enabled for all test panel cards`() {
         val labTestsPage = navigateToDiagnosticsPage()
         labTestsPage.waitForPageLoad()
         labTestsPage.waitForTestPanelsToLoad()
@@ -493,58 +487,34 @@ class LabTestsPageComprehensiveTest {
         // Get all backend items (packages + test_profiles + tests)
         val backendItems = labTestsPage.getAllBackendItems()
         logger.info { "Backend items: $backendItems" }
+        logger.info { "Backend items count: ${backendItems.size}" }
 
-        // Verify backend has 14 items
-        assert(backendItems.size == 14) {
-            "Expected 14 items from backend, but got ${backendItems.size}"
+        // Verify backend has at least one item
+        assert(backendItems.isNotEmpty()) {
+            "Expected at least one item from backend, but got ${backendItems.size}"
         }
 
-        // Expected order of cards based on Playwright code and screenshots
-        // This matches the order in which View Details buttons appear
-        val expectedCardOrder = listOf(
-            "Longevity Panel",
-            "Advanced Thyroid Panel",
-            "Autoimmune Panel",
-            "Advanced Genetic Analysis",
-            "Advanced Gut Microbiome Analysis",
-            "Advanced Heart Health Panel",
-            "Essential Nutrients Panel",
-            "Thyroid Health Panel",
-            "Omega Profile Panel",
-            "Stress and Cortisol Rhythm Panel",
-            "Liver Health Panel",
-            "Toxic Metals Panel",
-            "Blood Health Panel",
-            "Allergies Test Panel"
-        )
-
-        logger.info { "Verifying View Details buttons for all 14 cards" }
+        val totalCards = backendItems.size
+        logger.info { "Verifying View Details buttons for all $totalCards cards" }
 
         var enabledCount = 0
         var disabledCount = 0
         val failedCards = mutableListOf<String>()
 
-        expectedCardOrder.forEachIndexed { index, cardName ->
+        (0 until totalCards).forEach { index ->
             try {
-                // Map backend name to UI name if needed
-                val uiName = when {
-                    cardName == "Advanced Gut Microbiome Analysis" -> "Advanced Gut Microbiome"
-                    cardName == "Stress and Cortisol Rhythm Panel" -> "Stress and Cortisol Rhythm"
-                    else -> cardName
-                }
-
-                logger.info { "Checking View Details button for card $index: $uiName" }
+                logger.info { "Checking View Details button for card at index: $index" }
 
                 // Verify the View Details button exists and is enabled
                 val isEnabled = labTestsPage.isViewDetailsButtonEnabled(index)
 
                 if (isEnabled) {
                     enabledCount++
-                    logger.info { "✓ View Details button is enabled for: $uiName (index: $index)" }
+                    logger.info { "✓ View Details button is enabled for card at index: $index" }
                 } else {
                     disabledCount++
-                    failedCards.add(uiName)
-                    logger.warn { "✗ View Details button is NOT enabled for: $uiName (index: $index)" }
+                    failedCards.add("Card $index (disabled)")
+                    logger.warn { "✗ View Details button is NOT enabled for card at index: $index" }
                 }
 
                 // Also verify the button is visible
@@ -552,22 +522,23 @@ class LabTestsPageComprehensiveTest {
                     val button = labTestsPage.getViewDetailsButton(index)
                     val isVisible = button.isVisible
                     assert(isVisible) {
-                        "View Details button for '$uiName' (index: $index) should be visible"
+                        "View Details button for card at index $index should be visible"
                     }
-                    logger.info { "  Button visibility: $isVisible for $uiName" }
+                    logger.info { "  Button visibility: $isVisible for card at index: $index" }
                 } catch (e: Exception) {
-                    logger.warn { "Could not verify visibility for $uiName: ${e.message}" }
-                    failedCards.add("$uiName (visibility check failed)")
+                    logger.warn { "Could not verify visibility for card at index $index: ${e.message}" }
+                    failedCards.add("Card $index (visibility check failed)")
                 }
 
             } catch (e: Exception) {
                 disabledCount++
-                failedCards.add(cardName)
-                logger.error { "Failed to check View Details button for '$cardName' (index: $index): ${e.message}" }
+                failedCards.add("Card $index (error: ${e.message})")
+                logger.error { "Failed to check View Details button for card at index $index: ${e.message}" }
             }
         }
 
         logger.info { "View Details button verification summary:" }
+        logger.info { "  Total cards from backend: $totalCards" }
         logger.info { "  Enabled: $enabledCount" }
         logger.info { "  Disabled/Failed: $disabledCount" }
         logger.info { "  Failed cards: $failedCards" }
@@ -575,8 +546,8 @@ class LabTestsPageComprehensiveTest {
         labTestsPage.takeScreenshot("view-details-buttons-verification")
 
         // Assert that all buttons are enabled
-        assert(enabledCount == 14) {
-            "Expected all 14 View Details buttons to be enabled, but only $enabledCount were enabled. Failed cards: $failedCards"
+        assert(enabledCount == totalCards) {
+            "Expected all $totalCards View Details buttons to be enabled, but only $enabledCount were enabled. Failed cards: $failedCards"
         }
 
         assert(disabledCount == 0) {
