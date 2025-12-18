@@ -180,23 +180,18 @@ class LabTestsPageComprehensiveTest {
         val labTestsPage = navigateToDiagnosticsPage()
         labTestsPage.waitForPageLoad()
         labTestsPage.waitForTestPanelsToLoad()
-
         // Get all backend items (packages + test_profiles + tests)
         val backendItems = labTestsPage.getAllBackendItems()
         logger.info { "Backend items count: ${backendItems.size}" }
         logger.info { "Backend items: $backendItems" }
-
         // Verify backend has at least one item
         assert(backendItems.isNotEmpty()) {
             "Expected at least one item from backend, but got ${backendItems.size}"
         }
-
         // Cards should already be loaded from waitForTestPanelsToLoad()
-
         // Get all test panel cards from UI (excluding featured Longevity Panel)
         val uiCards = labTestsPage.getAllTestPanelCards()
         logger.info { "UI cards count: ${uiCards.size}" }
-
         // If no cards found, try alternative approach
         if (uiCards.isEmpty()) {
             logger.warn { "No cards found with getAllTestPanelCards(), trying alternative approach..." }
@@ -208,35 +203,12 @@ class LabTestsPageComprehensiveTest {
                 logger.error { "Could not find View Details buttons: ${e.message}" }
             }
         }
-
         // Verify UI shows the same number of cards as backend items (excluding featured Longevity Panel)
         assert(uiCards.size == backendItems.size) {
             "Expected ${backendItems.size} test panel cards in UI (matching backend count), but got ${uiCards.size}. " +
             "Page URL: ${page.url()}"
         }
-
-        // Verify each backend item has a corresponding UI card
-        val uiCardNames = mutableListOf<String>()
-        uiCards.forEachIndexed { index, card ->
-            val cardName = labTestsPage.getTestPanelNameFromCard(card)
-            if (cardName != null) {
-                uiCardNames.add(cardName)
-                logger.info { "Card $index: Found name '$cardName'" }
-            } else {
-                // Try to get card text for debugging
-                try {
-                    val cardText = card.textContent()?.take(200) ?: "null"
-                    logger.warn { "Card $index: Could not extract name. Card text preview: $cardText" }
-                } catch (e: Exception) {
-                    logger.warn { "Card $index: Could not extract name or text: ${e.message}" }
-                }
-            }
-        }
-
-        logger.info { "UI card names extracted: $uiCardNames" }
-        logger.info { "Total UI card names found: ${uiCardNames.size}" }
-
-        // Normalize names for comparison (handle UI vs backend name differences)
+        // Normalize backend names for comparison (handle UI vs backend name differences)
         val normalizedBackendItems = backendItems.map { name ->
             when {
                 name == "Advanced Gut Microbiome Analysis" -> "Advanced Gut Microbiome"
@@ -244,159 +216,178 @@ class LabTestsPageComprehensiveTest {
                 else -> name
             }
         }
-        
-        val normalizedUiCardNames = uiCardNames.map { name ->
-            when {
-                name.contains("Advanced Gut Microbiome") -> "Advanced Gut Microbiome"
-                name.contains("Stress and Cortisol") -> "Stress and Cortisol Rhythm"
-                else -> name
+        // Single loop: Verify each UI card matches backend data (dynamic template approach)
+        // All cards have same template structure, just different values from backend
+        var matchedCount = 0
+        var mismatchCount = 0
+        var viewDetailsButtonIssues = 0
+        val foundBackendItems = mutableSetOf<String>()
+        uiCards.forEachIndexed { index, card ->
+            // Extract ALL card data in ONE pass (minimizes DOM queries - single textContent() call)
+            val cardData = labTestsPage.extractAllCardData(card, index)
+            val cardName = cardData.name
+
+            if (cardName == null) {
+                logger.warn { "Card $index: Could not extract name" }
+                mismatchCount++
+                return@forEachIndexed
             }
+
+            // Normalize card name for comparison
+            val normalizedCardName = when {
+                cardName.contains("Advanced Gut Microbiome") -> "Advanced Gut Microbiome"
+                cardName.contains("Stress and Cortisol") -> "Stress and Cortisol Rhythm"
+                else -> cardName
+            }
+
+            // Find matching backend item (dynamic lookup)
+            val backendItem = labTestsPage.getBackendItemByName(cardName)
+            if (backendItem == null) {
+                logger.warn { "Backend item not found for UI card: '$cardName'" }
+                mismatchCount++
+                return@forEachIndexed
+            }
+
+            val (pkg, profile, test) = backendItem
+            
+            // Extract backend values dynamically (same template, different values)
+            val backendDescription = when {
+                pkg != null -> pkg.description
+                profile != null -> profile.description
+                test != null -> test.description
+                else -> null
+            }
+            val backendPrice = when {
+                pkg != null -> pkg.product?.price
+                profile != null -> profile.product?.price
+                test != null -> test.product?.price
+                else -> null
+            }
+            val backendSampleType = when {
+                pkg != null -> pkg.sample_type
+                profile != null -> profile.sample_type
+                test != null -> test.sample_type
+                else -> null
+            }
+            val backendCode = when {
+                pkg != null -> pkg.code
+                profile != null -> profile.code
+                test != null -> test.code
+                else -> null
+            }
+
+            // Track found backend items
+            foundBackendItems.add(normalizedCardName)
+
+            // Verify all card elements using extracted data (no additional DOM queries)
+            // 1. Verify image exists
+            if (!cardData.hasImage) {
+                logger.warn { "Image not found for '$cardName'" }
+                mismatchCount++
+            }
+            
+            // 2. Verify description
+            val uiDescription = cardData.description
+            val isSampleTypeOrBadge = uiDescription?.let { desc ->
+                desc.equals("Blood test", ignoreCase = true) ||
+                desc.equals("Stool test", ignoreCase = true) ||
+                desc.equals("Cheek swab test", ignoreCase = true) ||
+                desc.equals("At-Home Test Kit", ignoreCase = true) ||
+                desc.equals("Recommended for you", ignoreCase = true) ||
+                desc.length < 20
+            } ?: false
+            
+            if (!isSampleTypeOrBadge && uiDescription != null && backendDescription != null) {
+                val backendDescSnippet = backendDescription.take(50)
+                val uiDescSnippet = uiDescription.take(50)
+                val descriptionMatches = uiDescription.contains(backendDescSnippet) || 
+                                         backendDescription.contains(uiDescSnippet) ||
+                                         uiDescSnippet.contains(backendDescSnippet) ||
+                                         backendDescSnippet.contains(uiDescSnippet)
+                
+                if (!descriptionMatches) {
+                    logger.warn { "Description mismatch for '$cardName': UI='$uiDescription', Backend='$backendDescription'" }
+                    mismatchCount++
+                }
+            }
+
+            // 3. Verify price
+            val uiPrice = cardData.price
+            if (uiPrice != null && backendPrice != null) {
+                val uiPriceNum = uiPrice.replace(Regex("[₹, ]"), "").replace(".00", "")
+                val backendPriceNum = backendPrice.replace(".00", "")
+                
+                if (uiPriceNum != backendPriceNum) {
+                    logger.warn { "Price mismatch for '$cardName': UI='$uiPrice' ($uiPriceNum), Backend='₹$backendPrice' ($backendPriceNum)" }
+                    mismatchCount++
+                }
+            }
+
+            // 4. Verify sample type (with web logic)
+            val uiType = cardData.sampleType
+            if (uiType != null && backendSampleType != null) {
+                val expectedType = labTestsPage.getSampleTypeDisplayText(backendSampleType, backendCode)
+                if (uiType != expectedType) {
+                    logger.warn { "Sample type mismatch for '$cardName': UI='$uiType', Expected='$expectedType'" }
+                    mismatchCount++
+                }
+            }
+
+            // 5. Verify "Recommended for you" badge visibility (based on backend why_test)
+            val shouldHaveBadge = labTestsPage.shouldHaveRecommendedBadge(pkg, profile, test)
+            val hasBadge = cardData.hasRecommendedBadge
+            
+            if (shouldHaveBadge != hasBadge) {
+                if (shouldHaveBadge && !hasBadge) {
+                    logger.warn { "Missing 'Recommended for you' badge for '$cardName' (backend has why_test)" }
+                    mismatchCount++
+                } else if (!shouldHaveBadge && hasBadge) {
+                    logger.warn { "Unexpected 'Recommended for you' badge for '$cardName' (backend has no why_test)" }
+                    mismatchCount++
+                }
+            } else {
+                logger.debug { "Badge visibility correct for '$cardName': shouldHave=$shouldHaveBadge, has=$hasBadge" }
+            }
+
+            // 6. Verify View Details button is visible and enabled
+            val viewDetailsButton = cardData.viewDetailsButton
+            if (viewDetailsButton == null) {
+                logger.warn { "View Details button NOT found for '$cardName' (index: $index)" }
+                viewDetailsButtonIssues++
+            } else {
+                try {
+                    val isVisible = viewDetailsButton.isVisible
+                    val isEnabled = viewDetailsButton.isEnabled
+                    
+                    if (!isVisible) {
+                        logger.warn { "View Details button NOT visible for '$cardName' (index: $index)" }
+                        viewDetailsButtonIssues++
+                    }
+                    
+                    if (!isEnabled) {
+                        logger.warn { "View Details button NOT enabled for '$cardName' (index: $index)" }
+                        viewDetailsButtonIssues++
+                    }
+                } catch (e: Exception) {
+                    logger.error { "Failed to verify View Details button for '$cardName' (index: $index): ${e.message}" }
+                    viewDetailsButtonIssues++
+                }
+            }
+
+            matchedCount++
+            logger.info { "✓ Verified card: $cardName" }
         }
 
-        // Check that all backend items are displayed in UI
+        // Verify all backend items were found in UI
         val missingItems = normalizedBackendItems.filter { backendName ->
-            !normalizedUiCardNames.contains(backendName)
+            !foundBackendItems.contains(backendName)
         }
 
         if (missingItems.isNotEmpty()) {
             logger.error { "Backend items not found in UI: $missingItems" }
             logger.error { "Backend items: $normalizedBackendItems" }
-            logger.error { "UI card names: $normalizedUiCardNames" }
-        }
-
-        assert(missingItems.isEmpty()) {
-            "Backend items not found in UI: $missingItems. Backend: $normalizedBackendItems, UI: $normalizedUiCardNames"
-        }
-
-        // Verify each UI card matches backend data
-        var matchedCount = 0
-        var mismatchCount = 0
-        var viewDetailsButtonIssues = 0
-
-        uiCards.forEachIndexed { index, card ->
-            val cardName = labTestsPage.getTestPanelNameFromCard(card)
-            if (cardName != null && backendItems.contains(cardName)) {
-                val backendItem = labTestsPage.getBackendItemByName(cardName)
-                
-                if (backendItem != null) {
-                    val (pkg, profile, test) = backendItem
-                    
-                    // Get description, price, and sample_type based on item type
-                    val backendDescription = when {
-                        pkg != null -> pkg.description
-                        profile != null -> profile.description
-                        test != null -> test.description
-                        else -> null
-                    }
-                    
-                    val backendPrice = when {
-                        pkg != null -> pkg.product?.price
-                        profile != null -> profile.product?.price
-                        test != null -> test.product?.price
-                        else -> null
-                    }
-                    
-                    val backendSampleType = when {
-                        pkg != null -> pkg.sample_type
-                        profile != null -> profile.sample_type
-                        test != null -> test.sample_type
-                        else -> null
-                    }
-                    
-                    val backendCode = when {
-                        pkg != null -> pkg.code
-                        profile != null -> profile.code
-                        test != null -> test.code
-                        else -> null
-                    }
-                    
-                    // Verify description (skip if UI description is actually a sample type or badge)
-                    val uiDescription = labTestsPage.getTestPanelDescriptionFromCard(card)
-                    
-                    // Check if UI description is actually a sample type or badge (not a real description)
-                    val isSampleTypeOrBadge = uiDescription?.let { desc ->
-                        desc.equals("Blood test", ignoreCase = true) ||
-                        desc.equals("Stool test", ignoreCase = true) ||
-                        desc.equals("Cheek swab test", ignoreCase = true) ||
-                        desc.equals("At-Home Test Kit", ignoreCase = true) ||
-                        desc.equals("Recommended for you", ignoreCase = true) ||
-                        desc.length < 20 // Too short to be a description
-                    } ?: false
-                    
-                    if (!isSampleTypeOrBadge && uiDescription != null && backendDescription != null) {
-                        // Description might be truncated in UI, so check if either contains a portion of the other
-                        // Take first 50 chars of each for comparison (or full length if shorter)
-                        val backendDescSnippet = backendDescription.take(50)
-                        val uiDescSnippet = uiDescription.take(50)
-                        val descriptionMatches = uiDescription.contains(backendDescSnippet) || 
-                                                 backendDescription.contains(uiDescSnippet) ||
-                                                 uiDescSnippet.contains(backendDescSnippet) ||
-                                                 backendDescSnippet.contains(uiDescSnippet)
-                        
-                        if (!descriptionMatches) {
-                            logger.warn { "Description mismatch for '$cardName': UI='$uiDescription', Backend='$backendDescription'" }
-                            mismatchCount++
-                        }
-                    } else if (isSampleTypeOrBadge) {
-                        logger.debug { "Skipping description comparison for '$cardName' - UI text appears to be sample type or badge: '$uiDescription'" }
-                    }
-
-                    // Verify price
-                    val uiPrice = labTestsPage.getTestPanelPriceFromCard(card)
-
-                    if (uiPrice != null && backendPrice != null) {
-                        // Extract numeric price (e.g., "₹1,499" -> "1499", "1499.00" -> "1499")
-                        val uiPriceNum = uiPrice.replace(Regex("[₹, ]"), "").replace(".00", "")
-                        val backendPriceNum = backendPrice.replace(".00", "")
-                        
-                        if (uiPriceNum != backendPriceNum) {
-                            logger.warn { "Price mismatch for '$cardName': UI='$uiPrice' ($uiPriceNum), Backend='₹$backendPrice' ($backendPriceNum)" }
-                            mismatchCount++
-                        }
-                    }
-
-                    // Verify sample type (using web logic: check code first, then sample_type)
-                    val uiType = labTestsPage.getTestPanelTypeFromCard(card)
-                    
-                    if (uiType != null && backendSampleType != null) {
-                        // Pass code to getSampleTypeDisplayText to match web logic
-                        val expectedType = labTestsPage.getSampleTypeDisplayText(backendSampleType, backendCode)
-                        if (uiType != expectedType) {
-                            logger.warn { "Sample type mismatch for '$cardName': UI='$uiType', Backend='$backendSampleType' (code: '$backendCode', expected: '$expectedType')" }
-                            mismatchCount++
-                        } else {
-                            logger.debug { "Sample type matches for '$cardName': UI='$uiType', Expected='$expectedType'" }
-                        }
-                    }
-
-                    // Verify View Details button is visible and enabled
-                    try {
-                        val viewDetailsButton = labTestsPage.getViewDetailsButton(index)
-                        val isVisible = viewDetailsButton.isVisible
-                        val isEnabled = labTestsPage.isViewDetailsButtonEnabled(index)
-                        
-                        if (!isVisible) {
-                            logger.warn { "View Details button is NOT visible for '$cardName' (index: $index)" }
-                            viewDetailsButtonIssues++
-                        }
-                        
-                        if (!isEnabled) {
-                            logger.warn { "View Details button is NOT enabled for '$cardName' (index: $index)" }
-                            viewDetailsButtonIssues++
-                        }
-                        
-                        if (isVisible && isEnabled) {
-                            logger.debug { "View Details button is visible and enabled for '$cardName' (index: $index)" }
-                        }
-                    } catch (e: Exception) {
-                        logger.error { "Failed to verify View Details button for '$cardName' (index: $index): ${e.message}" }
-                        viewDetailsButtonIssues++
-                    }
-
-                    matchedCount++
-                    logger.info { "✓ Verified card: $cardName" }
-                }
-            }
+            logger.error { "Found UI items: $foundBackendItems" }
+            mismatchCount += missingItems.size
         }
 
         logger.info { "Matched cards: $matchedCount, Data mismatches: $mismatchCount, View Details button issues: $viewDetailsButtonIssues" }
