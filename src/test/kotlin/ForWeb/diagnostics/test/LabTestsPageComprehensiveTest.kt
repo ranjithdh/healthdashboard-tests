@@ -271,8 +271,9 @@ class LabTestsPageComprehensiveTest {
         // Verify each UI card matches backend data
         var matchedCount = 0
         var mismatchCount = 0
+        var viewDetailsButtonIssues = 0
 
-        uiCards.forEach { card ->
+        uiCards.forEachIndexed { index, card ->
             val cardName = labTestsPage.getTestPanelNameFromCard(card)
             if (cardName != null && backendItems.contains(cardName)) {
                 val backendItem = labTestsPage.getBackendItemByName(cardName)
@@ -368,18 +369,46 @@ class LabTestsPageComprehensiveTest {
                         }
                     }
 
+                    // Verify View Details button is visible and enabled
+                    try {
+                        val viewDetailsButton = labTestsPage.getViewDetailsButton(index)
+                        val isVisible = viewDetailsButton.isVisible
+                        val isEnabled = labTestsPage.isViewDetailsButtonEnabled(index)
+                        
+                        if (!isVisible) {
+                            logger.warn { "View Details button is NOT visible for '$cardName' (index: $index)" }
+                            viewDetailsButtonIssues++
+                        }
+                        
+                        if (!isEnabled) {
+                            logger.warn { "View Details button is NOT enabled for '$cardName' (index: $index)" }
+                            viewDetailsButtonIssues++
+                        }
+                        
+                        if (isVisible && isEnabled) {
+                            logger.debug { "View Details button is visible and enabled for '$cardName' (index: $index)" }
+                        }
+                    } catch (e: Exception) {
+                        logger.error { "Failed to verify View Details button for '$cardName' (index: $index): ${e.message}" }
+                        viewDetailsButtonIssues++
+                    }
+
                     matchedCount++
                     logger.info { "✓ Verified card: $cardName" }
                 }
             }
         }
 
-        logger.info { "Matched cards: $matchedCount, Mismatches: $mismatchCount" }
+        logger.info { "Matched cards: $matchedCount, Data mismatches: $mismatchCount, View Details button issues: $viewDetailsButtonIssues" }
         
         labTestsPage.takeScreenshot("all-cards-verified")
         
         assert(mismatchCount == 0) {
             "Found $mismatchCount mismatches between UI cards and backend data"
+        }
+        
+        assert(viewDetailsButtonIssues == 0) {
+            "Found $viewDetailsButtonIssues View Details button issues (not visible or not enabled)"
         }
         
         assert(matchedCount == backendItems.size) {
