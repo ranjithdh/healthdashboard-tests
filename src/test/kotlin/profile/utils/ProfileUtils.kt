@@ -63,7 +63,7 @@ object ProfileUtils {
 
         // 3️⃣ Format as dd/MM/yyyy
         val formatter =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH)
+            DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH)
 
         return localDate.format(formatter)
     }

@@ -677,8 +677,6 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-
-
     private fun valueByLabel(label: String): Locator {
         return page.getByRole(
             AriaRole.HEADING,
@@ -702,11 +700,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         countryCode: String
     ) {
 
-        assertTrue(valueByLabel("Name").innerText().equals(name))
-        assertTrue(valueByLabel("Email").innerText().equals(email))
-        assertTrue(valueByLabel("Date of Birth").innerText().equals(dob))
-        assertTrue(valueByLabel("Mobile Number").innerText().equals(countryCode))
-
         logger.info {
             "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${
                 valueByLabel(
@@ -718,6 +711,13 @@ class ProfilePage(page: Page) : BasePage(page) {
                 ).innerText()
             } : $countryCode"
         }
+
+        assertTrue(valueByLabel("Name").innerText().equals(name))
+        assertTrue(valueByLabel("Email").innerText().equals(email))
+        assertTrue(valueByLabel("Date of Birth").innerText().equals(dob))
+        assertTrue(valueByLabel("Mobile Number").innerText().equals(countryCode))
+
+
     }
 
 
@@ -727,20 +727,43 @@ class ProfilePage(page: Page) : BasePage(page) {
         waitForViewProfileLoaded()
 
         val editProfile = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Edit Profile"))
+        val saveChanges = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
+
         editProfile.waitFor()
         editProfile.click()
         waitForEditProfileLoaded()
 
 
-        /*  val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
-          val dob = formatDobToDdMmYyyy(piiData?.dob)
+        val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
+        val editDob = formatDobToDdMmYyyy(piiData?.dob)
+        val viewDob = formatDobWithAge(piiData?.dob)
 
-          assertEditProfileDetails(
-              name = piiData?.name ?: "",
-              email = piiData?.email ?: "",
-              dob = dob,
-              countryCode = mobileNumber
-          )*/
+
+        assertEditProfileDetails(
+            name = piiData?.name ?: "",
+            email = piiData?.email ?: "",
+            dob = editDob,
+            countryCode = mobileNumber
+        )
+
+        val randomNumber = (1..100).random()
+
+        val updateName = editableInputByLabel("Name").inputValue().plus(" $randomNumber")
+
+        editableInputByLabel("Name").fill(updateName)
+
+        saveChanges.click()
+
+        waitForViewProfileLoaded()
+
+
+        assertViewProfileDetails(
+            name = updateName,
+            email = piiData?.email ?: "",
+            dob = viewDob,
+            countryCode = mobileNumber
+        )
+
     }
 
     private fun fieldContainer(label: String): Locator {
@@ -770,30 +793,31 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    /*  fun assertEditProfileDetails(
-          name: String,
-          email: String,
-          dob: String,
-          countryCode: String
-      ) {
+    fun assertEditProfileDetails(
+        name: String,
+        email: String,
+        dob: String,
+        countryCode: String
+    ) {
+        logger.info {
+            "${editableInputByLabel("Name").inputValue()} : $name, ${editableInputByLabel("Email").inputValue()} : $email, ${
+                editableInputByLabel(
+                    "Date of Birth"
+                ).inputValue()
+            } : $dob, ${
+                readOnlyValueByLabel(
+                    "Mobile Number"
+                ).innerText().trim()
+            } : $countryCode"
+        }
 
-          assertTrue(inputByHeading("Name").innerText().equals(name))
-          assertTrue(inputByHeading("Email").innerText().equals(email))
-          assertTrue(inputByHeading("Date of Birth").innerText().equals(dob))
-          assertTrue(inputByHeading("Mobile Number").innerText().equals(countryCode))
+        assertTrue(editableInputByLabel("Name").inputValue().equals(name))
+        assertTrue(editableInputByLabel("Email").inputValue().equals(email))
+        assertTrue(editableInputByLabel("Date of Birth").inputValue().equals(dob))
+        assertEquals(readOnlyValueByLabel("Mobile Number").innerText().trim(), countryCode)
 
-          logger.info {
-              "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${
-                  valueByLabel(
-                      "Date of Birth"
-                  ).innerText()
-              } : $dob, ${
-                  valueByLabel(
-                      "Mobile Number"
-                  ).innerText()
-              } : $countryCode"
-          }
-      }*/
+
+    }
 
 }
 
