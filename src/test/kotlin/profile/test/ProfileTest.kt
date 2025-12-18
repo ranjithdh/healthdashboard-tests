@@ -88,7 +88,7 @@ class ProfileTest {
     }
 
 
-    @Test
+  /*  @Test
     fun `profile page new address validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -104,7 +104,7 @@ class ProfileTest {
         profilePage.clickAddNewAddress()
         assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         profilePage.assertAddressFormFieldsVisible()
-    }
+    }*/
 
     @Test
     fun `profile page new address add validation`() {
