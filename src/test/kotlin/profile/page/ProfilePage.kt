@@ -43,7 +43,20 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         }
 
+        // Listener to log all responses from API_ADDRESS during the action
+        val responseHandler = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
+                logger.info { "API Response: ${response.status()} ${response.url()}" }
+                try {
+                    logger.info { "API Response Body: ${response.text()}" }
+                } catch (e: Exception) {
+                    logger.warn { "Could not read response body: ${e.message}" }
+                }
+            }
+        }
+
         page.onRequest(requestHandler)
+        page.onResponse(responseHandler)
 
         try {
             val response = page.waitForResponse(
@@ -71,6 +84,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
         } finally {
             page.offRequest(requestHandler)
+            page.offResponse(responseHandler)
         }
     }
 
