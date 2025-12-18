@@ -143,4 +143,36 @@ class ProfileTest {
         profilePage.selectCommunicationOption()
 
     }
+
+
+    /**------------Account Information----------------*/
+    @Test
+    fun `account information validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        profilePage.accountInformationValidation()
+    }
+
+    @Test
+    fun `account information edit`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickProfile()
+            .waitForConfirmation()
+
+        profilePage.accountInformationValidation()
+    }
 }

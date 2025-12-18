@@ -7,11 +7,14 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
+import model.profile.PiiData
+import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import model.profile.PreferenceUpdateResponse
 import model.profile.UserPreferenceResponse
 import profile.utils.ProfileUtils.buildAddressText
+import profile.utils.ProfileUtils.formatDobWithAge
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
@@ -24,6 +27,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private var addressData: UserAddressData? = null
     private var currentPreference: String? = null
+    private var piiData: PiiData? = null
 
     val tonePreference: Locator = byText("Tone Preference")
 
@@ -618,6 +622,99 @@ class ProfilePage(page: Page) : BasePage(page) {
         val card = communicationCard(title)
         card.waitFor()
         return card.locator("svg").first().isVisible
+    }
+
+
+    /**------------Account Information----------------*/
+    fun fetchAccountInformation() {
+        try {
+            logger.info { "Fetching current preference from API..." }
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_ACCOUNT_INFORMATION,
+                com.microsoft.playwright.options.RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", "Asia/Calcutta")
+            )
+
+            if (response.status() != 200) {
+                logger.error { "API returned status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            logger.info { "API response...${responseBody}" }
+
+            val responseObj = json.decodeFromString<PiiUserResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                piiData = responseObj.data.piiData
+                logger.info { "Current account Information from API: $piiData" }
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch current preference: ${e.message}" }
+        }
+    }
+
+    fun accountInformationValidation() {
+        fetchAccountInformation()
+        waitForProfileLoaded()
+
+        val mobileNumber = "+${piiData?.countryCode} ${piiData?.mobile}"
+        val dob = formatDobWithAge(piiData?.dob)
+
+        assertProfileDetails(
+            name = piiData?.name ?: "",
+            email = piiData?.email ?: "",
+            dob = dob,
+            countryCode = mobileNumber
+        )
+
+    }
+
+
+    private fun valueByLabel(label: String): Locator {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName(label)
+        )
+            .locator("xpath=following-sibling::*")
+            .first()
+    }
+
+    fun waitForProfileLoaded() {
+        valueByLabel("Name").waitFor()
+        valueByLabel("Email").waitFor()
+        valueByLabel("Date of Birth").waitFor()
+        valueByLabel("Mobile Number").waitFor()
+    }
+
+
+    fun assertProfileDetails(
+        name: String,
+        email: String,
+        dob: String,
+        countryCode: String
+    ) {
+
+        assertTrue(valueByLabel("Name").innerText().equals(name))
+        assertTrue(valueByLabel("Email").innerText().equals(email))
+        assertTrue(valueByLabel("Date of Birth").innerText().equals(dob))
+        assertTrue(valueByLabel("Mobile Number").innerText().equals(countryCode))
+        logger.info {
+            "${valueByLabel("Name").innerText()} : $name, ${valueByLabel("Email").innerText()} : $email, ${valueByLabel("Date of Birth").innerText()} : $dob, ${
+                valueByLabel(
+                    "Mobile Number"
+                ).innerText()
+            } : $countryCode"
+        }
     }
 
 }

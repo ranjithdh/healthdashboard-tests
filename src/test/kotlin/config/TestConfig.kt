@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 
 object TestConfig {
 
-    const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiRkhlRzZ5cTNBWXZtdTR0eGN3OFVqN0VUcmFTMk5LUGsiLCJzZXNzaW9uX2lkIjoiYzk0MTliMzEtMTdiOC00ZTE4LTllN2ItN2M3ODU1ODVlNDVlIiwidXNlcl9pbnRfaWQiOiI0MSIsInByb2ZpbGVfaWQiOiIzMCIsImxlYWRfaWQiOiI2MjBkMTExNi0zMjI3LTQyMjctYWE4OS05OWJkMzgxZDJiIiwiaWF0IjoxNzY2MDU0NzQ0LCJleHAiOjE3NjY2NTk1NDR9.c918wHnulwB9BnhfTfiXS2mhma4XQSru2s4kIGnqh9w"
+    const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiRkhlRzZ5cTNBWXZtdTR0eGN3OFVqN0VUcmFTMk5LUGsiLCJzZXNzaW9uX2lkIjoiY2IzZmRiMjMtMzZjMC00NDA4LWJhZGQtZWQyYjQ2NDdhMDhiIiwidXNlcl9pbnRfaWQiOiI0MSIsInByb2ZpbGVfaWQiOiIzMCIsImxlYWRfaWQiOiI2MjBkMTExNi0zMjI3LTQyMjctYWE4OS05OWJkMzgxZDJiIiwiaWF0IjoxNzY2MDU2ODk3LCJleHAiOjE3NjY2NjE2OTd9.2EGJhkrfzfzBxPcrOBpungN7YVTWpZn3H-5H8uYnlIo"
     const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
 
 
@@ -42,6 +42,7 @@ object TestConfig {
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
         val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
         val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
+        val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
     }
 
 
