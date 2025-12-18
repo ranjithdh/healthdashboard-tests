@@ -40,6 +40,7 @@ object TestConfig {
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
+        val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
     }
 
 
