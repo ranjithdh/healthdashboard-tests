@@ -1,13 +1,16 @@
 package profile.utils
 
 import model.profile.Address
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.Period
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.util.*
 
 object ProfileUtils {
 
-     fun buildAddressText(address: Address): String {
+    fun buildAddressText(address: Address): String {
         return listOf(
             address.addressHouseNo,
             address.addressLine1,
@@ -22,12 +25,11 @@ object ProfileUtils {
     }
 
 
-
     fun formatDobWithAge(
         utcIso: String?,
         zoneId: ZoneId = ZoneId.systemDefault()
     ): String {
-        if (utcIso.isNullOrBlank()){
+        if (utcIso.isNullOrBlank()) {
             return ""
         }
 
@@ -68,6 +70,20 @@ object ProfileUtils {
         return localDate.format(formatter)
     }
 
+    fun calculateBMIValues(heightCm: Double, weightKg: Double): String {
+        val heightMeters = heightCm / 100
+        val bmi = weightKg / (heightMeters * heightMeters)
+        return String.format("%.2f", bmi)
+    }
+
+
+    fun bmiCategoryValues(bmi: Double): String {
+        if (bmi < 18) return "Unusual BMI. Re-check entered values."
+        if (bmi < 18.5) return "Underweight"
+        if (bmi < 25) return "Normal"
+        if (bmi < 30) return "Overweight"
+        return "Obese"
+    }
 
 
 }

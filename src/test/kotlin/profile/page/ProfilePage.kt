@@ -1,6 +1,7 @@
 package profile.page
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -8,7 +9,9 @@ import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
+import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
+import profile.utils.ProfileUtils.calculateBMIValues
 import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import utils.logger.logger
@@ -852,9 +855,102 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(editableInputByLabel("Email").inputValue().equals(email))
         assertTrue(editableInputByLabel("Date of Birth").inputValue().equals(dob))
         assertEquals(readOnlyValueByLabel("Mobile Number").innerText().trim(), countryCode)
-
-
     }
+
+    /**-------------Health Metrics---------------*/
+    private fun heightValue(): Locator? {
+        return page
+            .getByText("Height (cm):", Page.GetByTextOptions().setExact(true))
+            .locator("xpath=ancestor::div[contains(@class,'justify-between')]//p")
+            .first()
+    }
+
+
+    private fun weightValue(): Locator? {
+        return page
+            .getByText("Weight (kg):", Page.GetByTextOptions().setExact(true))
+            .locator("xpath=ancestor::div[contains(@class,'justify-between')]//p")
+            .first()
+    }
+
+
+    private fun bmiValue(): Locator? {
+        return page.locator("p")
+            .filter(
+                FilterOptions()
+                    .setHasText(Pattern.compile("\\d+\\.\\d{2}"))
+            )
+            .first()
+    }
+
+    var actualBmi: String = bmiValue()!!
+        .textContent()
+        .replace("BMI", "")
+        .trim { it <= ' ' }
+
+
+    private fun bmiCategory(): Locator? {
+        return page.locator("span")
+            .filter(
+                FilterOptions()
+                    .setHasNotText("BMI")
+            )
+            .filter(
+                FilterOptions()
+                    .setHasText(
+                        Pattern.compile(
+                            "Unusual|Underweight|Normal|Overweight|Obese"
+                        )
+                    )
+            )
+            .first()
+    }
+
+    fun assertHealthMetrics() {
+        fetchAccountInformation()
+
+        val expectedHeight = piiData?.height?:0
+        val expectedWeight = piiData?.weight?:0
+        // Height
+
+        assertEquals(
+            expectedHeight.toString(),
+            heightValue()!!.textContent().trim { it <= ' ' }
+        )
+
+        // Weight
+        assertEquals(
+            expectedWeight.toString(),
+            weightValue()!!.textContent().trim { it <= ' ' }
+        )
+
+        // BMI
+        val expectedBmi: String =
+            calculateBMIValues(expectedHeight.toDouble(), expectedWeight.toDouble())
+
+        val actualBmi =
+            bmiValue()!!.textContent().replace("BMI", "").trim { it <= ' ' }
+
+        assertEquals(expectedBmi, actualBmi)
+
+        // BMI Category
+        val expectedCategory: String? =
+            bmiCategoryValues(expectedBmi.toDouble())
+
+        assertEquals(
+            expectedCategory,
+            bmiCategory()!!.textContent().trim { it <= ' ' }
+        )
+    }
+
+
+
+
+
+
+
+
+
 
 }
 
