@@ -568,12 +568,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         return card.locator("svg").first().isVisible
     }
 
-    fun clickCommunicationCard(title: String) {
-        val card = communicationCard(title)
-        card.waitFor()
-        card.click()
-    }
-
 }
 
 
