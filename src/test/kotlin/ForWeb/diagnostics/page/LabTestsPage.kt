@@ -1686,8 +1686,13 @@ class LabTestsPage(page: Page) : BasePage(page) {
             false
         }
 
-        // Check if "Recommended for you" badge is visible (from card text content - already extracted)
-        val hasRecommendedBadge = cardText.contains("Recommended for you", ignoreCase = true)
+        // Check if "Recommended for you" badge is visible (check actual DOM element visibility)
+        // Badge is positioned absolutely: className="absolute top-2 left-2"
+        val hasRecommendedBadge = try {
+            card.locator("text=Recommended for you").isVisible
+        } catch (e: Exception) {
+            false
+        }
 
         // Get View Details button (single query - reuse for visibility/enabled check)
         val viewDetailsButton = try {
