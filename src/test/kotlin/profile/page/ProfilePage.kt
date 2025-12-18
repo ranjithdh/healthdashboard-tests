@@ -4,13 +4,11 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
-import com.microsoft.playwright.options.WaitForSelectorState
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
-import org.junit.jupiter.api.Assertions.assertFalse
 import profile.utils.ProfileUtils.buildAddressText
 import utils.logger.logger
 import java.util.regex.Pattern
@@ -76,6 +74,9 @@ class ProfilePage(page: Page) : BasePage(page) {
                 logger.info { "API Response: ${response.status()} ${response.url()}" }
                 try {
                     logger.info { "API Response Body: ${response.text()}" }
+                    if (response.status()==200){
+
+                    }
                 } catch (e: Exception) {
                     logger.warn { "Could not read response body: ${e.message}" }
                 }
