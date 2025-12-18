@@ -569,7 +569,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             "$selectedOption should show check icon"
         )
 
-        val newSelectedPreference = tonePreferenceKeyList[2]
+        val currentIndex = tonePreferenceKeyList.indexOf(alreadySelectedPreference)
+        val nextIndex = (currentIndex + 1) % tonePreferenceKeyList.size
+        val newSelectedPreference = tonePreferenceKeyList[nextIndex]
 
         val newSelectedOption = when (newSelectedPreference) {
             tonePreferenceKeyList[0] -> "Doctor"
