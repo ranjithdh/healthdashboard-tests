@@ -45,38 +45,14 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation() {
-        // Use waitForResponse with callback (matching HomePage.kt pattern)
-        // This will capture the API response that comes during URL wait
-        try {
-            val response = page.waitForResponse(
-                { response: Response? ->
-                    response?.url()
-                        ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
-                },
-                {
-                    // Callback: wait for diagnostics URL
-                    // The API response will come during this wait
-                    page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
-                }
-            )
-
-            // Process the captured response
-            val responseBodyBytes = response.body()
-            if (responseBodyBytes != null && responseBodyBytes.isNotEmpty()) {
-                val responseBody = String(responseBodyBytes)
-                try {
-                    val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
-                    labTestData = responseObj
-                    logger.info { "API data captured during waitForConfirmation" }
-                } catch (e: Exception) {
-                    logger.warn { "Failed to parse API response: ${e.message}" }
-                }
-            }
-        } catch (e: Exception) {
-            logger.warn { "Could not capture API response in waitForConfirmation: ${e.message}" }
-            // Fallback: ensure URL is loaded even if API capture failed
-            page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
+        // Just wait for URL - API response is already captured by OtpPage.onResponse listener
+        // No need to wait for response again if data is already cached
+        if (labTestData == null) {
+            logger.info { "API data not cached, waiting for URL only" }
+        } else {
+            logger.info { "Using cached API data, waiting for URL only" }
         }
+        page.waitForURL("https://app.stg.deepholistics.com/diagnostics")
     }
 
     /**
@@ -169,22 +145,27 @@ class LabTestsPage(page: Page) : BasePage(page) {
         // Wait for filter switches instead - they're more reliable
         byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).waitFor()
 
-        // Fetch API data during page load (before it times out)
-        // This ensures we capture the API response that happens during initial page load
-        try {
-            fetchLabTestDataFromApi()
-        } catch (e: Exception) {
-            logger.warn { "Could not fetch API data during page load: ${e.message}" }
+        // API data should already be cached from OtpPage.onResponse listener
+        // Only fetch if not cached (shouldn't happen in normal flow)
+        if (labTestData == null) {
+            logger.warn { "API data not cached, attempting to fetch..." }
+            try {
+                fetchLabTestDataFromApi()
+            } catch (e: Exception) {
+                logger.warn { "Could not fetch API data: ${e.message}" }
+            }
+        } else {
+            logger.debug { "Using cached API data" }
         }
 
-        // Optionally check for test panels, but don't fail if they don't exist
+        // Wait for View Details buttons to be visible (indicates cards are loaded)
         try {
-            page.waitForSelector("[data-testid='test-panel'], .test-card, [class*='test-card']",
+            page.waitForSelector("button:has-text('View Details')",
                 Page.WaitForSelectorOptions()
                     .setState(WaitForSelectorState.VISIBLE)
-                    .setTimeout(5000.0)) // Shorter timeout
+                    .setTimeout(5000.0))
         } catch (e: Exception) {
-            logger.warn { "Test panels selector not found, but continuing..." }
+            logger.warn { "View Details buttons not found, but continuing..." }
         }
         return this
     }
@@ -1631,6 +1612,94 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     /**
+     * Extract all card data in a single pass (optimized - minimizes DOM queries)
+     * Returns CardData with all extracted information
+     */
+    data class CardData(
+        val name: String?,
+        val description: String?,
+        val price: String?,
+        val sampleType: String?,
+        val hasImage: Boolean,
+        val hasRecommendedBadge: Boolean,
+        val viewDetailsButton: Locator?
+    )
+
+    fun extractAllCardData(card: Locator, index: Int): CardData {
+        // Get card text content ONCE (single DOM query) - reuse for all text extractions
+        val cardText = try { card.textContent() ?: "" } catch (e: Exception) { "" }
+        
+        // Extract name from card text (no additional DOM query)
+        val name = try {
+            val knownPanels = listOf(
+                "Longevity Panel", "Advanced Thyroid Panel", "Autoimmune Panel",
+                "Advanced Genetic Analysis", "Advanced Gut Microbiome Analysis", "Advanced Gut Microbiome",
+                "Advanced Heart Health Panel", "Essential Nutrients Panel", "Thyroid Health Panel",
+                "Omega Profile Panel", "Stress and Cortisol Rhythm Panel", "Stress and Cortisol Rhythm",
+                "Liver Health Panel", "Toxic Metals Panel", "Blood Health Panel", "Allergies Test Panel"
+            )
+            knownPanels.firstOrNull { cardText.contains(it) } ?: run {
+                // Fallback: try to extract from heading structure in text
+                val headingMatch = Regex("(?m)^([A-Z][^\\n]{3,100})$").find(cardText)
+                headingMatch?.value?.trim()?.takeIf { it.length in 3..100 }
+            }
+        } catch (e: Exception) {
+            null
+        }
+
+        // Extract description from card text (no additional DOM query)
+        // Look for longer text blocks that aren't sample types or badges
+        val description = try {
+            val lines = cardText.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+            lines.firstOrNull { line ->
+                line.length > 20 && 
+                !line.equals("Blood test", ignoreCase = true) &&
+                !line.equals("Stool test", ignoreCase = true) &&
+                !line.equals("Cheek swab test", ignoreCase = true) &&
+                !line.equals("At-Home Test Kit", ignoreCase = true) &&
+                !line.equals("Recommended for you", ignoreCase = true) &&
+                !line.matches(Regex("₹[\\d,]+")) && // Not a price
+                !line.matches(Regex("View Details", RegexOption.IGNORE_CASE)) // Not a button
+            }
+        } catch (e: Exception) {
+            null
+        }
+
+        // Extract price from card text (no additional DOM query)
+        val price = try {
+            Regex("₹[\\d,]+").find(cardText)?.value
+        } catch (e: Exception) {
+            null
+        }
+
+        // Extract sample type from card text (no additional DOM query)
+        val sampleType = try {
+            Regex("Blood test|Stool test|Cheek swab test|At-Home Test Kit|Saliva test|Dried Blood Spot test", RegexOption.IGNORE_CASE).find(cardText)?.value
+        } catch (e: Exception) {
+            null
+        }
+
+        // Check if image exists (single query)
+        val hasImage = try {
+            card.locator("img").count() > 0
+        } catch (e: Exception) {
+            false
+        }
+
+        // Check if "Recommended for you" badge is visible (from card text content - already extracted)
+        val hasRecommendedBadge = cardText.contains("Recommended for you", ignoreCase = true)
+
+        // Get View Details button (single query - reuse for visibility/enabled check)
+        val viewDetailsButton = try {
+            byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).nth(index)
+        } catch (e: Exception) {
+            null
+        }
+
+        return CardData(name, description, price, sampleType, hasImage, hasRecommendedBadge, viewDetailsButton)
+    }
+
+    /**
      * Click on test panel image by name
      */
     fun clickTestPanelImage(panelName: String): LabTestsPage {
@@ -1739,6 +1808,30 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     /**
+     * Check if "Recommended for you" badge is visible on a card Locator
+     */
+    fun hasRecommendedBadgeOnCard(card: Locator): Boolean {
+        return try {
+            card.locator("text=Recommended for you").isVisible
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Check if backend item should have "Recommended for you" badge
+     * Based on web logic: badge shows if content.why_test.length > 0
+     */
+    fun shouldHaveRecommendedBadge(pkg: LabTestPackage?, profile: LabTestProfile?, test: LabTestItem?): Boolean {
+        return when {
+            pkg != null -> !pkg.content?.why_test.isNullOrEmpty()
+            profile != null -> !profile.content?.why_test.isNullOrEmpty()
+            test != null -> !test.content?.why_test.isNullOrEmpty()
+            else -> false
+        }
+    }
+
+    /**
      * Get the index of a panel in the grid (for nth() selectors)
      * Returns -1 if not found
      */
@@ -1837,5 +1930,26 @@ class LabTestsPage(page: Page) : BasePage(page) {
             else -> "Blood test" // Default for blood, dried_blood_spot, etc.
         }
     }
+
+    init {
+//        getLabTest()
+    }
+
+//    fun getLabTest(){
+//        val response = page.waitForResponse(
+//            { response: Response? ->
+//                response?.url()
+//                    ?.contains("https://api.stg.dh.deepholistics.com/v4/human-token/lab-test") == true && response.status() == 200
+//            },
+//            {
+//                page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
+//                Page.WaitForResponseOptions().setTimeout(TestConfig.Browser.TIMEOUT * 2)
+//            },
+//        )
+//
+//        processApiResponse(response)
+//
+//
+//    }
 }
 
