@@ -123,6 +123,7 @@ class ProfileTest {
         assert(profilePage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         profilePage.assertAddressFormFieldsVisible()
         profilePage.addAddressAndValidate()
+        assertDoesNotThrow { profilePage.assertAddressesFromApi() }
     }
 
 

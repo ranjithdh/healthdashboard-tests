@@ -16,7 +16,6 @@ import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-private val Logger = KotlinLogging.logger {}
 const val TAG = "ProfilePage...."
 
 class ProfilePage(page: Page) : BasePage(page) {
@@ -34,6 +33,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun captureAddressData(action: () -> Unit) {
+        // Listener to log all requests to API_ADDRESS during the action
+        val requestHandler = { request: com.microsoft.playwright.Request ->
+            if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
+                logger.info { "API Request: ${request.method()} ${request.url()}" }
+                request.postData()?.let {
+                    logger.info { "API Request Payload: $it" }
+                }
+            }
+        }
+
+        page.onRequest(requestHandler)
+
         try {
             val response = page.waitForResponse(
                 { response: Response? ->
@@ -52,13 +63,14 @@ class ProfilePage(page: Page) : BasePage(page) {
             logger.info { "API response...${responseBody}" }
 
             val responseObj = json.decodeFromString<UserAddressResponse>(responseBody)
-            // logger.error { "responseObj...$responseObj" } // Reduced log level or removed redundant error log
 
             if (responseObj.data.addressList.isNotEmpty()) {
                 addressData = responseObj.data
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
+        } finally {
+            page.offRequest(requestHandler)
         }
     }
 
@@ -273,7 +285,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val address = addressItem.address
         val addressId = addressItem.addressId
 
-        Logger.info { "$TAG {addressId:$addressId}" }
+        logger.info { "$TAG {addressId:$addressId}" }
 
         val title = address.addressName ?: "Primary"
         val expectedAddressText = buildAddressText(address)
@@ -329,7 +341,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            6️⃣ Verify Removal
            ------------------------------- */
         val updatedList = addressData?.addressList ?: emptyList()
-        Logger.info { "$TAG {updatedList:$updatedList}" }
+        logger.info { "$TAG {updatedList:$updatedList}" }
         val isRemoved = updatedList.none { it.addressId == addressId }
 
         assertTrue(isRemoved, "Address with ID $addressId was not removed from the list")
@@ -347,6 +359,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val addressItem = addresses.first()
         val address = addressItem.address
+        val addressId = addressItem.addressId
 
         val title = address.addressName ?: "Primary"
         val expectedAddressText = buildAddressText(address)
@@ -402,7 +415,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         val updatedList = addressData?.addressList ?: throw AssertionError("Address list not updated")
-        val updatedAddress = updatedList.find { it.address.addressName == updatedNickName }
+        val updatedAddress = updatedList.find { it.addressId == addressId }
 
         assertEquals(updatedNickName, updatedAddress?.address?.addressName)
     }
