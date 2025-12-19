@@ -4,7 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
-import home.page.HomePage
+import mobileView.home.HomePage
 import forWeb.diagnostics.page.LabTestsPage
 import mu.KotlinLogging
 import profile.page.ProfilePage
@@ -156,5 +156,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return labTestPage
     }
 
-
+    fun isIncorrectOtpMessageVisible(): Boolean {
+        return page.getByText("Incorrect OTP").isVisible
+    }
 }
+

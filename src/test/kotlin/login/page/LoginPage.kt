@@ -16,6 +16,7 @@ class LoginPage(page: Page) : BasePage(page) {
 
     fun enterMobileNumber(phoneNumber: String): LoginPage {
         logger.info { "enterMobileNumber($phoneNumber)" }
+        utils.SignupDataStore.update { mobileNumber = phoneNumber }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).fill(phoneNumber)
         return this
     }
@@ -126,7 +127,7 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
     fun isBloodDrawTextVisible(): Boolean {
-        return byText("At-home blood-draw").isVisible
+        return byText("At-mobileView.home blood-draw").isVisible
     }
 
     fun isResultsTrackedTextVisible(): Boolean {

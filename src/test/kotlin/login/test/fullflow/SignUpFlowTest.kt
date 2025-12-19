@@ -1,11 +1,15 @@
 package login.test.fullflow
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import config.TestConfig
-import home.test.checkBloodTestBookedCardStatus
 import login.page.LoginPage
+import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import java.nio.file.Paths
+import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SignUpFlowTest {
@@ -61,13 +65,18 @@ class SignUpFlowTest {
             .enterOtpAndContinueToAccountCreation("")
             .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
             .fillAndContinue("Male", "170", "60")
-            .fillAndContinue("Flat 101","456 Main Road", "Delhi", "Delhi", "110001")
+            .fillAndContinue("Flat 101", "456 Main Road", "Delhi", "Delhi", "110001")
             .selectSlotsAndContinue()
             .clickContinue()
             .waitForMobileHomePageConfirmation()
 
 
         checkBloodTestBookedCardStatus(homePage)
+
+        assertTrue(
+            homePage.isSavedFullSlotMatchingApi(),
+            "Selected full slot (Date & Time) should match API response on HomePage"
+        )
 
         homePage.takeScreenshot("signup-order-placed")
     }

@@ -55,6 +55,11 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
 
     fun fillDetails(firstName: String, lastName: String, email: String): BasicDetailsPage {
         logger.info { "fillDetails($firstName, $lastName, $email)" }
+        utils.SignupDataStore.update {
+            this.firstName = firstName
+            this.lastName = lastName
+            this.email = email
+        }
         enterFirstName(firstName)
         enterLastName(lastName)
         enterEmail(email)

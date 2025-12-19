@@ -9,6 +9,7 @@ import model.slot.SlotData
 import model.slot.SlotList
 import utils.json.json
 import utils.logger.logger
+import java.time.LocalDateTime
 
 
 class TimeSlotPage(page: Page) : BasePage(page) {
@@ -76,6 +77,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         if (availableSlots.isNotEmpty()) {
             val slotName = availableSlots[0]
             logger.info { "selectMorningSlot: $slotName" }
+            val split = slotName.split("-")
+            utils.SignupDataStore.update { fastingSlot = split.first() }
             return selectSlot(slotName, 0)
         } else {
             logger.warn { "No available morning slots found from API" }
@@ -109,6 +112,13 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
     fun selectSlotsAndContinue(): OrderSummaryPage {
+        val currentDate = LocalDateTime.now()
+        selectDateView(
+            currentDate.dayOfMonth.toString(),
+        )
+
+        utils.SignupDataStore.update { slotDate = currentDate }
+
         selectMorningSlot()
         selectPostMealSlot()
         clickSchedule()
