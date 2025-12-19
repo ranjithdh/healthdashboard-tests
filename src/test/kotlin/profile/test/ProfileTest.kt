@@ -193,7 +193,7 @@ class ProfileTest {
     }
 
     /**-------------Health Metrics---------------*/
-   /* @Test
+ /*   @Test
     fun `health metrics validations`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -202,7 +202,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         profilePage.assertHealthMetrics()

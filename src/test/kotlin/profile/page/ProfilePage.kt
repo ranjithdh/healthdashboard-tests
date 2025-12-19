@@ -191,7 +191,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         addresses.forEach { item ->
             val address = item.address
 
-            val title = address.addressName ?: "Primary"
+            val title = address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
             val expectedAddressText = buildAddressText(address)
 
             // Unique address card
@@ -218,7 +218,6 @@ class ProfilePage(page: Page) : BasePage(page) {
                 .first()
                 .waitFor()
 
-            // Mobile (optional)
             // Mobile (optional)
             if (!address.addressMobile.isNullOrBlank()) {
                 addressCard
@@ -372,7 +371,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val addressId = addressItem.addressId
 
 
-        val title = address.addressName ?: "Primary"
+        val title = address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
         val expectedAddressText = buildAddressText(address)
 
         /* -------------------------------
@@ -445,7 +444,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val address = addressItem.address
         val addressId = addressItem.addressId
 
-        val title = address.addressName ?: "Primary"
+        val title = address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
         val expectedAddressText = buildAddressText(address)
 
         /* -------------------------------
@@ -857,87 +856,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertEquals(readOnlyValueByLabel("Mobile Number").innerText().trim(), countryCode)
     }
 
-    /**-------------Health Metrics---------------*/
-    private fun heightValue(): Locator? {
-        return page
-            .getByText("Height (cm):", Page.GetByTextOptions().setExact(true))
-            .locator("xpath=ancestor::div[contains(@class,'justify-between')]//p")
-            .first()
-    }
 
-
-    private fun weightValue(): Locator? {
-        return page
-            .getByText("Weight (kg):", Page.GetByTextOptions().setExact(true))
-            .locator("xpath=ancestor::div[contains(@class,'justify-between')]//p")
-            .first()
-    }
-
-
-    private fun bmiValue(): Locator? {
-        return page.locator("p")
-            .filter(
-                FilterOptions()
-                    .setHasText(Pattern.compile("\\d+\\.\\d{2}"))
-            )
-            .first()
-    }
-
-
-
-    private fun bmiCategory(): Locator? {
-        return page.locator("span")
-            .filter(
-                FilterOptions()
-                    .setHasNotText("BMI")
-            )
-            .filter(
-                FilterOptions()
-                    .setHasText(
-                        Pattern.compile(
-                            "Unusual|Underweight|Normal|Overweight|Obese"
-                        )
-                    )
-            )
-            .first()
-    }
-
-    fun assertHealthMetrics() {
-        fetchAccountInformation()
-
-        val expectedHeight = piiData?.height?:0
-        val expectedWeight = piiData?.weight?:0
-        // Height
-
-        assertEquals(
-            expectedHeight.toString(),
-            heightValue()!!.textContent().trim { it <= ' ' }
-        )
-
-        // Weight
-        assertEquals(
-            expectedWeight.toString(),
-            weightValue()!!.textContent().trim { it <= ' ' }
-        )
-
-        // BMI
-        val expectedBmi: String =
-            calculateBMIValues(expectedHeight.toDouble(), expectedWeight.toDouble())
-
-        val actualBmi =
-            bmiValue()!!.textContent().replace("BMI", "").trim { it <= ' ' }
-
-        assertEquals(expectedBmi, actualBmi)
-
-        // BMI Category
-        val expectedCategory: String? =
-            bmiCategoryValues(expectedBmi.toDouble())
-
-        assertEquals(
-            expectedCategory,
-            bmiCategory()!!.textContent().trim { it <= ' ' }
-        )
-    }
 
 
 
