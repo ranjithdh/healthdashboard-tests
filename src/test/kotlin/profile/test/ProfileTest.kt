@@ -61,7 +61,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
@@ -79,7 +79,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
@@ -102,7 +102,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -119,7 +119,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -137,7 +137,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         profilePage.selectCommunicationOption()
@@ -155,7 +155,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         profilePage.accountInformationValidation()
@@ -170,7 +170,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         profilePage.accountInformationEdit()
@@ -185,7 +185,7 @@ class ProfileTest {
         val profilePage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickProfile()
+            .clickAccountProfile()
             .waitForConfirmation()
 
         profilePage.accountInformationEditClose()

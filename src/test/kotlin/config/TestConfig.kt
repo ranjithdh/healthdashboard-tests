@@ -31,7 +31,7 @@ object TestConfig {
         val HOME_PATH = "/home"
         val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
 
-        val HOME_PAGE_URL = "$BASE_URL/home"
+       // val HOME_PAGE_URL = "$BASE_URL/home"
         val PROFILE_URL = "$BASE_URL/profile"
     }
 

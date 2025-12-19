@@ -164,7 +164,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
 
-    fun clickProfile(): ProfilePage {
+    fun clickAccountProfile(): ProfilePage {
         val profilePage = ProfilePage(page)
         profilePage.captureAddressData {
             profileImage.click()
