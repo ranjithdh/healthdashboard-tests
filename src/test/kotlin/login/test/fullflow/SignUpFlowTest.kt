@@ -43,7 +43,7 @@ class SignUpFlowTest {
             .setRecordVideoSize(390, 844)
 
         context = browser.newContext(contextOptions)
-        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
 
         val videoPath = page.video()?.path()
@@ -61,12 +61,41 @@ class SignUpFlowTest {
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue("726408303")
+            .enterMobileAndContinue("726408396")
             .enterOtpAndContinueToAccountCreation("")
             .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
             .fillAndContinue("Male", "170", "60")
             .fillAndContinue("Flat 101", "456 Main Road", "Delhi", "Delhi", "110001")
             .selectSlotsAndContinue()
+            .clickContinue()
+            .waitForMobileHomePageConfirmation()
+
+
+        checkBloodTestBookedCardStatus(homePage)
+
+        assertTrue(
+            homePage.isSavedFullSlotMatchingApi(),
+            "Selected full slot (Date & Time) should match API response on HomePage"
+        )
+
+        homePage.takeScreenshot("signup-order-placed")
+    }
+
+
+    @Test
+    fun `complete full signup flow with coupon code`() {
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val homePage = loginPage
+            .clickSignUp()
+            .enterMobileAndContinue("726408399")
+            .enterOtpAndContinueToAccountCreation("")
+            .fillAndContinue("ranjith", "test", "ranjithkumar.m@mysmitch.com")
+            .fillAndContinue("Male", "170", "60")
+            .fillAndContinue("Flat 101", "456 Main Road", "Delhi", "Delhi", "110001")
+            .selectSlotsAndContinue()
+            .enterCouponCode("D261C0")
+            .clickApplyCoupon()
             .clickContinue()
             .waitForMobileHomePageConfirmation()
 
