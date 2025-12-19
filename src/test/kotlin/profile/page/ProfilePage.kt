@@ -883,10 +883,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .first()
     }
 
-    var actualBmi: String = bmiValue()!!
-        .textContent()
-        .replace("BMI", "")
-        .trim { it <= ' ' }
 
 
     private fun bmiCategory(): Locator? {

@@ -29,7 +29,7 @@ class HomePage(page: Page) : BasePage(page) {
     val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
 
     private var homeData: HomeData? = HomeData()
-    private var appointmentDate: String?=null
+    private var appointmentDate: String? = null
 
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {
@@ -47,7 +47,8 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun isBloodTestCardVisible(): Boolean {
-       return page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
+        return page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Dashboard ready to view")).isVisible
     }
 
     fun waitForBloodTestCardToLoad(): HomePage {

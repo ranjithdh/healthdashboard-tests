@@ -121,6 +121,7 @@ class ProfileTest {
             .enterOtpAndContinueToHomePage(testUser.otp)
             .clickAccountProfile()
             .waitForConfirmation()
+
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
         profilePage.editUserAddress()
