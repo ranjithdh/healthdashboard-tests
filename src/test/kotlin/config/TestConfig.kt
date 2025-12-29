@@ -16,6 +16,13 @@ object TestConfig {
 
         val HOME_PAGE_URL = "$BASE_URL/home"
         val PROFILE_URL = "$BASE_URL/profile"
+        
+        // Marketing Website (www.deepholistics.com)
+        val MARKETING_BASE_URL: String = "https://www.deepholistics.com/"
+        val MARKETING_HOW_IT_WORKS: String = "how-it-works"
+        val MARKETING_WHAT_WE_TEST: String = "${MARKETING_BASE_URL}what-we-test"
+        val MARKETING_OUR_WHY: String = "our-why"
+        val MARKETING_FAQ: String = "faq"
     }
 
     object Browser {
