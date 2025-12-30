@@ -112,7 +112,7 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
     fun selectSlotsAndContinue(): OrderSummaryPage {
-        val currentDate = LocalDateTime.now()
+        val currentDate = LocalDateTime.now().plusDays(1)
         selectDateView(
             currentDate.dayOfMonth.toString(),
         )
@@ -296,7 +296,7 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
     fun selectDateView(day: String): TimeSlotPage {
-        logger.info { "selectCalendarDate($day)" }
+        logger.info { "selectDateView($day)" }
         page.getByText(day, Page.GetByTextOptions().setExact(true)).first().click()
         return this
     }
