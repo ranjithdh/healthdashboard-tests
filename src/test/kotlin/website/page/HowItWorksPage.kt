@@ -6,15 +6,28 @@ import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import mu.KotlinLogging
 
+
 private val logger = KotlinLogging.logger {}
 
-/**
- * How It Works Page (https://www.deepholistics.com/how-it-works)
- * Explains the step-by-step process of using Deep Holistics
- */
+
 class HowItWorksPage(page: Page) : MarketingBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.MARKETING_HOW_IT_WORKS
+
+    private val step1Title = page.getByRole(
+        AriaRole.HEADING,
+        Page.GetByRoleOptions().setName("B a s e l i n e s t a r t s w i t h y o u r h e a l t h a s s e s s m e n t")
+    )
+
+    private val step2Title = page.getByRole(
+        AriaRole.HEADING,
+        Page.GetByRoleOptions().setName("Y o u r r e s u l t s a r e a n a l y s e d a n d e x p l a i n e d")
+    )
+
+    private val step3Title = page.getByRole(
+        AriaRole.HEADING,
+        Page.GetByRoleOptions().setName("E x p e r t g u i d a n c e t o t u r n i n s i g h t s i n t o b e t t e r h e a l t h")
+    )
 
     fun waitForPageLoad(): HowItWorksPage {
         page.getByText("F", Page.GetByTextOptions().setExact(true)).waitFor()
@@ -39,61 +52,210 @@ class HowItWorksPage(page: Page) : MarketingBasePage(page) {
         return this
     }
 
-    // ---------------------- Page Content ----------------------
-
     fun isPageHeadingVisible(): Boolean {
-        return  page.getByText("F", Page.GetByTextOptions().setExact(true)).isVisible &&
-        page.getByText("r", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-        page.getByText("o", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-        page.locator("h1").getByText("m").isVisible &&
-        page.getByText("T", Page.GetByTextOptions().setExact(true)).isVisible &&
-        page.locator("h1").getByText("e", Locator.GetByTextOptions().setExact(true)).isVisible &&
-        page.locator("h1").getByText("s", Locator.GetByTextOptions().setExact(true)).isVisible &&
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-        page.getByText("o", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-        page.getByText("C", Page.GetByTextOptions().setExact(true)).isVisible &&
-        page.locator("h1").getByText("l", Locator.GetByTextOptions().setExact(true)).isVisible &&
-        page.locator("h1").getByText("a", Locator.GetByTextOptions().setExact(true)).isVisible &&
-        page.getByText("r", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-        page.locator("h1").getByText("i", Locator.GetByTextOptions().setExact(true)).isVisible &&
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(2).isVisible &&
-        page.locator("h1").getByText("y").isVisible &&
-        page.locator("h1").getByText(".").isVisible
+        return page.getByText("F", Page.GetByTextOptions().setExact(true)).isVisible &&
+                page.getByText("r", Page.GetByTextOptions().setExact(true)).first().isVisible &&
+                page.getByText("o", Page.GetByTextOptions().setExact(true)).first().isVisible &&
+                page.locator("h1").getByText("m").isVisible &&
+                page.getByText("T", Page.GetByTextOptions().setExact(true)).isVisible &&
+                page.locator("h1").getByText("e", Locator.GetByTextOptions().setExact(true)).isVisible &&
+                page.locator("h1").getByText("s", Locator.GetByTextOptions().setExact(true)).isVisible &&
+                page.getByText("t", Page.GetByTextOptions().setExact(true)).first().isVisible &&
+                page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
+                page.getByText("o", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
+                page.getByText("C", Page.GetByTextOptions().setExact(true)).isVisible &&
+                page.locator("h1").getByText("l", Locator.GetByTextOptions().setExact(true)).isVisible &&
+                page.locator("h1").getByText("a", Locator.GetByTextOptions().setExact(true)).isVisible &&
+                page.getByText("r", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
+                page.locator("h1").getByText("i", Locator.GetByTextOptions().setExact(true)).isVisible &&
+                page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(2).isVisible &&
+                page.locator("h1").getByText("y").isVisible &&
+                page.locator("h1").getByText(".").isVisible
     }
+
+    fun isFromTestToClarifyDescriptionVisible(): Boolean {
+        return page.getByText("Start with a comprehensive health assessment, then let our experts guide you with personalised insights to uncover risks early and optimise your health journey.").isVisible
+    }
+
+    // ************* ---------------------------------- STEP 1 ------------------------ ******************** //
 
     fun isStep1Visible(): Boolean {
-        return byText("Book").isVisible || byText("Step 1").isVisible
+        return page.getByText("Step 1").isVisible
     }
+
+    fun waitForStep1Title() {
+        step1Title.scrollIntoViewIfNeeded()
+        step1Title.waitFor()
+    }
+
+    fun isStep1TitleVisible(): Boolean {
+        return step1Title.isVisible
+    }
+
+    fun isStep1DescriptionVisible(): Boolean {
+        return page.getByText("This isn’t just a blood test. It’s the most complete health evaluation, with advanced diagnostics to identify risk earlier and interpret data across systems.").isVisible
+    }
+
+    fun isStep1Point1TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Get started with an at-home blood draw")
+        ).isVisible
+    }
+
+    fun isStep1Point1DescriptionVisible(): Boolean {
+        return page.getByText("Begin your journey with convenient testing at home. From scheduling to blood draw, enjoy a seamless experience from start to finish").isVisible
+    }
+
+    fun isStep1Point2TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Curated 100+ advanced diagnostics")
+        ).isVisible
+    }
+
+    fun isStep1Point2DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Curated by our experts to uncover a connected picture of your health. Every test is designed through a preventive health lens."
+        ).isVisible
+    }
+
+    fun isStep1Point3TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Your very own Baseline Dashboard")
+        ).isVisible
+    }
+
+    fun isStep1Point3DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Tracking trends and highlighting status made effortless, delivered in a format that makes sense to you."
+        ).isVisible
+    }
+
+
+    // ************* ---------------------------------- STEP 2 ------------------------ ******************** //
+
 
     fun isStep2Visible(): Boolean {
-        return byText("Test").isVisible || byText("Step 2").isVisible
+        return page.getByText("Step 2").isVisible
     }
+
+    fun waitForStep2Title() {
+        step2Title.waitFor()
+    }
+
+    fun isStep2TitleVisible(): Boolean {
+        step2Title.scrollIntoViewIfNeeded()
+        return step2Title.isVisible
+    }
+
+    fun isStep2DescriptionVisible(): Boolean {
+        return page.getByText(
+            "We don’t just hand you a report. We turn complex results into clear insights, guided by a 1:1 consult with our Longevity Expert to help you prioritise what matters most."
+        ).isVisible
+    }
+
+    fun isStep2Point1TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Discover what your results reveal")
+        ).isVisible
+    }
+
+    fun isStep2Point1DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Your health data is transformed into a insight map, turning complexity into clarity so you can focus on what matters most."
+        ).isVisible
+    }
+
+    fun isStep2Point2TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("1,000+ data points define your unique biology")
+        ).isVisible
+    }
+
+    fun isStep2Point2DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Connect the dots across biomarkers to uncover causes, patterns, effects, and meaningful insights into your biology."
+        ).isVisible
+    }
+
+    fun isStep2Point3TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Expert-led review of your results")
+        ).isVisible
+    }
+
+    fun isStep2Point3DescriptionVisible(): Boolean {
+        return page.getByText(
+            "A guided walkthrough of your results with expert assessment of health profile, leading to clear, personalised next steps"
+        ).isVisible
+    }
+
+
+    // ************* ---------------------------------- STEP 3 ------------------------ ******************** //
+
 
     fun isStep3Visible(): Boolean {
-        return byText("Results").isVisible || byText("Step 3").isVisible
+        return page.getByText("Step 3").isVisible
     }
 
-    fun isStep4Visible(): Boolean {
-        return byText("Track").isVisible || byText("Step 4").isVisible
+    fun waitForStep3Title() {
+        step3Title.waitFor()
     }
 
-    // ---------------------- CTAs ----------------------
-
-    fun isBookNowCtaVisible(): Boolean {
-        return element("a[href*='login']").isVisible ||
-               byText("Book Now").isVisible
+    fun isStep3TitleVisible(): Boolean {
+        step3Title.scrollIntoViewIfNeeded()
+        return step3Title.isVisible
     }
 
-    fun clickBookNowCta() {
-        logger.info { "Clicking Book Now CTA on How It Works page" }
-        byText("Book Now").click()
+    fun isStep3DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Turn your insights into action with expert guidance on supplements, exercise, nutrition, sleep, stress and follow-up testing, all tailored to helping you steadily improve your health."
+        ).isVisible
     }
 
-    // ---------------------- Benefits Section ----------------------
 
-    fun isBenefitsSectionVisible(): Boolean {
-        return byText("Why choose").isVisible ||
-               byText("Benefits").isVisible
+    fun isStep3Point1TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Personalised exercise and nutrition guidance")
+        ).isVisible
     }
+
+    fun isStep3Point1DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Work with our nutrition and fitness experts to translate your results into personalised strategies tailored to your health profile."
+        ).isVisible
+    }
+
+    fun isStep3Point2TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Additional testing for deeper insight")
+        ).isVisible
+    }
+
+    fun isStep3Point2DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Uncover deeper insights with optional diagnostics and 1:1 expert led reviews designed to identify what regular tests can't."
+        ).isVisible
+    }
+
+    fun isStep3Point3TitleVisible(): Boolean {
+        return page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Access your concierge for every step ahead")
+        ).isVisible
+    }
+
+    fun isStep3Point3DescriptionVisible(): Boolean {
+        return page.getByText(
+            "Year-round access to expert concierge care for personalised guidance, timely answers, and continuous support throughout the year."
+        ).isVisible
+    }
+
 }

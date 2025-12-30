@@ -17,7 +17,7 @@ abstract class MarketingBasePage(page: Page) : BasePage(page) {
      * Navigate to this marketing page
      */
     override fun navigate(): MarketingBasePage {
-        val fullUrl = "${TestConfig.Urls.MARKETING_BASE_URL}$pageUrl"
+        val fullUrl = pageUrl
         page.navigate(fullUrl)
         return this
     }

@@ -7,10 +7,7 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * Our Why Page (https://www.deepholistics.com/our-why)
- * Company mission, story, and values
- */
+
 class OurWhyPage(page: Page) : MarketingBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.MARKETING_OUR_WHY

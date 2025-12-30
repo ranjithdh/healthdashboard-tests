@@ -186,7 +186,6 @@ class LandingPageTest {
     }
 
 
-
     @Test
     fun `should display all the elements in the built by expert section`() {
         val landingPage = LandingPage(page).navigate() as LandingPage
@@ -196,12 +195,20 @@ class LandingPageTest {
         assert(landingPage.isBuiltByExpertDescriptionVisible()) { "BuiltByExpertDescription should be visible" }
         assert(landingPage.isDrVishalUsRaoSectionElementsVisible()) { "DrVishalUsRaoSectionElements should be visible" }
         assert(landingPage.isDrWasimMohideenElementsVisible()) { "DrWasimMohideenElementsVisible should be visible" }
-
     }
 
 
     @Test
-    fun `should display all the elements in the word from our founder section
+    fun `should display all the elements in the word from our founder section`() {
+        val landingPage = LandingPage(page).navigate() as LandingPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.isWordFromOurFounderHeadingVisible()) { "Word from the our founder section should be visible" }
+        assert(landingPage.isWhyWeBuiltTextVisible()) { "Why we built-text should be visible" }
+        assert(landingPage.isCeoNameVisible()) { "CeoName should be visible" }
+        assert(landingPage.isWordFromOurFounderSectionReadOurWhyButtonVisible()) { "Word from the our founder section should be visible" }
+    }
+
 
 
     @Test
