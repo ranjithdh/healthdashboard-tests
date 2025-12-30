@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 
 object TestConfig {
 
-    const val ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiRkhlRzZ5cTNBWXZtdTR0eGN3OFVqN0VUcmFTMk5LUGsiLCJzZXNzaW9uX2lkIjoiZmE3MDI0MWUtMWFkNy00OTFkLWFkNmMtZTllNjhhZmIzMGM2IiwidXNlcl9pbnRfaWQiOiI0MSIsInByb2ZpbGVfaWQiOiIzMCIsImxlYWRfaWQiOiI2MjBkMTExNi0zMjI3LTQyMjctYWE4OS05OWJkMzgxZDJiIiwiaWF0IjoxNzY2MTIzNzY4LCJleHAiOjE3NjY3Mjg1Njh9.iH9bsNFfCLt041cLSxBHNyirfpHPCfm3NmUMLYPERoM"
+    var ACCESS_TOKEN = ""
     const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
 
 
@@ -45,6 +45,7 @@ object TestConfig {
         val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
         val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
         val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
+        val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
     }
 
 

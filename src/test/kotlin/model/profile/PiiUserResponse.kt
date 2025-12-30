@@ -47,10 +47,10 @@ data class PiiData(
     val gender: String,
 
     @SerialName("height")
-    val height: Int,
+    val height: Float,
 
     @SerialName("weight")
-    val weight: Int,
+    val weight: Float,
 
     @SerialName("customer_id")
     val customerId: String
