@@ -1,6 +1,7 @@
 package profile.page
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -17,6 +18,7 @@ import profile.utils.ProfileUtils.formatFlotTwoDecimal
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 
@@ -31,6 +33,11 @@ class ProfilePage(page: Page) : BasePage(page) {
     val tonePreference: Locator = byText("Tone Preference")
 
     val tonePreferenceKeyList = listOf("doctor", "friend", "bio_hacker")
+
+    private val answersStored: MutableMap<String?, Any?> = HashMap<String?, Any?>()
+
+    val previousButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
+    val nextButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
 
 
     init {
@@ -857,6 +864,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
+    /**------------Health Metrics----------------*/
     fun assertHealthMetrics() {
         fetchAccountInformation()
 
@@ -882,8 +890,8 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun assertEditHealthMetrics() {
         fetchAccountInformation()
 
-        val newHeight=(60..302).random().toString()
-        val newWeight=(10..150).random().toString()
+        val newHeight = (60..302).random().toString()
+        val newWeight = (10..150).random().toString()
 
         val healthMetricsEdit = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit"))
         val edit =
@@ -913,7 +921,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         editHeight.fill(newHeight)
         editWeight.fill(newWeight)
 
-        val saveButton=page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
+        val saveButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
         assertTrue(saveButton.isEnabled)
         saveButton.click()
 
@@ -922,10 +930,112 @@ class ProfilePage(page: Page) : BasePage(page) {
         val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
         val updateHeight = formatFlotTwoDecimal(piiData?.height ?: 0f)
 
-        assertEquals(newHeight,updateHeight)
-        assertEquals(newWeight,updateWeight)
+        assertEquals(newHeight, updateHeight)
+        assertEquals(newWeight, updateWeight)
 
     }
+
+
+    /**------------Questioner----------------*/
+    fun assertQuestionerInitialCheck() {
+        val questionerHeading =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+        val editQuestionerButton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+        val questionerDialog = page.locator(".bg-zinc-900").first()
+
+        questionerHeading.waitFor()
+        editQuestionerButton.waitFor()
+
+        editQuestionerButton.click()
+
+        questionerDialog.waitFor()
+
+        questioner_1()
+        questioner_3()
+    }
+
+    fun questioner_1() {
+        val question =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
+
+        val vegetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegetarian Primarily plant-"))
+        val nonVegetarian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Non-Vegetarian Consumes meat"))
+        val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
+        val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
+
+        question.waitFor()
+        //options
+        vegetarian.waitFor()
+        nonVegetarian.waitFor()
+        vegan.waitFor()
+        eggetarian.waitFor()
+
+
+        assertFalse(previousButton.isEnabled)
+        vegetarian.click()
+        answersStored["food_preference"] = "vegetarian"
+    }
+
+    fun questioner_3() {
+       val title= page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your cuisine"))
+
+
+
+        val northIndian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("North Indian"))
+        val southIndian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("South Indian"))
+        val jain =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Jain"))
+        val mediterranean =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Mediterranean"))
+        val continental =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continental"))
+        val chinese =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Chinese"))
+        val arabian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Arabian"))
+        val asian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Asian"))
+        val japanese =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Japanese"))
+
+        val cuisineOptions = listOf(
+            title,
+            northIndian,
+            southIndian,
+            jain,
+            mediterranean,
+            continental,
+            chinese,
+            arabian,
+            asian,
+            japanese
+        )
+
+        cuisineOptions.forEach { it.waitFor() }
+
+
+        northIndian.click()
+        southIndian.click()
+        jain.click()
+        mediterranean.click()
+        continental.click()
+        chinese.click()
+        arabian.click()
+        asian.click()
+        japanese.click()
+
+
+
+
+    }
+
+
+
+
 
 
 }

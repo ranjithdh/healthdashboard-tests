@@ -92,8 +92,15 @@ object TestConfig {
             otp = "678901"
         )
 
+/*
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
+            otp = "678901"
+        )
+*/
+
+        val EXISTING_USER = TestUser(
+            mobileNumber = "8870208411",
             otp = "678901"
         )
     }

@@ -222,4 +222,21 @@ class ProfileTest {
 
         profilePage.assertEditHealthMetrics()
     }
+
+    /**-------------Questioner---------------*/
+
+    @Test
+    fun `questioner validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        profilePage.assertQuestionerInitialCheck()
+    }
 }
