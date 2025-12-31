@@ -1,13 +1,14 @@
 package website.test
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.OurWhyPage
 
-/**
- * Test cases for the Our Why Page (https://www.deepholistics.com/our-why)
- */
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OurWhyPageTest {
 
@@ -45,75 +46,35 @@ class OurWhyPageTest {
         context.close()
     }
 
-    // ---------------------- Page Load Tests ----------------------
 
     @Test
     fun `should display page heading`() {
         val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
         ourWhyPage.waitForPageLoad()
-
-        assert(ourWhyPage.isPageHeadingVisible()) { "Page heading should be visible" }
-
-        ourWhyPage.takeScreenshot("our-why-page-heading")
+        assert(ourWhyPage.isHederVisible()) { "Header should be visible" }
     }
 
-    // ---------------------- Mission Content Tests ----------------------
-
     @Test
-    fun `should display mission content`() {
+    fun `should display all the contents`() {
         val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
         ourWhyPage.waitForPageLoad()
 
-        assert(ourWhyPage.isMissionStatementVisible()) { "Mission statement should be visible" }
+        ourWhyPage.waitForMostPeopleDontWantSixPackAbsText()
 
-        ourWhyPage.takeScreenshot("our-why-mission-content")
+        assert(ourWhyPage.isMostPeopleDontWantSixPackAbsTextVisible()) { "Should display most people don't want six pack abs" }
+        assert(ourWhyPage.isWeLookAroundHeadingVisible()) { "Should display we-look heading" }
+        assert(ourWhyPage.isNoOneWasHelpingYouTextVisible()) { "Should display no one helping you" }
+        assert(ourWhyPage.isWeBuildSomethingHeadingVisible()) { "Should display we-build something" }
+        assert(ourWhyPage.isCoverImageVisible()) { "Should display cover image" }
+        assert(ourWhyPage.isSystemThatConnectHeadingVisible()) { "Should display system that connect" }
+        assert(ourWhyPage.isWeBuiltDeepHolisticsHeadingVisible()) { "Should display we-built-holistics" }
+        assert(ourWhyPage.isToHelpPeopleLookBetterSectionVisible()) { "Should display to-help people look better" }
+        assert(ourWhyPage.isThisIsNotAWellnessHeadingVisible()) { "Should display this heading" }
+        assert(ourWhyPage.forEverySingleDayTextVisible()) { "Should display one day" }
+        assert(ourWhyPage.weDidNotStartThisHeadingVisible()) { "Should display one heading" }
+        assert(ourWhyPage.isCeoNameVisible()) { "Should display ceo name" }
+        assert(ourWhyPage.isWeAreNoteHereHeadingVisible()) { "Should display heading" }
+        assert(ourWhyPage.whenPeopleAroundAsTextVisible()) { "Should display people around" }
     }
 
-    // ---------------------- Story Section Tests ----------------------
-
-    @Test
-    fun `should display story sections`() {
-        val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
-        ourWhyPage.waitForPageLoad()
-
-        // Story or values section should be visible
-        val hasStoryContent = ourWhyPage.isStorySectionVisible() ||
-                              ourWhyPage.isValuesSectionVisible() ||
-                              ourWhyPage.isTeamSectionVisible()
-
-        // At least the mission should be visible if not specific story sections
-        assert(hasStoryContent || ourWhyPage.isMissionStatementVisible()) { 
-            "Story content or mission should be visible" 
-        }
-
-        ourWhyPage.takeScreenshot("our-why-story-sections")
-    }
-
-    // ---------------------- Header Elements Tests ----------------------
-
-    @Test
-    fun `should display header navigation elements`() {
-        val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
-        ourWhyPage.waitForPageLoad()
-
-        assert(ourWhyPage.isLogoVisible()) { "Logo should be visible" }
-        assert(ourWhyPage.isHowItWorksLinkVisible()) { "How It Works link should be visible" }
-        assert(ourWhyPage.isWhatWeTestLinkVisible()) { "What We Test link should be visible" }
-        assert(ourWhyPage.isOurWhyLinkVisible()) { "Our Why link should be visible" }
-        assert(ourWhyPage.isFaqLinkVisible()) { "FAQ link should be visible" }
-
-        ourWhyPage.takeScreenshot("our-why-header-elements")
-    }
-
-    // ---------------------- CTA Tests ----------------------
-
-    @Test
-    fun `should display Book Now CTA`() {
-        val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
-        ourWhyPage.waitForPageLoad()
-
-        assert(ourWhyPage.isBookNowCtaVisible()) { "Book Now CTA should be visible" }
-
-        ourWhyPage.takeScreenshot("our-why-book-now-cta")
-    }
 }

@@ -84,8 +84,10 @@ class NavigationTest {
         val ourWhyPage = landingPage.clickOurWhyLink()
         
         page.waitForURL("**/our-why**")
+        ourWhyPage.waitForPageLoad()
+
         assert(page.url().contains("our-why")) { "Should be on Our Why page" }
-        assert(ourWhyPage.isPageHeadingVisible()) { "Our Why heading should be visible" }
+        assert(ourWhyPage.isHederVisible()) { "Our Why heading should be visible" }
 
         ourWhyPage.takeScreenshot("navigation-to-our-why")
     }
@@ -177,7 +179,8 @@ class NavigationTest {
         // What We Test -> Our Why
         val ourWhyPage = whatWeTestPage.clickOurWhyLink()
         page.waitForURL("**/our-why**")
-        assert(ourWhyPage.isPageHeadingVisible()) { "Our Why heading should be visible" }
+        ourWhyPage.waitForPageLoad()
+        assert(ourWhyPage.isHederVisible()) { "Our Why heading should be visible" }
         
         // Our Why -> FAQ
         val faqPage = ourWhyPage.clickFaqLink()
