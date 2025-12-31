@@ -1,7 +1,6 @@
 package profile.page
 
 import com.microsoft.playwright.Locator
-import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -14,6 +13,7 @@ import profile.utils.ProfileUtils.buildAddressText
 import profile.utils.ProfileUtils.calculateBMIValues
 import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
+import profile.utils.ProfileUtils.formatFlotTwoDecimal
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
@@ -857,14 +857,75 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
+    fun assertHealthMetrics() {
+        fetchAccountInformation()
+
+        val healthMetricsEdit = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit"))
+
+        val weight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
+        val height = formatFlotTwoDecimal(piiData?.height ?: 0f)
+
+        healthMetricsEdit.waitFor()
+
+        val bmi = calculateBMIValues(height.toFloat(), weight.toFloat())
+        val bmiStatus = bmiCategoryValues(bmi)
+
+        page.getByText("Height (cm):").waitFor()
+        page.getByText("Weight (kg):").waitFor()
+
+        page.getByText(weight).waitFor()
+        page.getByText(height).waitFor()
+        page.getByText(bmiStatus).waitFor()
+        page.getByText("${bmi}BMI").waitFor()
+    }
+
+    fun assertEditHealthMetrics() {
+        fetchAccountInformation()
+
+        val newHeight=(60..302).random().toString()
+        val newWeight=(10..150).random().toString()
+
+        val healthMetricsEdit = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit"))
+        val edit =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit")).locator("span")
+        healthMetricsEdit.waitFor()
+
+        edit.click()
+
+        val weight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
+        val height = formatFlotTwoDecimal(piiData?.height ?: 0f)
 
 
+        val editHeight = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter height in cm"))
+        val editWeight = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter weight in kg"))
+
+        assertEquals(editHeight.inputValue(), height)
+        assertEquals(editWeight.inputValue(), weight)
 
 
+        editHeight.fill("10")
+        page.getByText("Height must be within range").waitFor()
+
+        editWeight.fill("3")
+        page.getByText("Weight must be within range").waitFor()
 
 
+        editHeight.fill(newHeight)
+        editWeight.fill(newWeight)
 
+        val saveButton=page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
+        assertTrue(saveButton.isEnabled)
+        saveButton.click()
 
+        fetchAccountInformation()
+
+        val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
+        val updateHeight = formatFlotTwoDecimal(piiData?.height ?: 0f)
+
+        assertEquals(newHeight,updateHeight)
+        assertEquals(newWeight,updateWeight)
+
+    }
 
 
 }

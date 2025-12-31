@@ -70,14 +70,14 @@ object ProfileUtils {
         return localDate.format(formatter)
     }
 
-    fun calculateBMIValues(heightCm: Double, weightKg: Double): String {
+    fun calculateBMIValues(heightCm: Float, weightKg: Float): Float {
         val heightMeters = heightCm / 100
         val bmi = weightKg / (heightMeters * heightMeters)
-        return String.format("%.2f", bmi)
+        return String.format("%.2f", bmi).toFloat()
     }
 
 
-    fun bmiCategoryValues(bmi: Double): String {
+    fun bmiCategoryValues(bmi: Float): String {
         if (bmi < 18) return "Unusual BMI. Re-check entered values."
         if (bmi < 18.5) return "Underweight"
         if (bmi < 25) return "Normal"
@@ -85,5 +85,17 @@ object ProfileUtils {
         return "Obese"
     }
 
+
+
+
+
+    fun formatFlotTwoDecimal(value: Float): String {
+        val formatted = String.format("%.2f", value)
+        return if (formatted.endsWith(".00")) {
+            formatted.dropLast(3)
+        } else {
+            formatted
+        }
+    }
 
 }
