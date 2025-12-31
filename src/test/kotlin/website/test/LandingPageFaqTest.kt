@@ -62,13 +62,13 @@ class LandingPageFaqTest {
     fun `should display faq tabs`() {
         val landingPage = navigateToLandingPage()
 
-        assert(landingPage.isGeneralTabVisible()) { "Should display general tab" }
-        assert(landingPage.isAppointmentAndProcessVisible()) { "Should display appointment and process tab" }
-        assert(landingPage.isTestCoverageTabVisible()) { "Should display test coverage" }
-        assert(landingPage.isPrivacyAndDateSecurityTabVisible()) { "Should display privacy and date" }
-        assert(landingPage.isConsultTabVisible()) { "Should display consult" }
-        assert(landingPage.isActionPlanTabVisible()) { "Should display action plan" }
-        assert(landingPage.isPointsTabVisible()) { "Should display points" }
+        assert(landingPage.faqSection.isGeneralTabVisible()) { "Should display general tab" }
+        assert(landingPage.faqSection.isAppointmentAndProcessVisible()) { "Should display appointment and process tab" }
+        assert(landingPage.faqSection.isTestCoverageTabVisible()) { "Should display test coverage" }
+        assert(landingPage.faqSection.isPrivacyAndDataSecurityTabVisible()) { "Should display privacy and date" }
+        assert(landingPage.faqSection.isConsultTabVisible()) { "Should display consult" }
+        assert(landingPage.faqSection.isActionPlanTabVisible()) { "Should display action plan" }
+        assert(landingPage.faqSection.isPointsTabVisible()) { "Should display points" }
 
     }
 
@@ -77,36 +77,36 @@ class LandingPageFaqTest {
     fun `should display all the general tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        assert(landingPage.isWhoHelpsMeUnderStandMyResultQuestionVisible()) { "Should display who helps me" }
-        assert(landingPage.isDoYouTestEverythingOrOnlWhatMattersVisible()) { "Should display do you think" }
-        assert(landingPage.isWhyMostHealthTestsFeelConfusingVisible()) { "Should display why most health tests" }
-        assert(landingPage.isWhatMakesBaselineDifferentFromOtherBloodTestsVisible()) { "Should display what makes blood" }
-        assert(landingPage.isWhatExactlyIsBaselineTestsVisible()) { "Should display what exactly is baseline tests" }
-        assert(landingPage.isWhoIsBaselineForVisible()) { "Should display who is baseline for" }
-        assert(landingPage.isCanBaselineHelpMeUnderstandWhyIFeelLowEnergyOrUnwellVisible()) { "Should display who helps me" }
-        assert(landingPage.isWhoShouldTakeThisTestVisible()) { "Should display who helps me" }
-        assert(landingPage.isIveDoneARecentHealthCheckUpShouldIStillGoForBaselineVisible()) { "Should display who helps me" }
-        assert(landingPage.isWhenShouldICheckMyBaselineVisible()) { "Should display who helps me" }
+        assert(landingPage.faqSection.isWhoHelpsMeUnderstandMyResultQuestionVisible()) { "Should display who helps me" }
+        assert(landingPage.faqSection.isDoYouTestEverythingOrOnlyWhatMattersVisible()) { "Should display do you think" }
+        assert(landingPage.faqSection.isWhyMostHealthTestsFeelConfusingVisible()) { "Should display why most health tests" }
+        assert(landingPage.faqSection.isWhatMakesBaselineDifferentFromOtherBloodTestsVisible()) { "Should display what makes blood" }
+        assert(landingPage.faqSection.isWhatExactlyIsBaselineVisible()) { "Should display what exactly is baseline tests" }
+        assert(landingPage.faqSection.isWhoIsBaselineForVisible()) { "Should display who is baseline for" }
+        assert(landingPage.faqSection.isCanBaselineHelpMeUnderstandWhyIFeelLowEnergyOrUnwellVisible()) { "Should display can baseline help me" }
+        assert(landingPage.faqSection.isWhoShouldTakeThisTestVisible()) { "Should display who should take this test" }
+        assert(landingPage.faqSection.isIveDoneARecentHealthCheckUpShouldIStillGoForBaselineVisible()) { "Should display who helps me" }
+        assert(landingPage.faqSection.isWhenShouldICheckMyBaselineVisible()){"Should display when should i check" }
     }
 
     @Test
     fun `should display appointment and process tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        landingPage.clickProcessAndAppointmentTab()
+        landingPage.faqSection.clickAppointmentAndProcessTab()
 
-        assert(landingPage.isWhoToContactForHelpVisible()) {
+        assert(landingPage.faqSection.isWhoToContactForHelpVisible()) {
             "Should display 'Who to contact for help'"
         }
 
-        assert(landingPage.isWhatHappensAfterResultsArriveVisible()) {
+        assert(landingPage.faqSection.isWhatHappensAfterResultsArriveVisible()) {
             "Should display 'What happens after results arrive'"
         }
 
-        assert(landingPage.isWhyTwoBloodDrawsVisible()) {
+        assert(landingPage.faqSection.isWhyTwoBloodDrawsVisible()) {
             "Should display 'Why are there two blood draws'"
         }
-        assert(landingPage.isHowLongDoesBloodDrawTakeVisible()) {
+        assert(landingPage.faqSection.isHowLongDoesBloodDrawTakeVisible()) {
             "Should display 'How long does the blood draw take'"
         }
     }
@@ -115,22 +115,22 @@ class LandingPageFaqTest {
     fun `should display test coverage tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        landingPage.clickTestCoverageTab()
+        landingPage.faqSection.clickTestCoverageTab()
 
-        assert(landingPage.isHowAddOnsImproveClarityVisible()) {
+        assert(landingPage.faqSection.isHowAddOnsImproveClarityVisible()) {
             "Should display 'How add ons improve clarity'"
         }
-        assert(landingPage.isWhetherAddOnsMandatoryVisible()) {
+        assert(landingPage.faqSection.isWhetherAddOnsMandatoryVisible()) {
             "Should display 'Whether add ons are mandatory'"
         }
-        assert(landingPage.isWhatAddOnTestsAvailableVisible()) {
+        assert(landingPage.faqSection.isWhatAddOnTestsAvailableVisible()) {
             "Should display 'What add on tests are available'"
         }
-        assert(landingPage.isCanIAddTestsLaterVisible()) {
+        assert(landingPage.faqSection.isCanIAddTestsLaterVisible()) {
             "Should display 'Can I add tests later'"
         }
 
-        assert(landingPage.isBaselineMedicallyReliableVisible()) {
+        assert(landingPage.faqSection.isBaselineMedicallyReliableVisible()) {
             "Should display 'Is Baseline medically reliable'"
         }
     }
@@ -139,21 +139,21 @@ class LandingPageFaqTest {
     fun `should display test privacy and data security tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        landingPage.clickPrivacyAndDateSecurityTab()
+        landingPage.faqSection.clickPrivacyAndDataSecurityTab()
 
-        assert(landingPage.isWhoCanAccessMyDataVisible()) {
+        assert(landingPage.faqSection.isWhoCanAccessMyDataVisible()) {
             "Should display 'Who can access my data'"
         }
-        assert(landingPage.isHowPrivacyProtectedVisible()) {
+        assert(landingPage.faqSection.isHowPrivacyProtectedVisible()) {
             "Should display 'How privacy is protected'"
         }
-        assert(landingPage.isCanIDeleteMyDataVisible()) {
+        assert(landingPage.faqSection.isCanIDeleteMyDataVisible()) {
             "Should display 'Can I delete my data'"
         }
-        assert(landingPage.isWhetherMyDataSharedVisible()) {
+        assert(landingPage.faqSection.isWhetherMyDataSharedVisible()) {
             "Should display 'Whether my data is shared'"
         }
-        assert(landingPage.isHowHealthDataStoredVisible()) {
+        assert(landingPage.faqSection.isHowHealthDataStoredVisible()) {
             "Should display 'How my health data is stored'"
         }
     }
@@ -162,21 +162,21 @@ class LandingPageFaqTest {
     fun `should display consult tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        landingPage.clickConsultTab()
+        landingPage.faqSection.clickConsultTab()
 
-        assert(landingPage.isConsultationIncludedVisible()) {
+        assert(landingPage.faqSection.isConsultationIncludedVisible()) {
             "Should display 'Is consultation included'"
         }
-        assert(landingPage.isConsultationDurationVisible()) {
+        assert(landingPage.faqSection.isConsultationDurationVisible()) {
             "Should display 'How long the consultation takes'"
         }
-        assert(landingPage.isWhatHappensDuringConsultationVisible()) {
+        assert(landingPage.faqSection.isWhatHappensDuringConsultationVisible()) {
             "Should display 'What happens during the consultation'"
         }
-        assert(landingPage.isHowPersonalisedGuidanceVisible()) {
+        assert(landingPage.faqSection.isHowPersonalisedGuidanceVisible()) {
             "Should display 'How personalised the guidance is'"
         }
-        assert(landingPage.isWhoConductsConsultationVisible()) {
+        assert(landingPage.faqSection.isWhoConductsConsultationVisible()) {
             "Should display 'Who conducts the consultation'"
         }
     }
@@ -184,21 +184,21 @@ class LandingPageFaqTest {
     @Test
     fun `should display action plan tab questions`() {
         val landingPage = navigateToLandingPage()
-        landingPage.clickActionPlanTab()
+        landingPage.faqSection.clickActionPlanTab()
 
-        assert(landingPage.isWhenToRetestVisible()) {
+        assert(landingPage.faqSection.isWhenToRetestVisible()) {
             "Should display 'When to retest'"
         }
-        assert(landingPage.isWhenAddOnsRecommendedVisible()) {
+        assert(landingPage.faqSection.isWhenAddOnsRecommendedVisible()) {
             "Should display 'When add ons are recommended'"
         }
-        assert(landingPage.isHowPlanEvolvesVisible()) {
+        assert(landingPage.faqSection.isHowPlanEvolvesVisible()) {
             "Should display 'How the plan evolves over time'"
         }
-        assert(landingPage.isHowFollowUpTestsSuggestedVisible()) {
+        assert(landingPage.faqSection.isHowFollowUpTestsSuggestedVisible()) {
             "Should display 'How follow up tests are suggested'"
         }
-        assert(landingPage.isHowPrioritiesDecidedVisible()) {
+        assert(landingPage.faqSection.isHowPrioritiesDecidedVisible()) {
             "Should display 'How priorities are decided'"
         }
     }
@@ -207,21 +207,21 @@ class LandingPageFaqTest {
     fun `should display points tab questions`() {
         val landingPage = navigateToLandingPage()
 
-        landingPage.clickPointsTab()
+        landingPage.faqSection.clickPointsTab()
 
-        assert(landingPage.isWhereICanSeeMyPointsVisible()) {
+        assert(landingPage.faqSection.isWhereICanSeeMyPointsVisible()) {
             "Should display 'Where I can see my points'"
         }
-        assert(landingPage.isWhetherPointsExpireVisible()) {
+        assert(landingPage.faqSection.isWhetherPointsExpireVisible()) {
             "Should display 'Whether points expire'"
         }
-        assert(landingPage.isHowGiftingPointsWorksVisible()) {
+        assert(landingPage.faqSection.isHowGiftingPointsWorksVisible()) {
             "Should display 'How gifting points works'"
         }
-        assert(landingPage.isWhatPointsUsedForVisible()) {
+        assert(landingPage.faqSection.isWhatPointsUsedForVisible()) {
             "Should display 'What DH Points can be used for'"
         }
-        assert(landingPage.isHowReferralsWorkVisible()) {
+        assert(landingPage.faqSection.isHowReferralsWorkVisible()) {
             "Should display 'How referrals work'"
         }
     }
