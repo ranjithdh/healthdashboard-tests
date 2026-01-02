@@ -938,24 +938,34 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /**------------Questioner----------------*/
     fun assertQuestionerInitialCheck() {
-        val questionerHeading =
+        val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
-        val questionerDialog = page.locator(".bg-zinc-900").first()
+        val questionDialog = page.locator(".bg-zinc-900").first()
 
-        questionerHeading.waitFor()
+        questionHeading.waitFor()
         editQuestionerButton.waitFor()
 
         editQuestionerButton.click()
 
-        questionerDialog.waitFor()
+        questionDialog.waitFor()
 
-        questioner_1()
-        questioner_3()
+        question_1()
+        question_3()
+        question_4()
+        question_5()
+        question_6()
+        question_7()
+        question_8()
+        question_9()
+        question_10()
+        question_11()
     }
 
-    fun questioner_1() {
+
+    fun question_1() { //What is your food preference?
+        logger.error { "Questioner 1" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
 
@@ -978,9 +988,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["food_preference"] = "vegetarian"
     }
 
-    fun questioner_3() {
-       val title= page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your cuisine"))
-
+    fun question_3() { //What is your cuisine preference?
+        logger.error { "Questioner 3" }
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your cuisine"))
 
 
         val northIndian =
@@ -1021,21 +1031,562 @@ class ProfilePage(page: Page) : BasePage(page) {
         northIndian.click()
         southIndian.click()
         jain.click()
-        mediterranean.click()
-        continental.click()
-        chinese.click()
-        arabian.click()
-        asian.click()
-        japanese.click()
 
+
+        answersStored["cuisine_preference"] =
+            arrayOf(
+                "North Indian", "South Indian", "Jain"
+            )
+
+        nextButton.click()
+
+    }
+
+    fun question_4() { //Which of the following best describes your daily eating habits?
+        logger.error { "Questioner 4" }
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Which of the following best"))
+
+        val homeCooked =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Primarily Home Cooked Meals")
+            )
+
+        val occasionalSnacker =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Occasional Snacker")
+            )
+
+        val oftenDiningOut =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Often dining out")
+            )
+
+        val frequentJunk =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Frequent junk/processed food")
+            )
+
+        val skipsMeals =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Skips meals")
+            )
+
+        val lateNightEating =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Late-night eating")
+            )
+
+        val intermittentFasting =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Intermittent fasting / time-")
+            )
+
+        val lifestyleOptions = listOf(
+            title,
+            homeCooked,
+            occasionalSnacker,
+            oftenDiningOut,
+            frequentJunk,
+            skipsMeals,
+            lateNightEating,
+            intermittentFasting
+        )
+
+        // ✅ Single wait point
+        lifestyleOptions.forEach { it.waitFor() }
+
+        homeCooked.click()
+        answersStored["daily_eating_habit"] = "Primarily Home Cooked Meals"
+
+
+        /*  Optional: random selection (single click)
+         lifestyleOptions
+             .drop(1) // exclude title
+             .random()
+             .click()*/
+
+
+    }
+
+    fun question_5() { //What is your past experience with diets?
+        logger.error { "Questioner 5" }
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What is your past experience"))
+
+        val triedAndWorks =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried and found what works")
+            )
+
+        val triedVarious =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried various diets, unsure")
+            )
+
+        val triedAll =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried them all, hard to")
+            )
+
+        val none =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("None")
+            )
+
+        val previous =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Previous")
+            )
+
+        val experienceOptions = listOf(
+            title,
+            triedAndWorks,
+            triedVarious,
+            triedAll,
+            none,
+            previous
+        )
+
+        // ✅ wait once
+        experienceOptions.forEach { it.waitFor() }
+
+        none.click()
+
+        answersStored["diet_experience"] = "None"
+
+
+        /*   click each option → go back using Previous
+            listOf(triedAndWorks, triedVarious, triedAll, none).forEach { option ->
+                option.click()
+                previous.waitFor()
+                previous.click()
+            }*/
+    }
+
+    fun question_6() { //How familiar are you with tracking calories or macronutrients and micronutrients?
+        logger.error { "Questioner 6" }
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How familiar are you with"))
+
+        val veryFamiliar =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Very familiar, successful")
+            )
+
+        val trackedABit =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tracked a bit, unsure of my")
+            )
+
+        val neverTracked =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Never tracked, need guidance")
+            )
+
+        val options = listOf(
+            title,
+            veryFamiliar,
+            trackedABit,
+            neverTracked
+        )
+
+        // ✅ wait once for everything
+        options.forEach { it.waitFor() }
+
+        neverTracked.click()
+
+        answersStored["nutrition_tracking_experience"] = "Never tracked, need guidance"
+
+        /*      // 🎯 choose one (random)
+              options
+                  .drop(1) // exclude title
+                  .random()
+                  .click()*/
+    }
+
+    fun question_7() { //Do you have any food allergies?
+        logger.error { "Questioner 7" }
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Do you have any food"))
+
+        val milk =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Milk or dairy"))
+        val peanuts =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Peanuts"))
+        val treeNuts =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tree nuts"))
+        val soy =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Soy"))
+        val gluten =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten (Wheat)"))
+        val none =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+        val others =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+
+        val othersTextBox =
+            page.getByRole(
+                AriaRole.TEXTBOX,
+                Page.GetByRoleOptions().setName("Please specify...")
+            )
+
+        val options = listOf(
+            title,
+            milk,
+            peanuts,
+            treeNuts,
+            soy,
+            gluten,
+            none,
+            others
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        // 🎯 select multiple (example: random 1–2 allergies)
+        val selectable = listOf(milk, peanuts)
+
+        selectable.forEach { it.click() }
+
+        answersStored["allergy"] = arrayOf("Milk or dairy", "Eggs")
+        nextButton.click()
+    }
+
+    fun question_8() { //Do you have any food intolerances?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Do you have any food"))
+
+        val lactose =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lactose"))
+
+        val caffeine =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Caffeine"))
+
+        val gluten =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten"))
+
+        val none =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+
+        val subtitle = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("(Select all that apply —"))
+
+        val options = listOf(
+            title,
+            lactose,
+            caffeine,
+            gluten,
+            none,
+            subtitle
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        lactose.click()
+        caffeine.click()
+
+        answersStored["intolerance"] = arrayOf("Lactose", "Caffeine")
+
+        nextButton.click()
+    }
+
+    fun question_9() { //How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How much caffeine do you"))
+
+        val noneOrRarely =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("None or Rarely")
+            )
+
+        val twoServings =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-2 servings")
+            )
+
+        val fourServings =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-4 servings")
+            )
+
+        val moreServings =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("or more servings")
+            )
+
+        val options = listOf(
+            title,
+            noneOrRarely,
+            twoServings,
+            fourServings,
+            moreServings
+        )
+
+
+        options.forEach { it.waitFor() }
+
+        answersStored["caffeine_consumption"] = "None or Rarely"
+
+        noneOrRarely.click()
+
+    }
+
+    fun question_10() { //How active are you in a typical week?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How active are you in a"))
+
+        val sedentary =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Sedentary: <3 hrs/week")
+            )
+
+        val lightlyActive =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Lightly Active: 3–5 hrs/week")
+            )
+
+        val moderatelyActive =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Moderately Active: 5–7 hrs/")
+            )
+
+        val veryActive =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Very Active: >7 hrs/week")
+            )
+
+        val hardlyExercise =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Hardly Exercise")
+            )
+
+        val options = listOf(
+            title,
+            sedentary,
+            lightlyActive,
+            moderatelyActive,
+            veryActive,
+            hardlyExercise
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        answersStored["typical_day"] = "hardly_exercise"
+        hardlyExercise.click()
+
+        /*     // 🎯 select ONE option (radio behavior)
+             options
+                 .drop(1) // exclude title
+                 .random()
+                 .click()*/
+    }
+
+
+    fun question_11() { //What type of exercise do you usually do?
 
 
 
     }
 
+    private fun question_2() { //Which of the following do you consume?
+
+    }
 
 
+    fun question_12() {
+        // When do you usually work out or prefer to work out?
+    }
 
+    fun question_13() {
+        // Equipments available
+    }
+
+    fun question_14() {
+        // How would you describe your sleep?
+    }
+
+    fun question_15() {
+        // What time do you usually go to bed on weekdays?
+    }
+
+    fun question_16() {
+        // What time do you usually wake up on weekdays?
+    }
+
+    fun question_17() {
+        // What time do you usually go to bed on weekends?
+    }
+
+    fun question_18() {
+        // What time do you usually wakeup on weekends?
+    }
+
+    fun question_19() {
+        // Would you like to set your ideal bedtime or wakeup time?
+    }
+
+    fun question_20() {
+        // Set your ideal Bedtime
+    }
+
+    fun question_21() {
+        // Set your ideal Waketime
+    }
+
+    fun question_22() {
+        // How satisfied are you with your sleep?
+    }
+
+    fun question_23() {
+        // Do you wake up refreshed?
+    }
+
+    fun question_24() {
+        // What is the duration of your sun exposure on a day-to-day basis?
+    }
+
+    fun question_25() {
+        // During which part of the day are you usually exposed to direct sunlight?
+    }
+
+    fun question_26() {
+        // How often do you look for external motivation to stick to your wellness routine?
+    }
+
+    fun question_27() {
+        // In the past month, how often have you felt stressed, sad, or low?
+    }
+
+    fun question_28() {
+        // How well do you deal with stress?
+    }
+
+    fun question_29() {
+        // How often do you eat in response to emotions rather than physical hunger?
+    }
+
+    fun question_30() {
+        // What type of snacks do you usually indulge in?
+    }
+
+    fun question_31() {
+        // What's your current menstrual status?
+    }
+
+    fun question_32() {
+        // Are you pregnant?
+    }
+
+    fun question_33() {
+        // How many cigarettes do you typically smoke in a day?
+    }
+
+    fun question_34() {
+        // How many alcoholic drinks do you consume per week?
+    }
+
+    fun question_35() {
+        // Please select any additional dietary supplements you take
+    }
+
+    fun question_36() {
+        // Do you have a family history of any medical conditions?
+    }
+
+    fun question_37() {
+        // Do you currently have or have ever been diagnosed with any medical conditions?
+    }
+
+    fun question_38() {
+        // Which of the following best describes your GI condition?
+    }
+
+    fun question_39() {
+        // Which of the following best describes your skin condition?
+    }
+
+    fun question_40() {
+        // Which of the following best describes your bone or joint condition?
+    }
+
+    fun question_41() {
+        // Which of the following best describes your neurological condition?
+    }
+
+    fun question_42() {
+        // How would you best describe your Diabetes status?
+    }
+
+    fun question_43() {
+        // Which of the following best describes your thyroid condition?
+    }
+
+    fun question_44() {
+        // Which of the following best describes your liver condition?
+    }
+
+    fun question_45() {
+        // Which of the following best describes your kidney condition?
+    }
+
+    fun question_46() {
+        // Which of the following best describes your heart condition?
+    }
+
+    fun question_47() {
+        // Which of the following best describes your respiratory condition?
+    }
+
+    fun question_48() {
+        // Which of the following best describes your auto-immune condition?
+    }
+
+    fun question_49() {
+        // What is your current cancer status?
+    }
+
+    fun question_50() {
+        // Please mention the type of cancer
+    }
+
+    fun question_51() {
+        // Are you currently taking any of the following types of medicines?
+    }
+
+    fun question_52() {
+        // What is your waist circumference at its narrowest point?
+    }
 
 
 }
