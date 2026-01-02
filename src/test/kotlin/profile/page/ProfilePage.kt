@@ -937,7 +937,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
-    fun assertQuestionerInitialCheck() {
+    fun assertQuestionerVegInitialCheck() {
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -951,20 +951,55 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         questionDialog.waitFor()
 
-        question_1()
+        question_1_veg()
+    }
 
+    fun assertQuestionerNonVegInitialCheck() {
+        val questionHeading =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+        val editQuestionerButton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+        val questionDialog = page.locator(".bg-zinc-900").first()
 
+        questionHeading.waitFor()
+        editQuestionerButton.waitFor()
 
+        editQuestionerButton.click()
 
+        questionDialog.waitFor()
 
-
-
-
+        question_1_non_veg()
     }
 
 
-    fun question_1() { //What is your food preference?
-        logger.error { "Questioner 1" }
+    //Question - 1
+    fun question_1_veg() { //What is your food preference?
+        logger.error { "Questioner 1 Vegetarian" }
+        val question =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
+
+        val vegetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegetarian Primarily plant-"))
+        val nonVegetarian =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Non-Vegetarian Consumes meat"))
+        val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
+        val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
+
+        question.waitFor()
+
+        vegetarian.waitFor()
+        nonVegetarian.waitFor()
+        vegan.waitFor()
+        eggetarian.waitFor()
+
+
+        assertFalse(previousButton.isEnabled)
+        vegetarian.click()
+        answersStored["food_preference"] = "vegetarian"
+        question_3()
+    }
+
+    fun question_1_non_veg() { //What is your food preference?
+        logger.error { "Questioner 1 Non-Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
 
@@ -983,10 +1018,74 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         assertFalse(previousButton.isEnabled)
-        vegetarian.click()
-        answersStored["food_preference"] = "vegetarian"
+
+        nonVegetarian.click()
+        answersStored["food_preference"] = "non_vegetarian"
+        question_2()
+    }
+
+    private fun question_2() { //Which of the following do you consume?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Which of the following do you"))
+
+        val chicken =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Chicken"))
+
+        val pork =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Pork"))
+
+        val mutton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Mutton"))
+
+        val turkey =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Turkey"))
+
+        val fish =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Fish"))
+
+        val shellfish =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Shellfish"))
+
+        val beef =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Beef"))
+
+        val options = listOf(
+            title,
+            chicken,
+            pork,
+            mutton,
+            turkey,
+            fish,
+            shellfish,
+            beef
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        // 🎯 multi-select: choose 1–3 randomly
+        val meatOptions = listOf(
+            chicken,
+            pork,
+            mutton,
+            turkey,
+            fish,
+            shellfish,
+            beef
+        )
+
+        meatOptions
+            .forEach { it.click() }
+
+        answersStored["type_of_meat"] = "non_vegetarian"
+
+        nextButton.click()
         question_3()
     }
+
 
     fun question_3() { //What is your cuisine preference?
         logger.error { "Questioner 3" }
@@ -1405,19 +1504,109 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["typical_day"] = "hardly_exercise"
-        hardlyExercise.click()
-        question_11()
+        /**-------Hardly Exercise another flow-------* - question_14 */
+
+        answersStored["typical_day"] = "sedentary"
+        sedentary.click()
+        question_11_with_exercise()
     }
 
 
-    fun question_11() { //What type of exercise do you usually do?
+    //Question - 11
+
+    fun question_11_without_noExercise() { //What type of exercise do you usually do?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What type of exercise do you"))
+
+        val yoga =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yoga"))
+        val strengthTraining =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Strength Training"))
+        val pilates =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Pilates"))
+        val flexibility =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Flexibility / Stretching")
+            )
+        val noExercise =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I don't exercise")
+            )
+
+        val exerciseOptions = listOf(yoga, strengthTraining, pilates, flexibility)
+
+        // ✅ wait once
+        listOf(title, *exerciseOptions.toTypedArray(), noExercise).forEach { it.waitFor() }
+
+        // ----------------------
+        // 🎯 SELECTION LOGIC
+        // ----------------------
+
+        // Example: select Yoga (your test can vary this)
+        noExercise.click()
 
 
+        // Case 1: No Exercise selected → unselect all others
+        exerciseOptions.forEach {
+            if (isButtonChecked(it)) {
+                it.click()
+            }
+        }
 
+        // Assertions
+        assertTrue(isButtonChecked(noExercise))
+        exerciseOptions.forEach { assertFalse(isButtonChecked(it)) }
+
+        // ➡️ Go to Question 14
+        question_14()
     }
 
-    private fun question_2() { //Which of the following do you consume?
+    fun question_11_with_exercise() { //What type of exercise do you usually do?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What type of exercise do you"))
+
+        val yoga =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yoga"))
+        val strengthTraining =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Strength Training"))
+        val pilates =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Pilates"))
+        val flexibility =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Flexibility / Stretching")
+            )
+        val noExercise =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I don't exercise")
+            )
+
+        val exerciseOptions = listOf(yoga, strengthTraining, pilates, flexibility)
+
+        // ✅ wait once
+        listOf(title, *exerciseOptions.toTypedArray(), noExercise).forEach { it.waitFor() }
+
+        // Example: select Yoga (your test can vary this)
+        yoga.click()
+
+        // Case 2: Any exercise selected → unselect No Exercise
+        if (isButtonChecked(noExercise)) {
+            noExercise.click()
+        }
+
+        // Assertions
+        exerciseOptions.any { isButtonChecked(it) }.also {
+            assertTrue(it)
+        }
+        assertFalse(isButtonChecked(noExercise))
+
+        // ➡️ Go to Question 12
+        question_12()
 
     }
 
@@ -1584,6 +1773,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun question_52() {
         // What is your waist circumference at its narrowest point?
+    }
+
+
+    fun isButtonChecked(button: Locator): Boolean {
+        return button.locator("svg").count() > 0
+    }
+
+    fun isRadioSelected(button: Locator): Boolean {
+        val ariaPressed = button.getAttribute("aria-pressed")
+        val ariaSelected = button.getAttribute("aria-selected")
+
+        return ariaPressed == "true" || ariaSelected == "true"
     }
 
 

@@ -237,6 +237,6 @@ class ProfileTest {
             .clickAccountProfile()
             .waitForConfirmation()
 
-        profilePage.assertQuestionerInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck()
     }
 }
