@@ -952,15 +952,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionDialog.waitFor()
 
         question_1()
-        question_3()
-        question_4()
-        question_5()
-        question_6()
-        question_7()
-        question_8()
-        question_9()
-        question_10()
-        question_11()
+
+
+
+
+
+
+
+
     }
 
 
@@ -986,6 +985,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertFalse(previousButton.isEnabled)
         vegetarian.click()
         answersStored["food_preference"] = "vegetarian"
+        question_3()
     }
 
     fun question_3() { //What is your cuisine preference?
@@ -1039,7 +1039,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
 
         nextButton.click()
-
+        question_4()
     }
 
     fun question_4() { //Which of the following best describes your daily eating habits?
@@ -1105,7 +1105,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         homeCooked.click()
         answersStored["daily_eating_habit"] = "Primarily Home Cooked Meals"
-
+        question_5()
 
         /*  Optional: random selection (single click)
          lifestyleOptions
@@ -1167,7 +1167,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         answersStored["diet_experience"] = "None"
 
-
+        question_6()
         /*   click each option → go back using Previous
             listOf(triedAndWorks, triedVarious, triedAll, none).forEach { option ->
                 option.click()
@@ -1212,7 +1212,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         neverTracked.click()
 
         answersStored["nutrition_tracking_experience"] = "Never tracked, need guidance"
-
+        question_7()
         /*      // 🎯 choose one (random)
               options
                   .drop(1) // exclude title
@@ -1267,6 +1267,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         answersStored["allergy"] = arrayOf("Milk or dairy", "Eggs")
         nextButton.click()
+        question_8()
     }
 
     fun question_8() { //Do you have any food intolerances?
@@ -1307,6 +1308,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["intolerance"] = arrayOf("Lactose", "Caffeine")
 
         nextButton.click()
+        question_9()
     }
 
     fun question_9() { //How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?
@@ -1352,6 +1354,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["caffeine_consumption"] = "None or Rarely"
 
         noneOrRarely.click()
+        question_10()
 
     }
 
@@ -1404,12 +1407,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         answersStored["typical_day"] = "hardly_exercise"
         hardlyExercise.click()
-
-        /*     // 🎯 select ONE option (radio behavior)
-             options
-                 .drop(1) // exclude title
-                 .random()
-                 .click()*/
+        question_11()
     }
 
 
