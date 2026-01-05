@@ -2486,7 +2486,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val selectedCondition = conditions.first()
         selectedCondition.click()
         assertConditionSelected(selectedCondition, notSure, none)
-        answersStored["medical_condition_family"] = "Dermatological Conditions"
+        answersStored["medical_condition_family"] = arrayOf("Dermatological Conditions")
         nextButton.click()
         question_37()
     }
@@ -2541,7 +2541,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         val selectedCondition = conditions.first()
         selectedCondition.click()
         assertConditionSelected(selectedCondition, notSure, none)
-        answersStored["medical_condition"] = "Dermatological Conditions"
+
+        answersStored["medical_condition"] = arrayOf("Dermatological Conditions")
         nextButton.click()
         question_38()
 
@@ -2592,52 +2593,643 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_51()
     }
 
-    fun question_39() {
-        // Which of the following best describes your skin condition?
+
+    fun question_39() {  // Which of the following best describes your skin condition?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Skin condition buttons (excluding "Others" and "None")
+        val skinConditions = listOf("Psoriasis", "Eczema", "Acne")
+        val conditionButtons = skinConditions.map {
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(it))
+        }
+
+        // Separate buttons
+        val othersButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+        val noneButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+
+        // ✅ Wait for all elements
+        listOf(title, othersButton, noneButton).plus(conditionButtons).forEach { it.waitFor() }
+
+        conditionButtons.forEach { it.click() } // Psoriasis, Eczema, Acne
+
+        othersButton.click()
+        assertExclusiveSelected(othersButton, conditionButtons)
+
+        noneButton.click()
+        assertExclusiveSelected(
+            exclusive = noneButton,
+            others = conditionButtons + listOf(othersButton)
+        )
+
+        conditionButtons[0].click()
+        answersStored["skin_condition"] = arrayOf("Psoriasis")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_40() {
-        // Which of the following best describes your bone or joint condition?
+    fun question_40() { // Which of the following best describes your bone or joint condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Ankylosing Spondylitis",
+            "Rheumatoid arthritis",
+            "Gout",
+            "Psoriatic Arthritis"
+        )
+
+        val conditionButtons = conditionNames.map {
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(it))
+        }
+
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for everything
+        listOf(title, others, none).plus(conditionButtons).forEach { it.waitFor() }
+
+        conditionButtons.forEach { it.click() }
+
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditionButtons + listOf(others)
+        )
+
+        conditionButtons[0].click()
+        answersStored["bone_joint_condition"] = arrayOf("Ankylosing Spondylitis")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_41() {
-        // Which of the following best describes your neurological condition?
+    fun question_41() {// Which of the following best describes your neurological condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Migraines",
+            "Epilepsy",
+            "Parkinson's"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for all elements
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["neurological_condition"] = arrayOf("Migraines")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_42() {
-        // How would you best describe your Diabetes status?
+    fun question_42() { // How would you best describe your Diabetes status?
+        // Question title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("How would you best describe"))
+
+        // Answer options
+        val preDiabeticNotOnMeds = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("I am prediabetic, but I'm not")
+        )
+
+        val preDiabeticOnMeds = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("I have prediabetes and I'm on")
+        )
+
+        val diabeticNotOnMeds = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("I have diabetes, but not on")
+        )
+
+        val diabeticOnMeds = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("I have diabetes and I'm on")
+        )
+
+        // ✅ wait once
+        listOf(
+            title,
+            preDiabeticNotOnMeds,
+            preDiabeticOnMeds,
+            diabeticNotOnMeds,
+            diabeticOnMeds
+        ).forEach { it.waitFor() }
+
+        // -------------------------
+        // Select ONE option (wizard auto-handles navigation)
+        // -------------------------
+
+        answersStored["diabetes_status"] = "I am prediabetic, but I'm not on medication"
+        preDiabeticNotOnMeds.click()
+        question_51()
+
     }
 
-    fun question_43() {
-        // Which of the following best describes your thyroid condition?
+    fun question_43() {// Which of the following best describes your thyroid condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Hypothyroidism",
+            "Hyperthyroidism"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for all elements
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["thyroid_condition"] = arrayOf("Hypothyroidism")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_44() {
-        // Which of the following best describes your liver condition?
+    fun question_44() {  // Which of the following best describes your liver condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Fatty Liver",
+            "Cirrhosis",
+            "Hepatitis"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for all elements
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["liver_condition"] = arrayOf("Fatty Liver")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_45() {
-        // Which of the following best describes your kidney condition?
+    fun question_45() {  // Which of the following best describes your kidney condition?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Nephritis",
+            "Chronic Kidney Disease"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for everything
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["kidney_condition"] = arrayOf("Nephritis")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_46() {
-        // Which of the following best describes your heart condition?
+    fun question_46() {//  Which of the following best describes your heart condition?
+
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Hypertension",
+            "Heart disease risk",
+            "Hypotension"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for all elements
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["heart_condition"] = arrayOf("Hypertension")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_47() {
-        // Which of the following best describes your respiratory condition?
+    fun question_47() {//  Which of the following best describes your respiratory condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Asthma",
+            "Chronic Obstructive Pulmonary",
+            "Bronchitis"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for everything
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["respiratory_condition"] = arrayOf("Asthma")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_48() {
-        // Which of the following best describes your auto-immune condition?
+    fun question_48() {  // Which of the following best describes your auto-immune condition?
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        // Condition buttons (excluding Others / None)
+        val conditionNames = listOf(
+            "Systemic Lupus Erythematosus",
+            "Hashimoto's Thyroiditis",
+            "Graves' disease",
+            "Rheumatoid Arthritis",
+            "Multiple Sclerosis (MS)",
+            "Type 1 Diabetes",
+            "Celiac Disease"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        // Separate buttons
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        // ✅ wait once for everything
+        listOf(title, others, none).plus(conditions)
+            .forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select conditions
+        // -------------------------
+        conditions.forEach { it.click() }
+
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = conditions + listOf(others)
+        )
+
+        conditions[0].click()
+        answersStored["auto_immune_condition"] = arrayOf("Systemic Lupus Erythematosus (SLE")
+        nextButton.click()
+        question_51()
     }
 
-    fun question_49() {
-        // What is your current cancer status?
+    fun question_49() { // What is your current cancer status?
+        // Question title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("What is your current cancer"))
+
+        // Answer options (single-select)
+        val onTreatment = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Yes, I currently have cancer and on treatment")
+        )
+
+        val notOnTreatment = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Yes, I currently have cancer but not on treatment")
+        )
+
+        val completedLessThanYear = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Yes, but completed treatment less than a year ago")
+        )
+
+        val completedMoreThanYear = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Yes, but completed treatment more than a year ago")
+        )
+
+        // ✅ wait once
+        listOf(
+            title,
+            onTreatment,
+            notOnTreatment,
+            completedLessThanYear,
+            completedMoreThanYear
+        ).forEach { it.waitFor() }
+
+        // -------------------------
+        // Select ONE option only
+        // -------------------------
+
+        answersStored["cancer_diagnosis"] = "Yes, I currently have cancer and on treatment"
+        onTreatment.click()
+        question_50()
     }
 
     fun question_50() {
         // Please mention the type of cancer
+        // Title
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Please mention the type of"))
+
+        // Textbox
+        val typeTextbox = page.getByRole(
+            AriaRole.TEXTBOX,
+            Page.GetByRoleOptions().setName("Please mention the type of")
+        )
+
+        // ✅ wait once
+        listOf(title, typeTextbox).forEach { it.waitFor() }
+
+        assertFalse(nextButton.isEnabled)
+
+        // -------------------------
+        // Enter cancer type
+        // -------------------------
+        typeTextbox.fill("Breast cancer")
+
+        assertTrue(nextButton.isEnabled)
+
+        nextButton.click()
+        question_51()
     }
 
     fun question_51() { // Are you currently taking any of the following types of medicines?
