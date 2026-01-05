@@ -2311,8 +2311,13 @@ class ProfilePage(page: Page) : BasePage(page) {
             allOfTheAbove
         ).forEach { it.waitFor() }
 
-        logAnswer("snack_preference", arrayOf("Sweets"))
+
+        //Scenario 1
+        allOfTheAbove.click()
+        assertExclusiveSelected(allOfTheAbove,snackOptions)
+
         sweets.click()
+        logAnswer("snack_preference", arrayOf("Sweets"))
         nextButton.click()
         question_33()
     }
@@ -2601,7 +2606,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         logAnswer("medical_condition", arrayOf("Dermatological Conditions"))
         nextButton.click()
-        question_38()
+        question_39()
 
     }
 
