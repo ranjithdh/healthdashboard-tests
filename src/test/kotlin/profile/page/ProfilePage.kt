@@ -998,6 +998,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logger.error { "Questioner 1 Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
+        val subTitle=page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply)"))
 
         val vegetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegetarian Primarily plant-"))
         val nonVegetarian =
@@ -1006,13 +1007,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
 
         question.waitFor()
+        subTitle.waitFor()
 
-        previousButton.waitFor()
+
         vegetarian.waitFor()
         nonVegetarian.waitFor()
         vegan.waitFor()
         eggetarian.waitFor()
 
+
+        previousButton.waitFor()
+        nextButton.waitFor()
 
         assertFalse(previousButton.isEnabled)
         vegetarian.click()
