@@ -9,6 +9,8 @@ import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
+import profile.utils.ProfileUtils.assertConditionSelected
+import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
 import profile.utils.ProfileUtils.calculateBMIValues
@@ -2261,31 +2263,229 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["snack_preference"] = arrayOf("Sweets")
         sweets.click()
         nextButton.click()
-        //question_31()
+        question_33()
     }
 
     fun question_31() {
         // What's your current menstrual status?
+
     }
 
     fun question_32() {
         // Are you pregnant?
     }
 
-    fun question_33() {
-        // How many cigarettes do you typically smoke in a day?
+    fun question_33() {  // How many cigarettes do you typically smoke in a day?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How many cigarettes do you"))
+
+        val dontSmoke =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I don't smoke")
+            )
+
+        val upTo5 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("–5")
+            )
+
+        val upTo10 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("–10")
+            )
+
+        val upTo20 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("–20")
+            )
+
+        val moreThan20 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than")
+            )
+
+        val options = listOf(
+            title,
+            dontSmoke,
+            upTo5,
+            upTo10,
+            upTo20,
+            moreThan20
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["n_smoke"] = "I don't smoke"
+        dontSmoke.click()
+        question_34()
     }
 
-    fun question_34() {
-        // How many alcoholic drinks do you consume per week?
+    fun question_34() { // How many alcoholic drinks do you consume per week?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How many alcoholic drinks do"))
+
+        val dontDrink =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I don't drink")
+            )
+
+        val lessThanOncePerWeek =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Less than once per week")
+            )
+
+        val upTo3 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-3 drinks")
+            )
+
+        val upTo7 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-7 drinks")
+            )
+
+        val upTo14 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-14 drinks")
+            )
+
+        val moreThan14 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than 14 drinks")
+            )
+
+        val options = listOf(
+            title,
+            dontDrink,
+            lessThanOncePerWeek,
+            upTo3,
+            upTo7,
+            upTo14,
+            moreThan14
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        dontDrink.click()
+        answersStored["n_alcohol"] = "I don't drink"
+        question_35()
     }
 
-    fun question_35() {
-        // Please select any additional dietary supplements you take
+    fun question_35() { // Please select any additional dietary supplements you take
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please select any additional"))
+
+        val supplementNames = listOf(
+            "Vitamin A",
+            "Vitamin D",
+            "Vitamin E",
+            "Vitamin K",
+            "Vitamin B12",
+            "Folate / Folic Acid",
+            "Biotin",
+            "Vitamin C",
+            "Iron",
+            "Calcium",
+            "Magnesium",
+            "Zinc",
+            "Iodine",
+            "Selenium",
+            "Multivitamin / Combination",
+            "Collagen",
+            "Ashwagandha",
+            "Chyawanprash",
+            "Apple cider vinegar",
+            "Melatonin",
+            "Omega-3 fatty acids",
+            "Flavonoids, Resveratrol,",
+            "Nicotinamide mononucleotide (",
+            "Curcumin / Turmeric extract",
+            "Protein powders (Whey, Plant-",
+            "Herbal adaptogens (e.g.,",
+            "Probiotics / Prebiotics"
+        )
+
+        val supplements = supplementNames.map {
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(it))
+        }
+
+        val others =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+
+        val none =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+
+        listOf(title, others, none).plus(supplements).forEach { it.waitFor() }
+
+        answersStored["additional_supplement"] = arrayOf("Vitamin A", "Vitamin D", "Vitamin E")
+        supplements.take(3).forEach { it.click() }
+        nextButton.click()
+        question_36()
     }
 
-    fun question_36() {
-        // Do you have a family history of any medical conditions?
+    fun question_36() {// Do you have a family history of any medical conditions?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Do you have a family history"))
+
+        val conditionNames = listOf(
+            "Dermatological Conditions",
+            "Bone or Joint Conditions",
+            "Gastrointestinal Conditions",
+            "Neurological Conditions",
+            "Diabetes",
+            "Thyroid-related disorders",
+            "Liver Disorders",
+            "Kidney Conditions",
+            "Cardiovascular Conditions",
+            "Gall bladder issues",
+            "Cancer",
+            "Respiratory conditions",
+            "Auto-immune condition"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        val notSure =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm not sure"))
+
+        val none =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
+
+        // Wait once
+        listOf(title, notSure, none).plus(conditions).forEach { it.waitFor() }
+
+        conditions.forEach { it.click() }
+
+        // -------- CASE 1: Not Sure --------
+        notSure.click()
+        assertExclusiveSelected(notSure, conditions)
+
+        // -------- CASE 2: None of the above --------
+        none.click()
+        assertExclusiveSelected(none, conditions)
+
+        // -------- CASE 3: Normal condition --------
+        val selectedCondition = conditions.first()
+        selectedCondition.click()
+        assertConditionSelected(selectedCondition, notSure, none)
+        answersStored["medical_condition_family"]="Dermatological Conditions"
     }
 
     fun question_37() {

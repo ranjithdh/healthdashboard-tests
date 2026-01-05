@@ -1,5 +1,6 @@
 package profile.utils
 
+import com.microsoft.playwright.Locator
 import model.profile.Address
 import java.time.Instant
 import java.time.LocalDate
@@ -97,5 +98,39 @@ object ProfileUtils {
             formatted
         }
     }
+
+    fun isSelected(button: Locator): Boolean {
+        val clazz = button.getAttribute("class") ?: return false
+        return clazz.contains("border-[#6d6d79]") &&
+                clazz.contains("bg-[#25252a]")
+    }
+
+    fun assertExclusiveSelected(
+        exclusive: Locator,
+        others: List<Locator>
+    ) {
+        check(isSelected(exclusive)) {
+            "Expected exclusive option to be selected"
+        }
+
+        others.forEach {
+            check(!isSelected(it)) {
+                "Other options must be unselected when exclusive option is selected"
+            }
+        }
+    }
+
+    fun assertConditionSelected(
+        selected: Locator,
+        notSure: Locator,
+        none: Locator
+    ) {
+        check(isSelected(selected))
+        check(!isSelected(notSure)) { "'I'm not sure' must be unselected" }
+        check(!isSelected(none)) { "'None of the above' must be unselected" }
+    }
+
+
+
 
 }
