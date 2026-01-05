@@ -42,6 +42,23 @@ class ProfilePage(page: Page) : BasePage(page) {
     val previousButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
     val nextButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
 
+    private fun logQuestion(questionText: String) {
+        logger.info { "[QUESTIONER]: $questionText" }
+    }
+
+    private fun logAnswer(key: String, value: Any?) {
+        answersStored[key] = value
+        logger.info { "[ANSWERS STORED SNAPSHOT]: ${answersStored.entries.joinToString(prefix = "{", postfix = "}") { "${it.key}: ${formatValue(it.value)}" }}" }
+    }
+
+    private fun formatValue(value: Any?): String {
+        return when (value) {
+            is Array<*> -> value.joinToString(", ", prefix = "[", postfix = "]")
+            is List<*> -> value.joinToString(", ", prefix = "[", postfix = "]")
+            else -> value.toString()
+        }
+    }
+
 
     init {
         monitorTraffic()
@@ -977,6 +994,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     //Question - 1
     fun question_1_veg() { //What is your food preference?
+        logQuestion("What is your food preference?")
         logger.error { "Questioner 1 Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
@@ -997,11 +1015,12 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertFalse(previousButton.isEnabled)
         vegetarian.click()
-        answersStored["food_preference"] = "vegetarian"
+        logAnswer("food_preference", "vegetarian")
         question_3()
     }
 
     fun question_1_non_veg() { //What is your food preference?
+        logQuestion("What is your food preference?")
         logger.error { "Questioner 1 Non-Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
@@ -1023,11 +1042,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertFalse(previousButton.isEnabled)
 
         nonVegetarian.click()
-        answersStored["food_preference"] = "non_vegetarian"
+        logAnswer("food_preference", "non_vegetarian")
         question_2()
     }
 
     private fun question_2() { //Which of the following do you consume?
+        logQuestion("Which of the following do you consume?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Which of the following do you"))
@@ -1084,7 +1104,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         meatOptions
             .forEach { it.click() }
 
-        answersStored["type_of_meat"] = "non_vegetarian"
+        logAnswer("type_of_meat", "non_vegetarian")
 
         nextButton.click()
         question_3()
@@ -1092,6 +1112,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun question_3() { //What is your cuisine preference?
+        logQuestion("What is your cuisine preference?")
         logger.error { "Questioner 3" }
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your cuisine"))
 
@@ -1136,16 +1157,19 @@ class ProfilePage(page: Page) : BasePage(page) {
         jain.click()
 
 
-        answersStored["cuisine_preference"] =
+        logAnswer(
+            "cuisine_preference",
             arrayOf(
                 "North Indian", "South Indian", "Jain"
             )
+        )
 
         nextButton.click()
         question_4()
     }
 
     fun question_4() { //Which of the following best describes your daily eating habits?
+        logQuestion("Which of the following best describes your daily eating habits?")
         logger.error { "Questioner 4" }
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Which of the following best"))
@@ -1207,7 +1231,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         lifestyleOptions.forEach { it.waitFor() }
 
         homeCooked.click()
-        answersStored["daily_eating_habit"] = "Primarily Home Cooked Meals"
+        logAnswer("daily_eating_habit", "Primarily Home Cooked Meals")
         question_5()
 
         /*  Optional: random selection (single click)
@@ -1220,6 +1244,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_5() { //What is your past experience with diets?
+        logQuestion("What is your past experience with diets?")
         logger.error { "Questioner 5" }
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("What is your past experience"))
@@ -1268,7 +1293,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         none.click()
 
-        answersStored["diet_experience"] = "None"
+        logAnswer("diet_experience", "None")
 
         question_6()
         /*   click each option → go back using Previous
@@ -1280,6 +1305,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_6() { //How familiar are you with tracking calories or macronutrients and micronutrients?
+        logQuestion("How familiar are you with tracking calories or macronutrients and micronutrients?")
         logger.error { "Questioner 6" }
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How familiar are you with"))
@@ -1314,7 +1340,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         neverTracked.click()
 
-        answersStored["nutrition_tracking_experience"] = "Never tracked, need guidance"
+        logAnswer("nutrition_tracking_experience", "Never tracked, need guidance")
         question_7()
         /*      // 🎯 choose one (random)
               options
@@ -1324,6 +1350,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_7() { //Do you have any food allergies?
+        logQuestion("Do you have any food allergies?")
         logger.error { "Questioner 7" }
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have any food"))
@@ -1368,12 +1395,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         selectable.forEach { it.click() }
 
-        answersStored["allergy"] = arrayOf("Milk or dairy", "Eggs")
+        logAnswer("allergy", arrayOf("Milk or dairy", "Eggs"))
         nextButton.click()
         question_8()
     }
 
     fun question_8() { //Do you have any food intolerances?
+        logQuestion("Do you have any food intolerances?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have any food"))
@@ -1408,13 +1436,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         lactose.click()
         caffeine.click()
 
-        answersStored["intolerance"] = arrayOf("Lactose", "Caffeine")
+        logAnswer("intolerance", arrayOf("Lactose", "Caffeine"))
 
         nextButton.click()
         question_9()
     }
 
     fun question_9() { //How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?
+        logQuestion("How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How much caffeine do you"))
@@ -1454,7 +1483,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        answersStored["caffeine_consumption"] = "None or Rarely"
+        logAnswer("caffeine_consumption", "None or Rarely")
 
         noneOrRarely.click()
         question_10()
@@ -1462,6 +1491,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_10() { //How active are you in a typical week?
+        logQuestion("How active are you in a typical week?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How active are you in a"))
@@ -1510,7 +1540,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         /**-------Hardly Exercise another flow-------* - question_14 */
 
-        answersStored["typical_day"] = "sedentary"
+        logAnswer("typical_day", "sedentary")
         sedentary.click()
         question_11_with_exercise()
     }
@@ -1519,6 +1549,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     //Question - 11
 
     fun question_11_without_noExercise() { //What type of exercise do you usually do?
+        logQuestion("What type of exercise do you usually do?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("What type of exercise do you"))
@@ -1564,9 +1595,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(isButtonChecked(noExercise))
         exerciseOptions.forEach { assertFalse(isButtonChecked(it)) }
 
-        answersStored["exercise_type"] = arrayOf(
+        logAnswer("exercise_type", arrayOf(
             "I don't exercise"
-        )
+        ))
 
 
         // ➡️ Go to Question 14
@@ -1574,6 +1605,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_11_with_exercise() { //What type of exercise do you usually do?
+        logQuestion("What type of exercise do you usually do?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("What type of exercise do you"))
@@ -1607,9 +1639,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(isButtonChecked(yoga))
 
 
-        answersStored["exercise_type"] = arrayOf(
+        logAnswer("exercise_type", arrayOf(
             "Yoga"
-        )
+        ))
 
         nextButton.click()
         // ➡️ Go to Question 12
@@ -1619,6 +1651,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun question_12() {// When do you usually work out or prefer to work out?
+        logQuestion("When do you usually work out or prefer to work out?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("When do you usually work out"))
@@ -1649,11 +1682,12 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         morning.click()
 
-        answersStored["preferred_workout_time"] = "Morning"
+        logAnswer("preferred_workout_time", "Morning")
         question_13()
     }
 
     fun question_13() { // Equipments available
+        logQuestion("Equipments available")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Equipments available"))
 
@@ -1696,13 +1730,14 @@ class ProfilePage(page: Page) : BasePage(page) {
             assertFalse(isButtonChecked(it))
         }
 
-        answersStored["equipments_available"] = "None"
+        logAnswer("equipments_available", "None")
 
         nextButton.click()
         question_14()
     }
 
     fun question_14() {// How would you describe your sleep?
+        logQuestion("How would you describe your sleep?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How would you describe your"))
 
@@ -1734,7 +1769,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["sleep_hygiene"] = "Room for improvement, occasional distractions"
+        logAnswer("sleep_hygiene", "Room for improvement, occasional distractions")
 
         roomForImprovement.click()
 
@@ -1742,6 +1777,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_15() {   // What time do you usually go to bed on weekdays?
+        logQuestion("What time do you usually go to bed on weekdays?")
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually go"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -1754,12 +1790,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         timerBox.fill("23:00")
-        answersStored["weekday_sleep_routine_bed_time"] = "23:00"
+        logAnswer("weekday_sleep_routine_bed_time", "23:00")
         nextButton.click()
         question_16()
     }
 
     fun question_16() { // What time do you usually wake up on weekdays?
+        logQuestion("What time do you usually wake up on weekdays?")
 
         val title =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually wake"))
@@ -1772,12 +1809,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        answersStored["weekday_sleep_routine_wakeup_time"] = "07:00"
+        logAnswer("weekday_sleep_routine_wakeup_time", "07:00")
         nextButton.click()
         question_17()
     }
 
     fun question_17() { // What time do you usually go to bed on weekends?
+        logQuestion("What time do you usually go to bed on weekends?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually go"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
@@ -1790,13 +1828,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("23:00")
-        answersStored["weekend_sleep_routine_bed_time"] = "23:00"
+        logAnswer("weekend_sleep_routine_bed_time", "23:00")
         nextButton.click()
 
         question_18()
     }
 
     fun question_18() {    // What time do you usually wakeup on weekends?
+        logQuestion("What time do you usually wakeup on weekends?")
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -1807,12 +1846,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        answersStored["weekend_sleep_routine_wakeup_time"] = "07:00"
+        logAnswer("weekend_sleep_routine_wakeup_time", "07:00")
         nextButton.click()
         question_19()
     }
 
     fun question_19() {        // Would you like to set your ideal bedtime or wakeup time?
+        logQuestion("Would you like to set your ideal bedtime or wakeup time?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Let's make your sleep"))
 
@@ -1837,12 +1877,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["sleep_schedule_preference"] = "Bedtime"
+        logAnswer("sleep_schedule_preference", "Bedtime")
         bedtime.click()
         question_20()
     }
 
     fun question_20() {  // Set your ideal Bedtime
+        logQuestion("Set your ideal Bedtime")
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Set your ideal Bedtime"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -1853,12 +1894,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("11:00")
-        answersStored["bed_time_goal"] = "11:00"
+        logAnswer("bed_time_goal", "11:00")
         nextButton.click()
         question_22()
     }
 
     fun question_21() { // Set your ideal Waketime
+        logQuestion("Set your ideal Waketime")
         val title =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Set your ideal Waketime"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
@@ -1870,11 +1912,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        answersStored["wakeup_time_goal"] = "07:00"
+        logAnswer("wakeup_time_goal", "07:00")
         //question_22()
     }
 
     fun question_22() { // How satisfied are you with your sleep?
+        logQuestion("How satisfied are you with your sleep?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How satisfied are you with"))
 
@@ -1905,12 +1948,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["sleep_satisfaction"] = "Somewhat Satisfied"
+        logAnswer("sleep_satisfaction", "Somewhat Satisfied")
         somewhatSatisfied.click()
         question_23()
     }
 
     fun question_23() {// Do you wake up refreshed?
+        logQuestion("Do you wake up refreshed?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you wake up refreshed?"))
 
@@ -1941,13 +1985,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["sleep_wakeup_refreshment"] = "Sometimes"
+        logAnswer("sleep_wakeup_refreshment", "Sometimes")
         sometimes.click()
         question_24()
     }
 
     fun question_24() {// What is the duration of your sun exposure on a day-to-day basis?
-
+        logQuestion("What is the duration of your sun exposure on a day-to-day basis?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("What is the duration of your"))
@@ -1987,12 +2031,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["sunlight_upon_wakeup"] = "5-10 minutes"
+        logAnswer("sunlight_upon_wakeup", "5-10 minutes")
         fiveToTen.click()
         question_25()
     }
 
     fun question_25() { // During which part of the day are you usually exposed to direct sunlight?
+        logQuestion("During which part of the day are you usually exposed to direct sunlight?")
 
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
@@ -2032,12 +2077,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["sunlight_timing"] = "Early morning (before 10 a.m.)"
+        logAnswer("sunlight_timing", "Early morning (before 10 a.m.)")
         earlyMorning.click()
         question_26()
     }
 
     fun question_26() {  // How often do you look for external motivation to stick to your wellness routine?
+        logQuestion("How often do you look for external motivation to stick to your wellness routine?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How often do you look for"))
@@ -2069,12 +2115,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["wellness_motivation_frequency"] = "Now and then"
+        logAnswer("wellness_motivation_frequency", "Now and then")
         nowAndThen.click()
         question_27()
     }
 
     fun question_27() {
+        logQuestion("In the past month, how often have you felt stressed, sad, or low?")
         // In the past month, how often have you felt stressed, sad, or low?
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("In the past month, how often"))
@@ -2121,12 +2168,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["wellness_bother_frequency"] = "Once a week"
+        logAnswer("wellness_bother_frequency", "Once a week")
         onceAWeek.click()
         question_28()
     }
 
     fun question_28() {   // How well do you deal with stress?
+        logQuestion("How well do you deal with stress?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How well do you deal with"))
 
@@ -2158,12 +2206,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["stress_management"] = "I could deal with stress better"
+        logAnswer("stress_management", "I could deal with stress better")
         overwhelmed.click()
         question_29()
     }
 
     fun question_29() {  // How often do you eat in response to emotions rather than physical hunger?
+        logQuestion("How often do you eat in response to emotions rather than physical hunger?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How often do you eat in"))
 
@@ -2202,12 +2251,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        answersStored["emotional_eating"] = "Rarely"
+        logAnswer("emotional_eating", "Rarely")
         rarely.click()
         question_30()
     }
 
     fun question_30() { // What type of snacks do you usually indulge in?
+        logQuestion("What type of snacks do you usually indulge in?")
 
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
@@ -2261,7 +2311,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             allOfTheAbove
         ).forEach { it.waitFor() }
 
-        answersStored["snack_preference"] = arrayOf("Sweets")
+        logAnswer("snack_preference", arrayOf("Sweets"))
         sweets.click()
         nextButton.click()
         question_33()
@@ -2269,14 +2319,17 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun question_31() {
         // What's your current menstrual status?
+        logQuestion("What's your current menstrual status?")
 
     }
 
     fun question_32() {
         // Are you pregnant?
+        logQuestion("Are you pregnant?")
     }
 
     fun question_33() {  // How many cigarettes do you typically smoke in a day?
+        logQuestion("How many cigarettes do you typically smoke in a day?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How many cigarettes do you"))
 
@@ -2321,12 +2374,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        answersStored["n_smoke"] = "I don't smoke"
+        logAnswer("n_smoke", "I don't smoke")
         dontSmoke.click()
         question_34()
     }
 
     fun question_34() { // How many alcoholic drinks do you consume per week?
+        logQuestion("How many alcoholic drinks do you consume per week?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("How many alcoholic drinks do"))
 
@@ -2379,11 +2433,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
         dontDrink.click()
-        answersStored["n_alcohol"] = "I don't drink"
+        logAnswer("n_alcohol", "I don't drink")
         question_35()
     }
 
     fun question_35() { // Please select any additional dietary supplements you take
+        logQuestion("Please select any additional dietary supplements you take")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please select any additional"))
 
@@ -2429,13 +2484,14 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         listOf(title, others, none).plus(supplements).forEach { it.waitFor() }
 
-        answersStored["additional_supplement"] = arrayOf("Vitamin A", "Vitamin D", "Vitamin E")
+        logAnswer("additional_supplement", arrayOf("Vitamin A", "Vitamin D", "Vitamin E"))
         supplements.take(3).forEach { it.click() }
         nextButton.click()
         question_36()
     }
 
     fun question_36() {// Do you have a family history of any medical conditions?
+        logQuestion("Do you have a family history of any medical conditions?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have a family history"))
@@ -2486,12 +2542,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         val selectedCondition = conditions.first()
         selectedCondition.click()
         assertConditionSelected(selectedCondition, notSure, none)
-        answersStored["medical_condition_family"] = arrayOf("Dermatological Conditions")
+        logAnswer("medical_condition_family", arrayOf("Dermatological Conditions"))
         nextButton.click()
         question_37()
     }
 
     fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
+        logQuestion("Do you currently have or have ever been diagnosed with any medical conditions?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Do you currently have or have"))
 
@@ -2542,13 +2599,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         selectedCondition.click()
         assertConditionSelected(selectedCondition, notSure, none)
 
-        answersStored["medical_condition"] = arrayOf("Dermatological Conditions")
+        logAnswer("medical_condition", arrayOf("Dermatological Conditions"))
         nextButton.click()
         question_38()
 
     }
 
     fun question_38() { // Which of the following best describes your GI condition?
+        logQuestion("Which of the following best describes your GI condition?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
 
@@ -2588,13 +2646,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, none).plus(conditions).forEach { it.waitFor() }
 
         ibs.click()
-        answersStored["gi_condition"] = arrayOf("Irritable Bowel Syndrome")
+        logAnswer("gi_condition", arrayOf("Irritable Bowel Syndrome"))
         nextButton.click()
         question_51()
     }
 
 
     fun question_39() {  // Which of the following best describes your skin condition?
+        logQuestion("Which of the following best describes your skin condition?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
 
@@ -2623,12 +2682,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditionButtons[0].click()
-        answersStored["skin_condition"] = arrayOf("Psoriasis")
+        logAnswer("skin_condition", arrayOf("Psoriasis"))
         nextButton.click()
         question_51()
     }
 
     fun question_40() { // Which of the following best describes your bone or joint condition?
+        logQuestion("Which of the following best describes your bone or joint condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -2677,12 +2737,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditionButtons[0].click()
-        answersStored["bone_joint_condition"] = arrayOf("Ankylosing Spondylitis")
+        logAnswer("bone_joint_condition", arrayOf("Ankylosing Spondylitis"))
         nextButton.click()
         question_51()
     }
 
     fun question_41() {// Which of the following best describes your neurological condition?
+        logQuestion("Which of the following best describes your neurological condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -2738,12 +2799,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["neurological_condition"] = arrayOf("Migraines")
+        logAnswer("neurological_condition", arrayOf("Migraines"))
         nextButton.click()
         question_51()
     }
 
     fun question_42() { // How would you best describe your Diabetes status?
+        logQuestion("How would you best describe your Diabetes status?")
         // Question title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("How would you best describe"))
@@ -2784,11 +2846,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         answersStored["diabetes_status"] = "I am prediabetic, but I'm not on medication"
         preDiabeticNotOnMeds.click()
+        logAnswer("diabetes_status", "I am prediabetic, but I'm not on medication")
         question_51()
 
     }
 
     fun question_43() {// Which of the following best describes your thyroid condition?
+        logQuestion("Which of the following best describes your thyroid condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -2843,12 +2907,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["thyroid_condition"] = arrayOf("Hypothyroidism")
+        logAnswer("thyroid_condition", arrayOf("Hypothyroidism"))
         nextButton.click()
         question_51()
     }
 
     fun question_44() {  // Which of the following best describes your liver condition?
+        logQuestion("Which of the following best describes your liver condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -2904,12 +2969,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["liver_condition"] = arrayOf("Fatty Liver")
+        logAnswer("liver_condition", arrayOf("Fatty Liver"))
         nextButton.click()
         question_51()
     }
 
     fun question_45() {  // Which of the following best describes your kidney condition?
+        logQuestion("Which of the following best describes your kidney condition?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -2964,12 +3030,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["kidney_condition"] = arrayOf("Nephritis")
+        logAnswer("kidney_condition", arrayOf("Nephritis"))
         nextButton.click()
         question_51()
     }
 
     fun question_46() {//  Which of the following best describes your heart condition?
+        logQuestion("Which of the following best describes your heart condition?")
 
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
@@ -3027,12 +3094,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["heart_condition"] = arrayOf("Hypertension")
+        logAnswer("heart_condition", arrayOf("Hypertension"))
         nextButton.click()
         question_51()
     }
 
     fun question_47() {//  Which of the following best describes your respiratory condition?
+        logQuestion("Which of the following best describes your respiratory condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -3089,12 +3157,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["respiratory_condition"] = arrayOf("Asthma")
+        logAnswer("respiratory_condition", arrayOf("Asthma"))
         nextButton.click()
         question_51()
     }
 
     fun question_48() {  // Which of the following best describes your auto-immune condition?
+        logQuestion("Which of the following best describes your auto-immune condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Which of the following best"))
@@ -3155,12 +3224,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        answersStored["auto_immune_condition"] = arrayOf("Systemic Lupus Erythematosus (SLE")
+        logAnswer("auto_immune_condition", arrayOf("Systemic Lupus Erythematosus (SLE"))
         nextButton.click()
         question_51()
     }
 
     fun question_49() { // What is your current cancer status?
+        logQuestion("What is your current cancer status?")
         // Question title
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("What is your current cancer"))
@@ -3199,12 +3269,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Select ONE option only
         // -------------------------
 
-        answersStored["cancer_diagnosis"] = "Yes, I currently have cancer and on treatment"
+        logAnswer("cancer_diagnosis", "Yes, I currently have cancer and on treatment")
         onTreatment.click()
         question_50()
     }
 
     fun question_50() {
+        logQuestion("Please mention the type of cancer")
         // Please mention the type of cancer
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
@@ -3233,6 +3304,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_51() { // Are you currently taking any of the following types of medicines?
+        logQuestion("Are you currently taking any of the following types of medicines?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("Are you currently taking any"))
 
@@ -3298,13 +3370,16 @@ class ProfilePage(page: Page) : BasePage(page) {
             it.click()
         }
 
-        answersStored["medicines_taking"] =
+        logAnswer(
+            "medicines_taking",
             arrayOf("Cholesterol-lowering drugs (Statins)", "Blood pressure medicines", "Thyroid medicines")
+        )
 
         nextButton.click()
     }
 
     fun question_52() { // What is your waist circumference at its narrowest point?
+        logQuestion("What is your waist circumference at its narrowest point?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(Locator.FilterOptions().setHasText("What is your waist"))
