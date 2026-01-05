@@ -1600,28 +1600,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Example: select Yoga (your test can vary this)
         yoga.click()
 
-        // Case 2: Any exercise selected → unselect No Exercise
-        if (isButtonChecked(noExercise)) {
-            noExercise.click()
-        }
 
-        // Assertions
-        exerciseOptions.any { isButtonChecked(it) }.also {
-            assertTrue(it)
-        }
-
-        assertFalse(isButtonChecked(noExercise))
+        assertTrue(isButtonChecked(yoga))
 
 
         answersStored["exercise_type"] = arrayOf(
-            "Yoga",
-            "Strength Training",
-            "Pilates",
-            "Flexibility / Stretching"
+            "Yoga"
         )
 
+        nextButton.click()
         // ➡️ Go to Question 12
         question_12()
+
     }
 
 
@@ -1706,6 +1696,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["equipments_available"] = "None"
 
         nextButton.click()
+        question_14()
     }
 
     fun question_14() {// How would you describe your sleep?
@@ -1743,70 +1734,534 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["sleep_hygiene"] = "Room for improvement, occasional distractions"
 
         roomForImprovement.click()
+
+        question_15()
     }
 
     fun question_15() {   // What time do you usually go to bed on weekdays?
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually go"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
 
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+
+
+        timerBox.fill("23:00")
+        answersStored["weekday_sleep_routine_bed_time"] = "23:00"
+        nextButton.click()
+        question_16()
     }
 
-    fun question_16() {
-        // What time do you usually wake up on weekdays?
+    fun question_16() { // What time do you usually wake up on weekdays?
+
+        val title =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually wake"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
+
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+        timerBox.fill("07:00")
+        answersStored["weekday_sleep_routine_wakeup_time"] = "07:00"
+        nextButton.click()
+        question_17()
     }
 
-    fun question_17() {
-        // What time do you usually go to bed on weekends?
+    fun question_17() { // What time do you usually go to bed on weekends?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually go"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
+
+
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+        timerBox.fill("23:00")
+        answersStored["weekend_sleep_routine_bed_time"] = "23:00"
+        nextButton.click()
+
+        question_18()
     }
 
-    fun question_18() {
-        // What time do you usually wakeup on weekends?
+    fun question_18() {    // What time do you usually wakeup on weekends?
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
+
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+        timerBox.fill("07:00")
+        answersStored["weekend_sleep_routine_wakeup_time"] = "07:00"
+        nextButton.click()
+        question_19()
     }
 
-    fun question_19() {
-        // Would you like to set your ideal bedtime or wakeup time?
+    fun question_19() {        // Would you like to set your ideal bedtime or wakeup time?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Let's make your sleep"))
+
+        val bedtime =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Bedtime")
+            )
+
+        val waketime =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Waketime")
+            )
+
+        val options = listOf(
+            title,
+            bedtime,
+            waketime
+        )
+
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["sleep_schedule_preference"] = "Bedtime"
+        bedtime.click()
+        question_20()
     }
 
-    fun question_20() {
-        // Set your ideal Bedtime
+    fun question_20() {  // Set your ideal Bedtime
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Set your ideal Bedtime"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
+
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+        timerBox.fill("11:00")
+        answersStored["bed_time_goal"] = "11:00"
+        nextButton.click()
+        question_22()
     }
 
-    fun question_21() {
-        // Set your ideal Waketime
+    fun question_21() { // Set your ideal Waketime
+        val title =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Set your ideal Waketime"))
+        val timerBox = page.getByRole(AriaRole.TEXTBOX)
+
+        val listOfField = listOf(title, timerBox)
+
+        listOfField.forEach {
+            it.waitFor()
+        }
+
+        timerBox.fill("07:00")
+        answersStored["wakeup_time_goal"] = "07:00"
+        //question_22()
     }
 
-    fun question_22() {
-        // How satisfied are you with your sleep?
+    fun question_22() { // How satisfied are you with your sleep?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How satisfied are you with"))
+
+        val fullySatisfied =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Fully Satisfied")
+            )
+
+        val somewhatSatisfied =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Somewhat Satisfied")
+            )
+
+        val notSatisfied =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Not Satisfied")
+            )
+
+        val options = listOf(
+            title,
+            fullySatisfied,
+            somewhatSatisfied,
+            notSatisfied
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["sleep_satisfaction"] = "Somewhat Satisfied"
+        somewhatSatisfied.click()
+        question_23()
     }
 
-    fun question_23() {
-        // Do you wake up refreshed?
+    fun question_23() {// Do you wake up refreshed?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Do you wake up refreshed?"))
+
+        val always =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Always")
+            )
+
+        val sometimes =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Sometimes")
+            )
+
+        val rarely =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Rarely")
+            )
+
+        val options = listOf(
+            title,
+            always,
+            sometimes,
+            rarely
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["sleep_wakeup_refreshment"] = "Sometimes"
+        sometimes.click()
+        question_24()
     }
 
-    fun question_24() {
-        // What is the duration of your sun exposure on a day-to-day basis?
+    fun question_24() {// What is the duration of your sun exposure on a day-to-day basis?
+
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What is the duration of your"))
+
+        val lessThan5 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Less than 5 minutes")
+            )
+
+        val fiveToTen =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-10 minutes")
+            )
+
+        val tenToTwenty =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("-20 minutes")
+            )
+
+        val moreThan20 =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than 20 minutes")
+            )
+
+        val options = listOf(
+            title,
+            lessThan5,
+            fiveToTen,
+            tenToTwenty,
+            moreThan20
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        answersStored["sunlight_upon_wakeup"] = "5-10 minutes"
+        fiveToTen.click()
+        question_25()
     }
 
-    fun question_25() {
-        // During which part of the day are you usually exposed to direct sunlight?
+    fun question_25() { // During which part of the day are you usually exposed to direct sunlight?
+
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("During which part of the day"))
+
+        val earlyMorning =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Early morning (before 10 a.m.)")
+            )
+
+        val lateMorning =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Late morning to early")
+            )
+
+        val lateAfternoon =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Late afternoon (3 p.m. - 5 p.")
+            )
+
+        val evening =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Evening (after 5 p.m.)")
+            )
+
+        val options = listOf(
+            title,
+            earlyMorning,
+            lateMorning,
+            lateAfternoon,
+            evening
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["sunlight_timing"] = "Early morning (before 10 a.m.)"
+        earlyMorning.click()
+        question_26()
     }
 
-    fun question_26() {
-        // How often do you look for external motivation to stick to your wellness routine?
+    fun question_26() {  // How often do you look for external motivation to stick to your wellness routine?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How often do you look for"))
+
+        val allTheTime =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("All the time")
+            )
+
+        val nowAndThen =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Now and then")
+            )
+
+        val hardlyEver =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Hardly Ever")
+            )
+
+        val options = listOf(
+            title,
+            allTheTime,
+            nowAndThen,
+            hardlyEver
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+        answersStored["wellness_motivation_frequency"] = "Now and then"
+        nowAndThen.click()
+        question_27()
     }
 
     fun question_27() {
         // In the past month, how often have you felt stressed, sad, or low?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("In the past month, how often"))
+
+        val everyDay =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Every day")
+            )
+
+        val moreThanOnceAWeek =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than once a week")
+            )
+
+        val onceAWeek =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Once a week").setExact(true)
+            )
+
+        val onceInTwoWeeks =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Once in two weeks")
+            )
+
+        val onceAMonth =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Once a month / Rarely")
+            )
+
+        val options = listOf(
+            title,
+            everyDay,
+            moreThanOnceAWeek,
+            onceAWeek,
+            onceInTwoWeeks,
+            onceAMonth
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        answersStored["wellness_bother_frequency"] = "Once a week"
+        onceAWeek.click()
+        question_28()
     }
 
-    fun question_28() {
-        // How well do you deal with stress?
+    fun question_28() {   // How well do you deal with stress?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How well do you deal with"))
+
+        val dealWell =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I deal with my stress well")
+            )
+
+        val couldDealBetter =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I could deal with stress")
+            )
+
+        val overwhelmed =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I feel overwhelmed by stress")
+            )
+
+        val options = listOf(
+            title,
+            dealWell,
+            couldDealBetter,
+            overwhelmed
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        answersStored["stress_management"] = "I could deal with stress better"
+        overwhelmed.click()
+        question_29()
     }
 
-    fun question_29() {
-        // How often do you eat in response to emotions rather than physical hunger?
+    fun question_29() {  // How often do you eat in response to emotions rather than physical hunger?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("How often do you eat in"))
+
+        val frequently =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Frequently")
+            )
+
+        val occasionally =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Occasionally")
+            )
+
+        val rarely =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Rarely")
+            )
+
+        val never =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Never")
+            )
+
+        val options = listOf(
+            title,
+            frequently,
+            occasionally,
+            rarely,
+            never
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        answersStored["emotional_eating"] = "Rarely"
+        rarely.click()
+        question_30()
     }
 
-    fun question_30() {
-        // What type of snacks do you usually indulge in?
+    fun question_30() { // What type of snacks do you usually indulge in?
+
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What type of snacks do you"))
+
+        val sweets =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sweets"))
+
+        val fried =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fried and crispy"))
+
+        val salty =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Salty"))
+
+        val healthy =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Healthier options (e.g.,")
+            )
+
+        val others =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+
+        val othersInput =
+            page.getByRole(
+                AriaRole.TEXTBOX,
+                Page.GetByRoleOptions().setName("Please specify...")
+            )
+
+        val allOfTheAbove =
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("All of the above")
+            )
+
+        val snackOptions = listOf(
+            sweets,
+            fried,
+            salty,
+            healthy
+        )
+
+        // ✅ wait once
+        listOf(
+            title,
+            sweets,
+            fried,
+            salty,
+            healthy,
+            others,
+            allOfTheAbove
+        ).forEach { it.waitFor() }
+
+        answersStored["snack_preference"] = arrayOf("Sweets")
+        sweets.click()
+        nextButton.click()
+        //question_31()
     }
 
     fun question_31() {
