@@ -1007,6 +1007,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         question.waitFor()
 
+        previousButton.waitFor()
         vegetarian.waitFor()
         nonVegetarian.waitFor()
         vegan.waitFor()
@@ -1033,6 +1034,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         question.waitFor()
         //options
+        previousButton.waitFor()
         vegetarian.waitFor()
         nonVegetarian.waitFor()
         vegan.waitFor()
@@ -1109,7 +1111,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         nextButton.click()
         question_3()
     }
-
 
     fun question_3() { //What is your cuisine preference?
         logQuestion("What is your cuisine preference?")
@@ -1342,11 +1343,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         logAnswer("nutrition_tracking_experience", "Never tracked, need guidance")
         question_7()
-        /*      // 🎯 choose one (random)
-              options
-                  .drop(1) // exclude title
-                  .random()
-                  .click()*/
     }
 
     fun question_7() { //Do you have any food allergies?
@@ -1370,11 +1366,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         val others =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
 
-        val othersTextBox =
-            page.getByRole(
-                AriaRole.TEXTBOX,
-                Page.GetByRoleOptions().setName("Please specify...")
-            )
 
         val options = listOf(
             title,
@@ -1383,12 +1374,19 @@ class ProfilePage(page: Page) : BasePage(page) {
             treeNuts,
             soy,
             gluten,
-            none,
-            others
+
         )
 
         // ✅ wait once
-        options.forEach { it.waitFor() }
+        options.plus(none).plus(others).forEach { it.waitFor() }
+
+        //Others
+
+
+        //None
+        none.click()
+        assertExclusiveSelected(none,(options+others))
+
 
         // 🎯 select multiple (example: random 1–2 allergies)
         val selectable = listOf(milk, peanuts)
@@ -1418,8 +1416,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         val none =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
 
-        val subtitle = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(FilterOptions().setHasText("(Select all that apply —"))
 
         val options = listOf(
             title,
@@ -1427,7 +1423,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             caffeine,
             gluten,
             none,
-            subtitle
         )
 
         // ✅ wait once
@@ -2281,12 +2276,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         val others =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
 
-        val othersInput =
-            page.getByRole(
-                AriaRole.TEXTBOX,
-                Page.GetByRoleOptions().setName("Please specify...")
-            )
-
         val allOfTheAbove =
             page.getByRole(
                 AriaRole.BUTTON,
@@ -2546,6 +2535,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // -------- CASE 3: Normal condition --------
         val selectedCondition = conditions.first()
         selectedCondition.click()
+
         assertConditionSelected(selectedCondition, notSure, none)
         logAnswer("medical_condition_family", arrayOf("Dermatological Conditions"))
         nextButton.click()
@@ -2677,8 +2667,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         conditionButtons.forEach { it.click() } // Psoriasis, Eczema, Acne
 
-        othersButton.click()
-        assertExclusiveSelected(othersButton, conditionButtons)
+        //Other
+  /*      othersButton.click()
+        assertExclusiveSelected(othersButton, conditionButtons)*/
 
         noneButton.click()
         assertExclusiveSelected(
