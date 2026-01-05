@@ -226,7 +226,7 @@ class ProfileTest {
     /**-------------Questioner---------------*/
 
     @Test
-    fun `questioner validation`() {
+    fun `questioner validation vegetarian`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -239,4 +239,21 @@ class ProfileTest {
 
         profilePage.assertQuestionerVegInitialCheck()
     }
+
+    @Test
+    fun `questioner validation non_vegetarian`(){
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        profilePage.assertQuestionerNonVegInitialCheck()
+    }
+
+
 }

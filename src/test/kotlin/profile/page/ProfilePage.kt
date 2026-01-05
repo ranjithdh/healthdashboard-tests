@@ -1077,11 +1077,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         val fish =
             page.getByRole(
                 AriaRole.BUTTON,
-                Page.GetByRoleOptions().setName("Fish")
+                Page.GetByRoleOptions().setName("Fish").setExact(true)
             )
 
         val shellfish =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Shellfish"))
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Shellfish").setExact(true))
 
         val beef =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Beef"))
@@ -3550,7 +3550,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // If blank, expect error and button states
         if (inputValue.isNullOrBlank()) {
             errorParagraph.waitFor()
-          //  assertFalse(!nextButton.isEnabled) // next should be disabled //TODO need to check
+            //  assertFalse(!nextButton.isEnabled) // next should be disabled //TODO need to check
             assertTrue(previousButton.isEnabled)
         }
 
@@ -3562,7 +3562,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // After filling, Next should be enabled
         if (!inputValue.isNullOrBlank()) {
-         //   assertTrue(nextButton.isEnabled) //TODO need to check
+            //   assertTrue(nextButton.isEnabled) //TODO need to check
             assertTrue(previousButton.isEnabled)
         }
 
