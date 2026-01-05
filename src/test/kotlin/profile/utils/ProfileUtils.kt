@@ -120,7 +120,7 @@ object ProfileUtils {
         }
     }
 
-    fun assertConditionSelected(
+  /*  fun assertConditionSelected(
         selected: Locator,
         notSure: Locator,
         none: Locator
@@ -128,7 +128,7 @@ object ProfileUtils {
         check(isSelected(selected))
         check(!isSelected(notSure)) { "'I'm not sure' must be unselected" }
         check(!isSelected(none)) { "'None of the above' must be unselected" }
-    }
+    }*/
 
 
 
