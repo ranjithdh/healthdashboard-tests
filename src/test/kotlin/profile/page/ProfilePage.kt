@@ -2518,7 +2518,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //Others
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2699,7 +2698,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, none).plus(conditions).forEach { it.waitFor() }
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2747,7 +2745,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditionButtons.forEach { it.click() } // Psoriasis, Eczema, Acne
 
         //--------Others---------
-        othersButton.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2810,7 +2807,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2872,7 +2868,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .forEach { it.waitFor() }
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2984,7 +2979,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .forEach { it.waitFor() }
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3050,7 +3044,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3115,7 +3108,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3181,7 +3173,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .forEach { it.waitFor() }
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3247,7 +3238,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3316,7 +3306,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .forEach { it.waitFor() }
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -3459,7 +3448,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //--------Others---------
-        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
