@@ -9,7 +9,6 @@ import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
-import profile.utils.ProfileUtils.assertConditionSelected
 import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
@@ -17,7 +16,6 @@ import profile.utils.ProfileUtils.calculateBMIValues
 import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import profile.utils.ProfileUtils.formatFlotTwoDecimal
-import profile.utils.ProfileUtils.isSelected
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
@@ -2520,6 +2518,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         //Others
+        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2534,7 +2533,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         //None
         supplements.take(5).forEach { it.click() }
         none.click()
-        assertExclusiveSelected(none,supplements)
+        assertExclusiveSelected(none, supplements)
 
         logAnswer("additional_supplement", arrayOf("Vitamin A", "Vitamin D", "Vitamin E"))
         supplements.take(3).forEach { it.click() }
@@ -2579,7 +2578,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
 
         // Wait once
-        listOf(title,subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
+        listOf(title, subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
 
         conditions.forEach { it.click() }
 
@@ -2638,7 +2637,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         // Wait once
-        listOf(title,subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
+        listOf(title, subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
 
         conditions.forEach { it.click() }
 
@@ -2700,6 +2699,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, none).plus(conditions).forEach { it.waitFor() }
 
         //--------Others---------
+        others.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2747,6 +2747,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditionButtons.forEach { it.click() } // Psoriasis, Eczema, Acne
 
         //--------Others---------
+        othersButton.click()
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
         val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Please specify your answer to"))
@@ -2759,6 +2760,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             previousButton = previousButton,
         )
 
+        //-------None----------
         noneButton.click()
         assertExclusiveSelected(
             exclusive = noneButton,
@@ -2806,14 +2808,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         conditionButtons.forEach { it.click() }
 
+
+        //--------Others---------
         others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
 
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
 
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
+        //-------None----------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -2861,21 +2871,25 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
+        //--------Others---------
+        others.click()
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
+
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
         conditions.forEach { it.click() }
 
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
-        others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
 
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
+        //--------None---------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -2969,21 +2983,24 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
+        //--------Others---------
+        others.click()
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
+
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        //--------None---------
         conditions.forEach { it.click() }
 
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
-        others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
-
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3031,21 +3048,25 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
+
+        //--------Others---------
+        others.click()
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
+
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+        // None
+
         conditions.forEach { it.click() }
 
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
-        others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
-
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3092,21 +3113,25 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
+
+        //--------Others---------
+        others.click()
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
+
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        // None
         conditions.forEach { it.click() }
 
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
-        others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
-
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3155,22 +3180,24 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
+        //--------Others---------
+        others.click()
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
+
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        //--------None---------
         conditions.forEach { it.click() }
 
-
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
-        others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
-
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3218,22 +3245,25 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
-        conditions.forEach { it.click() }
 
-
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
+        //--------Others---------
         others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
 
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        //--------None---------
+
+        conditions.forEach { it.click() }
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3285,22 +3315,24 @@ class ProfilePage(page: Page) : BasePage(page) {
         listOf(title, others, none).plus(conditions)
             .forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select conditions
-        // -------------------------
-        conditions.forEach { it.click() }
-
-
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
+        //--------Others---------
         others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None' must be unselected" }
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
 
-        // -------------------------
-        // Scenario 3: Select "None"
-        // -------------------------
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        //--------None---------
+
+        conditions.forEach { it.click() }
         none.click()
         assertExclusiveSelected(
             exclusive = none,
@@ -3425,27 +3457,27 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         listOf(title, none, others).plus(medications).forEach { it.waitFor() }
 
-        // -------------------------
-        // Scenario 1: Select medication
-        // -------------------------
-        medications[0].click() // Cholesterol
 
-      /*  assertConditionSelected(
-            selected = medications[0],
-            notSure = others, // treated as non-exclusive
-            none = none
-        )*/
-
-        // -------------------------
-        // Scenario 2: Select "Others"
-        // -------------------------
+        //--------Others---------
         others.click()
-        check(isSelected(others)) { "'Others' should be selected" }
-        check(!isSelected(none)) { "'None of the above' must be unselected" }
+        val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
+        val errorInfo = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Please specify your answer to"))
 
-        // -------------------------
-        // Scenario 3: Select "None of the above"
-        // -------------------------
+        handleOthersTextBox(
+            othersButton = others,
+            textBox = otherTextBox,
+            errorParagraph = errorInfo,
+            nextButton = nextButton,
+            previousButton = previousButton,
+        )
+
+
+        // None
+        medications.forEach {
+            it.click()
+        }
+
         none.click()
         assertExclusiveSelected(
             exclusive = none,
