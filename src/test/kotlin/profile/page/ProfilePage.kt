@@ -17,6 +17,7 @@ import profile.utils.ProfileUtils.calculateBMIValues
 import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import profile.utils.ProfileUtils.formatFlotTwoDecimal
+import profile.utils.ProfileUtils.isSelected
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
@@ -2485,15 +2486,110 @@ class ProfilePage(page: Page) : BasePage(page) {
         val selectedCondition = conditions.first()
         selectedCondition.click()
         assertConditionSelected(selectedCondition, notSure, none)
-        answersStored["medical_condition_family"]="Dermatological Conditions"
+        answersStored["medical_condition_family"] = "Dermatological Conditions"
+        nextButton.click()
+        question_37()
     }
 
-    fun question_37() {
-        // Do you currently have or have ever been diagnosed with any medical conditions?
+    fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Do you currently have or have"))
+
+        val conditionNames = listOf(
+            "Dermatological Conditions",
+            "Bone or Joint Conditions",
+            "Gastrointestinal Conditions",
+            "Neurological Conditions",
+            "Type 2 - Diabetes",
+            "Thyroid-related disorders",
+            "Liver Disorders",
+            "Kidney Conditions",
+            "Cardiovascular Conditions",
+            "Gall bladder issues",
+            "Cancer",
+            "Respiratory conditions",
+            "Auto-immune condition"
+        )
+
+        val conditions = conditionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        val notSure =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm not sure"))
+
+        val none =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
+
+
+        // Wait once
+        listOf(title, notSure, none).plus(conditions).forEach { it.waitFor() }
+
+        conditions.forEach { it.click() }
+
+        // -------- CASE 1: Not Sure --------
+        notSure.click()
+        assertExclusiveSelected(notSure, conditions)
+
+        // -------- CASE 2: None of the above --------
+        none.click()
+        assertExclusiveSelected(none, conditions)
+
+        val selectedCondition = conditions.first()
+        selectedCondition.click()
+        assertConditionSelected(selectedCondition, notSure, none)
+        answersStored["medical_condition"] = "Dermatological Conditions"
+        nextButton.click()
+        question_38()
+
     }
 
-    fun question_38() {
-        // Which of the following best describes your GI condition?
+    fun question_38() { // Which of the following best describes your GI condition?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+
+        val ibs = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Irritable Bowel Syndrome")
+        )
+
+        val ibd = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Inflammatory Bowel Disease")
+        )
+
+        val acidReflux = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Acid reflux or")
+        )
+
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None")
+        )
+
+        val conditions = listOf(
+            ibs,
+            ibd,
+            acidReflux,
+            others
+        )
+
+        // ✅ wait once
+        listOf(title, none).plus(conditions).forEach { it.waitFor() }
+
+        ibs.click()
+        answersStored["gi_condition"] = arrayOf("Irritable Bowel Syndrome")
+        nextButton.click()
+        question_51()
     }
 
     fun question_39() {
@@ -2544,12 +2640,97 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Please mention the type of cancer
     }
 
-    fun question_51() {
-        // Are you currently taking any of the following types of medicines?
+    fun question_51() { // Are you currently taking any of the following types of medicines?
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Are you currently taking any"))
+
+        val medicationNames = listOf(
+            "Cholesterol-lowering drugs",
+            "Blood pressure medicines",
+            "Thyroid medicines",
+            "Painkillers / Anti-",
+            "Steroids / Corticosteroids",
+            "Antacids / Acid-reducing",
+            "Chemotherapy or Cancer-",
+            "Hormone-related medicines",
+            "Antidepressants / Anti-",
+            "Any herbal or alternative"
+        )
+
+        val medications = medicationNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        val none = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("None of the above")
+        )
+
+        val others = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Others")
+        )
+
+        // ✅ wait once
+        listOf(title, none, others).plus(medications).forEach { it.waitFor() }
+
+        // -------------------------
+        // Scenario 1: Select medication
+        // -------------------------
+        medications[0].click() // Cholesterol
+        assertConditionSelected(
+            selected = medications[0],
+            notSure = others, // treated as non-exclusive
+            none = none
+        )
+
+        // -------------------------
+        // Scenario 2: Select "Others"
+        // -------------------------
+        others.click()
+        check(isSelected(others)) { "'Others' should be selected" }
+        check(!isSelected(none)) { "'None of the above' must be unselected" }
+
+        // -------------------------
+        // Scenario 3: Select "None of the above"
+        // -------------------------
+        none.click()
+        assertExclusiveSelected(
+            exclusive = none,
+            others = medications + listOf(others)
+        )
+        medications.take(3).forEach {
+            it.click()
+        }
+
+        answersStored["medicines_taking"] =
+            arrayOf("Cholesterol-lowering drugs (Statins)", "Blood pressure medicines", "Thyroid medicines")
+
+        nextButton.click()
     }
 
-    fun question_52() {
-        // What is your waist circumference at its narrowest point?
+    fun question_52() { // What is your waist circumference at its narrowest point?
+
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("What is your waist"))
+
+        val waistInput = page.getByRole(AriaRole.TEXTBOX)
+
+        val completeButton = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Complete")
+        )
+
+        // ✅ wait once
+        listOf(title, waistInput, completeButton).forEach { it.waitFor() }
+
+        // ✅ clear + fill (important)
+        waistInput.fill("")
+        waistInput.fill("85") // example: cm
+
     }
 
 
