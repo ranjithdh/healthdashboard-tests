@@ -6,18 +6,17 @@ import config.TestConfig
 import utils.logger.logger
 
 
-class FaqPage(page: Page) : MarketingBasePage(page) {
+class AllTestPage(page: Page) : MarketingBasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.FAQ
+    override val pageUrl = TestConfig.Urls.ALL_TEST
 
     private val header = page.getByRole(
         AriaRole.HEADING,
-        Page.GetByRoleOptions().setName("F r e q u e n t l y A s k e d Q u e s t i o n s")
+        Page.GetByRoleOptions().setName("G e t t e s t e d f r o m t h e c o m f o r t o f y o u r h o m e .")
     )
 
-    val faqSection = FaqSection(page)
 
-    fun waitForPageLoad(): FaqPage {
+    fun waitForPageLoad(): AllTestPage {
         header.waitFor()
         logger.info { "FAQ page loaded" }
         return this

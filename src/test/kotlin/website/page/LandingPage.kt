@@ -8,132 +8,27 @@ import utils.logger.logger
 
 class LandingPage(page: Page) : MarketingBasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.MARKETING_BASE_URL
+    override val pageUrl = TestConfig.Urls.WEBSITE_BASE_URL
 
-    private val allergy = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Allergies\n" + "Checks for allergic responses and sensitivities"
-        )
-    )
+    private val pageType = AddOnTestPageType.LANDING
+    val addOnTestCards = AddOnTestCards(page,pageType)
 
-    private val gut = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Gut Microbiome\n" + "Profiles gut microbes to reveal imbalances"
-        )
-    )
-
-    private val stressAndCortisol = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Stress and Cortisol\n" + "Tracks stress hormones throughout the day"
-        )
-    )
-
-    private val gene = page.getByRole(
-        AriaRole.LINK, Page.GetByRoleOptions().setName(
-            "Genetic Analysis\n" + "Comprehensive screening for genetic traits and risks"
-        )
-    )
-
-    private val omega = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Omega Profile\n" + "Examines fatty acid profiles and ratios"
-        )
-    )
-
-    private val toxicMetals = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Toxic Metals\n" +
-                    "Detects heavy metal exposure in the bloodstream"
-        )
-    )
-
-    private val thyroidHealth = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Thyroid Health\n" +
-                    "Evaluates thyroid hormones and related issues"
-        )
-    )
-
-    private val womensHealth = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Women’s Health\n" +
-                    "Assesses key factors for women’s wellbeing"
-        )
-    )
-
-    private val essentialNutrients = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Essential Nutrients\n" +
-                    "Measures vital nutrient, vitamin, and mineral levels"
-        )
-    )
-
-    private val advancedThyroid = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Advanced Thyroid\n" +
-                    "Detects autoimmune thyroid conditions"
-        )
-    )
-
-    private val liverHealth = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Liver Health\n" +
-                    "Gauges liver enzymes and performance"
-        )
-    )
-
-    private val autoImmune = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "AutoImmune\n" +
-                    "Identifies immune system disorder"
-        )
-    )
-
-    private val advanceHeartHealth = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Advanced Heart Health\n" +
-                    "Analyses indicators for heart health"
-        )
-    )
-
-    private val womensFertility = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Women's Fertility\n" +
-                    "Assess fertility readiness and reproductive health"
-        )
-    )
-
-    private val bloodHealth = page.getByRole(
-        AriaRole.LINK,
-        Page.GetByRoleOptions().setName(
-            "Blood Health\n" +
-                    "Evaluates blood cell health and overall vitality"
-        )
-    )
-
-    // Delegate FAQ functionality to FaqSection
     val faqSection = FaqSection(page)
 
+    private val heroSectionBookNow = page.locator("#join-now-btn-hero")
+    private val whatWeTest =
+        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true))
+    private val learnMore = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Learn more"))
+    private val whatsIncludedSectionBookNow = page.locator("#join-now-btn-membership")
+    private val isEveryThingYouNeedToKnowBookNow = page.locator("#join-now-btn-membership-pricing")
+    private val readOurWhy = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Read our Why"))
+    private val stopeGuessingBookNow = page.locator("#join-now-btn-foot-hero")
 
     fun waitForPageLoad(): LandingPage {
-        element("a#join-now-btn-hero").waitFor()
+        page.locator("a#join-now-btn-hero").waitFor()
         logger.info { "Landing page loaded" }
         return this
     }
-
 
     fun isHeroHeadingVisible(): Boolean {
         return page.getByText(
@@ -149,14 +44,13 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isHeroBookNowVisible(): Boolean {
-        return page.locator("#join-now-btn-hero").isVisible
+        return heroSectionBookNow.isVisible
     }
 
     fun clickHeroBookNow() {
         logger.info { "Clicking Hero Book Now button" }
-        element("a#join-now-btn-hero").click()
+        heroSectionBookNow.click()
     }
-
 
     fun isAtHomeTestVisible(): Boolean {
         return page.locator(".clock").isVisible &&
@@ -176,13 +70,14 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
                 page.getByText("Everything you need, hassle-").isVisible
     }
 
-
     fun isIntroducingTitleVisible(): Boolean {
         return page.getByText("INTRODUCING").isVisible
     }
 
     fun isBaselineVisible(): Boolean {
-        return page.getByText("Baseline").isVisible
+        val bassLine = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("B a s e l i n e"))
+        bassLine.waitFor()
+        return bassLine.isVisible
     }
 
     fun isBaseLineDescriptionVisible(): Boolean {
@@ -190,20 +85,18 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isWhatWeTestButtonVisible(): Boolean {
-        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true)).isVisible
+        return whatWeTest.isVisible
     }
 
     fun clickWhatWeTestButton(): WhatWeTestPage {
-        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true)).click()
+        whatWeTest.click()
         val whatWeTestPage = WhatWeTestPage(page)
         return whatWeTestPage
     }
 
-
     fun isCoverImageVisible(): Boolean {
         return page.locator(".dashboard-cover-l").isVisible
     }
-
 
     fun isHowItWorksHeadingVisible(): Boolean {
         return page.getByText("H", Page.GetByTextOptions().setExact(true)).isVisible &&
@@ -223,15 +116,14 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isLearnMoreButtonVisible(): Boolean {
-        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Learn more")).isVisible
+        return learnMore.isVisible
     }
 
     fun clickLearnMoreButton(): HowItWorksPage {
-        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Learn more")).click()
+        learnMore.click()
         val howItWorksPage = HowItWorksPage(page)
         return howItWorksPage
     }
-
 
     fun isStep1Visible(): Boolean {
         return page.getByText("Step 1").isVisible &&
@@ -254,122 +146,6 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
                 page.getByText("Turn your insights into action with expert guidance on supplements, exercise, nutrition, sleep, stress and follow-up testing, all tailored to helping you improve your health.").isVisible
     }
 
-
-    fun waitForForAddOnTestHeader() {
-        page.getByText("O", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.getByText("p", Page.GetByTextOptions().setExact(true)).nth(1).waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(3)").first().waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(4)").first().waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(5)").first().waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(6)").first().waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(7)").first().waitFor()
-        page.locator(".heading_h2-mt > span > span:nth-child(8)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(2) > span").first().waitFor()
-        page.getByText("d", Page.GetByTextOptions().setExact(true)).nth(1).waitFor()
-        page.getByText("d", Page.GetByTextOptions().setExact(true)).nth(2).waitFor()
-        page.getByText("-", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(2) > span:nth-child(5)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(2) > span:nth-child(6)").waitFor()
-        page.getByText("s", Page.GetByTextOptions().setExact(true)).nth(5).waitFor()
-        page.getByText("f", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(3) > span:nth-child(2)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(3) > span:nth-child(3)").waitFor()
-        page.getByText("d", Page.GetByTextOptions().setExact(true)).nth(3).waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(4) > span:nth-child(2)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(4) > span:nth-child(3)").waitFor()
-        page.getByText("p", Page.GetByTextOptions().setExact(true)).nth(2).waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(4) > span:nth-child(5)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(4) > span:nth-child(6)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(5) > span").first().waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(5) > span:nth-child(2)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(5) > span:nth-child(3)").waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(5) > span:nth-child(4)").waitFor()
-        page.getByText("g", Page.GetByTextOptions().setExact(true)).nth(2).waitFor()
-        page.getByText("h", Page.GetByTextOptions().setExact(true)).nth(4).waitFor()
-        page.locator(".heading_h2-mt > span:nth-child(5) > span:nth-child(7)").waitFor()
-    }
-
-    fun isAddOnTestHeadingVisible(): Boolean {
-
-        waitForForAddOnTestHeader()
-
-        return page.getByText(
-            "Optional add-ons for deeper\ninsight"
-        ).isVisible
-
-    }
-
-
-    fun isAddOnTestDescriptionVisible(): Boolean {
-        return page.getByText("Your Baseline helps you know where you stand. That’s why we’ve built a holistic platform of advanced diagnostics to measure and improve every aspect of your health journey.").isVisible
-    }
-
-
-    fun isAllergyTestVisible(): Boolean {
-        return allergy.isVisible
-    }
-
-    fun isGutTestVisible(): Boolean {
-        return gut.isVisible
-    }
-
-    fun isStressAndCortisolVisible(): Boolean {
-        return stressAndCortisol.isVisible
-    }
-
-    fun isGeneVisible(): Boolean {
-        return gene.isVisible
-    }
-
-    fun isOmegaTestVisible(): Boolean {
-        return omega.isVisible
-    }
-
-    fun isToxicTestVisible(): Boolean {
-        return toxicMetals.isVisible
-    }
-
-    fun isThyroidHealthVisible(): Boolean {
-        return thyroidHealth.isVisible
-    }
-
-    fun isWomenHealthVisible(): Boolean {
-        return womensHealth.isVisible
-    }
-
-    fun isEssentialNutrientsVisible(): Boolean {
-        return essentialNutrients.isVisible
-    }
-
-    fun isAdvancedThyroidVisible(): Boolean {
-        return advancedThyroid.isVisible
-    }
-
-    fun isLiverHealthVisible(): Boolean {
-        return liverHealth.isVisible
-    }
-
-    fun isAutoImmuneVisible(): Boolean {
-        return autoImmune.isVisible
-    }
-
-    fun isAdvanceHeartHealthVisible(): Boolean {
-        return advanceHeartHealth.isVisible
-    }
-
-    fun isWomensFertilityVisible(): Boolean {
-        return womensFertility.isVisible
-    }
-
-    fun isBloodHealthVisible(): Boolean {
-        return bloodHealth.isVisible
-    }
-
-    fun isViewAllAddOnTestButtonVisible(): Boolean {
-        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("View All Add-on Tests")).isVisible
-    }
-
-
     fun isWhatIsIncludedHeadingVisible(): Boolean {
         return page.getByRole(
             AriaRole.HEADING,
@@ -382,7 +158,11 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isWhatIncludedSectionBookNowButtonVisible(): Boolean {
-        return page.locator("#join-now-btn-membership").isVisible
+        return whatsIncludedSectionBookNow.isVisible
+    }
+
+    fun clickWhatIsIncludedSectionBookNowButton() {
+        whatsIncludedSectionBookNow.click()
     }
 
 
@@ -449,7 +229,11 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isEveryThingYouNeedToKnowBookNowVisible(): Boolean {
-        return page.locator("#join-now-btn-membership-pricing").isVisible
+        return isEveryThingYouNeedToKnowBookNow.isVisible
+    }
+
+    fun clickEveryThingYouNeedToKnowBookNow() {
+        isEveryThingYouNeedToKnowBookNow.click()
     }
 
 
@@ -484,7 +268,8 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isWordFromOurFounderHeadingVisible(): Boolean {
-        val wordFromOurFounder = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Word from our founder"))
+        val wordFromOurFounder =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Word from our founder"))
         wordFromOurFounder.scrollIntoViewIfNeeded()
         return wordFromOurFounder.isVisible
     }
@@ -506,11 +291,16 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
     }
 
     fun isWordFromOurFounderSectionReadOurWhyButtonVisible(): Boolean {
-        return page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Read our Why")).isVisible
+        return readOurWhy.isVisible
     }
 
+    fun clickWordFromOurFounderSectionReadOurWhyButtonVisible(): OurWhyPage {
+        readOurWhy.click()
+        val ourWhyPage = OurWhyPage(page)
+        ourWhyPage.waitForPageLoad()
+        return ourWhyPage
+    }
 
-    //faq - faq - faq -faq -----------------------------------------------------------------------------------------
 
     fun isFaqHeadingVisible(): Boolean {
         return page.getByRole(
@@ -521,24 +311,24 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
         ).isVisible
     }
 
+    fun stopGuessingSectionElementsVisible(): Boolean {
+        val header = page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("S t o p g u e s s i n g . S t a r t w i t h c l a r i t y .")
+        )
+        val description =
+            page.getByText("It’s time to reclaim control and address what’s holding you back so you can look, feel and perform 10/10, day after day")
+        header.waitFor()
 
-    // ---------------------- Other Methods ----------------------
-
-    fun clickLearnMoreLink(): HowItWorksPage {
-        logger.info { "Clicking Learn More link" }
-        element("a#cta_how_it_works").click()
-        return HowItWorksPage(page)
+        return header.isVisible && description.isVisible
     }
 
-    fun isDiagnosticCardsSectionVisible(): Boolean {
-        return element("a.diagnostic_card").first().isVisible
+    fun stopGuessingBookNowButtonVisible(): Boolean {
+        return stopeGuessingBookNow.isVisible
     }
 
-    fun getDiagnosticCardsCount(): Int {
-        return element("a.diagnostic_card").count()
+    fun clickStopGuessingBookNowButtonVisible() {
+        stopeGuessingBookNow.click()
     }
 
-    fun scrollToBottom() {
-        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-    }
 }

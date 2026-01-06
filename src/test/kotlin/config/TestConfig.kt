@@ -6,29 +6,31 @@ import com.microsoft.playwright.BrowserType
 object TestConfig {
 
     object Urls {
-        val BASE_URL: String = "https://app.stg.deepholistics.com"
-        val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
-        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+        const val BASE_URL: String = "https://app.stg.deepholistics.com/"
+        const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
 
-        val LOGIN_PATH = "/login"
-        val HOME_PATH = "/home"
-        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
+        const val LOGIN_URL = "${BASE_URL}login"
+        const val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
 
-        val HOME_PAGE_URL = "$BASE_URL/home"
-        val PROFILE_URL = "$BASE_URL/profile"
-        
-        // Marketing Website (www.deepholistics.com)
-        val MARKETING_BASE_URL: String = "https://www.deepholistics.com/"
-        val MARKETING_HOW_IT_WORKS: String = "${MARKETING_BASE_URL}how-it-works"
-        val MARKETING_WHAT_WE_TEST: String = "${MARKETING_BASE_URL}what-we-test"
-        val MARKETING_OUR_WHY: String = "${MARKETING_BASE_URL}our-why"
-        val MARKETING_FAQ: String = "${MARKETING_BASE_URL}faq"
+        const val HOME_PAGE_URL = "$BASE_URL/home"
+        const val PROFILE_URL = "$BASE_URL/profile"
+
+
+        const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
+        const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
+        const val WHAT_WE_TEST: String = "${WEBSITE_BASE_URL}what-we-test"
+        const val OUR_WHY: String = "${WEBSITE_BASE_URL}our-why"
+        const val FAQ: String = "${WEBSITE_BASE_URL}faq"
+        const val ALL_TEST: String = "${WEBSITE_BASE_URL}all-tests"
+
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
     }
 
     object Browser {
-        val HEADLESS: Boolean = false
-        val SLOW_MO: Double = (1 * 1000).toDouble()
-        val TIMEOUT: Double = 60000.toDouble()
+        const val HEADLESS: Boolean = false
+        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
@@ -75,18 +77,14 @@ object TestConfig {
     }
 
     object Artifacts {
-        val SCREENSHOT_DIR = "build/screenshots"
-        val VIDEO_DIR = "build/videos"
-        val TRACE_DIR = "build/traces"
-        val SCREENSHOT_ON_FAILURE = true
-        val RECORD_VIDEO = true
+        const val SCREENSHOT_DIR = "build/screenshots"
+        const val VIDEO_DIR = "build/videos"
+        const val RECORD_VIDEO = true
     }
 
     object Timeouts {
-        const val DEFAULT_TIMEOUT = 30000L
         const val NAVIGATION_TIMEOUT = 60000L
         const val ELEMENT_TIMEOUT = 10000L
-        const val ANIMATION_TIMEOUT = 500L
     }
 }
 

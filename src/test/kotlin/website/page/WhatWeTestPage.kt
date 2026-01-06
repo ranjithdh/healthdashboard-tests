@@ -7,13 +7,10 @@ import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * What We Test Page (https://www.deepholistics.com/what-we-test)
- * Details about biomarkers and tests offered
- */
+
 class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.MARKETING_WHAT_WE_TEST
+    override val pageUrl = TestConfig.Urls.WHAT_WE_TEST
 
     private val header = page.getByRole(
         AriaRole.HEADING,
@@ -878,5 +875,7 @@ class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
         )
     }
 
+    private val pageType = AddOnTestPageType.WHAT_WE_TEST
+    val addOnTestCards = AddOnTestCards(page, pageType)
 
 }

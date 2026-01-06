@@ -137,5 +137,35 @@ class HowItWorksPageTest {
         assert(howItWorksPage.isStep3Point3DescriptionVisible()) { "Step 3 point 3 description should be visible"}
     }
 
+    @Test
+    fun `should display all the add on test`() {
+        val landingPage =  HowItWorksPage(page).navigate() as HowItWorksPage
+        landingPage.waitForPageLoad()
+
+
+        assert(landingPage.addOnTestCards.isAddOnTestHeadingVisible()) { "AddOn Test Heading should be visible" }
+        assert(landingPage.addOnTestCards.isAddOnTestDescriptionVisible()) { "AddOn Test Description should be visible" }
+
+        assert(landingPage.addOnTestCards.isAllergyVisible()) { "Allergy test should be visible" }
+        assert(landingPage.addOnTestCards.isGutMicrobiomeVisible()) { "GutTest should be visible" }
+        assert(landingPage.addOnTestCards.isStressAndCortisolVisible()) { "StressAndCortisol should be visible" }
+        assert(landingPage.addOnTestCards.isGeneVisible()) { "Gene should be visible" }
+        assert(landingPage.addOnTestCards.isOmegaVisible()) { "Omega should be visible" }
+        assert(landingPage.addOnTestCards.isToxicMetalsVisible()) { "ToxicTest should be visible" }
+        assert(landingPage.addOnTestCards.isThyroidHealthVisible()) { "ThyroidHealth should be visible" }
+        assert(landingPage.addOnTestCards.isWomensHealthVisible()) { "Women health should be visible" }
+        assert(landingPage.addOnTestCards.isEssentialNutrientsVisible()) { "EssentialNutrients should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedThyroidVisible()) { "Advanced thyroid should be visible" }
+        assert(landingPage.addOnTestCards.isLiverHealthVisible()) { "Liver health should be visible" }
+        assert(landingPage.addOnTestCards.isAutoImmuneVisible()) { "Auto immune should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedHeartHealthVisible()) { "Advance heart health should be visible" }
+        assert(landingPage.addOnTestCards.isWomensFertilityVisible()) { "Women fertility should be visible" }
+        assert(landingPage.addOnTestCards.isBloodHealthVisible()) { "Blood health should be visible" }
+
+        assert(landingPage.addOnTestCards.isViewAllAddOnTestButtonVisible()) { "ViewAllAddOnTest Button should be visible" }
+
+        val allTestPage = landingPage.addOnTestCards.clickViewAllAddOnTestButton()
+        assert(allTestPage.isPageHeadingVisible()) { "Page Heading should be visible" }
+    }
 
 }

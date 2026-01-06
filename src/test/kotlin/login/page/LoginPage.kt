@@ -11,7 +11,7 @@ private val logger = KotlinLogging.logger {}
 
 class LoginPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.LOGIN_PATH
+    override val pageUrl = TestConfig.Urls.LOGIN_URL
 
 
     fun enterMobileNumber(phoneNumber: String): LoginPage {

@@ -12,7 +12,7 @@ private val logger = KotlinLogging.logger {}
 
 class HowItWorksPage(page: Page) : MarketingBasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.MARKETING_HOW_IT_WORKS
+    override val pageUrl = TestConfig.Urls.HOW_IT_WORKS
 
     private val step1Title = page.getByRole(
         AriaRole.HEADING,
@@ -29,48 +29,15 @@ class HowItWorksPage(page: Page) : MarketingBasePage(page) {
         Page.GetByRoleOptions().setName("E x p e r t g u i d a n c e t o t u r n i n s i g h t s i n t o b e t t e r h e a l t h")
     )
 
+    private val header = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("F r o m T e s t t o C l a r i t y ."))
+
     fun waitForPageLoad(): HowItWorksPage {
-        page.getByText("F", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.getByText("r", Page.GetByTextOptions().setExact(true)).first().waitFor()
-        page.getByText("o", Page.GetByTextOptions().setExact(true)).first().waitFor()
-        page.locator("h1").getByText("m").waitFor()
-        page.getByText("T", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.locator("h1").getByText("e", Locator.GetByTextOptions().setExact(true)).waitFor()
-        page.locator("h1").getByText("s", Locator.GetByTextOptions().setExact(true)).waitFor()
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).first().waitFor()
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(1).waitFor()
-        page.getByText("o", Page.GetByTextOptions().setExact(true)).nth(1).waitFor()
-        page.getByText("C", Page.GetByTextOptions().setExact(true)).waitFor()
-        page.locator("h1").getByText("l", Locator.GetByTextOptions().setExact(true)).waitFor()
-        page.locator("h1").getByText("a", Locator.GetByTextOptions().setExact(true)).waitFor()
-        page.getByText("r", Page.GetByTextOptions().setExact(true)).nth(1).waitFor()
-        page.locator("h1").getByText("i", Locator.GetByTextOptions().setExact(true)).waitFor()
-        page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(2).waitFor()
-        page.locator("h1").getByText("y").waitFor()
-        page.locator("h1").getByText(".").waitFor()
-        logger.info { "How It Works page loaded" }
+        header.waitFor()
         return this
     }
 
     fun isPageHeadingVisible(): Boolean {
-        return page.getByText("F", Page.GetByTextOptions().setExact(true)).isVisible &&
-                page.getByText("r", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-                page.getByText("o", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-                page.locator("h1").getByText("m").isVisible &&
-                page.getByText("T", Page.GetByTextOptions().setExact(true)).isVisible &&
-                page.locator("h1").getByText("e", Locator.GetByTextOptions().setExact(true)).isVisible &&
-                page.locator("h1").getByText("s", Locator.GetByTextOptions().setExact(true)).isVisible &&
-                page.getByText("t", Page.GetByTextOptions().setExact(true)).first().isVisible &&
-                page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-                page.getByText("o", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-                page.getByText("C", Page.GetByTextOptions().setExact(true)).isVisible &&
-                page.locator("h1").getByText("l", Locator.GetByTextOptions().setExact(true)).isVisible &&
-                page.locator("h1").getByText("a", Locator.GetByTextOptions().setExact(true)).isVisible &&
-                page.getByText("r", Page.GetByTextOptions().setExact(true)).nth(1).isVisible &&
-                page.locator("h1").getByText("i", Locator.GetByTextOptions().setExact(true)).isVisible &&
-                page.getByText("t", Page.GetByTextOptions().setExact(true)).nth(2).isVisible &&
-                page.locator("h1").getByText("y").isVisible &&
-                page.locator("h1").getByText(".").isVisible
+        return header.isVisible
     }
 
     fun isFromTestToClarifyDescriptionVisible(): Boolean {
@@ -257,5 +224,10 @@ class HowItWorksPage(page: Page) : MarketingBasePage(page) {
             "Year-round access to expert concierge care for personalised guidance, timely answers, and continuous support throughout the year."
         ).isVisible
     }
+
+
+    private val pageType = AddOnTestPageType.HOW_IT_WORKS
+    val addOnTestCards = AddOnTestCards(page, pageType)
+
 
 }

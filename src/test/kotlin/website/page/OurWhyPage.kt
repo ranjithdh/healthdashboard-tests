@@ -10,7 +10,7 @@ private val logger = KotlinLogging.logger {}
 
 class OurWhyPage(page: Page) : MarketingBasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.MARKETING_OUR_WHY
+    override val pageUrl = TestConfig.Urls.OUR_WHY
 
     private val header = page.getByRole(
         AriaRole.HEADING,

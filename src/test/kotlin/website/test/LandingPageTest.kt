@@ -31,7 +31,7 @@ class LandingPageTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.DESKTOP_FHD
+        val viewport = TestConfig.Viewports.DESKTOP_HD
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -60,7 +60,6 @@ class LandingPageTest {
         assert(landingPage.isHeaderBookNowVisible()) { "Header Book Now button should be visible" }
     }
 
-
     @Test
     fun `should display hero section with headline`() {
         val landingPage = LandingPage(page).navigate() as LandingPage
@@ -82,7 +81,7 @@ class LandingPageTest {
         landingPage.waitForPageLoad()
 
         assert(landingPage.isIntroducingTitleVisible()) { "Introducing Title should be visible" }
-//        assert(landingPage.isBaselineVisible()) { "Baseline Title should be visible" }
+        assert(landingPage.isBaselineVisible()) { "Baseline Title should be visible" }
         assert(landingPage.isBaseLineDescriptionVisible()) { "BaseLine Description should be visible" }
         assert(landingPage.isWhatWeTestButtonVisible()) { "What We TestButton should be visible" }
 
@@ -125,36 +124,36 @@ class LandingPageTest {
         assert(landingPage.isStep3Visible()) { "Step 3 should be visible" }
     }
 
-
     @Test
     fun `should display all the add on test`() {
         val landingPage = LandingPage(page).navigate() as LandingPage
         landingPage.waitForPageLoad()
 
 
-        assert(landingPage.isAddOnTestHeadingVisible()) { "AddOn Test Heading should be visible" }
-        assert(landingPage.isAddOnTestDescriptionVisible()) { "AddOn Test Description should be visible" }
+        assert(landingPage.addOnTestCards.isAddOnTestHeadingVisible()) { "AddOn Test Heading should be visible" }
+        assert(landingPage.addOnTestCards.isAddOnTestDescriptionVisible()) { "AddOn Test Description should be visible" }
 
-        assert(landingPage.isAllergyTestVisible()) { "Allergy test should be visible" }
-        assert(landingPage.isGutTestVisible()) { "GutTest should be visible" }
-        assert(landingPage.isStressAndCortisolVisible()) { "StressAndCortisol should be visible" }
-        assert(landingPage.isGeneVisible()) { "Gene should be visible" }
-        assert(landingPage.isOmegaTestVisible()) { "Omega should be visible" }
-        assert(landingPage.isToxicTestVisible()) { "ToxicTest should be visible" }
-        assert(landingPage.isThyroidHealthVisible()) { "ThyroidHealth should be visible" }
-        assert(landingPage.isWomenHealthVisible()) { "Women health should be visible" }
-        assert(landingPage.isEssentialNutrientsVisible()) { "EssentialNutrients should be visible" }
-        assert(landingPage.isAdvancedThyroidVisible()) { "Advanced thyroid should be visible" }
-        assert(landingPage.isLiverHealthVisible()) { "Liver health should be visible" }
-        assert(landingPage.isAutoImmuneVisible()) { "Auto immune should be visible" }
-        assert(landingPage.isAdvanceHeartHealthVisible()) { "Advance heart health should be visible" }
-        assert(landingPage.isWomensFertilityVisible()) { "Women fertility should be visible" }
-        assert(landingPage.isBloodHealthVisible()) { "Blood health should be visible" }
+        assert(landingPage.addOnTestCards.isAllergyVisible()) { "Allergy test should be visible" }
+        assert(landingPage.addOnTestCards.isGutMicrobiomeVisible()) { "GutTest should be visible" }
+        assert(landingPage.addOnTestCards.isStressAndCortisolVisible()) { "StressAndCortisol should be visible" }
+        assert(landingPage.addOnTestCards.isGeneVisible()) { "Gene should be visible" }
+        assert(landingPage.addOnTestCards.isOmegaVisible()) { "Omega should be visible" }
+        assert(landingPage.addOnTestCards.isToxicMetalsVisible()) { "ToxicTest should be visible" }
+        assert(landingPage.addOnTestCards.isThyroidHealthVisible()) { "ThyroidHealth should be visible" }
+        assert(landingPage.addOnTestCards.isWomensHealthVisible()) { "Women health should be visible" }
+        assert(landingPage.addOnTestCards.isEssentialNutrientsVisible()) { "EssentialNutrients should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedThyroidVisible()) { "Advanced thyroid should be visible" }
+        assert(landingPage.addOnTestCards.isLiverHealthVisible()) { "Liver health should be visible" }
+        assert(landingPage.addOnTestCards.isAutoImmuneVisible()) { "Auto immune should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedHeartHealthVisible()) { "Advance heart health should be visible" }
+        assert(landingPage.addOnTestCards.isWomensFertilityVisible()) { "Women fertility should be visible" }
+        assert(landingPage.addOnTestCards.isBloodHealthVisible()) { "Blood health should be visible" }
 
-        assert(landingPage.isViewAllAddOnTestButtonVisible()) { "ViewAllAddOnTest Button should be visible" }
+        assert(landingPage.addOnTestCards.isViewAllAddOnTestButtonVisible()) { "ViewAllAddOnTest Button should be visible" }
 
+        val allTestPage = landingPage.addOnTestCards.clickViewAllAddOnTestButton()
+        assert(allTestPage.isPageHeadingVisible()) { "Page Heading should be visible" }
     }
-
 
     @Test
     fun `should display all the elements in what's included in baseline section   `() {
@@ -171,6 +170,9 @@ class LandingPageTest {
         assert(landingPage.addOnTestingSectionVisible()) { "OnTestingSection should be visible" }
         assert(landingPage.referAndEarnSectionVisible()) { "ReferAndEarnSection should be visible" }
 
+        landingPage.clickWhatIsIncludedSectionBookNowButton()
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
     @Test
@@ -183,8 +185,11 @@ class LandingPageTest {
         assert(landingPage.isWhatsIncludedPointsVisible()) { "What's included points should be visible" }
         assert(landingPage.isEveryThingYouNeedToKnowBookNowVisible()) { "Everything you need to know book now should be visible" }
 
-    }
 
+        landingPage.clickEveryThingYouNeedToKnowBookNow()
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+    }
 
     @Test
     fun `should display all the elements in the built by expert section`() {
@@ -197,7 +202,6 @@ class LandingPageTest {
         assert(landingPage.isDrWasimMohideenElementsVisible()) { "DrWasimMohideenElementsVisible should be visible" }
     }
 
-
     @Test
     fun `should display all the elements in the word from our founder section`() {
         val landingPage = LandingPage(page).navigate() as LandingPage
@@ -207,8 +211,11 @@ class LandingPageTest {
         assert(landingPage.isWhyWeBuiltTextVisible()) { "Why we built-text should be visible" }
         assert(landingPage.isCeoNameVisible()) { "CeoName should be visible" }
         assert(landingPage.isWordFromOurFounderSectionReadOurWhyButtonVisible()) { "Word from the our founder section should be visible" }
-    }
 
+        val ourWhyPage = landingPage.clickWordFromOurFounderSectionReadOurWhyButtonVisible()
+
+        assert(ourWhyPage.isHederVisible())
+    }
 
 
     @Test
@@ -218,79 +225,23 @@ class LandingPageTest {
 
         landingPage.clickHeroBookNow()
 
-        // Should navigate to the app login/signup page
-        page.waitForURL("**/app.deepholistics.com/**")
-        assert(page.url().contains("app.deepholistics.com")) { "Should navigate to app domain" }
-
-        landingPage.takeScreenshot("landing-page-hero-book-now-navigation")
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
-    // ---------------------- Diagnostic Cards Tests ----------------------
-
     @Test
-    fun `should display diagnostic cards section`() {
-        val landingPage = LandingPage(page).navigate() as LandingPage
-        landingPage.waitForPageLoad()
-        landingPage.scrollToBottom()
+    fun `should show stop guessing elements`(){
 
-        // Wait a bit for lazy-loaded content
-        Thread.sleep(1000)
-
-        assert(landingPage.isDiagnosticCardsSectionVisible()) { "Diagnostic cards section should be visible" }
-        assert(landingPage.getDiagnosticCardsCount() > 0) { "Should have at least one diagnostic card" }
-
-        landingPage.takeScreenshot("landing-page-diagnostic-cards")
-    }
-
-    // ---------------------- Footer Tests ----------------------
-
-    @Test
-    fun `should display footer with all links`() {
-        val landingPage = LandingPage(page).navigate() as LandingPage
-        landingPage.waitForPageLoad()
-        landingPage.scrollToBottom()
-
-        // Wait for footer to be visible
-        Thread.sleep(500)
-
-        assert(landingPage.isFooterVisible()) { "Footer should be visible" }
-        assert(landingPage.isPrivacyPolicyFooterLinkVisible()) { "Privacy Policy link should be visible" }
-        assert(landingPage.isTermsFooterLinkVisible()) { "Terms link should be visible" }
-
-        landingPage.takeScreenshot("landing-page-footer")
-    }
-
-    // ---------------------- Intercom Chat Tests ----------------------
-
-    @Test
-    fun `should display Intercom chat launcher`() {
         val landingPage = LandingPage(page).navigate() as LandingPage
         landingPage.waitForPageLoad()
 
-        // Intercom may take time to load
-        Thread.sleep(2000)
+        assert(landingPage.stopGuessingSectionElementsVisible())
+        assert(landingPage.stopGuessingBookNowButtonVisible())
 
-        // Note: Intercom might not always be visible depending on configuration
-        if (landingPage.isIntercomChatVisible()) {
-            landingPage.takeScreenshot("landing-page-intercom-visible")
-        } else {
-            // Not a failure - Intercom might be configured differently
-            landingPage.takeScreenshot("landing-page-intercom-not-visible")
-        }
+        landingPage.clickStopGuessingBookNowButtonVisible()
+
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
-    // ---------------------- CTA Navigation Tests ----------------------
-
-    @Test
-    fun `should navigate to How It Works when clicking Learn More`() {
-        val landingPage = LandingPage(page).navigate() as LandingPage
-        landingPage.waitForPageLoad()
-
-        val howItWorksPage = landingPage.clickLearnMoreLink()
-
-        page.waitForURL("**/how-it-works**")
-        assert(page.url().contains("how-it-works")) { "Should navigate to How It Works page" }
-
-        landingPage.takeScreenshot("landing-page-learn-more-navigation")
-    }
 }
