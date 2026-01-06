@@ -3,12 +3,15 @@ package profile.page
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
+import profile.model.ActivityLevel
 import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
@@ -37,8 +40,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private val answersStored: MutableMap<String?, Any?> = HashMap<String?, Any?>()
 
-    val previousButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
-    val nextButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
+    private val previousButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
+    private val nextButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
+    private var exerciseType = ActivityLevel.SEDENTARY
 
     private fun logQuestion(questionText: String) {
         logger.info { "[QUESTIONER]: $questionText" }
@@ -77,7 +81,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun monitorTraffic() {
         //update address
-        val updateProfileRequest = { request: com.microsoft.playwright.Request ->
+        val updateProfileRequest = { request: Request ->
             if (request.url().contains(TestConfig.APIs.API_UPDATE_PROFILE)) {
                 logger.info { "API Request: ${request.method()} ${request.url()}" }
                 request.postData()?.let {
@@ -98,7 +102,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         //preference update
-        val preferenceProfileRequest = { request: com.microsoft.playwright.Request ->
+        val preferenceProfileRequest = { request: Request ->
             if (request.url().contains(TestConfig.APIs.API_TONE_PREFERENCE)) {
                 logger.info { "API Request: ${request.method()} ${request.url()}" }
                 request.postData()?.let {
@@ -199,7 +203,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     /**------Address Flied------*/
 
     val saveAddressDropDown: Locator =
-        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Saved Addresses$"))).first()
+        page.locator("div").filter(FilterOptions().setHasText(Pattern.compile("^Saved Addresses$"))).first()
 
     val addNewAddress: Locator = page.getByText("Add a new address")
 
@@ -230,7 +234,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val addressCard = page
                 .locator("div.border")
                 .filter(
-                    Locator.FilterOptions().setHas(
+                    FilterOptions().setHas(
                         page.getByRole(
                             AriaRole.HEADING,
                             Page.GetByRoleOptions().setName(title)
@@ -245,7 +249,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             addressCard
                 .locator("p")
                 .filter(
-                    Locator.FilterOptions().setHasText(expectedAddressText)
+                    FilterOptions().setHasText(expectedAddressText)
                 )
                 .first()
                 .waitFor()
@@ -255,7 +259,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 addressCard
                     .locator("p")
                     .filter(
-                        Locator.FilterOptions().setHasText("Mobile number: ${address.addressMobile}")
+                        FilterOptions().setHasText("Mobile number: ${address.addressMobile}")
                     )
                     .first()
                     .waitFor()
@@ -412,7 +416,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val addressCard = page
             .locator("div.border")
             .filter(
-                Locator.FilterOptions().setHas(
+                FilterOptions().setHas(
                     page.getByRole(
                         AriaRole.HEADING,
                         Page.GetByRoleOptions().setName(title)
@@ -428,7 +432,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            ------------------------------- */
         addressCard
             .locator("p")
-            .filter(Locator.FilterOptions().setHasText(expectedAddressText))
+            .filter(FilterOptions().setHasText(expectedAddressText))
             .first()
             .waitFor()
 
@@ -485,7 +489,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val addressCard = page
             .locator("div.border")
             .filter(
-                Locator.FilterOptions().setHas(
+                FilterOptions().setHas(
                     page.getByRole(
                         AriaRole.HEADING,
                         Page.GetByRoleOptions().setName(title)
@@ -501,7 +505,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            ------------------------------- */
         addressCard
             .locator("p")
-            .filter(Locator.FilterOptions().setHasText(expectedAddressText))
+            .filter(FilterOptions().setHasText(expectedAddressText))
             .first()
             .waitFor()
 
@@ -544,7 +548,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val apiContext = page.context().request()
             val response = apiContext.get(
                 TestConfig.APIs.API_PREFERENCE,
-                com.microsoft.playwright.options.RequestOptions.create()
+                RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
                     .setHeader("user_timezone", "Asia/Calcutta")
@@ -639,7 +643,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun communicationCard(title: String): Locator {
         return page.locator("div.cursor-pointer.border").filter(
-            Locator.FilterOptions().setHas(
+            FilterOptions().setHas(
                 page.getByRole(
                     AriaRole.HEADING,
                     Page.GetByRoleOptions().setName(title)
@@ -663,7 +667,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val apiContext = page.context().request()
             val response = apiContext.get(
                 TestConfig.APIs.API_ACCOUNT_INFORMATION,
-                com.microsoft.playwright.options.RequestOptions.create()
+                RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
                     .setHeader("user_timezone", "Asia/Calcutta")
@@ -962,7 +966,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
-    fun assertQuestionerVegInitialCheck() {
+    fun assertQuestionerVegInitialCheck(type: ActivityLevel) {
+        exerciseType = type
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1307,12 +1312,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer("diet_experience", "None")
 
         question_6()
-        /*   click each option → go back using Previous
-            listOf(triedAndWorks, triedVarious, triedAll, none).forEach { option ->
-                option.click()
-                previous.waitFor()
-                previous.click()
-            }*/
     }
 
     fun question_6() { //How familiar are you with tracking calories or macronutrients and micronutrients?
@@ -1575,63 +1574,38 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        /**-------Hardly Exercise another flow-------* - question_14 */
+        // 🔹 Select option and navigate based on activityLevel parameter
+        when (exerciseType) {
+            ActivityLevel.HARDLY_EXERCISE -> {
+                hardlyExercise.click()
+                logAnswer("typical_day", "hardly_exercise")
+                question_14()  // Skip Q11-Q13 and go directly to sleep question
+            }
 
-        logAnswer("typical_day", "sedentary")
-        sedentary.click()
-        question_11_with_exercise()
-    }
+            ActivityLevel.SEDENTARY -> {
+                sedentary.click()
+                logAnswer("typical_day", "sedentary")
+                question_11_with_exercise()
+            }
 
+            ActivityLevel.LIGHTLY_ACTIVE -> {
+                lightlyActive.click()
+                logAnswer("typical_day", "light")
+                question_11_with_exercise()
+            }
 
-    //Question - 11
+            ActivityLevel.MODERATELY_ACTIVE -> {
+                moderatelyActive.click()
+                logAnswer("typical_day", "moderate")
+                question_11_with_exercise()
+            }
 
-    fun question_11_without_noExercise() { //What type of exercise do you usually do?
-        logQuestion("What type of exercise do you usually do?")
-
-        val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(FilterOptions().setHasText("What type of exercise do you"))
-
-        val yoga =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yoga"))
-        val strengthTraining =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Strength Training"))
-        val pilates =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Pilates"))
-        val flexibility =
-            page.getByRole(
-                AriaRole.BUTTON,
-                Page.GetByRoleOptions().setName("Flexibility / Stretching")
-            )
-        val noExercise =
-            page.getByRole(
-                AriaRole.BUTTON,
-                Page.GetByRoleOptions().setName("I don't exercise")
-            )
-
-        val exerciseOptions = listOf(yoga, strengthTraining, pilates, flexibility)
-
-        // ✅ wait once
-        listOf(title, *exerciseOptions.toTypedArray(), noExercise).forEach { it.waitFor() }
-
-
-        exerciseOptions.forEach { it.click() }
-
-        // Example: select Yoga (your test can vary this)
-        noExercise.click()
-        assertExclusiveSelected(noExercise, exerciseOptions)
-
-
-        exerciseOptions[0].click()
-
-        logAnswer(
-            "exercise_type", arrayOf(
-                "Yoga"
-            )
-        )
-
-
-        // ➡️ Go to Question 14
-        question_14()
+            ActivityLevel.VERY_ACTIVE -> {
+                veryActive.click()
+                logAnswer("typical_day", "high")
+                question_11_with_exercise()
+            }
+        }
     }
 
     fun question_11_with_exercise() { //What type of exercise do you usually do?
@@ -2605,7 +2579,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
         logQuestion("Do you currently have or have ever been diagnosed with any medical conditions?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Do you currently have or have"))
+            .filter(FilterOptions().setHasText("Do you currently have or have"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply)"))
 
         val conditionNames = listOf(
@@ -2663,7 +2637,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun question_38() { // Which of the following best describes your GI condition?
         logQuestion("Which of the following best describes your GI condition?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         val ibs = page.getByRole(
             AriaRole.BUTTON,
@@ -2730,7 +2704,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun question_39() {  // Which of the following best describes your skin condition?
         logQuestion("Which of the following best describes your skin condition?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Skin condition buttons (excluding "Others" and "None")
         val skinConditions = listOf("Psoriasis", "Eczema", "Acne")
@@ -2777,7 +2751,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your bone or joint condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -2839,7 +2813,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your neurological condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -2904,7 +2878,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("How would you best describe your Diabetes status?")
         // Question title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("How would you best describe"))
+            .filter(FilterOptions().setHasText("How would you best describe"))
 
         // Answer options
         val preDiabeticNotOnMeds = page.getByRole(
@@ -2951,7 +2925,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your thyroid condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3014,7 +2988,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your liver condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3079,7 +3053,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your kidney condition?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3144,7 +3118,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3208,7 +3182,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your respiratory condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3273,7 +3247,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Which of the following best describes your auto-immune condition?")
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Which of the following best"))
+            .filter(FilterOptions().setHasText("Which of the following best"))
 
         // Condition buttons (excluding Others / None)
         val conditionNames = listOf(
@@ -3341,7 +3315,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("What is your current cancer status?")
         // Question title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("What is your current cancer"))
+            .filter(FilterOptions().setHasText("What is your current cancer"))
 
         // Answer options (single-select)
         val onTreatment = page.getByRole(
@@ -3387,7 +3361,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Please mention the type of cancer
         // Title
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Please mention the type of"))
+            .filter(FilterOptions().setHasText("Please mention the type of"))
 
         // Textbox
         val typeTextbox = page.getByRole(
@@ -3414,7 +3388,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun question_51() { // Are you currently taking any of the following types of medicines?
         logQuestion("Are you currently taking any of the following types of medicines?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Are you currently taking any"))
+            .filter(FilterOptions().setHasText("Are you currently taking any"))
 
         val medicationNames = listOf(
             "Cholesterol-lowering drugs",
@@ -3490,7 +3464,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("What is your waist circumference at its narrowest point?")
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("What is your waist"))
+            .filter(FilterOptions().setHasText("What is your waist"))
 
         val waistInput = page.getByRole(AriaRole.TEXTBOX)
 

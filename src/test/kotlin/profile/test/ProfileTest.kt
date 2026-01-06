@@ -237,11 +237,11 @@ class ProfileTest {
             .clickAccountProfile()
             .waitForConfirmation()
 
-        profilePage.assertQuestionerVegInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY)
     }
 
     @Test
-    fun `questioner validation non_vegetarian`(){
+    fun `questioner validation non_vegetarian`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -253,6 +253,23 @@ class ProfileTest {
             .waitForConfirmation()
 
         profilePage.assertQuestionerNonVegInitialCheck()
+    }
+
+
+    @Test
+    fun `questioner validation skipping the exercise`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
+        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
     }
 
 
