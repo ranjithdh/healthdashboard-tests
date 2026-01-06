@@ -969,7 +969,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
-    fun assertQuestionerVegInitialCheck(type: ActivityLevel, condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)) {
+    fun assertQuestionerVegInitialCheck(
+        type: ActivityLevel,
+        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)
+    ) {
         exerciseType = type
         medicalConditions = condition
         val questionHeading =
@@ -2682,9 +2685,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         if (medicalConditions.contains(MedicalCondition.CARDIOVASCULAR)) {
             medicalQuestionQueue.add(::question_46)
         }
-       /* if (medicalConditions.contains(MedicalCondition.GALL_BLADDER)) {
-            medicalQuestionQueue.add(::question_38)
-        }*/
+        // Gall bladder issues has no sub-questions in JSON
         if (medicalConditions.contains(MedicalCondition.CANCER)) {
             medicalQuestionQueue.add(::question_49)
         }
@@ -3533,28 +3534,45 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         nextButton.click()
+        question_52()
     }
 
     fun question_52() { // What is your waist circumference at its narrowest point?
         logQuestion("What is your waist circumference at its narrowest point?")
+        val values = "24"
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(FilterOptions().setHasText("What is your waist"))
+            .filter(Locator.FilterOptions().setHasText("What is your waist"))
 
-        val waistInput = page.getByRole(AriaRole.TEXTBOX)
+        // Helper text
+        val subTitle = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Please enter the value in"))
 
-        val completeButton = page.getByRole(
-            AriaRole.BUTTON,
-            Page.GetByRoleOptions().setName("Complete")
-        )
+        // Waist input
+        val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
-        // ✅ wait once
-        listOf(title, waistInput, completeButton).forEach { it.waitFor() }
+        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
 
-        // ✅ clear + fill (important)
-        waistInput.fill("")
-        waistInput.fill("85") // example: cm
+        listOf(title, subTitle, waistTextBox, completeButton).forEach { it.waitFor() }
 
+
+        val rangeError = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(Locator.FilterOptions().setHasText("Please enter a value between"))
+
+        waistTextBox.fill("10")
+        rangeError.waitFor()
+
+
+        waistTextBox.fill("")
+
+
+        waistTextBox.fill("60")
+        rangeError.waitFor()
+
+        waistTextBox.fill("")
+        waistTextBox.fill(values)
+        answersStored["completeButton"] = values
+        completeButton.click()
     }
 
 
