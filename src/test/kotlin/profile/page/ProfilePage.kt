@@ -976,6 +976,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         type: ActivityLevel,
         condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)
     ) {
+        answersStored.clear()
         exerciseType = type
         medicalConditions = condition
         val questionHeading =
@@ -995,6 +996,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun assertQuestionerNonVegInitialCheck() {
+        answersStored.clear()
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1011,10 +1013,27 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_non_veg()
     }
 
+    fun assertQuestionerValidationsCheck() {
+        answersStored.clear()
+        val questionHeading =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+        val editQuestionerButton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+        val questionDialog = page.locator(".bg-zinc-900").first()
+
+        questionHeading.waitFor()
+        editQuestionerButton.waitFor()
+
+        editQuestionerButton.click()
+
+        questionDialog.waitFor()
+
+        question_1_veg_checker()
+    }
+
 
     fun question_1_veg() { //What is your food preference?
         logQuestion("What is your food preference?")
-        logger.error { "Questioner 1 Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
 
@@ -1045,7 +1064,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun question_1_non_veg() { //What is your food preference?
         logQuestion("What is your food preference?")
-        logger.error { "Questioner 1 Non-Vegetarian" }
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
 
@@ -2995,7 +3013,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Select ONE option (wizard auto-handles navigation)
         // -------------------------
 
-    
+
         preDiabeticNotOnMeds.click()
         logAnswer("diabetes_status", "How would you best describe your Diabetes status?", "I am prediabetic, but I'm not on medication")
         visitNextMedicalQuestion()
@@ -3642,6 +3660,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         textBox.fill("")
     }
 
+    /*---------------Questioner Re-selection check----------------*/
+
+    fun question_1_veg_checker(){
+        logQuestion("What is your food preference?")
+
+
+    }
 
 }
 

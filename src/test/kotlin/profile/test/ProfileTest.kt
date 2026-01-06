@@ -271,8 +271,8 @@ class ProfileTest {
         profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
     }
 
-    /**------------Medical Conditions Flow Tests----------------*/
-    
+    //Medical Conditions Flow Tests
+
     @Test
     fun `medical conditions - no conditions selected`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
@@ -491,6 +491,22 @@ class ProfileTest {
                 profile.model.MedicalCondition.GALL_BLADDER,
             )
         )
+    }
+
+    //Re-selection checking
+    @Test
+    fun `questioner re-selection validations`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
 
