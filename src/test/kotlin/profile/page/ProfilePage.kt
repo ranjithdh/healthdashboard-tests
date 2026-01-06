@@ -3454,6 +3454,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Enter cancer type
         // -------------------------
         typeTextbox.fill("Breast cancer")
+        logAnswer("cancer_type", "Breast cancer")
 
         assertTrue(nextButton.isEnabled)
 
@@ -3571,7 +3572,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         waistTextBox.fill("")
         waistTextBox.fill(values)
-        answersStored["completeButton"] = values
+        answersStored["waist_circumference"] = values
         completeButton.click()
     }
 
