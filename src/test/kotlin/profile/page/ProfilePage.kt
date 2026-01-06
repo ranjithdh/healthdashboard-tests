@@ -28,6 +28,7 @@ import kotlin.test.assertTrue
 
 
 import profile.model.QuestionAnswer
+import profile.model.QuestionSubType
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -1058,7 +1059,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertFalse(previousButton.isEnabled)
         vegetarian.click()
-        logAnswer("food_preference", "What is your food preference?", "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood")
+        logAnswer(
+            QuestionSubType.FOOD_PREFERENCE,
+            "What is your food preference?",
+            "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
+        )
         question_3()
     }
 
@@ -1085,7 +1090,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertFalse(previousButton.isEnabled)
 
         nonVegetarian.click()
-        logAnswer("food_preference", "What is your food preference?", "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods")
+        logAnswer(
+            QuestionSubType.FOOD_PREFERENCE,
+            "What is your food preference?",
+            "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods"
+        )
         question_2()
     }
 
@@ -1147,7 +1156,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         meatOptions
             .forEach { it.click() }
 
-        logAnswer("type_of_meat", "Which of the following do you consume?", arrayOf("Chicken", "Pork", "Mutton"))
+        logAnswer(
+            QuestionSubType.TYPE_OF_MEAT,
+            "Which of the following do you consume?",
+            arrayOf("Chicken", "Pork", "Mutton")
+        )
 
         nextButton.click()
         question_3()
@@ -1202,7 +1215,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         logAnswer(
-            "cuisine_preference",
+            QuestionSubType.CUISINE_PREFERENCE,
             "What is your cuisine preference?",
             arrayOf(
                 "North Indian", "South Indian", "Jain"
@@ -1276,7 +1289,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         lifestyleOptions.forEach { it.waitFor() }
 
         homeCooked.click()
-        logAnswer("daily_eating_habit", "Which of the following best describes your daily eating habits?", "Primarily Home Cooked Meals")
+        logAnswer(
+            QuestionSubType.DAILY_EATING_HABIT,
+            "Which of the following best describes your daily eating habits?",
+            "Primarily Home Cooked Meals"
+        )
         question_5()
 
         /*  Optional: random selection (single click)
@@ -1338,7 +1355,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         none.click()
 
-        logAnswer("diet_experience", "What is your past experience with diets?", "None")
+        logAnswer(QuestionSubType.DIET_EXPERIENCE, "What is your past experience with diets?", "None")
 
         question_6()
     }
@@ -1379,7 +1396,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         neverTracked.click()
 
-        logAnswer("nutrition_tracking_experience", "How familiar are you with tracking calories or macronutrients and micronutrients?", "Never tracked, need guidance")
+        logAnswer(
+            QuestionSubType.NUTRITION_TRACKING_EXPERIENCE,
+            "How familiar are you with tracking calories or macronutrients and micronutrients?",
+            "Never tracked, need guidance"
+        )
         question_7()
     }
 
@@ -1448,7 +1469,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         selectable.forEach { it.click() }
 
-        logAnswer("allergy", "Do you have any food allergies?", arrayOf("Milk or dairy", "Eggs"))
+        logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Milk or dairy", "Eggs"))
         nextButton.click()
         question_8()
     }
@@ -1501,7 +1522,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         lactose.click()
         caffeine.click()
 
-        logAnswer("intolerance", "Do you have any food intolerances?", arrayOf("Lactose", "Caffeine"))
+        logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", arrayOf("Lactose", "Caffeine"))
 
         nextButton.click()
         question_9()
@@ -1548,7 +1569,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        logAnswer("caffeine_consumption", "How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?", "None or Rarely")
+        logAnswer(
+            QuestionSubType.CAFFEINE_CONSUMPTION,
+            "How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?",
+            "None or Rarely"
+        )
 
         noneOrRarely.click()
         question_10()
@@ -1607,31 +1632,47 @@ class ProfilePage(page: Page) : BasePage(page) {
         when (exerciseType) {
             ActivityLevel.HARDLY_EXERCISE -> {
                 hardlyExercise.click()
-                logAnswer("typical_day", "How active are you in a typical week?", "Hardly Exercise")
+                logAnswer(QuestionSubType.TYPICAL_DAY, "How active are you in a typical week?", "Hardly Exercise")
                 question_14()  // Skip Q11-Q13 and go directly to sleep question
             }
 
             ActivityLevel.SEDENTARY -> {
                 sedentary.click()
-                logAnswer("typical_day", "How active are you in a typical week?", "Sedentary: <3 hrs/week")
+                logAnswer(
+                    QuestionSubType.TYPICAL_DAY,
+                    "How active are you in a typical week?",
+                    "Sedentary: <3 hrs/week"
+                )
                 question_11_with_exercise()
             }
 
             ActivityLevel.LIGHTLY_ACTIVE -> {
                 lightlyActive.click()
-                logAnswer("typical_day", "How active are you in a typical week?", "Lightly Active: 3–5 hrs/week")
+                logAnswer(
+                    QuestionSubType.TYPICAL_DAY,
+                    "How active are you in a typical week?",
+                    "Lightly Active: 3–5 hrs/week"
+                )
                 question_11_with_exercise()
             }
 
             ActivityLevel.MODERATELY_ACTIVE -> {
                 moderatelyActive.click()
-                logAnswer("typical_day", "How active are you in a typical week?", "Moderately Active: 5–7 hrs/week")
+                logAnswer(
+                    QuestionSubType.TYPICAL_DAY,
+                    "How active are you in a typical week?",
+                    "Moderately Active: 5–7 hrs/week"
+                )
                 question_11_with_exercise()
             }
 
             ActivityLevel.VERY_ACTIVE -> {
                 veryActive.click()
-                logAnswer("typical_day", "How active are you in a typical week?", "Very Active: >7 hrs/week")
+                logAnswer(
+                    QuestionSubType.TYPICAL_DAY,
+                    "How active are you in a typical week?",
+                    "Very Active: >7 hrs/week"
+                )
                 question_11_with_exercise()
             }
         }
@@ -1673,7 +1714,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         logAnswer(
-            "exercise_type", "What type of exercise do you usually do?", arrayOf(
+            QuestionSubType.EXERCISE_TYPE, "What type of exercise do you usually do?", arrayOf(
                 "Yoga"
             )
         )
@@ -1717,7 +1758,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         morning.click()
 
-        logAnswer("preferred_workout_time", "When do you usually work out or prefer to work out?", "Morning")
+        logAnswer(
+            QuestionSubType.PREFERRED_WORKOUT_TIME,
+            "When do you usually work out or prefer to work out?",
+            "Morning"
+        )
         question_13()
     }
 
@@ -1761,7 +1806,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         dumbbells.click()
 
-        logAnswer("equipments_available", "Equipments available", arrayOf("Dumbbells"))
+        logAnswer(QuestionSubType.EQUIPMENTS_AVAILABLE, "Equipments available", arrayOf("Dumbbells"))
 
         nextButton.click()
         question_14()
@@ -1801,7 +1846,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        logAnswer("sleep_hygiene", "How would you describe your sleep?", "Room for improvement, occasional distractions")
+        logAnswer(
+            QuestionSubType.SLEEP_HYGIENE,
+            "How would you describe your sleep?",
+            "Room for improvement, occasional distractions"
+        )
 
         roomForImprovement.click()
 
@@ -1822,7 +1871,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         timerBox.fill("23:00")
-        logAnswer("weekday_sleep_routine_bed_time", "What time do you usually go to bed on weekdays?", "23:00")
+        logAnswer(
+            QuestionSubType.WEEKDAY_SLEEP_ROUTINE_BED_TIME,
+            "What time do you usually go to bed on weekdays?",
+            "23:00"
+        )
         nextButton.click()
         question_16()
     }
@@ -1841,7 +1894,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        logAnswer("weekday_sleep_routine_wakeup_time", "What time do you usually wake up on weekdays?", "07:00")
+        logAnswer(
+            QuestionSubType.WEEKDAY_SLEEP_ROUTINE_WAKEUP_TIME,
+            "What time do you usually wake up on weekdays?",
+            "07:00"
+        )
         nextButton.click()
         question_17()
     }
@@ -1860,7 +1917,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("23:00")
-        logAnswer("weekend_sleep_routine_bed_time", "What time do you usually go to bed on weekends?", "23:00")
+        logAnswer(
+            QuestionSubType.WEEKEND_SLEEP_ROUTINE_BED_TIME,
+            "What time do you usually go to bed on weekends?",
+            "23:00"
+        )
         nextButton.click()
 
         question_18()
@@ -1878,7 +1939,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        logAnswer("weekend_sleep_routine_wakeup_time", "What time do you usually wakeup on weekends?", "07:00")
+        logAnswer(
+            QuestionSubType.WEEKEND_SLEEP_ROUTINE_WAKEUP_TIME,
+            "What time do you usually wakeup on weekends?",
+            "07:00"
+        )
         nextButton.click()
         question_19()
     }
@@ -1909,7 +1974,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("sleep_schedule_preference", "Let's make your sleep schedule perfect! Would you like to set your ideal bedtime or wakeup time?", "Bedtime")
+        logAnswer(
+            QuestionSubType.SLEEP_SCHEDULE_PREFERENCE,
+            "Let's make your sleep schedule perfect! Would you like to set your ideal bedtime or wakeup time?",
+            "Bedtime"
+        )
         bedtime.click()
         question_20()
     }
@@ -1926,7 +1995,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("11:00")
-        logAnswer("bed_time_goal", "Set your ideal Bedtime", "11:00")
+        logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
         nextButton.click()
         question_22()
     }
@@ -1944,7 +2013,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         timerBox.fill("07:00")
-        logAnswer("wakeup_time_goal", "Set your ideal Waketime", "07:00")
+        logAnswer(QuestionSubType.WAKEUP_TIME_GOAL, "Set your ideal Waketime", "07:00")
         //question_22()
     }
 
@@ -1980,7 +2049,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("sleep_satisfaction", "How satisfied are you with your sleep?", "Somewhat Satisfied")
+        logAnswer(QuestionSubType.SLEEP_SATISFACTION, "How satisfied are you with your sleep?", "Somewhat Satisfied")
         somewhatSatisfied.click()
         question_23()
     }
@@ -2017,7 +2086,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("sleep_wakeup_refreshment", "Do you wake up refreshed?", "Sometimes")
+        logAnswer(QuestionSubType.SLEEP_WAKEUP_REFRESHMENT, "Do you wake up refreshed?", "Sometimes")
         sometimes.click()
         question_24()
     }
@@ -2063,7 +2132,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        logAnswer("sunlight_upon_wakeup", "What is the duration of your sun exposure on a day-to-day basis?", "5-10 minutes")
+        logAnswer(
+            QuestionSubType.SUNLIGHT_UPON_WAKEUP,
+            "What is the duration of your sun exposure on a day-to-day basis?",
+            "5-10 minutes"
+        )
         fiveToTen.click()
         question_25()
     }
@@ -2109,7 +2182,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("sunlight_timing", "During which part of the day are you usually exposed to direct sunlight?", "Early morning (before 10 a.m.)")
+        logAnswer(
+            QuestionSubType.SUNLIGHT_TIMING,
+            "During which part of the day are you usually exposed to direct sunlight?",
+            "Early morning (before 10 a.m.)"
+        )
         earlyMorning.click()
         question_26()
     }
@@ -2150,7 +2227,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("wellness_motivation_frequency", "How often do you look for external motivation to stick to your wellness routine?", "Now and then")
+        logAnswer(
+            QuestionSubType.WELLNESS_MOTIVATION_FREQUENCY,
+            "How often do you look for external motivation to stick to your wellness routine?",
+            "Now and then"
+        )
         nowAndThen.click()
         question_27()
     }
@@ -2203,7 +2284,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        logAnswer("wellness_bother_frequency", "In the past month, how often have you felt stressed, sad, or low?", "Once a week")
+        logAnswer(
+            QuestionSubType.WELLNESS_BOTHER_FREQUENCY,
+            "In the past month, how often have you felt stressed, sad, or low?",
+            "Once a week"
+        )
         onceAWeek.click()
         question_28()
     }
@@ -2241,7 +2326,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        logAnswer("stress_management", "How well do you deal with stress?", "I could deal with stress better")
+        logAnswer(
+            QuestionSubType.STRESS_MANAGEMENT,
+            "How well do you deal with stress?",
+            "I could deal with stress better"
+        )
         overwhelmed.click()
         question_29()
     }
@@ -2286,7 +2375,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
 
-        logAnswer("emotional_eating", "How often do you eat in response to emotions such as stress, cravings, boredom, or anxiety rather than physical hunger?", "Rarely")
+        logAnswer(
+            QuestionSubType.EMOTIONAL_EATING,
+            "How often do you eat in response to emotions such as stress, cravings, boredom, or anxiety rather than physical hunger?",
+            "Rarely"
+        )
         rarely.click()
         question_30()
     }
@@ -2349,7 +2442,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertExclusiveSelected(allOfTheAbove, snackOptions)
 
         sweets.click()
-        logAnswer("snack_preference", "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
+        logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
         nextButton.click()
         question_33()
     }
@@ -2411,7 +2504,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ✅ wait once
         options.forEach { it.waitFor() }
-        logAnswer("n_smoke", "How many cigarettes do you typically smoke in a day?", "I don't smoke")
+        logAnswer(QuestionSubType.N_SMOKE, "How many cigarettes do you typically smoke in a day?", "I don't smoke")
         dontSmoke.click()
         question_34()
     }
@@ -2470,7 +2563,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // ✅ wait once
         options.forEach { it.waitFor() }
         dontDrink.click()
-        logAnswer("n_alcohol", "How many alcoholic drinks do you consume per week?", "I don't drink")
+        logAnswer(QuestionSubType.N_ALCOHOL, "How many alcoholic drinks do you consume per week?", "I don't drink")
         question_35()
     }
 
@@ -2541,7 +2634,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         none.click()
         assertExclusiveSelected(none, supplements)
 
-        logAnswer("additional_supplement", "Please select any additional dietary supplements you take from the following list:", arrayOf("Vitamin A", "Vitamin D", "Vitamin E"))
+        logAnswer(
+            QuestionSubType.ADDITIONAL_SUPPLEMENT,
+            "Please select any additional dietary supplements you take from the following list:",
+            arrayOf("Vitamin A", "Vitamin D", "Vitamin E")
+        )
         supplements.take(3).forEach { it.click() }
         nextButton.click()
         question_36()
@@ -2601,7 +2698,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         selectedCondition.click()
 
         //assertConditionSelected(selectedCondition, notSure, none)
-        logAnswer("medical_condition_family", "Do you have a family history of any of the following medical conditions?", arrayOf("Dermatological Conditions (e.g., eczema, acne, psoriasis)"))
+        logAnswer(
+            QuestionSubType.MEDICAL_CONDITION_FAMILY,
+            "Do you have a family history of any of the following medical conditions?",
+            arrayOf("Dermatological Conditions (e.g., eczema, acne, psoriasis)")
+        )
         nextButton.click()
         question_37()
     }
@@ -2721,7 +2822,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Log the selected conditions
         // Log the selected conditions
         val selectedConditionLabels = medicalConditions.mapNotNull { it.label }.toTypedArray()
-        logAnswer("medical_condition", "Do you currently have or have ever been diagnosed with any of the following medical conditions?", selectedConditionLabels)
+        logAnswer(
+            QuestionSubType.MEDICAL_CONDITION,
+            "Do you currently have or have ever been diagnosed with any of the following medical conditions?",
+            selectedConditionLabels
+        )
 
         nextButton.click()
 
@@ -2794,7 +2899,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         ibs.click()
-        logAnswer("gi_condition", "Which of the following best describes your GI condition?", arrayOf("Irritable Bowel Syndrome"))
+        logAnswer(
+            QuestionSubType.GI_CONDITION,
+            "Which of the following best describes your GI condition?",
+            arrayOf("Irritable Bowel Syndrome")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -2841,7 +2950,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditionButtons[0].click()
-        logAnswer("skin_condition", "Which of the following best describes your skin condition?", arrayOf("Psoriasis"))
+        logAnswer(
+            QuestionSubType.SKIN_CONDITION,
+            "Which of the following best describes your skin condition?",
+            arrayOf("Psoriasis")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -2903,7 +3016,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditionButtons[0].click()
-        logAnswer("bone_joint_condition", "Which of the following best describes your bone/joint condition?", arrayOf("Ankylosing Spondylitis"))
+        logAnswer(
+            QuestionSubType.BONE_JOINT_CONDITION,
+            "Which of the following best describes your bone/joint condition?",
+            arrayOf("Ankylosing Spondylitis")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -2968,7 +3085,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("neurological_condition", "Which of the following best describes your neurological condition?", arrayOf("Migraines"))
+        logAnswer(
+            QuestionSubType.NEUROLOGICAL_CONDITION,
+            "Which of the following best describes your neurological condition?",
+            arrayOf("Migraines")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3015,7 +3136,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         preDiabeticNotOnMeds.click()
-        logAnswer("diabetes_status", "How would you best describe your Diabetes status?", "I am prediabetic, but I'm not on medication")
+        logAnswer(
+            QuestionSubType.DIABETES_STATUS,
+            "How would you best describe your Diabetes status?",
+            "I am prediabetic, but I'm not on medication"
+        )
         visitNextMedicalQuestion()
 
     }
@@ -3078,7 +3203,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("thyroid_condition", "Which of the following best describes your thyroid condition?", arrayOf("Hypothyroidism"))
+        logAnswer(
+            QuestionSubType.THYROID_CONDITION,
+            "Which of the following best describes your thyroid condition?",
+            arrayOf("Hypothyroidism")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3143,7 +3272,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("liver_condition", "Which of the following best describes your liver condition?", arrayOf("Fatty Liver"))
+        logAnswer(
+            QuestionSubType.LIVER_CONDITION,
+            "Which of the following best describes your liver condition?",
+            arrayOf("Fatty Liver")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3207,7 +3340,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("kidney_condition", "Which of the following best describes your kidney condition?", arrayOf("Nephritis"))
+        logAnswer(
+            QuestionSubType.KIDNEY_CONDITION,
+            "Which of the following best describes your kidney condition?",
+            arrayOf("Nephritis")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3272,7 +3409,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("heart_condition", "Which of the following best describes your heart condition?", arrayOf("Hypertension"))
+        logAnswer(
+            QuestionSubType.HEART_CONDITION,
+            "Which of the following best describes your heart condition?",
+            arrayOf("Hypertension")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3337,7 +3478,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("respiratory_condition", "Which of the following best describes your respiratory condition?", arrayOf("Asthma"))
+        logAnswer(
+            QuestionSubType.RESPIRATORY_CONDITION,
+            "Which of the following best describes your respiratory condition?",
+            arrayOf("Asthma")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3405,7 +3550,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         conditions[0].click()
-        logAnswer("auto_immune_condition", "Which of the following best describes your auto-immune condition?", arrayOf("Systemic Lupus Erythematosus (SLE)"))
+        logAnswer(
+            QuestionSubType.AUTO_IMMUNE_CONDITION,
+            "Which of the following best describes your auto-immune condition?",
+            arrayOf("Systemic Lupus Erythematosus (SLE)")
+        )
         nextButton.click()
         visitNextMedicalQuestion()
     }
@@ -3450,7 +3599,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Select ONE option only
         // -------------------------
 
-        logAnswer("cancer_diagnosis", "What is your current cancer status?","Yes, I currently have cancer and on treatment")
+        logAnswer(
+            QuestionSubType.CANCER_DIAGNOSIS,
+            "What is your current cancer status?",
+            "Yes, I currently have cancer and on treatment"
+        )
         onTreatment.click()
         question_50()
     }
@@ -3477,7 +3630,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Enter cancer type
         // -------------------------
         typeTextbox.fill("Breast cancer")
-        logAnswer("cancer_type", "Please mention the type of cancer","Breast cancer")
+        logAnswer(QuestionSubType.CANCER_TYPE, "Please mention the type of cancer", "Breast cancer")
 
         assertTrue(nextButton.isEnabled)
 
@@ -3553,7 +3706,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
 
         logAnswer(
-            "medicines_taking","Are you currently taking any of the following types of medicines?",
+            QuestionSubType.MEDICINES_TAKING, "Are you currently taking any of the following types of medicines?",
             arrayOf("Cholesterol-lowering drugs (Statins)", "Blood pressure medicines", "Thyroid medicines")
         )
 
@@ -3595,7 +3748,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         waistTextBox.fill("")
         waistTextBox.fill(values)
-        logAnswer("waist_circumference", "What is your waist circumference at its narrowest point?", values)
+        logAnswer(
+            QuestionSubType.WAIST_CIRCUMFERENCE,
+            "What is your waist circumference at its narrowest point?",
+            values
+        )
         completeButton.click()
     }
 
@@ -3662,7 +3819,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /*---------------Questioner Re-selection check----------------*/
 
-    fun question_1_veg_checker(){
+    fun question_1_veg_checker() {
         logQuestion("What is your food preference?")
 
 
