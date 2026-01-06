@@ -11,9 +11,6 @@ enum class AddOnTestPageType {
 }
 
 
-
-
-
 class AddOnTestCards(val page: Page, private val pageType: AddOnTestPageType) {
 
 
@@ -79,9 +76,9 @@ class AddOnTestCards(val page: Page, private val pageType: AddOnTestPageType) {
         return getViewAllAddOnTestButton()?.isVisible ?: false
     }
 
-    fun clickViewAllAddOnTestButton(): AllTestPage {
+    fun clickViewAllAddOnTestButton(): AddOnTestPage {
         getViewAllAddOnTestButton()?.click()
-        val allTestPage = AllTestPage(page)
+        val allTestPage = AddOnTestPage(page)
         allTestPage.waitForPageLoad()
         return allTestPage
     }
