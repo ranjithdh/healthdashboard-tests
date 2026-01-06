@@ -12,6 +12,9 @@ class OurWhyPage(page: Page) : MarketingBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.OUR_WHY
 
+    val everyThingYouNeedToKnowCard = EveryThingYouNeedToKnowCard(page, EveryThingYouNeedToKnowPageType.OUR_WHY)
+    val stopGuessingStartWithClaritySection = StopGuessingStartWithClaritySection(page,StopGuessingPageType.OUR_WHY)
+
     private val header = page.getByRole(
         AriaRole.HEADING,
         Page.GetByRoleOptions().setName("T a k e c h a r g e o f y o u r h e a l t h t o d a y")

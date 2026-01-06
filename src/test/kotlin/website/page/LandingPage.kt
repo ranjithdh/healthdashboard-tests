@@ -10,17 +10,18 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.WEBSITE_BASE_URL
 
-    private val pageType = AddOnTestPageType.LANDING
-    val addOnTestCards = AddOnTestCards(page,pageType)
+    private val addOnTestPageType = AddOnTestPageType.LANDING
+    val addOnTestCards = AddOnTestCards(page, addOnTestPageType)
 
     val faqSection = FaqSection(page)
+    val everyThingYouNeedToKnowCard = EveryThingYouNeedToKnowCard(page, EveryThingYouNeedToKnowPageType.LANDING)
+    val stopGuessingStartWithClaritySection = StopGuessingStartWithClaritySection(page,StopGuessingPageType.LANDING)
 
     private val heroSectionBookNow = page.locator("#join-now-btn-hero")
     private val whatWeTest =
         page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true))
     private val learnMore = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Learn more"))
     private val whatsIncludedSectionBookNow = page.locator("#join-now-btn-membership")
-    private val isEveryThingYouNeedToKnowBookNow = page.locator("#join-now-btn-membership-pricing")
     private val readOurWhy = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Read our Why"))
     private val stopeGuessingBookNow = page.locator("#join-now-btn-foot-hero")
 
@@ -205,38 +206,6 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
                 page.getByText("Unlock welcome points, and redeem them across the platform for exclusive member discounts.").isVisible
     }
 
-
-    fun isEverythingYouNeedToKnowHeadingVisible(): Boolean {
-        return page.getByRole(
-            AriaRole.HEADING,
-            Page.GetByRoleOptions().setName("Everything you need to know")
-        ).isVisible
-    }
-
-    fun isEverythingYouNeedToKnowDescriptionVisible(): Boolean {
-        return page.getByText("Baseline brings together a preventive health system to give you clarity and help you take action with confidence.").isVisible
-    }
-
-    fun isWhatsIncludedPointsVisible(): Boolean {
-        return page.getByText("What's Included", Page.GetByTextOptions().setExact(true)).isVisible &&
-                page.getByText("Advanced Biomarker at-home").isVisible &&
-                page.getByText(":1 Expert Consults for all the tests").isVisible &&
-                page.getByText("Longevity platform to manage").isVisible &&
-                page.getByText("Add-on tests to help you go").isVisible &&
-                page.getByText("DH Reward points and").isVisible &&
-                page.getByText("This isn’t a check-up. It’s").isVisible &&
-                page.getByText("₹9,999", Page.GetByTextOptions().setExact(true)).isVisible
-    }
-
-    fun isEveryThingYouNeedToKnowBookNowVisible(): Boolean {
-        return isEveryThingYouNeedToKnowBookNow.isVisible
-    }
-
-    fun clickEveryThingYouNeedToKnowBookNow() {
-        isEveryThingYouNeedToKnowBookNow.click()
-    }
-
-
     fun isBuiltByExpertHeadingVisible(): Boolean {
         return page.getByRole(
             AriaRole.HEADING, Page.GetByRoleOptions().setName(
@@ -311,24 +280,24 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
         ).isVisible
     }
 
-    fun stopGuessingSectionElementsVisible(): Boolean {
-        val header = page.getByRole(
-            AriaRole.HEADING,
-            Page.GetByRoleOptions().setName("S t o p g u e s s i n g . S t a r t w i t h c l a r i t y .")
-        )
-        val description =
-            page.getByText("It’s time to reclaim control and address what’s holding you back so you can look, feel and perform 10/10, day after day")
-        header.waitFor()
-
-        return header.isVisible && description.isVisible
-    }
-
-    fun stopGuessingBookNowButtonVisible(): Boolean {
-        return stopeGuessingBookNow.isVisible
-    }
-
-    fun clickStopGuessingBookNowButtonVisible() {
-        stopeGuessingBookNow.click()
-    }
+//    fun stopGuessingSectionElementsVisible(): Boolean {
+//        val header = page.getByRole(
+//            AriaRole.HEADING,
+//            Page.GetByRoleOptions().setName("S t o p g u e s s i n g . S t a r t w i t h c l a r i t y .")
+//        )
+//        val description =
+//            page.getByText("It’s time to reclaim control and address what’s holding you back so you can look, feel and perform 10/10, day after day")
+//        header.waitFor()
+//
+//        return header.isVisible && description.isVisible
+//    }
+//
+//    fun stopGuessingBookNowButtonVisible(): Boolean {
+//        return stopeGuessingBookNow.isVisible
+//    }
+//
+//    fun clickStopGuessingBookNowButtonVisible() {
+//        stopeGuessingBookNow.click()
+//    }
 
 }

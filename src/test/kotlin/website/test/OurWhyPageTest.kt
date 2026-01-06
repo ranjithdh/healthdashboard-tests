@@ -6,6 +6,8 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
+import website.page.HowItWorksPage
+import website.page.LandingPage
 import website.page.OurWhyPage
 
 
@@ -75,6 +77,39 @@ class OurWhyPageTest {
         assert(ourWhyPage.isCeoNameVisible()) { "Should display ceo name" }
         assert(ourWhyPage.isWeAreNoteHereHeadingVisible()) { "Should display heading" }
         assert(ourWhyPage.whenPeopleAroundAsTextVisible()) { "Should display people around" }
+    }
+
+
+    @Test
+    fun `should show everything you need to know your baseline`() {
+        val landingPage =OurWhyPage(page).navigate() as OurWhyPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowHeadingVisible()) { "Everything you need to know heading should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowDescriptionVisible()) { "Everything you need to know description should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isWhatsIncludedPointsVisible()) { "What's included points should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEveryThingYouNeedToKnowBookNowVisible()) { "Everything you need to know book now should be visible" }
+
+
+        landingPage.everyThingYouNeedToKnowCard.clickEveryThingYouNeedToKnowBookNow()
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+    }
+
+
+    @Test
+    fun `should show stop guessing elements`(){
+
+        val landingPage = OurWhyPage(page).navigate() as OurWhyPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingSectionElementsVisible())
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingBookNowButtonVisible())
+
+        landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
+
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }

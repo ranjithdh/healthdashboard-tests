@@ -4,6 +4,7 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.HowItWorksPage
+import website.page.LandingPage
 import website.page.WhatWeTestPage
 
 
@@ -51,6 +52,29 @@ class WhatWeTestPageTest {
         whatWeTestPage.waitForPageLoad()
 
         assert(whatWeTestPage.isPageHeadingVisible()) { "Page heading should be visible" }
+
+        whatWeTestPage.takeScreenshot("what-we-test-page-heading")
+    }
+
+    @Test
+    fun `should display what is biomarker section`() {
+        val whatWeTestPage = WhatWeTestPage(page).navigate() as WhatWeTestPage
+        whatWeTestPage.waitForPageLoad()
+
+        assert(whatWeTestPage.isWhatIsBiomarkerTestingTitleVisible()) { "What-is-biomarker should be visible" }
+        assert(whatWeTestPage.isWhatIsBiomarkingTextVisible()) { "What-is-biomarking should be visible" }
+        assert(whatWeTestPage.isWhyItMattersTitleVisible()) { "Why-it-matters should be visible" }
+        assert(whatWeTestPage.isWhyItMattersSection1Visible()) { "Why-it-matters should be visible" }
+        assert(whatWeTestPage.isWhyItMattersSection2Visible()) { "Why-it-matters should be visible" }
+        assert(whatWeTestPage.whyItMattersSection3Visible()) { "Why-it-matters should be visible" }
+        assert(whatWeTestPage.isBaseLineBloodPanelVisible()) { "What-is-bloodpanel should be visible" }
+        assert(whatWeTestPage.isBaseLineBloodPanelDescriptionVisible()) { "What-is-bloodpanel_description should be visible" }
+        assert(whatWeTestPage.isBookNowVisible()) { "What-is-booknow should be visible" }
+
+        whatWeTestPage.clickBookNowButton()
+
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
 
         whatWeTestPage.takeScreenshot("what-we-test-page-heading")
     }
@@ -248,7 +272,7 @@ class WhatWeTestPageTest {
 
     @Test
     fun `should display all the add on test`() {
-        val landingPage =  WhatWeTestPage(page).navigate() as WhatWeTestPage
+        val landingPage = WhatWeTestPage(page).navigate() as WhatWeTestPage
         landingPage.waitForPageLoad()
 
         assert(landingPage.addOnTestCards.isAddOnTestHeadingVisible()) { "AddOn Test Heading should be visible" }
@@ -274,6 +298,22 @@ class WhatWeTestPageTest {
 
         val allTestPage = landingPage.addOnTestCards.clickViewAllAddOnTestButton()
         assert(allTestPage.isPageHeadingVisible()) { "Page Heading should be visible" }
+    }
+
+    @Test
+    fun `should show stop guessing elements`() {
+
+        val landingPage = WhatWeTestPage(page).navigate() as WhatWeTestPage
+        landingPage.waitForPageLoad()
+
+
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingSectionElementsVisible())
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingBookNowButtonVisible())
+
+        landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
+
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }

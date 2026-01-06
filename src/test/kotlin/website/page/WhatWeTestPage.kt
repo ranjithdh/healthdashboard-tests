@@ -12,6 +12,8 @@ class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.WHAT_WE_TEST
 
+    val stopGuessingStartWithClaritySection = StopGuessingStartWithClaritySection(page,StopGuessingPageType.WHAT_WE_TEST)
+
     private val header = page.getByRole(
         AriaRole.HEADING,
         Page.GetByRoleOptions().setName("H e r e i s e v e r y t h i n g w e t e s t")
@@ -47,8 +49,9 @@ class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
 
     fun isWhyItMattersSection1Visible(): Boolean {
         return page.getByText(
-            "These markers act like signals from inside your body, helping identify early signs of imbalance, disease risk, or progress toward better health. Many health issues develop silently long before symptoms appear, which is why tracking the right biomarkers gives you the power to act early and precisely. \u200D By monitoring these indicators over time, you can:"
-        ).isVisible
+            "These markers act like signals from inside your body, helping identify early signs of imbalance, disease risk, or progress toward better health. Many health issues develop silently long before symptoms appear, which is why tracking the right biomarkers gives you the power to act early and precisely."
+        ).isVisible &&
+                page.getByText(" By monitoring these indicators over time, you can:").isVisible
     }
 
     fun isWhyItMattersSection2Visible(): Boolean {
@@ -86,6 +89,9 @@ class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
 
     fun isBookNowVisible() = bookNow.isVisible
 
+    fun clickBookNowButton() {
+        bookNow.click()
+    }
 
     fun isHearHealthSectionTitleVisible(): Boolean {
         return page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Heart Health")).isVisible
@@ -875,7 +881,7 @@ class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
         )
     }
 
-    private val pageType = AddOnTestPageType.WHAT_WE_TEST
-    val addOnTestCards = AddOnTestCards(page, pageType)
+    private val addOnTestPageType = AddOnTestPageType.WHAT_WE_TEST
+    val addOnTestCards = AddOnTestCards(page, addOnTestPageType)
 
 }

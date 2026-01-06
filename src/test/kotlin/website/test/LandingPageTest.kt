@@ -180,13 +180,13 @@ class LandingPageTest {
         val landingPage = LandingPage(page).navigate() as LandingPage
         landingPage.waitForPageLoad()
 
-        assert(landingPage.isEverythingYouNeedToKnowHeadingVisible()) { "Everything you need to know heading should be visible" }
-        assert(landingPage.isEverythingYouNeedToKnowDescriptionVisible()) { "Everything you need to know description should be visible" }
-        assert(landingPage.isWhatsIncludedPointsVisible()) { "What's included points should be visible" }
-        assert(landingPage.isEveryThingYouNeedToKnowBookNowVisible()) { "Everything you need to know book now should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowHeadingVisible()) { "Everything you need to know heading should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowDescriptionVisible()) { "Everything you need to know description should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isWhatsIncludedPointsVisible()) { "What's included points should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEveryThingYouNeedToKnowBookNowVisible()) { "Everything you need to know book now should be visible" }
 
 
-        landingPage.clickEveryThingYouNeedToKnowBookNow()
+        landingPage.everyThingYouNeedToKnowCard.clickEveryThingYouNeedToKnowBookNow()
         page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
         assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
@@ -235,10 +235,10 @@ class LandingPageTest {
         val landingPage = LandingPage(page).navigate() as LandingPage
         landingPage.waitForPageLoad()
 
-        assert(landingPage.stopGuessingSectionElementsVisible())
-        assert(landingPage.stopGuessingBookNowButtonVisible())
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingSectionElementsVisible())
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingBookNowButtonVisible())
 
-        landingPage.clickStopGuessingBookNowButtonVisible()
+        landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
 
         page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
         assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }

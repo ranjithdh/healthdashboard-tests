@@ -7,6 +7,7 @@ import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.HowItWorksPage
+import website.page.LandingPage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HowItWorksPageTest {
@@ -166,6 +167,38 @@ class HowItWorksPageTest {
 
         val allTestPage = landingPage.addOnTestCards.clickViewAllAddOnTestButton()
         assert(allTestPage.isPageHeadingVisible()) { "Page Heading should be visible" }
+    }
+
+
+    @Test
+    fun `should show everything you need to know your baseline`() {
+        val landingPage = HowItWorksPage(page).navigate() as HowItWorksPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowHeadingVisible()) { "Everything you need to know heading should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEverythingYouNeedToKnowDescriptionVisible()) { "Everything you need to know description should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isWhatsIncludedPointsVisible()) { "What's included points should be visible" }
+        assert(landingPage.everyThingYouNeedToKnowCard.isEveryThingYouNeedToKnowBookNowVisible()) { "Everything you need to know book now should be visible" }
+
+
+        landingPage.everyThingYouNeedToKnowCard.clickEveryThingYouNeedToKnowBookNow()
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+    }
+
+    @Test
+    fun `should show stop guessing elements`(){
+
+        val landingPage = HowItWorksPage(page).navigate() as HowItWorksPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingSectionElementsVisible())
+        assert(landingPage.stopGuessingStartWithClaritySection.stopGuessingBookNowButtonVisible())
+
+        landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
+
+        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }
