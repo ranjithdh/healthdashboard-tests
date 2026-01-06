@@ -12,6 +12,7 @@ import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
 import profile.model.ActivityLevel
+import profile.model.MedicalCondition
 import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
@@ -43,6 +44,8 @@ class ProfilePage(page: Page) : BasePage(page) {
     private val previousButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
     private val nextButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
     private var exerciseType = ActivityLevel.SEDENTARY
+    private var medicalConditions: List<MedicalCondition> = listOf(MedicalCondition.NONE)
+    private val medicalQuestionQueue: MutableList<() -> Unit> = mutableListOf()
 
     private fun logQuestion(questionText: String) {
         logger.info { "[QUESTIONER]: $questionText" }
@@ -966,8 +969,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
-    fun assertQuestionerVegInitialCheck(type: ActivityLevel) {
+    fun assertQuestionerVegInitialCheck(type: ActivityLevel, condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)) {
         exerciseType = type
+        medicalConditions = condition
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1737,6 +1741,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         nextButton.click()
         question_14()
     }
+
 
     fun question_14() {// How would you describe your sleep?
         logQuestion("How would you describe your sleep?")
@@ -2576,6 +2581,19 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_37()
     }
 
+    /**
+     * Helper function to visit the next medical question in the queue.
+     * If queue is empty, proceeds to question_51 (medications).
+     */
+    private fun visitNextMedicalQuestion() {
+        if (medicalQuestionQueue.isNotEmpty()) {
+            val nextQuestion = medicalQuestionQueue.removeAt(0)
+            nextQuestion()
+        } else {
+            question_51()  // All condition questions processed, move to medications
+        }
+    }
+
     fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
         logQuestion("Do you currently have or have ever been diagnosed with any medical conditions?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
@@ -2615,23 +2633,80 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Wait once
         listOf(title, subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
 
-        conditions.forEach { it.click() }
+        // 🔹 Clear any previous selections (optional but good practice)
+        // Note: For a clean run, we assume nothing is selected initially.
 
-        // -------- CASE 1: Not Sure --------
-        notSure.click()
-        assertExclusiveSelected(notSure, conditions)
+        // 🔹 Select options based on the passed parameter
+        medicalConditions.forEach { condition ->
+            val buttonName = condition.buttonName
+            val buttonToClick = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(buttonName))
+            buttonToClick.click()
+        }
 
-        // -------- CASE 2: None of the above --------
-        none.click()
-        assertExclusiveSelected(none, conditions)
+        // 🔹 Logic for "Not Sure" and "None" (Exclusive check)
+        if (medicalConditions.contains(MedicalCondition.NOT_SURE)) {
+            assertExclusiveSelected(notSure, conditions)
+        }
+        if (medicalConditions.contains(MedicalCondition.NONE)) {
+            assertExclusiveSelected(none, conditions)
+        }
 
-        val selectedCondition = conditions.first()
-        selectedCondition.click()
+        // 🔹 Build the medical question queue based on selections
+        medicalQuestionQueue.clear()  // Clear any previous queue
 
-        logAnswer("medical_condition", arrayOf("Dermatological Conditions"))
+        // Check against the ENUM list to add to queue (Order matters based on questionnaire flow)
+        if (medicalConditions.contains(MedicalCondition.GASTROINTESTINAL)) {
+            medicalQuestionQueue.add(::question_38)
+        }
+        if (medicalConditions.contains(MedicalCondition.DERMATOLOGICAL)) {
+            medicalQuestionQueue.add(::question_39)
+        }
+        if (medicalConditions.contains(MedicalCondition.BONE_OR_JOINT)) {
+            medicalQuestionQueue.add(::question_40)
+        }
+        if (medicalConditions.contains(MedicalCondition.NEUROLOGICAL)) {
+            medicalQuestionQueue.add(::question_41)
+        }
+        if (medicalConditions.contains(MedicalCondition.DIABETES)) {
+            medicalQuestionQueue.add(::question_42)
+        }
+        if (medicalConditions.contains(MedicalCondition.THYROID)) {
+            medicalQuestionQueue.add(::question_43)
+        }
+        if (medicalConditions.contains(MedicalCondition.LIVER)) {
+            medicalQuestionQueue.add(::question_44)
+        }
+        if (medicalConditions.contains(MedicalCondition.KIDNEY)) {
+            medicalQuestionQueue.add(::question_45)
+        }
+        if (medicalConditions.contains(MedicalCondition.CARDIOVASCULAR)) {
+            medicalQuestionQueue.add(::question_46)
+        }
+       /* if (medicalConditions.contains(MedicalCondition.GALL_BLADDER)) {
+            medicalQuestionQueue.add(::question_38)
+        }*/
+        if (medicalConditions.contains(MedicalCondition.CANCER)) {
+            medicalQuestionQueue.add(::question_49)
+        }
+        if (medicalConditions.contains(MedicalCondition.RESPIRATORY)) {
+            medicalQuestionQueue.add(::question_47)
+        }
+        if (medicalConditions.contains(MedicalCondition.AUTO_IMMUNE)) {
+            medicalQuestionQueue.add(::question_48)
+        }
+
+        // Log the selected conditions
+        val selectedConditionNames = medicalConditions.map { it.buttonName }.toTypedArray()
+        logAnswer("medical_condition", selectedConditionNames)
+
         nextButton.click()
-        question_39()
 
+        // 🔹 Check for exclusive selections first
+        if (medicalConditions.contains(MedicalCondition.NOT_SURE) || medicalConditions.contains(MedicalCondition.NONE)) {
+            question_51()  // Skip condition details, go straight to medications
+        } else {
+            visitNextMedicalQuestion()  // Start visiting queued condition questions
+        }
     }
 
     fun question_38() { // Which of the following best describes your GI condition?
@@ -2697,7 +2772,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         ibs.click()
         logAnswer("gi_condition", arrayOf("Irritable Bowel Syndrome"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
 
@@ -2744,7 +2819,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditionButtons[0].click()
         logAnswer("skin_condition", arrayOf("Psoriasis"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_40() { // Which of the following best describes your bone or joint condition?
@@ -2806,7 +2881,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditionButtons[0].click()
         logAnswer("bone_joint_condition", arrayOf("Ankylosing Spondylitis"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_41() {// Which of the following best describes your neurological condition?
@@ -2871,7 +2946,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("neurological_condition", arrayOf("Migraines"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_42() { // How would you best describe your Diabetes status?
@@ -2917,7 +2992,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answersStored["diabetes_status"] = "I am prediabetic, but I'm not on medication"
         preDiabeticNotOnMeds.click()
         logAnswer("diabetes_status", "I am prediabetic, but I'm not on medication")
-        question_51()
+        visitNextMedicalQuestion()
 
     }
 
@@ -2981,7 +3056,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("thyroid_condition", arrayOf("Hypothyroidism"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_44() {  // Which of the following best describes your liver condition?
@@ -3046,7 +3121,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("liver_condition", arrayOf("Fatty Liver"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_45() {  // Which of the following best describes your kidney condition?
@@ -3110,7 +3185,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("kidney_condition", arrayOf("Nephritis"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_46() {//  Which of the following best describes your heart condition?
@@ -3175,7 +3250,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("heart_condition", arrayOf("Hypertension"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_47() {//  Which of the following best describes your respiratory condition?
@@ -3240,7 +3315,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("respiratory_condition", arrayOf("Asthma"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_48() {  // Which of the following best describes your auto-immune condition?
@@ -3308,7 +3383,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         conditions[0].click()
         logAnswer("auto_immune_condition", arrayOf("Systemic Lupus Erythematosus (SLE"))
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_49() { // What is your current cancer status?
@@ -3382,7 +3457,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(nextButton.isEnabled)
 
         nextButton.click()
-        question_51()
+        visitNextMedicalQuestion()
     }
 
     fun question_51() { // Are you currently taking any of the following types of medicines?

@@ -267,9 +267,230 @@ class ProfileTest {
             .enterOtpAndContinueToHomePage(testUser.otp)
             .clickAccountProfile()
             .waitForConfirmation()
-
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
         profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
+    }
+
+    /**------------Medical Conditions Flow Tests----------------*/
+    
+    @Test
+    fun `medical conditions - no conditions selected`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "None of the above" in Q37
+        // Expected: Q37 → Q51 (skip all condition detail questions)
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.NONE)
+        )
+    }
+
+    @Test
+    fun `medical conditions - single gastrointestinal`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Gastrointestinal Conditions" only in Q37
+        // Expected: Q37 → Q38 (GI details) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL)
+        )
+    }
+
+    @Test
+    fun `medical conditions - multiple conditions GI and dermatological`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Gastrointestinal" + "Dermatological" in Q37
+        // Expected: Q37 → Q38 (GI) → Q39 (Skin) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(
+                profile.model.MedicalCondition.GASTROINTESTINAL,
+                profile.model.MedicalCondition.DERMATOLOGICAL
+            )
+        )
+    }
+
+    @Test
+    fun `medical conditions - diabetes only`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Type 2 - Diabetes" only in Q37
+        // Expected: Q37 → Q42 (Diabetes status) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.DIABETES)
+        )
+    }
+
+    @Test
+    fun `medical conditions - thyroid only`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Thyroid-related disorders" only in Q37
+        // Expected: Q37 → Q43 (Thyroid details) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.THYROID)
+        )
+    }
+
+    @Test
+    fun `medical conditions - cancer flow`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Cancer" only in Q37
+        // Expected: Q37 → Q49 (Cancer status) → Q50 (Cancer type) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.CANCER)
+        )
+    }
+
+    @Test
+    fun `medical conditions - cardiovascular and kidney`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Cardiovascular" + "Kidney Conditions" in Q37
+        // Expected: Q37 → Q46 (Heart) → Q45 (Kidney) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(
+                profile.model.MedicalCondition.CARDIOVASCULAR,
+                profile.model.MedicalCondition.KIDNEY
+            )
+        )
+    }
+
+    @Test
+    fun `medical conditions - complex multi selection`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Diabetes" + "Thyroid" + "Cancer" in Q37
+        // Expected: Q37 → Q42 (Diabetes) → Q43 (Thyroid) → Q49 (Cancer) → Q50 (Type) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(
+                profile.model.MedicalCondition.DIABETES,
+                profile.model.MedicalCondition.THYROID,
+                profile.model.MedicalCondition.CANCER
+            )
+        )
+    }
+
+    @Test
+    fun `medical conditions - respiratory and auto-immune`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select "Respiratory" + "Auto-immune" in Q37
+        // Expected: Q37 → Q47 (Respiratory) → Q48 (Auto-immune) → Q51
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(
+                profile.model.MedicalCondition.RESPIRATORY,
+                profile.model.MedicalCondition.AUTO_IMMUNE
+            )
+        )
+    }
+
+    @Test
+    fun `medical conditions - all major conditions`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Test: Select multiple major conditions in Q37
+        // Expected: Q37 → All selected detail questions → Q51
+        // This tests the queue handling with maximum load
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(
+                profile.model.MedicalCondition.GASTROINTESTINAL,
+                profile.model.MedicalCondition.DERMATOLOGICAL,
+                profile.model.MedicalCondition.DIABETES,
+                profile.model.MedicalCondition.THYROID,
+                profile.model.MedicalCondition.GALL_BLADDER,
+            )
+        )
     }
 
 

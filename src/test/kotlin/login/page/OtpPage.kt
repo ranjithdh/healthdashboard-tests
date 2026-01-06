@@ -117,7 +117,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToHomePage(otp: String): HomePage {
         enterOtp(otp)
-        clickContinue()
+        //clickContinue()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
