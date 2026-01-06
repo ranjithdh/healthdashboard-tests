@@ -8,7 +8,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 
-class WhatWeTestPage(page: Page) : MarketingBasePage(page) {
+class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.WHAT_WE_TEST
 

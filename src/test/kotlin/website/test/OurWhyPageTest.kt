@@ -6,8 +6,6 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
-import website.page.HowItWorksPage
-import website.page.LandingPage
 import website.page.OurWhyPage
 
 
@@ -53,7 +51,7 @@ class OurWhyPageTest {
     fun `should display page heading`() {
         val ourWhyPage = OurWhyPage(page).navigate() as OurWhyPage
         ourWhyPage.waitForPageLoad()
-        assert(ourWhyPage.isHederVisible()) { "Header should be visible" }
+        assert(ourWhyPage.isPageHeadingVisible()) { "Header should be visible" }
     }
 
     @Test
@@ -92,8 +90,8 @@ class OurWhyPageTest {
 
 
         landingPage.everyThingYouNeedToKnowCard.clickEveryThingYouNeedToKnowBookNow()
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 
@@ -108,8 +106,8 @@ class OurWhyPageTest {
 
         landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
 
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }

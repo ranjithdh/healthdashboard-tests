@@ -7,7 +7,6 @@ import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.HowItWorksPage
-import website.page.LandingPage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class HowItWorksPageTest {
@@ -58,22 +57,6 @@ class HowItWorksPageTest {
 
 
     @Test
-    fun `should display header navigation elements`() {
-        val howItWorksPage = HowItWorksPage(page).navigate() as HowItWorksPage
-        howItWorksPage.waitForPageLoad()
-
-        assert(howItWorksPage.isLogoVisible()) { "Logo should be visible" }
-        assert(howItWorksPage.isHowItWorksLinkVisible()) { "How It Works link should be visible" }
-        assert(howItWorksPage.isWhatWeTestLinkVisible()) { "What We Test link should be visible" }
-        assert(howItWorksPage.isOurWhyLinkVisible()) { "Our Why link should be visible" }
-        assert(howItWorksPage.isFaqLinkVisible()) { "FAQ link should be visible" }
-        assert(howItWorksPage.isLoginLinkVisible()) { "Login link should be visible" }
-        assert(howItWorksPage.isHeaderBookNowVisible()) { "Header Book Now button should be visible" }
-
-        howItWorksPage.takeScreenshot("how-it-works-header-elements")
-    }
-
-    @Test
     fun `should display step 1 elements`() {
         val howItWorksPage = HowItWorksPage(page).navigate() as HowItWorksPage
         howItWorksPage.waitForPageLoad()
@@ -87,11 +70,11 @@ class HowItWorksPageTest {
         assert(howItWorksPage.isStep1Point1DescriptionVisible()) { "Step 1 point 1 description should be visible" }
 
         assert(howItWorksPage.isStep1Point2TitleVisible()) { "Step 1 point 2 title should be visible" }
-        assert(howItWorksPage.isStep1Point2DescriptionVisible()){"Step 1 point 2 description should be visible"}
+        assert(howItWorksPage.isStep1Point2DescriptionVisible()) { "Step 1 point 2 description should be visible" }
 
 
-        assert(howItWorksPage.isStep1Point3TitleVisible()) { "Step 1 point 3 title should be visible"}
-        assert(howItWorksPage.isStep1Point3DescriptionVisible()) { "Step 1 point 3 description should be visible"}
+        assert(howItWorksPage.isStep1Point3TitleVisible()) { "Step 1 point 3 title should be visible" }
+        assert(howItWorksPage.isStep1Point3DescriptionVisible()) { "Step 1 point 3 description should be visible" }
     }
 
 
@@ -109,11 +92,11 @@ class HowItWorksPageTest {
         assert(howItWorksPage.isStep2Point1DescriptionVisible()) { "Step 2 point 1 description should be visible" }
 
         assert(howItWorksPage.isStep2Point2TitleVisible()) { "Step 2 point 2 title should be visible" }
-        assert(howItWorksPage.isStep2Point2DescriptionVisible()){"Step 2 point 2 description should be visible"}
+        assert(howItWorksPage.isStep2Point2DescriptionVisible()) { "Step 2 point 2 description should be visible" }
 
 
-        assert(howItWorksPage.isStep2Point3TitleVisible()) { "Step 2 point 3 title should be visible"}
-        assert(howItWorksPage.isStep2Point3DescriptionVisible()) { "Step 2 point 3 description should be visible"}
+        assert(howItWorksPage.isStep2Point3TitleVisible()) { "Step 2 point 3 title should be visible" }
+        assert(howItWorksPage.isStep2Point3DescriptionVisible()) { "Step 2 point 3 description should be visible" }
     }
 
 
@@ -131,16 +114,16 @@ class HowItWorksPageTest {
         assert(howItWorksPage.isStep3Point1DescriptionVisible()) { "Step 3 point 1 description should be visible" }
 
         assert(howItWorksPage.isStep3Point2TitleVisible()) { "Step 3 point 2 title should be visible" }
-        assert(howItWorksPage.isStep3Point2DescriptionVisible()){"Step 3 point 2 description should be visible"}
+        assert(howItWorksPage.isStep3Point2DescriptionVisible()) { "Step 3 point 2 description should be visible" }
 
 
-        assert(howItWorksPage.isStep3Point3TitleVisible()) { "Step 3 point 3 title should be visible"}
-        assert(howItWorksPage.isStep3Point3DescriptionVisible()) { "Step 3 point 3 description should be visible"}
+        assert(howItWorksPage.isStep3Point3TitleVisible()) { "Step 3 point 3 title should be visible" }
+        assert(howItWorksPage.isStep3Point3DescriptionVisible()) { "Step 3 point 3 description should be visible" }
     }
 
     @Test
     fun `should display all the add on test`() {
-        val landingPage =  HowItWorksPage(page).navigate() as HowItWorksPage
+        val landingPage = HowItWorksPage(page).navigate() as HowItWorksPage
         landingPage.waitForPageLoad()
 
 
@@ -182,12 +165,12 @@ class HowItWorksPageTest {
 
 
         landingPage.everyThingYouNeedToKnowCard.clickEveryThingYouNeedToKnowBookNow()
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
     @Test
-    fun `should show stop guessing elements`(){
+    fun `should show stop guessing elements`() {
 
         val landingPage = HowItWorksPage(page).navigate() as HowItWorksPage
         landingPage.waitForPageLoad()
@@ -197,8 +180,8 @@ class HowItWorksPageTest {
 
         landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
 
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }

@@ -8,7 +8,7 @@ import mu.KotlinLogging
 private val logger = KotlinLogging.logger {}
 
 
-class OurWhyPage(page: Page) : MarketingBasePage(page) {
+class OurWhyPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.OUR_WHY
 
@@ -20,17 +20,13 @@ class OurWhyPage(page: Page) : MarketingBasePage(page) {
         Page.GetByRoleOptions().setName("T a k e c h a r g e o f y o u r h e a l t h t o d a y")
     )
 
-    private val mostPeopleDontWantSixPackAbsTextVisible = page.getByText(
-        "Most people don’t want six-pack abs. They just want to wake up with energy. Focus without three cups of coffee. Eat without bloating. Feel sharp, light, and strong every day."
-    )
-
     fun waitForPageLoad(): OurWhyPage {
         header.waitFor()
         logger.info { "Our Why page loaded" }
         return this
     }
 
-    fun isHederVisible(): Boolean {
+    fun isPageHeadingVisible(): Boolean {
         return header.isVisible
     }
 

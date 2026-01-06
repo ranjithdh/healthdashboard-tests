@@ -1,10 +1,11 @@
 package website.test
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
-import website.page.HowItWorksPage
-import website.page.LandingPage
 import website.page.WhatWeTestPage
 
 
@@ -73,8 +74,8 @@ class WhatWeTestPageTest {
 
         whatWeTestPage.clickBookNowButton()
 
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
 
         whatWeTestPage.takeScreenshot("what-we-test-page-heading")
     }
@@ -312,8 +313,8 @@ class WhatWeTestPageTest {
 
         landingPage.stopGuessingStartWithClaritySection.clickStopGuessingBookNowButtonVisible()
 
-        page.waitForURL(TestConfig.Urls.LOGIN_VIA_WEBSITE)
-        assert(page.url().contains(TestConfig.Urls.LOGIN_VIA_WEBSITE)) { "Should navigate to app domain" }
+        page.waitForURL(TestConfig.Urls.SIGNUP_VIA_WEBSITE)
+        assert(page.url().contains(TestConfig.Urls.SIGNUP_VIA_WEBSITE)) { "Should navigate to app domain" }
     }
 
 }

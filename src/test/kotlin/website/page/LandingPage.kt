@@ -6,24 +6,23 @@ import config.TestConfig
 import utils.logger.logger
 
 
-class LandingPage(page: Page) : MarketingBasePage(page) {
+class LandingPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.WEBSITE_BASE_URL
 
-    private val addOnTestPageType = AddOnTestPageType.LANDING
-    val addOnTestCards = AddOnTestCards(page, addOnTestPageType)
-
     val faqSection = FaqSection(page)
+    val headerSection = HeaderSection(page)
+    val footerSection = FooterSection(page, FooterPageType.LANDING)
+    val addOnTestCards = AddOnTestCards(page, AddOnTestPageType.LANDING)
     val everyThingYouNeedToKnowCard = EveryThingYouNeedToKnowCard(page, EveryThingYouNeedToKnowPageType.LANDING)
-    val stopGuessingStartWithClaritySection = StopGuessingStartWithClaritySection(page,StopGuessingPageType.LANDING)
+    val stopGuessingStartWithClaritySection = StopGuessingStartWithClaritySection(page, StopGuessingPageType.LANDING)
+
 
     private val heroSectionBookNow = page.locator("#join-now-btn-hero")
-    private val whatWeTest =
-        page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true))
+    private val whatWeTest = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("What we test").setExact(true))
     private val learnMore = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Learn more"))
     private val whatsIncludedSectionBookNow = page.locator("#join-now-btn-membership")
     private val readOurWhy = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Read our Why"))
-    private val stopeGuessingBookNow = page.locator("#join-now-btn-foot-hero")
 
     fun waitForPageLoad(): LandingPage {
         page.locator("a#join-now-btn-hero").waitFor()
@@ -279,25 +278,4 @@ class LandingPage(page: Page) : MarketingBasePage(page) {
             )
         ).isVisible
     }
-
-//    fun stopGuessingSectionElementsVisible(): Boolean {
-//        val header = page.getByRole(
-//            AriaRole.HEADING,
-//            Page.GetByRoleOptions().setName("S t o p g u e s s i n g . S t a r t w i t h c l a r i t y .")
-//        )
-//        val description =
-//            page.getByText("It’s time to reclaim control and address what’s holding you back so you can look, feel and perform 10/10, day after day")
-//        header.waitFor()
-//
-//        return header.isVisible && description.isVisible
-//    }
-//
-//    fun stopGuessingBookNowButtonVisible(): Boolean {
-//        return stopeGuessingBookNow.isVisible
-//    }
-//
-//    fun clickStopGuessingBookNowButtonVisible() {
-//        stopeGuessingBookNow.click()
-//    }
-
 }

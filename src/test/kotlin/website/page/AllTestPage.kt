@@ -6,7 +6,7 @@ import config.TestConfig
 import utils.logger.logger
 
 
-class AllTestPage(page: Page) : MarketingBasePage(page) {
+class AllTestPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.ALL_TEST
 

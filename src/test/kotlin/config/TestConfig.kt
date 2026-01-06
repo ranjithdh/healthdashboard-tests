@@ -24,7 +24,8 @@ object TestConfig {
         const val FAQ: String = "${WEBSITE_BASE_URL}faq"
         const val ALL_TEST: String = "${WEBSITE_BASE_URL}all-tests"
 
-        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
+        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
     }
 
     object Browser {

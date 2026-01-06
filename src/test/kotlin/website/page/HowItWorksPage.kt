@@ -3,13 +3,9 @@ package website.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
-import mu.KotlinLogging
 
 
-private val logger = KotlinLogging.logger {}
-
-
-class HowItWorksPage(page: Page) : MarketingBasePage(page) {
+class HowItWorksPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOW_IT_WORKS
 
