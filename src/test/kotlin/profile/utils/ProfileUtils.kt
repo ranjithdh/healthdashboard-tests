@@ -107,6 +107,10 @@ object ProfileUtils {
                 clazz.contains("bg-[#25252a]")
     }
 
+    fun isButtonChecked(button: Locator): Boolean {
+        return isSelected(button)
+    }
+
     fun assertExclusiveSelected(
         exclusive: Locator,
         others: List<Locator>

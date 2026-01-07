@@ -2475,7 +2475,12 @@ class ProfilePage(page: Page) : BasePage(page) {
             "I'm still menstruating"
         )
         stillMenstruating.click()
-        question_32()
+
+        if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == "I'm still menstruating") {
+            question_32()
+        } else {
+            question_33()
+        }
     }
 
     fun question_32() {
@@ -3867,17 +3872,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionHeading.waitFor()
         editQuestionerButton.waitFor()
 
-         editQuestionerButton.click()
+        editQuestionerButton.click()
 
         questionDialog.waitFor()
 
-        /*     // Validate all questions sequentially based on stored answers
+        // Validate all questions sequentially based on stored answers
         answersStored.keys.forEach { key ->
             runChecker(key)
             if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
                 nextButton.click()
             }
-        }*/
+        }
     }
 
     private fun runChecker(subType: String) {
@@ -4035,13 +4040,28 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Which of the following best")).waitFor()
 
         val options = mapOf(
-            "Primarily Home Cooked Meals" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Primarily Home Cooked Meals")),
-            "Occasional Snacker" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Occasional Snacker")),
+            "Primarily Home Cooked Meals" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Primarily Home Cooked Meals")
+            ),
+            "Occasional Snacker" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Occasional Snacker")
+            ),
             "Often dining out" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Often dining out")),
-            "Frequent junk/processed food" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Frequent junk/processed food")),
+            "Frequent junk/processed food" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Frequent junk/processed food")
+            ),
             "Skips meals" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Skips meals")),
-            "Late-night eating" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Late-night eating")),
-            "Intermittent fasting" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Intermittent fasting / time-"))
+            "Late-night eating" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Late-night eating")
+            ),
+            "Intermittent fasting" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Intermittent fasting / time-")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.DAILY_EATING_HABIT]?.answer as? String, options)
@@ -4052,9 +4072,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your past experience")).waitFor()
 
         val options = mapOf(
-            "Tried and found what works" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tried and found what works")),
-            "Tried various diets, unsure" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tried various diets, unsure")),
-            "Tried them all" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tried them all, hard to")),
+            "Tried and found what works" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried and found what works")
+            ),
+            "Tried various diets, unsure" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried various diets, unsure")
+            ),
+            "Tried them all" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tried them all, hard to")
+            ),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
         options.values.forEach { it.waitFor() }
@@ -4066,9 +4095,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("How familiar are you with")).waitFor()
 
         val options = mapOf(
-            "Very familiar" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Very familiar, successful")),
-            "Tracked a bit" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tracked a bit, unsure of my")),
-            "Never tracked" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Never tracked, need guidance"))
+            "Very familiar" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Very familiar, successful")
+            ),
+            "Tracked a bit" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Tracked a bit, unsure of my")
+            ),
+            "Never tracked" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Never tracked, need guidance")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.NUTRITION_TRACKING_EXPERIENCE]?.answer as? String, options)
@@ -4125,9 +4163,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Sedentary" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sedentary: <3 hrs/week")),
-            "Lightly Active" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lightly Active: 3–5 hrs/week")),
-            "Moderately Active" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Moderately Active: 5–7 hrs/")),
-            "Very Active" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Very Active: >7 hrs/week")),
+            "Lightly Active" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Lightly Active: 3–5 hrs/week")
+            ),
+            "Moderately Active" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Moderately Active: 5–7 hrs/")
+            ),
+            "Very Active" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Very Active: >7 hrs/week")
+            ),
             "Hardly Exercise" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hardly Exercise"))
         )
         options.values.forEach { it.waitFor() }
@@ -4144,9 +4191,15 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Yoga" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yoga")),
-            "Strength Training" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Strength Training")),
+            "Strength Training" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Strength Training")
+            ),
             "Pilates" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Pilates")),
-            "Flexibility" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Flexibility / Stretching")),
+            "Flexibility" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Flexibility / Stretching")
+            ),
             "I don't exercise" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I don't exercise"))
         )
         options.values.forEach { it.waitFor() }
@@ -4189,9 +4242,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         title.waitFor()
 
         val options = mapOf(
-            "Excellent routine" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Excellent routine, sleep like")),
-            "Room for improvement" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Room for improvement,")),
-            "Needs work" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Needs work, struggling with"))
+            "Excellent routine" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Excellent routine, sleep like")
+            ),
+            "Room for improvement" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Room for improvement,")
+            ),
+            "Needs work" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Needs work, struggling with")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.SLEEP_HYGIENE]?.answer as? String, options)
@@ -4223,7 +4285,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_18_checker() {
         logQuestion("Checking: Weekend wake up time")
-        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually wakeup")).waitFor()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What time do you usually wakeup"))
+            .waitFor()
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
         timerBox.waitFor()
         checkTextInput(answersStored[QuestionSubType.WEEKEND_SLEEP_ROUTINE_WAKEUP_TIME]?.answer as? String, timerBox)
@@ -4265,7 +4328,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Fully Satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fully Satisfied")),
-            "Somewhat Satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Somewhat Satisfied")),
+            "Somewhat Satisfied" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Somewhat Satisfied")
+            ),
             "Not Satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Not Satisfied"))
         )
         options.values.forEach { it.waitFor() }
@@ -4290,10 +4356,16 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is the duration of your")).waitFor()
 
         val options = mapOf(
-            "Less than 5 minutes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Less than 5 minutes")),
+            "Less than 5 minutes" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Less than 5 minutes")
+            ),
             "-10 minutes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("-10 minutes")),
             "-20 minutes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("-20 minutes")),
-            "More than 20 minutes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("More than 20 minutes"))
+            "More than 20 minutes" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than 20 minutes")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.SUNLIGHT_UPON_WAKEUP]?.answer as? String, options)
@@ -4304,9 +4376,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("During which part of the day")).waitFor()
 
         val options = mapOf(
-            "Early morning" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Early morning (before 10 a.m.)")),
+            "Early morning" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Early morning (before 10 a.m.)")
+            ),
             "Late morning" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Late morning to early")),
-            "Late afternoon" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Late afternoon (3 p.m. - 5 p.")),
+            "Late afternoon" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Late afternoon (3 p.m. - 5 p.")
+            ),
             "Evening" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Evening (after 5 p.m.)"))
         )
         options.values.forEach { it.waitFor() }
@@ -4332,9 +4410,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Every day" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Every day")),
-            "More than once a week" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("More than once a week")),
-            "Once a week" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Once a week").setExact(true)),
-            "Once in two weeks" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Once in two weeks")),
+            "More than once a week" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than once a week")
+            ),
+            "Once a week" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Once a week").setExact(true)
+            ),
+            "Once in two weeks" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Once in two weeks")
+            ),
             "Once a month" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Once a month / Rarely"))
         )
         options.values.forEach { it.waitFor() }
@@ -4346,9 +4433,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("How well do you deal with")).waitFor()
 
         val options = mapOf(
-            "I deal with my stress well" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I deal with my stress well")),
-            "I could deal with stress" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I could deal with stress")),
-            "I feel overwhelmed" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I feel overwhelmed by stress"))
+            "I deal with my stress well" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I deal with my stress well")
+            ),
+            "I could deal with stress" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I could deal with stress")
+            ),
+            "I feel overwhelmed" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I feel overwhelmed by stress")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.STRESS_MANAGEMENT]?.answer as? String, options)
@@ -4376,7 +4472,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Sweets" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sweets")),
             "Fried" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fried and crispy")),
             "Salty" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Salty")),
-            "Healthier options" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Healthier options (e.g.,")),
+            "Healthier options" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Healthier options (e.g.,")
+            ),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         )
         options.values.forEach { it.waitFor() }
@@ -4386,12 +4485,22 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_31_checker() {
         if (answersStored[QuestionSubType.MENSTRUAL_STATUS] == null) return
         logQuestion("Checking: Menstrual Status")
-        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What's your current menstrual status?")).waitFor()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What's your current menstrual status?"))
+            .waitFor()
 
         val options = mapOf(
-            "I'm still menstruating" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm still menstruating")),
-            "I'm nearing menopause" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm nearing menopause")),
-            "I have attained Menopause" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have attained Menopause"))
+            "I'm still menstruating" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I'm still menstruating")
+            ),
+            "I'm nearing menopause" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I'm nearing menopause")
+            ),
+            "I have attained Menopause" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I have attained Menopause")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String, options)
@@ -4433,11 +4542,17 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "I don't drink" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I don't drink")),
-            "Less than once per week" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Less than once per week")),
+            "Less than once per week" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Less than once per week")
+            ),
             "-3 drinks" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("-3 drinks")),
             "-7 drinks" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("-7 drinks")),
             "-14 drinks" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("-14 drinks")),
-            "More than 14 drinks" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("More than 14 drinks"))
+            "More than 14 drinks" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than 14 drinks")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.N_ALCOHOL]?.answer as? String, options)
@@ -4461,17 +4576,23 @@ class ProfilePage(page: Page) : BasePage(page) {
         // I should list all?
         // Let's stick to the ones likely used or add "Zinc" etc if needed.
         // Given the array in Q35 is huge, I'll rely on the fact that the test logs specific ones.
-        
+
         checkMultiSelect(answersStored[QuestionSubType.ADDITIONAL_SUPPLEMENT]?.answer, options)
     }
 
     private fun question_36_checker() {
         logQuestion("Checking: Family History")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Do you have a family history")).waitFor()
-        
+
         val options = mapOf(
-            "Dermatological Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Dermatological Conditions")),
-            "Bone or Joint Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Bone or Joint Conditions")),
+            "Dermatological Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Dermatological Conditions")
+            ),
+            "Bone or Joint Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Bone or Joint Conditions")
+            ),
             // ... Add others as needed
             "I'm not sure" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm not sure")),
             "None of the above" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
@@ -4484,22 +4605,55 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Do you currently have or have")).waitFor()
 
         val options = mapOf(
-            "Dermatological Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Dermatological Conditions")),
-            "Bone or Joint Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Bone or Joint Conditions")),
-            "Gastrointestinal Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gastrointestinal Conditions")),
-             "Neurological Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Neurological Conditions")),
-            "Type 2 - Diabetes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Type 2 - Diabetes")),
-             "Thyroid-related disorders" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Thyroid-related disorders")),
-             "Liver Disorders" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Liver Disorders")),
-             "Kidney Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Kidney Conditions")),
-             "Cardiovascular Conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cardiovascular Conditions")),
-             "Gall bladder issues" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gall bladder issues")),
-             "Cancer" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancer")),
-             "Respiratory conditions" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Respiratory conditions")),
-             "Auto-immune condition" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Auto-immune condition")),
+            "Dermatological Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Dermatological Conditions")
+            ),
+            "Bone or Joint Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Bone or Joint Conditions")
+            ),
+            "Gastrointestinal Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Gastrointestinal Conditions")
+            ),
+            "Neurological Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Neurological Conditions")
+            ),
+            "Type 2 - Diabetes" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Type 2 - Diabetes")
+            ),
+            "Thyroid-related disorders" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Thyroid-related disorders")
+            ),
+            "Liver Disorders" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Liver Disorders")),
+            "Kidney Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Kidney Conditions")
+            ),
+            "Cardiovascular Conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Cardiovascular Conditions")
+            ),
+            "Gall bladder issues" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Gall bladder issues")
+            ),
+            "Cancer" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancer")),
+            "Respiratory conditions" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Respiratory conditions")
+            ),
+            "Auto-immune condition" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Auto-immune condition")
+            ),
 
             "I'm not sure" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm not sure")),
-             "None of the above" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
+            "None of the above" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
         )
         options.values.forEach { it.waitFor() }
         checkMultiSelect(answersStored[QuestionSubType.MEDICAL_CONDITION]?.answer, options)
@@ -4511,8 +4665,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Which of the following best")).waitFor()
 
         val options = mapOf(
-            "Irritable Bowel Syndrome" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Irritable Bowel Syndrome")),
-            "Inflammatory Bowel Disease" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Inflammatory Bowel Disease")),
+            "Irritable Bowel Syndrome" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Irritable Bowel Syndrome")
+            ),
+            "Inflammatory Bowel Disease" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Inflammatory Bowel Disease")
+            ),
             "Acid reflux" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Acid reflux or")),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
@@ -4525,7 +4685,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         if (answersStored[QuestionSubType.SKIN_CONDITION] == null) return
         logQuestion("Checking: Skin Condition")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Which of the following best")).waitFor()
-        
+
         val options = mapOf(
             "Psoriasis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Psoriasis")),
             "Eczema" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eczema")),
@@ -4543,10 +4703,19 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Which of the following best")).waitFor()
 
         val options = mapOf(
-            "Ankylosing Spondylitis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Ankylosing Spondylitis")),
-            "Rheumatoid arthritis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Rheumatoid arthritis")),
+            "Ankylosing Spondylitis" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Ankylosing Spondylitis")
+            ),
+            "Rheumatoid arthritis" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Rheumatoid arthritis")
+            ),
             "Gout" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gout")),
-            "Psoriatic Arthritis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Psoriatic Arthritis")),
+            "Psoriatic Arthritis" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Psoriatic Arthritis")
+            ),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
@@ -4576,10 +4745,22 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("How would you best describe")).waitFor()
 
         val options = mapOf(
-            "I am prediabetic" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I am prediabetic, but I'm not")),
-            "I have prediabetes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have prediabetes and I'm on")),
-            "I have diabetes, but not on" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have diabetes, but not on")),
-            "I have diabetes and I'm on" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have diabetes and I'm on"))
+            "I am prediabetic" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I am prediabetic, but I'm not")
+            ),
+            "I have prediabetes" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I have prediabetes and I'm on")
+            ),
+            "I have diabetes, but not on" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I have diabetes, but not on")
+            ),
+            "I have diabetes and I'm on" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("I have diabetes and I'm on")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.DIABETES_STATUS]?.answer as? String, options)
@@ -4623,7 +4804,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Nephritis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Nephritis")),
-            "Chronic Kidney Disease" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Chronic Kidney Disease")),
+            "Chronic Kidney Disease" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Chronic Kidney Disease")
+            ),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
@@ -4638,7 +4822,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Hypertension" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hypertension")),
-            "Heart disease risk" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Heart disease risk")),
+            "Heart disease risk" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Heart disease risk")
+            ),
             "Hypotension" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hypotension")),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
@@ -4654,7 +4841,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Asthma" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Asthma")),
-            "Chronic Obstructive" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Chronic Obstructive Pulmonary")),
+            "Chronic Obstructive" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Chronic Obstructive Pulmonary")
+            ),
             "Bronchitis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Bronchitis")),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
@@ -4669,11 +4859,23 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Which of the following best")).waitFor()
 
         val options = mapOf(
-            "Systemic Lupus" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Systemic Lupus Erythematosus")),
-            "Hashimoto's" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hashimoto's Thyroiditis")),
+            "Systemic Lupus" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Systemic Lupus Erythematosus")
+            ),
+            "Hashimoto's" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Hashimoto's Thyroiditis")
+            ),
             "Graves'" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Graves' disease")),
-            "Rheumatoid Arthritis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Rheumatoid Arthritis")),
-            "Multiple Sclerosis" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Multiple Sclerosis (MS)")),
+            "Rheumatoid Arthritis" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Rheumatoid Arthritis")
+            ),
+            "Multiple Sclerosis" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Multiple Sclerosis (MS)")
+            ),
             "Type 1 Diabetes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Type 1 Diabetes")),
             "Celiac Disease" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Celiac Disease")),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others")),
@@ -4689,10 +4891,22 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your current cancer")).waitFor()
 
         val options = mapOf(
-            "on treatment" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes, I currently have cancer and on treatment")),
-            "not on treatment" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes, I currently have cancer but not on treatment")),
-            "completed less than a year" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes, but completed treatment less than a year ago")),
-            "completed more than a year" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes, but completed treatment more than a year ago"))
+            "on treatment" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Yes, I currently have cancer and on treatment")
+            ),
+            "not on treatment" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Yes, I currently have cancer but not on treatment")
+            ),
+            "completed less than a year" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Yes, but completed treatment less than a year ago")
+            ),
+            "completed more than a year" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Yes, but completed treatment more than a year ago")
+            )
         )
         options.values.forEach { it.waitFor() }
         checkSingleSelect(answersStored[QuestionSubType.CANCER_DIAGNOSIS]?.answer as? String, options)
@@ -4702,7 +4916,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         if (answersStored[QuestionSubType.CANCER_TYPE] == null) return
         logQuestion("Checking: Cancer Type")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Please mention the type of")).waitFor()
-        val typeTextbox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please mention the type of"))
+        val typeTextbox =
+            page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please mention the type of"))
         typeTextbox.waitFor()
         checkTextInput(answersStored[QuestionSubType.CANCER_TYPE]?.answer as? String, typeTextbox)
     }
@@ -4711,17 +4926,41 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Checking: Medicines")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Are you currently taking any")).waitFor()
 
-         val options = mapOf(
-            "Cholesterol-lowering" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cholesterol-lowering drugs")),
-            "Blood pressure" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Blood pressure medicines")),
-            "Thyroid medicines" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Thyroid medicines")),
+        val options = mapOf(
+            "Cholesterol-lowering" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Cholesterol-lowering drugs")
+            ),
+            "Blood pressure" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Blood pressure medicines")
+            ),
+            "Thyroid medicines" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Thyroid medicines")
+            ),
             "Painkillers" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Painkillers / Anti-")),
-            "Steroids" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Steroids / Corticosteroids")),
+            "Steroids" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Steroids / Corticosteroids")
+            ),
             "Antacids" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Antacids / Acid-reducing")),
-            "Chemotherapy" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Chemotherapy or Cancer-")),
-            "Hormone-related" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hormone-related medicines")),
-            "Antidepressants" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Antidepressants / Anti-")),
-            "Any herbal" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Any herbal or alternative")),
+            "Chemotherapy" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Chemotherapy or Cancer-")
+            ),
+            "Hormone-related" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Hormone-related medicines")
+            ),
+            "Antidepressants" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Antidepressants / Anti-")
+            ),
+            "Any herbal" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Any herbal or alternative")
+            ),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above")),
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         )
@@ -4780,6 +5019,43 @@ class ProfilePage(page: Page) : BasePage(page) {
             assertEquals(storedAnswer, actualValue, "Text input value mismatch")
         }
     }
+
+
+    fun assertQuestionerValidationsCheckSample() {
+        logger.info {
+            "Answer count --> ${answersStored.size}"
+        }
+
+        waitForConfirmation()
+
+        val questionHeading =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+        val editQuestionerButton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+        val questionDialog = page.locator(".bg-zinc-900").first()
+
+        questionHeading.waitFor()
+        editQuestionerButton.waitFor()
+
+        editQuestionerButton.click()
+
+        questionDialog.waitFor()
+
+        logAnswer(
+            QuestionSubType.FOOD_PREFERENCE,
+            "What is your food preference?",
+            "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
+        )
+
+        // Validate all questions sequentially based on stored answers
+        answersStored.keys.forEach { key ->
+            runChecker(key)
+            if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
+                nextButton.click()
+            }
+        }
+    }
+
 }
 
 

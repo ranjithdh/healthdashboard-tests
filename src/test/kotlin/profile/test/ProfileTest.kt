@@ -522,4 +522,21 @@ class ProfileTest {
     }
 
 
+    //Re-selection checking
+    @Test
+    fun `questioner re-selection validations sample`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        profilePage.assertQuestionerValidationsCheckSample()
+    }
+
+
 }
