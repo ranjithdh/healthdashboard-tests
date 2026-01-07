@@ -2,14 +2,19 @@ package profile.utils
 
 import com.microsoft.playwright.Locator
 import model.profile.Address
+import profile.model.QuestionAnswer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 object ProfileUtils {
+
+
+     val answersStored: MutableMap<String, QuestionAnswer> = LinkedHashMap()
 
     fun buildAddressText(address: Address): String {
         return listOf(

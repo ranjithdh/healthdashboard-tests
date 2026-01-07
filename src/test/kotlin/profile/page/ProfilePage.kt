@@ -29,6 +29,7 @@ import kotlin.test.assertTrue
 
 import profile.model.QuestionAnswer
 import profile.model.QuestionSubType
+import profile.utils.ProfileUtils.answersStored
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -42,7 +43,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     val tonePreferenceKeyList = listOf("doctor", "friend", "bio_hacker")
 
-    private val answersStored: MutableMap<String, QuestionAnswer> = HashMap()
 
     private val previousButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
     private val nextButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
@@ -1013,26 +1013,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         question_1_non_veg()
     }
-
-/*
-    fun assertQuestionerValidationsCheck() {
-        answersStored.clear()
-        val questionHeading =
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
-        val editQuestionerButton =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
-        val questionDialog = page.locator(".bg-zinc-900").first()
-
-        questionHeading.waitFor()
-        editQuestionerButton.waitFor()
-
-        editQuestionerButton.click()
-
-        questionDialog.waitFor()
-
-        question_1_veg_checker()
-    }
-*/
 
 
     fun question_1_veg() { //What is your food preference?
@@ -3761,13 +3741,6 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun isButtonChecked(button: Locator): Boolean {
         return button.locator("svg").count() > 0
-    }
-
-    fun isRadioSelected(button: Locator): Boolean {
-        val ariaPressed = button.getAttribute("aria-pressed")
-        val ariaSelected = button.getAttribute("aria-selected")
-
-        return ariaPressed == "true" || ariaSelected == "true"
     }
 
     /**
