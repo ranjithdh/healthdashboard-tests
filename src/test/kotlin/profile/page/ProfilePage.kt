@@ -30,6 +30,7 @@ import kotlin.test.assertTrue
 import profile.model.QuestionAnswer
 import profile.model.QuestionSubType
 import profile.utils.ProfileUtils.answersStored
+import profile.utils.ProfileUtils.isButtonChecked
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -3803,10 +3804,10 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    fun isButtonChecked(button: Locator): Boolean {
+ /*   fun isButtonChecked(button: Locator): Boolean {
         return button.locator("svg").count() > 0
     }
-
+*/
     /**
      * Handles a multi-select question with "Others" option that requires a textbox input.
      *
