@@ -92,9 +92,6 @@ object ProfileUtils {
     }
 
 
-
-
-
     fun formatFlotTwoDecimal(value: Float): String {
         val formatted = String.format("%.2f", value)
         return if (formatted.endsWith(".00")) {
@@ -125,17 +122,15 @@ object ProfileUtils {
         }
     }
 
-  /*  fun assertConditionSelected(
-        selected: Locator,
-        notSure: Locator,
-        none: Locator
-    ) {
-        check(isSelected(selected))
-        check(!isSelected(notSure)) { "'I'm not sure' must be unselected" }
-        check(!isSelected(none)) { "'None of the above' must be unselected" }
-    }*/
-
-
+    /*  fun assertConditionSelected(
+          selected: Locator,
+          notSure: Locator,
+          none: Locator
+      ) {
+          check(isSelected(selected))
+          check(!isSelected(notSure)) { "'I'm not sure' must be unselected" }
+          check(!isSelected(none)) { "'None of the above' must be unselected" }
+      }*/
 
 
 }

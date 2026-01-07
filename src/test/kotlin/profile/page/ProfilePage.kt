@@ -977,7 +977,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         type: ActivityLevel,
         condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)
     ) {
+
         answersStored.clear()
+        logger.info {
+            "Answer count --> ${answersStored.size}"
+        }
         exerciseType = type
         medicalConditions = condition
         val questionHeading =
@@ -998,6 +1002,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun assertQuestionerNonVegInitialCheck() {
         answersStored.clear()
+        logger.info {
+            "Answer count --> ${answersStored.size}"
+        }
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -3697,6 +3704,9 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun question_52() { // What is your waist circumference at its narrowest point?
+        logger.info {
+            "Answer count --> ${answersStored.size}"
+        }
         logQuestion("What is your waist circumference at its narrowest point?")
         val values = "24"
 
@@ -3793,7 +3803,9 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun assertQuestionerValidationsCheck() {
-        answersStored.clear()
+        logger.info {
+            "Answer count --> ${answersStored.size}"
+        }
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
