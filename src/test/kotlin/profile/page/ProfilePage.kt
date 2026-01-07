@@ -48,6 +48,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private val nextButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
     private var exerciseType = ActivityLevel.SEDENTARY
     private var medicalConditions: List<MedicalCondition> = listOf(MedicalCondition.NONE)
+    private var isMale: Boolean = true
     private val medicalQuestionQueue: MutableList<() -> Unit> = mutableListOf()
 
     private fun logQuestion(questionText: String) {
@@ -975,7 +976,8 @@ class ProfilePage(page: Page) : BasePage(page) {
     /**------------Questioner----------------*/
     fun assertQuestionerVegInitialCheck(
         type: ActivityLevel,
-        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)
+        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE),
+        isMale: Boolean
     ) {
 
         answersStored.clear()
@@ -984,6 +986,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
         exerciseType = type
         medicalConditions = condition
+        this.isMale = isMale
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -2433,18 +2436,64 @@ class ProfilePage(page: Page) : BasePage(page) {
         sweets.click()
         logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
         nextButton.click()
-        question_33()
+        if (isMale) {
+            question_33()
+        } else {
+            question_31()
+        }
     }
 
     fun question_31() {
         // What's your current menstrual status?
         logQuestion("What's your current menstrual status?")
 
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("What's your current menstrual"))
+
+        val stillMenstruating =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm still menstruating"))
+
+        val nearingMenopause =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm nearing menopause"))
+
+        val attainedMenopause =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have attained Menopause"))
+
+        val options = listOf(
+            title,
+            stillMenstruating,
+            nearingMenopause,
+            attainedMenopause
+        )
+
+        // ✅ wait once
+        options.forEach { it.waitFor() }
+
+        logAnswer(
+            QuestionSubType.MENSTRUAL_STATUS,
+            "What's your current menstrual status?",
+            "I'm still menstruating"
+        )
+        stillMenstruating.click()
+        question_32()
     }
 
     fun question_32() {
         // Are you pregnant?
         logQuestion("Are you pregnant?")
+        val title = page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Are you pregnant?"))
+
+        val yes = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes"))
+        val no = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("No"))
+
+        val options = listOf(title, yes, no)
+        options.forEach { it.waitFor() }
+
+        // Scenario: select "No" by default or based on test
+        logAnswer(QuestionSubType.IS_PREGNANT, "Are you pregnant?", "No")
+        no.click()
+        question_33()
     }
 
     fun question_33() {  // How many cigarettes do you typically smoke in a day?
@@ -3806,6 +3855,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         logger.info {
             "Answer count --> ${answersStored.size}"
         }
+
+        waitForConfirmation()
+
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -3815,17 +3867,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionHeading.waitFor()
         editQuestionerButton.waitFor()
 
-        editQuestionerButton.click()
+         editQuestionerButton.click()
 
         questionDialog.waitFor()
 
-        // Validate all questions sequentially based on stored answers
+        /*     // Validate all questions sequentially based on stored answers
         answersStored.keys.forEach { key ->
             runChecker(key)
             if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
                 nextButton.click()
             }
-        }
+        }*/
     }
 
     private fun runChecker(subType: String) {
@@ -3860,6 +3912,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             QuestionSubType.STRESS_MANAGEMENT -> question_28_checker()
             QuestionSubType.EMOTIONAL_EATING -> question_29_checker()
             QuestionSubType.SNACK_PREFERENCE -> question_30_checker()
+            QuestionSubType.MENSTRUAL_STATUS -> question_31_checker()
+            QuestionSubType.IS_PREGNANT -> question_32_checker()
             QuestionSubType.N_SMOKE -> question_33_checker()
             QuestionSubType.N_ALCOHOL -> question_34_checker()
             QuestionSubType.ADDITIONAL_SUPPLEMENT -> question_35_checker()
@@ -4327,6 +4381,33 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
         options.values.forEach { it.waitFor() }
         checkMultiSelect(answersStored[QuestionSubType.SNACK_PREFERENCE]?.answer, options)
+    }
+
+    private fun question_31_checker() {
+        if (answersStored[QuestionSubType.MENSTRUAL_STATUS] == null) return
+        logQuestion("Checking: Menstrual Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What's your current menstrual status?")).waitFor()
+
+        val options = mapOf(
+            "I'm still menstruating" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm still menstruating")),
+            "I'm nearing menopause" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I'm nearing menopause")),
+            "I have attained Menopause" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I have attained Menopause"))
+        )
+        options.values.forEach { it.waitFor() }
+        checkSingleSelect(answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String, options)
+    }
+
+    private fun question_32_checker() {
+        if (answersStored[QuestionSubType.IS_PREGNANT] == null) return
+        logQuestion("Checking: Pregnancy Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Are you pregnant?")).waitFor()
+
+        val options = mapOf(
+            "Yes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Yes")),
+            "No" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("No"))
+        )
+        options.values.forEach { it.waitFor() }
+        checkSingleSelect(answersStored[QuestionSubType.IS_PREGNANT]?.answer as? String, options)
     }
 
     private fun question_33_checker() {

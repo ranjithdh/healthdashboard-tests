@@ -182,6 +182,18 @@ object QuestionSubType {
     const val SNACK_PREFERENCE = "snack_preference"
 
     /**
+     * Question 31:
+     * What's your current menstrual status?
+     */
+    const val MENSTRUAL_STATUS = "menstrual_status"
+
+    /**
+     * Question 32:
+     * Are you pregnant?
+     */
+    const val IS_PREGNANT = "is_pregnant"
+
+    /**
      * Question 33:
      * How many cigarettes do you typically smoke in a day?
      */

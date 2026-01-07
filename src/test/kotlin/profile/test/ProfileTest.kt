@@ -237,7 +237,7 @@ class ProfileTest {
             .clickAccountProfile()
             .waitForConfirmation()
 
-        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY, isMale = false)
     }
 
     @Test
@@ -268,7 +268,7 @@ class ProfileTest {
             .clickAccountProfile()
             .waitForConfirmation()
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
-        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
+        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE, isMale = false)
     }
 
     //Medical Conditions Flow Tests
@@ -289,7 +289,8 @@ class ProfileTest {
         // Expected: Q37 → Q51 (skip all condition detail questions)
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.NONE)
+            condition = listOf(profile.model.MedicalCondition.NONE),
+             isMale = false
         )
     }
 
@@ -309,7 +310,8 @@ class ProfileTest {
         // Expected: Q37 → Q38 (GI details) → Q51
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL)
+            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL),
+            isMale = false
         )
     }
 
@@ -332,7 +334,8 @@ class ProfileTest {
             condition = listOf(
                 profile.model.MedicalCondition.GASTROINTESTINAL,
                 profile.model.MedicalCondition.DERMATOLOGICAL
-            )
+            ),
+            isMale = false
         )
     }
 
@@ -352,7 +355,8 @@ class ProfileTest {
         // Expected: Q37 → Q42 (Diabetes status) → Q51
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.DIABETES)
+            condition = listOf(profile.model.MedicalCondition.DIABETES),
+            isMale = false
         )
     }
 
@@ -372,7 +376,8 @@ class ProfileTest {
         // Expected: Q37 → Q43 (Thyroid details) → Q51
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.THYROID)
+            condition = listOf(profile.model.MedicalCondition.THYROID),
+            isMale = false
         )
     }
 
@@ -392,7 +397,8 @@ class ProfileTest {
         // Expected: Q37 → Q49 (Cancer status) → Q50 (Cancer type) → Q51
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.CANCER)
+            condition = listOf(profile.model.MedicalCondition.CANCER),
+            isMale = false
         )
     }
 
@@ -415,7 +421,8 @@ class ProfileTest {
             condition = listOf(
                 profile.model.MedicalCondition.CARDIOVASCULAR,
                 profile.model.MedicalCondition.KIDNEY
-            )
+            ),
+            isMale = false
         )
     }
 
@@ -439,7 +446,8 @@ class ProfileTest {
                 profile.model.MedicalCondition.DIABETES,
                 profile.model.MedicalCondition.THYROID,
                 profile.model.MedicalCondition.CANCER
-            )
+            ),
+            isMale = false
         )
     }
 
@@ -462,7 +470,8 @@ class ProfileTest {
             condition = listOf(
                 profile.model.MedicalCondition.RESPIRATORY,
                 profile.model.MedicalCondition.AUTO_IMMUNE
-            )
+            ),
+            isMale = false
         )
     }
 
@@ -489,8 +498,11 @@ class ProfileTest {
                 profile.model.MedicalCondition.DIABETES,
                 profile.model.MedicalCondition.THYROID,
                 profile.model.MedicalCondition.GALL_BLADDER,
-            )
+            ),
+            isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     //Re-selection checking
