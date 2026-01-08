@@ -521,7 +521,7 @@ class ProfileTest {
             .waitForConfirmation()
 
         profilePage.assertQuestionerValidationsCheckSample()
-    }
+     }
 
 
 }

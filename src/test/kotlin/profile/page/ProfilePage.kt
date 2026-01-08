@@ -1288,14 +1288,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Primarily Home Cooked Meals"
         )
         question_5()
-
-        /*  Optional: random selection (single click)
-         lifestyleOptions
-             .drop(1) // exclude title
-             .random()
-             .click()*/
-
-
     }
 
     fun question_5() { //What is your past experience with diets?
@@ -1462,7 +1454,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         selectable.forEach { it.click() }
 
-        logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Milk or dairy", "Eggs"))
+        logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Milk or dairy", "Peanuts"))
         nextButton.click()
         question_8()
     }
@@ -5050,6 +5042,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
         )
 
+
         logAnswer(
             QuestionSubType.CUISINE_PREFERENCE,
             "What is your cuisine preference?",
@@ -5063,6 +5056,118 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Which of the following best describes your daily eating habits?",
             "Primarily Home Cooked Meals"
         )
+
+        logAnswer(QuestionSubType.DIET_EXPERIENCE, "What is your past experience with diets?", "None")
+
+        logAnswer(
+            QuestionSubType.NUTRITION_TRACKING_EXPERIENCE,
+            "How familiar are you with tracking calories or macronutrients and micronutrients?",
+            "Never tracked, need guidance"
+        )
+
+        logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Milk or dairy", "Peanuts"))
+
+        logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", arrayOf("Lactose", "Caffeine"))
+
+        logAnswer(
+            QuestionSubType.CAFFEINE_CONSUMPTION,
+            "How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?",
+            "None or Rarely"
+        )
+
+
+        logAnswer(
+            QuestionSubType.TYPICAL_DAY,
+            "How active are you in a typical week?",
+            "Sedentary: <3 hrs/week"
+        )
+
+        logAnswer(
+            QuestionSubType.EXERCISE_TYPE, "What type of exercise do you usually do?", arrayOf(
+                "Yoga"
+            )
+        )
+
+        logAnswer(
+            QuestionSubType.PREFERRED_WORKOUT_TIME,
+            "When do you usually work out or prefer to work out?",
+            "Morning"
+        )
+
+        logAnswer(QuestionSubType.EQUIPMENTS_AVAILABLE, "Equipments available", arrayOf("Dumbbells"))
+
+        logAnswer(
+            QuestionSubType.SLEEP_HYGIENE,
+            "How would you describe your sleep?",
+            "Room for improvement, occasional distractions"
+        )
+
+        logAnswer(
+            QuestionSubType.WEEKDAY_SLEEP_ROUTINE_BED_TIME,
+            "What time do you usually go to bed on weekdays?",
+            "23:00"
+        )
+        logAnswer(
+            QuestionSubType.WEEKDAY_SLEEP_ROUTINE_WAKEUP_TIME,
+            "What time do you usually wake up on weekdays?",
+            "07:00"
+        )
+
+        logAnswer(
+            QuestionSubType.WEEKEND_SLEEP_ROUTINE_BED_TIME,
+            "What time do you usually go to bed on weekends?",
+            "23:00"
+        )
+        logAnswer(
+            QuestionSubType.WEEKEND_SLEEP_ROUTINE_WAKEUP_TIME,
+            "What time do you usually wakeup on weekends?",
+            "07:00"
+        )
+
+        logAnswer(
+            QuestionSubType.SLEEP_SCHEDULE_PREFERENCE,
+            "Let's make your sleep schedule perfect! Would you like to set your ideal bedtime or wakeup time?",
+            "Bedtime"
+        )
+
+        logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
+
+        logAnswer(QuestionSubType.SLEEP_SATISFACTION, "How satisfied are you with your sleep?", "Somewhat Satisfied")
+
+
+        logAnswer(QuestionSubType.SLEEP_WAKEUP_REFRESHMENT, "Do you wake up refreshed?", "Sometimes")
+        logAnswer(
+            QuestionSubType.SUNLIGHT_UPON_WAKEUP,
+            "What is the duration of your sun exposure on a day-to-day basis?",
+            "5-10 minutes"
+        )
+        logAnswer(
+            QuestionSubType.SUNLIGHT_TIMING,
+            "During which part of the day are you usually exposed to direct sunlight?",
+            "Early morning (before 10 a.m.)"
+        )
+        logAnswer(
+            QuestionSubType.WELLNESS_MOTIVATION_FREQUENCY,
+            "How often do you look for external motivation to stick to your wellness routine?",
+            "Now and then"
+        )
+        logAnswer(
+            QuestionSubType.WELLNESS_BOTHER_FREQUENCY,
+            "In the past month, how often have you felt stressed, sad, or low?",
+            "Once a week"
+        )
+        logAnswer(
+            QuestionSubType.STRESS_MANAGEMENT,
+            "How well do you deal with stress?",
+            "I could deal with stress better"
+        )
+        logAnswer(
+            QuestionSubType.EMOTIONAL_EATING,
+            "How often do you eat in response to emotions such as stress, cravings, boredom, or anxiety rather than physical hunger?",
+            "Rarely"
+        )
+        logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
+
 
 
         // Validate all questions sequentially based on stored answers
