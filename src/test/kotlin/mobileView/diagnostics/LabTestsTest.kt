@@ -76,30 +76,52 @@ class LabTestsTest {
         val data = json["data"]?.jsonObject
         val productList = data?.get("diagnostic_product_list")?.jsonObject
 
-        val codes = mutableListOf<String>()
+        // Map API sample types to displayed text
+        val sampleTypeMap = mapOf(
+            "blood" to "Blood test",
+            "saliva" to "Cheek swab test",
+            "stool" to "Stool test",
+            "dried_blood_spot" to "At-Home Test Kit",
+            "saliva_stress" to "At-Home Test Kit"
+        )
 
-        // Extract codes from packages
-        productList?.get("packages")?.jsonArray?.forEach {
-            it.jsonObject["code"]?.jsonPrimitive?.content?.let { code -> codes.add(code) }
+        data class TestCardData(val code: String, val name: String, val sampleType: String, val price: String)
+        val testCards = mutableListOf<TestCardData>()
+        
+        fun extractData(jsonArray: JsonArray?) {
+            jsonArray?.forEach { element ->
+                val obj = element.jsonObject
+                val code = obj["code"]?.jsonPrimitive?.content ?: return@forEach
+                val name = obj["name"]?.jsonPrimitive?.content ?: ""
+                val rawSampleType = obj["sample_type"]?.jsonPrimitive?.content ?: ""
+                val sampleType = sampleTypeMap[rawSampleType] ?: rawSampleType
+                
+                // Price extraction and formatting
+                val rawPrice = obj["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+                val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
+                numberFormat.maximumFractionDigits = 0
+                val formattedPrice = "₹" + numberFormat.format(rawPrice)
+                
+                testCards.add(TestCardData(code, name, sampleType, formattedPrice))
+            }
         }
+        
+        // Extract data from packages
+        extractData(productList?.get("packages")?.jsonArray)
+        
+        // Extract data from test_profiles
+        extractData(productList?.get("test_profiles")?.jsonArray)
+        
+        // Extract data from tests
+        extractData(productList?.get("tests")?.jsonArray)
 
-        // Extract codes from test_profiles
-        productList?.get("test_profiles")?.jsonArray?.forEach {
-            it.jsonObject["code"]?.jsonPrimitive?.content?.let { code -> codes.add(code) }
-        }
-
-        // Extract codes from tests
-        productList?.get("tests")?.jsonArray?.forEach {
-            it.jsonObject["code"]?.jsonPrimitive?.content?.let { code -> codes.add(code) }
-        }
-
-        println("Found ${codes.size} codes to verify: $codes")
+        println("Found ${testCards.size} cards to verify: ${testCards.map { it.code }}")
 
         // Verify each card
-        codes.forEach { code ->
-            println("Verifying card for code: $code")
-            labTestsPage.verifyTestCard(code)
-            println("Verified card for code: $code")
+        testCards.forEach { data ->
+            println("Verifying card for code: ${data.code}")
+            labTestsPage.verifyTestCard(data.code, data.name, data.sampleType, data.price)
+            println("Verified card for code: ${data.code}")
         }
 
 
