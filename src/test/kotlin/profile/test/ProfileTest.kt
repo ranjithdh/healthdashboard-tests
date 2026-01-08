@@ -547,4 +547,30 @@ class ProfileTest {
         }
    */
 
+    @Test
+    fun `questioner backward validation complete flow`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage = loginPage
+            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterOtpAndContinueToHomePage(testUser.otp)
+            .clickAccountProfile()
+            .waitForConfirmation()
+
+        // Set flag to stop before completion
+        profilePage.setShouldClickComplete(false)
+
+        // Fill the questionnaire (using Veg flow as example)
+        profilePage.assertQuestionerVegInitialCheck(
+            type = profile.model.ActivityLevel.SEDENTARY,
+            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL),
+            isMale = false
+        )
+
+        // Validate backward navigation
+        profilePage.assertQuestionerBackwardValidationsCheck()
+    }
+
 }

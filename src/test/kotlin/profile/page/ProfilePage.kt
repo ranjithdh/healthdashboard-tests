@@ -51,6 +51,11 @@ class ProfilePage(page: Page) : BasePage(page) {
     private var medicalConditions: List<MedicalCondition> = listOf(MedicalCondition.NONE)
     private var isMale: Boolean = true
     private val medicalQuestionQueue: MutableList<() -> Unit> = mutableListOf()
+    private var shouldClickComplete: Boolean = true
+
+    fun setShouldClickComplete(value: Boolean) {
+        this.shouldClickComplete = value
+    }
 
     private fun logQuestion(questionText: String) {
         logger.info { "[QUESTIONER]: $questionText" }
@@ -3803,7 +3808,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             "What is your waist circumference at its narrowest point?",
             values
         )
-        completeButton.click()
+        if (shouldClickComplete) {
+            completeButton.click()
+        }
     }
 
 
@@ -3885,6 +3892,25 @@ class ProfilePage(page: Page) : BasePage(page) {
             runChecker(key)
             if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
                 nextButton.click()
+            }
+        }
+    }
+
+    fun assertQuestionerBackwardValidationsCheck() {
+        logger.info {
+            "Starting backward validation. Answer count --> ${answersStored.size}"
+        }
+
+        val reversedKeys = answersStored.keys.toList().reversed()
+
+        reversedKeys.forEachIndexed { index, key ->
+            logger.info { "Backward Validating: $key" }
+            runChecker(key)
+
+            // If not the last question in the backward flow (which is Q1)
+            if (index < reversedKeys.size - 1) {
+                logger.info { "Clicking Previous to reach next question in backward flow" }
+                previousButton.click()
             }
         }
     }
@@ -5218,6 +5244,10 @@ class ProfilePage(page: Page) : BasePage(page) {
                 nextButton.click()
             }
         }
+    }
+
+    fun goBackProfile(){
+        page.goBack()
     }
 
 }
