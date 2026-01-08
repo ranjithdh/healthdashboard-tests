@@ -4977,36 +4977,68 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     // --- Checker Helpers ---
 
-    private fun checkSingleSelect(storedAnswer: String?, options: Map<String, Locator>) {
-        if (storedAnswer == null) {
+    private fun normalize(text: String): String =
+        text
+            .lowercase()
+            .replace("\n", " ")
+            .replace(":", " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+
+
+
+    private fun checkSingleSelect(
+        storedAnswer: String?,
+        options: Map<String, Locator>
+    ) {
+        if (storedAnswer.isNullOrBlank()) {
             logger.info { "No stored answer to verify." }
             return
         }
 
+        val expected = normalize(storedAnswer)
+
         options.forEach { (key, locator) ->
-            if (storedAnswer.startsWith(key)) {
-                assertTrue(isButtonChecked(locator), "$key button should be selected (Stored: $storedAnswer)")
-            } else {
-                assertFalse(isButtonChecked(locator), "$key button should NOT be selected (Stored: $storedAnswer)")
+            val actual = normalize(locator.innerText())
+            val isMatch = actual.contains(expected)
+
+            logger.info {
+                "Comparing -> UI: '$actual' | Stored: '$expected'"
             }
+
+            assertEquals(
+                isMatch,
+                isButtonChecked(locator),
+                "'$key' selection mismatch. Stored='$storedAnswer'"
+            )
         }
     }
 
-    private fun checkMultiSelect(storedAnswer: Any?, options: Map<String, Locator>) {
+    private fun checkMultiSelect(
+        storedAnswer: Any?,
+        options: Map<String, Locator>
+    ) {
         val storedList = when (storedAnswer) {
             is Array<*> -> storedAnswer.filterIsInstance<String>()
             is List<*> -> storedAnswer.filterIsInstance<String>()
             else -> emptyList()
-        }
+        }.map { normalize(it) }
 
-        options.forEach { (key, locator) ->
-            if (storedList.any { it.startsWith(key) }) {
-                assertTrue(isButtonChecked(locator), "$key button should be selected. (Stored: $storedList)")
-            } else {
-                assertFalse(isButtonChecked(locator), "$key button should NOT be selected. (Stored: $storedList)")
+        options.forEach { (_, locator) ->
+            val buttonText = normalize(locator.innerText())
+
+            val isExpectedSelected = storedList.any { stored ->
+                buttonText.contains(stored) || stored.contains(buttonText)
             }
+
+            assertEquals(
+                isExpectedSelected,
+                isButtonChecked(locator),
+                "'${locator.innerText()}' selection mismatch. Stored=$storedList"
+            )
         }
     }
+
 
     private fun checkTextInput(storedAnswer: String?, locator: Locator) {
         if (storedAnswer != null) {
