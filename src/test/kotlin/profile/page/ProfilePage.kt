@@ -4009,6 +4009,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_3_checker() {
         logQuestion("Checking: What is your cuisine preference?")
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your cuisine"))
+
         title.waitFor()
 
         val northIndian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("North Indian"))
@@ -4971,6 +4972,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_52_checker() {
         logQuestion("Checking: What is your waist circumference?")
+     //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("What is your waist"))
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -5047,6 +5049,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             "What is your food preference?",
             "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
         )
+
+        logAnswer(
+            QuestionSubType.CUISINE_PREFERENCE,
+            "What is your cuisine preference?",
+            arrayOf(
+                "North Indian", "South Indian", "Jain"
+            )
+        )
+
+        logAnswer(
+            QuestionSubType.DAILY_EATING_HABIT,
+            "Which of the following best describes your daily eating habits?",
+            "Primarily Home Cooked Meals"
+        )
+
 
         // Validate all questions sequentially based on stored answers
         answersStored.keys.forEach { key ->
