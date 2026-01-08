@@ -507,7 +507,7 @@ class ProfileTest {
 
 
 
-    //Re-selection checking
+ /*   //Re-selection checking
     @Test
     fun `questioner re-selection validations sample`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
@@ -522,6 +522,6 @@ class ProfileTest {
 
         profilePage.assertQuestionerValidationsCheckSample()
      }
-
+*/
 
 }

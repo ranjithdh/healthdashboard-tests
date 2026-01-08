@@ -2314,7 +2314,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(
             QuestionSubType.STRESS_MANAGEMENT,
             "How well do you deal with stress?",
-            "I could deal with stress better"
+            "I feel overwhelmed by stress"
         )
         overwhelmed.click()
         question_29()
@@ -3743,7 +3743,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         logAnswer(
             QuestionSubType.MEDICINES_TAKING, "Are you currently taking any of the following types of medicines?",
-            arrayOf("Cholesterol-lowering drugs (Statins)", "Blood pressure medicines", "Thyroid medicines")
+            arrayOf("Cholesterol-lowering drugs (Statins) – e.g., Rosuvastatin, Atorvastatin", "Blood pressure medicines – e.g., Amlodipine, Telmisartan, Losartan", "Thyroid medicines – e.g., Thyronorm, Eltroxin")
         )
 
         nextButton.click()
@@ -5000,7 +5000,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { (key, locator) ->
             val actual = normalize(locator.innerText())
-            val isMatch = actual.contains(expected)
+            val isMatch = actual == expected
 
             logger.info {
                 "Comparing -> UI: '$actual' | Stored: '$expected'"
@@ -5028,7 +5028,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val buttonText = normalize(locator.innerText())
 
             val isExpectedSelected = storedList.any { stored ->
-                buttonText.contains(stored) || stored.contains(buttonText)
+                buttonText == stored || stored == buttonText
             }
 
             assertEquals(
@@ -5191,7 +5191,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(
             QuestionSubType.STRESS_MANAGEMENT,
             "How well do you deal with stress?",
-            "I could deal with stress better"
+            "I feel overwhelmed by stress"
         )
         logAnswer(
             QuestionSubType.EMOTIONAL_EATING,
