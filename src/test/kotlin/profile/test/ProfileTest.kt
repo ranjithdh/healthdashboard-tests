@@ -36,11 +36,9 @@ class ProfileTest {
     @BeforeEach
     fun createContext() {
         val viewport = TestConfig.Viewports.ANDROID
-        val contextOptions = Browser.NewContextOptions()
-            .setViewportSize(viewport.width, viewport.height)
-            .setHasTouch(viewport.hasTouch)
-            .setIsMobile(viewport.isMobile)
-            .setDeviceScaleFactor(viewport.deviceScaleFactor)
+        val contextOptions =
+            Browser.NewContextOptions().setViewportSize(viewport.width, viewport.height).setHasTouch(viewport.hasTouch)
+                .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
@@ -58,11 +56,9 @@ class ProfileTest {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -76,11 +72,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -99,11 +93,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
         profilePage.removeUserAddress()
@@ -116,11 +108,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -135,11 +125,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.selectCommunicationOption()
 
@@ -153,11 +141,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.accountInformationValidation()
     }
@@ -168,11 +154,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.accountInformationEdit()
     }
@@ -183,11 +167,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.accountInformationEditClose()
     }
@@ -199,11 +181,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.assertHealthMetrics()
     }
@@ -214,11 +194,9 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         profilePage.assertEditHealthMetrics()
     }
@@ -231,13 +209,14 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
-        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY, isMale = false)
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMaleConditions(isMale = false)
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -248,13 +227,14 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
-        profilePage.assertQuestionerNonVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY, isMale = false)
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMaleConditions(isMale = false)
+
+        profilePage.assertQuestionerNonVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -266,13 +246,15 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
-        profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE, isMale = false)
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
+        profilePage.setMaleConditions(isMale = false)
+
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -285,19 +267,17 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.NONE))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "None of the above" in Q37
         // Expected: Q37 → Q51 (skip all condition detail questions)
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.NONE),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -308,19 +288,18 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setMaleConditions(isMale = false)
+
 
         // Test: Select "Gastrointestinal Conditions" only in Q37
         // Expected: Q37 → Q38 (GI details) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -331,22 +310,20 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(
+            profile.model.MedicalCondition.GASTROINTESTINAL, profile.model.MedicalCondition.DERMATOLOGICAL
+        ))
+        profilePage.setMaleConditions(isMale = false)
+
 
         // Test: Select "Gastrointestinal" + "Dermatological" in Q37
         // Expected: Q37 → Q38 (GI) → Q39 (Skin) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(
-                profile.model.MedicalCondition.GASTROINTESTINAL,
-                profile.model.MedicalCondition.DERMATOLOGICAL
-            ),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -357,19 +334,17 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.DIABETES))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Type 2 - Diabetes" only in Q37
         // Expected: Q37 → Q42 (Diabetes status) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.DIABETES),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -380,19 +355,17 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.THYROID))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Thyroid-related disorders" only in Q37
         // Expected: Q37 → Q43 (Thyroid details) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.THYROID),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -403,19 +376,17 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.CANCER))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Cancer" only in Q37
         // Expected: Q37 → Q49 (Cancer status) → Q50 (Cancer type) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.CANCER),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -426,22 +397,19 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions( listOf(
+            profile.model.MedicalCondition.CARDIOVASCULAR, profile.model.MedicalCondition.KIDNEY
+        ))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Cardiovascular" + "Kidney Conditions" in Q37
         // Expected: Q37 → Q46 (Heart) → Q45 (Kidney) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(
-                profile.model.MedicalCondition.CARDIOVASCULAR,
-                profile.model.MedicalCondition.KIDNEY
-            ),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -452,23 +420,22 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions( listOf(
+            profile.model.MedicalCondition.DIABETES,
+            profile.model.MedicalCondition.THYROID,
+            profile.model.MedicalCondition.CANCER
+        ))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Diabetes" + "Thyroid" + "Cancer" in Q37
         // Expected: Q37 → Q42 (Diabetes) → Q43 (Thyroid) → Q49 (Cancer) → Q50 (Type) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(
-                profile.model.MedicalCondition.DIABETES,
-                profile.model.MedicalCondition.THYROID,
-                profile.model.MedicalCondition.CANCER
-            ),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -479,22 +446,19 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions( listOf(
+            profile.model.MedicalCondition.RESPIRATORY, profile.model.MedicalCondition.AUTO_IMMUNE
+        ))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Respiratory" + "Auto-immune" in Q37
         // Expected: Q37 → Q47 (Respiratory) → Q48 (Auto-immune) → Q51
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(
-                profile.model.MedicalCondition.RESPIRATORY,
-                profile.model.MedicalCondition.AUTO_IMMUNE
-            ),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -505,26 +469,25 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions( listOf(
+            profile.model.MedicalCondition.GASTROINTESTINAL,
+            profile.model.MedicalCondition.DERMATOLOGICAL,
+            profile.model.MedicalCondition.DIABETES,
+            profile.model.MedicalCondition.THYROID,
+            profile.model.MedicalCondition.GALL_BLADDER,
+        ))
+        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select multiple major conditions in Q37
         // Expected: Q37 → All selected detail questions → Q51
         // This tests the queue handling with maximum load
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(
-                profile.model.MedicalCondition.GASTROINTESTINAL,
-                profile.model.MedicalCondition.DERMATOLOGICAL,
-                profile.model.MedicalCondition.DIABETES,
-                profile.model.MedicalCondition.THYROID,
-                profile.model.MedicalCondition.GALL_BLADDER,
-            ),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -553,21 +516,18 @@ class ProfileTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
 
         // Set flag to stop before completion
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setMaleConditions(isMale = false)
         profilePage.setShouldClickComplete(false)
 
         // Fill the questionnaire (using Veg flow as example)
-        profilePage.assertQuestionerVegInitialCheck(
-            type = profile.model.ActivityLevel.SEDENTARY,
-            condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL),
-            isMale = false
-        )
+        profilePage.assertQuestionerVegInitialCheck()
 
         // Validate backward navigation
         profilePage.assertQuestionerBackwardValidationsCheck()

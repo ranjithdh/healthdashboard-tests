@@ -57,6 +57,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         this.shouldClickComplete = value
     }
 
+    fun setActivityType(type: ActivityLevel = ActivityLevel.SEDENTARY) {
+        exerciseType = type
+    }
+
+    fun setMedicalConditions(condition: List<MedicalCondition> = listOf(MedicalCondition.NONE)) {
+        medicalConditions = condition
+    }
+
+    fun setMaleConditions(isMale: Boolean) {
+        this.isMale = isMale
+    }
+
     private fun logQuestion(questionText: String) {
         logger.info { "[QUESTIONER]: $questionText" }
     }
@@ -980,19 +992,13 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
-    fun assertQuestionerVegInitialCheck(
-        type: ActivityLevel,
-        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE),
-        isMale: Boolean
-    ) {
+    fun assertQuestionerVegInitialCheck() {
 
         answersStored.clear()
         logger.info {
             "Answer count --> ${answersStored.size}"
         }
-        exerciseType = type
-        medicalConditions = condition
-        this.isMale = isMale
+
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1009,18 +1015,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_veg()
     }
 
-    fun assertQuestionerNonVegInitialCheck(
-        type: ActivityLevel,
-        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE),
-        isMale: Boolean
-    ) {
+    fun assertQuestionerNonVegInitialCheck() {
         answersStored.clear()
         logger.info {
             "Answer count --> ${answersStored.size}"
         }
-        exerciseType = type
-        medicalConditions = condition
-        this.isMale = isMale
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1050,6 +1049,10 @@ class ProfilePage(page: Page) : BasePage(page) {
         val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
         val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
 
+        val questionerCount = page
+            .getByTestId("question-progress-counter-mobile")
+
+        questionerCount.waitFor()
         question.waitFor()
 
 
@@ -5246,7 +5249,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
-    fun goBackProfile(){
+    fun goBackProfile() {
         page.goBack()
     }
 
