@@ -1004,11 +1004,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_veg()
     }
 
-    fun assertQuestionerNonVegInitialCheck() {
+    fun assertQuestionerNonVegInitialCheck(
+        type: ActivityLevel,
+        condition: List<MedicalCondition> = listOf(MedicalCondition.NONE),
+        isMale: Boolean
+    ) {
         answersStored.clear()
         logger.info {
             "Answer count --> ${answersStored.size}"
         }
+        exerciseType = type
+        medicalConditions = condition
+        this.isMale = isMale
         val questionHeading =
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
         val editQuestionerButton =
@@ -1146,7 +1153,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             beef
         )
 
-        meatOptions
+        meatOptions.take(3)
             .forEach { it.click() }
 
         logAnswer(
@@ -3743,7 +3750,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         logAnswer(
             QuestionSubType.MEDICINES_TAKING, "Are you currently taking any of the following types of medicines?",
-            arrayOf("Cholesterol-lowering drugs (Statins) – e.g., Rosuvastatin, Atorvastatin", "Blood pressure medicines – e.g., Amlodipine, Telmisartan, Losartan", "Thyroid medicines – e.g., Thyronorm, Eltroxin")
+            arrayOf(
+                "Cholesterol-lowering drugs (Statins) – e.g., Rosuvastatin, Atorvastatin",
+                "Blood pressure medicines – e.g., Amlodipine, Telmisartan, Losartan",
+                "Thyroid medicines – e.g., Thyronorm, Eltroxin"
+            )
         )
 
         nextButton.click()
@@ -3796,10 +3807,10 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
- /*   fun isButtonChecked(button: Locator): Boolean {
-        return button.locator("svg").count() > 0
-    }
-*/
+    /*   fun isButtonChecked(button: Locator): Boolean {
+           return button.locator("svg").count() > 0
+       }
+   */
     /**
      * Handles a multi-select question with "Others" option that requires a textbox input.
      *
@@ -4964,7 +4975,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_52_checker() {
         logQuestion("Checking: What is your waist circumference?")
-     //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
+        //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("What is your waist"))
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -4984,7 +4995,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             .replace(":", " ")
             .replace(Regex("\\s+"), " ")
             .trim()
-
 
 
     private fun checkSingleSelect(
@@ -5199,7 +5209,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Rarely"
         )
         logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
-
 
 
         // Validate all questions sequentially based on stored answers

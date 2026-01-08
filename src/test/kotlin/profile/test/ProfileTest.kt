@@ -226,7 +226,7 @@ class ProfileTest {
     /**-------------Questioner---------------*/
 
     @Test
-    fun `questioner validation vegetarian`() {
+    fun `questioner validation vegetarian`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -238,10 +238,12 @@ class ProfileTest {
             .waitForConfirmation()
 
         profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY, isMale = false)
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
-    fun `questioner validation non_vegetarian`() {
+    fun `questioner validation non_vegetarian`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -252,12 +254,14 @@ class ProfileTest {
             .clickAccountProfile()
             .waitForConfirmation()
 
-        profilePage.assertQuestionerNonVegInitialCheck()
+        profilePage.assertQuestionerNonVegInitialCheck(type = profile.model.ActivityLevel.SEDENTARY, isMale = false)
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
 
     @Test
-    fun `questioner validation skipping the exercise`() {
+    fun `questioner validation skipping the exercise`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -269,6 +273,8 @@ class ProfileTest {
             .waitForConfirmation()
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
         profilePage.assertQuestionerVegInitialCheck(type = profile.model.ActivityLevel.HARDLY_EXERCISE, isMale = false)
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     //Medical Conditions Flow Tests
@@ -290,8 +296,10 @@ class ProfileTest {
         profilePage.assertQuestionerVegInitialCheck(
             type = profile.model.ActivityLevel.SEDENTARY,
             condition = listOf(profile.model.MedicalCondition.NONE),
-             isMale = false
+            isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -313,6 +321,8 @@ class ProfileTest {
             condition = listOf(profile.model.MedicalCondition.GASTROINTESTINAL),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -337,6 +347,8 @@ class ProfileTest {
             ),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -358,6 +370,8 @@ class ProfileTest {
             condition = listOf(profile.model.MedicalCondition.DIABETES),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -379,6 +393,8 @@ class ProfileTest {
             condition = listOf(profile.model.MedicalCondition.THYROID),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -400,6 +416,8 @@ class ProfileTest {
             condition = listOf(profile.model.MedicalCondition.CANCER),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -424,6 +442,8 @@ class ProfileTest {
             ),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -449,6 +469,8 @@ class ProfileTest {
             ),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -473,6 +495,8 @@ class ProfileTest {
             ),
             isMale = false
         )
+
+        profilePage.assertQuestionerValidationsCheck()
     }
 
     @Test
@@ -506,22 +530,21 @@ class ProfileTest {
     }
 
 
+    /*   //Re-selection checking
+       @Test
+       fun `questioner re-selection validations sample`() {
+           val testUser = TestConfig.TestUsers.EXISTING_USER
 
- /*   //Re-selection checking
-    @Test
-    fun `questioner re-selection validations sample`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
+           val loginPage = LoginPage(page).navigate() as LoginPage
 
-        val loginPage = LoginPage(page).navigate() as LoginPage
+           val profilePage = loginPage
+               .enterMobileAndContinue(testUser.mobileNumber)
+               .enterOtpAndContinueToHomePage(testUser.otp)
+               .clickAccountProfile()
+               .waitForConfirmation()
 
-        val profilePage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToHomePage(testUser.otp)
-            .clickAccountProfile()
-            .waitForConfirmation()
-
-        profilePage.assertQuestionerValidationsCheckSample()
-     }
-*/
+           profilePage.assertQuestionerValidationsCheckSample()
+        }
+   */
 
 }
