@@ -1792,12 +1792,14 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         (listOf(title, *exerciseOptions.toTypedArray(), noExercise) + questionerCount).forEach { it.waitFor() }
-        val expectedText_veg = "QUESTION 10/33"
-        val expectedText_nonVeg = "QUESTION 11/34"
         val expected = questionerCount.innerText()
 
 
-        assertTrue { expectedText_veg == expected || expectedText_nonVeg == expected }
+        if (isMale) {
+            assertTrue { "QUESTION 10/32" == expected || "QUESTION 11/33" == expected }
+        } else {
+            assertTrue { "QUESTION 10/33" == expected || "QUESTION 11/34" == expected }
+        }
 
         //  assertProgressCount()
 
