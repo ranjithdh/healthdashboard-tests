@@ -6,14 +6,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import login.page.LoginPage
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertDoesNotThrow
-import profile.model.MenstrualStatus
+import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProfileTest {
@@ -520,5 +513,27 @@ class ProfileTest {
         profilePage.assertQuestionerBackwardValidationsCheck()
     }
 
+    @Test
+    fun `questioner backward validation at question 20`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        // Set flag to stop at question 20 and goBack
+        profilePage.setStopAtQuestion(20)
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setShouldClickComplete(false)
+
+        // Fill the questionnaire (using Veg flow as example)
+        profilePage.assertQuestionerVegInitialCheck()
+
+        // Validate backward navigation
+        profilePage.assertQuestionerBackwardValidationsCheck()
+    }
 
 }

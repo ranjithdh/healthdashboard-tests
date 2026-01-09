@@ -50,7 +50,13 @@ class ProfilePage(page: Page) : BasePage(page) {
     private var isMale: Boolean = true
     private val medicalQuestionQueue: MutableList<() -> Unit> = mutableListOf()
     private var shouldClickComplete: Boolean = true
+    private var stopAtQuestion: Int? = null
     private var menstrualStatus: MenstrualStatus = MenstrualStatus.STILL_MENSTRUATING
+
+
+    fun setStopAtQuestion(questionNumber: Int?) {
+        this.stopAtQuestion = questionNumber
+    }
 
     fun setShouldClickComplete(value: Boolean) {
         this.shouldClickComplete = value
@@ -167,15 +173,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Verify Progress Bar indicator
         val style = progressIndicator.getAttribute("style") ?: ""
         val expectedScale = currentIndex.toDouble() / total
-        
+
         // Regex to extract scaleX value from transform: scaleX(0.02702702702702703)
         val match = Pattern.compile("scaleX\\(([0-9.]+)\\)").matcher(style)
         if (match.find()) {
             val actualScale = match.group(1).toDouble()
             logger.info { "Asserting Progress Bar: Expected Scale [~$expectedScale], Actual Scale [$actualScale]" }
             // Use a small delta for floating point comparison
-            assertTrue(Math.abs(expectedScale - actualScale) < 0.01, 
-                "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale")
+            assertTrue(
+                Math.abs(expectedScale - actualScale) < 0.01,
+                "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale"
+            )
         } else {
             throw AssertionError("Could not find scaleX in progress indicator style: $style")
         }
@@ -1101,7 +1109,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             question_51()  // All condition questions processed, move to medications
         }
     }
-
 
 
     fun assertQuestionerVegInitialCheck() {
@@ -2108,6 +2115,12 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun question_20() {  // Set your ideal Bedtime
         logQuestion("Set your ideal Bedtime")
+        if (stopAtQuestion == 20) {
+            logger.info { "Stopping at question 20 and clicking goBack()." }
+            goBackQuestioner()
+            return
+        }
+
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Set your ideal Bedtime"))
         val timerBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -2120,6 +2133,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         timerBox.fill("11:00")
         logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
+
         nextButton.click()
         question_22()
     }
@@ -5512,8 +5526,35 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
-    fun goBackProfile() {
+    fun goBackQuestioner() {
         page.goBack()
+        val title = page.getByText("Confirm ExitAre you sure you")
+        val quitButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Quit"))
+
+        val components = listOf(title, quitButton)
+        components.forEach { it.waitFor() }
+
+        quitButton.click()
+
+
+        setStopAtQuestion(null)
+
+        waitForConfirmation()
+
+        val questionHeading =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+        val editQuestionerButton =
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+        val questionDialog = page.locator(".bg-zinc-900").first()
+
+        questionHeading.waitFor()
+        editQuestionerButton.waitFor()
+
+        editQuestionerButton.click()
+
+        questionDialog.waitFor()
+
+        question_20()
     }
 
 }
