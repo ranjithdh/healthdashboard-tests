@@ -1136,19 +1136,16 @@ class ProfilePage(page: Page) : BasePage(page) {
         val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
         val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
 
-        questionerCount.waitFor()
-        question.waitFor()
-
-
-        vegetarian.waitFor()
-        nonVegetarian.waitFor()
-        vegan.waitFor()
-        eggetarian.waitFor()
-
-
-        previousButton.waitFor()
-        nextButton.waitFor()
-        questionerCount.waitFor()
+        listOf(
+            question,
+            vegetarian,
+            nonVegetarian,
+            vegan,
+            eggetarian,
+            previousButton,
+            nextButton,
+            questionerCount
+        ).forEach { it.waitFor() }
 
         assertProgressCount()
 
@@ -1173,15 +1170,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
         val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
 
-        questionerCount.waitFor()
-        question.waitFor()
-        //options
-        previousButton.waitFor()
-        vegetarian.waitFor()
-        nonVegetarian.waitFor()
-        vegan.waitFor()
-        eggetarian.waitFor()
-        questionerCount.waitFor()
+        listOf(
+            question,
+            previousButton,
+            vegetarian,
+            nonVegetarian,
+            vegan,
+            eggetarian,
+            questionerCount
+        ).forEach { it.waitFor() }
 
         assertProgressCount()
 
@@ -1306,9 +1303,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             japanese,
         )
 
-        cuisineOptions.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (cuisineOptions + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         northIndian.click()
@@ -1387,9 +1382,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             intermittentFasting
         )
 
-        lifestyleOptions.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (lifestyleOptions + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         homeCooked.click()
@@ -1446,9 +1439,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             previous
         )
 
-        experienceOptions.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (experienceOptions + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         none.click()
@@ -1539,9 +1530,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
 
-        options.plus(none).plus(others).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options + none + others + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
 
@@ -1814,9 +1803,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val exerciseOptions = listOf(yoga, strengthTraining, pilates, flexibility)
 
 
-        listOf(title, *exerciseOptions.toTypedArray(), noExercise).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, *exerciseOptions.toTypedArray(), noExercise) + questionerCount).forEach { it.waitFor() }
         val expectedText_veg = "QUESTION 10/33"
         val expectedText_nonVeg = "QUESTION 11/34"
         val expected = questionerCount.innerText()
@@ -1909,10 +1896,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             resistanceBands
         )
 
-        listOf(title, subTitle, dumbbells, kettlebells, resistanceBands, none)
-            .forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, subTitle, dumbbells, kettlebells, resistanceBands, none) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         equipmentOptions.forEach { it.click() }
@@ -1984,9 +1968,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
-            it.waitFor()
-        }
+        (listOfField + questionerCount).forEach { it.waitFor() }
 
 
 
@@ -2009,9 +1991,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
-            it.waitFor()
-        }
+        (listOfField + questionerCount).forEach { it.waitFor() }
 
         timerBox.fill("07:00")
         logAnswer(
@@ -2825,9 +2805,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val none =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
 
-        listOf(title, subTitle, others, none).plus(supplements).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, subTitle, others, none).plus(supplements) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         //Others
@@ -2893,9 +2871,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val none =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
 
-        listOf(title, subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, subTitle, notSure, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         conditions.forEach { it.click() }
@@ -2971,9 +2947,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None of the above"))
 
 
-        listOf(title, subTitle, notSure, none).plus(conditions).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, subTitle, notSure, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         // 🔹 Clear any previous selections (optional but good practice)
@@ -3092,9 +3066,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             others
         )
 
-        listOf(title, none).plus(conditions).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         //--------Others---------
@@ -3143,9 +3115,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val othersButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         val noneButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
 
-        listOf(title, othersButton, noneButton).plus(conditionButtons).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, othersButton, noneButton).plus(conditionButtons) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         conditionButtons.forEach { it.click() } // Psoriasis, Eczema, Acne
@@ -3210,9 +3180,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none).plus(conditionButtons).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, others, none).plus(conditionButtons) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         conditionButtons.forEach { it.click() }
@@ -3844,9 +3812,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("Please mention the type of")
         )
 
-        listOf(title, typeTextbox).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, typeTextbox) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         assertFalse(nextButton.isEnabled)
@@ -3898,9 +3864,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("Others")
         )
 
-        listOf(title, none, others).plus(medications).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, none, others).plus(medications) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
 
@@ -3964,9 +3928,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
 
-        listOf(title, subTitle, waistTextBox, completeButton).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (listOf(title, subTitle, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
@@ -4171,12 +4133,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
         val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
 
-        question.waitFor()
-
-
-        listOf(vegetarian, nonVegetarian, vegan, eggetarian).forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        listOf(question, vegetarian, nonVegetarian, vegan, eggetarian, questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
 
         val storedAnswer = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
@@ -4215,10 +4172,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Beef" to beef
         )
 
-        options.values.forEach { it.waitFor() }
-
-        // Wait for all options to be visible
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
 
         val storedAnswer = answersStored[QuestionSubType.TYPE_OF_MEAT]?.answer
@@ -4253,9 +4207,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Japanese" to japanese
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.CUISINE_PREFERENCE]?.answer, options)
     }
@@ -4289,9 +4241,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
 
         checkSingleSelect(answersStored[QuestionSubType.DAILY_EATING_HABIT]?.answer as? String, options)
@@ -4317,9 +4267,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.DIET_EXPERIENCE]?.answer as? String, options)
     }
@@ -4343,9 +4291,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.NUTRITION_TRACKING_EXPERIENCE]?.answer as? String, options)
     }
@@ -4364,9 +4310,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.ALLERGY]?.answer, options)
     }
@@ -4382,9 +4326,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.INTOLERANCE]?.answer, options)
     }
@@ -4400,9 +4342,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "or more servings" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("or more servings"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.CAFFEINE_CONSUMPTION]?.answer as? String, options)
     }
@@ -4428,9 +4368,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Hardly Exercise" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hardly Exercise"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.TYPICAL_DAY]?.answer as? String, options)
     }
@@ -4457,9 +4395,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "I don't exercise" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("I don't exercise"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.EXERCISE_TYPE]?.answer, options)
     }
@@ -4476,9 +4412,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Flexible" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Flexible"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.PREFERRED_WORKOUT_TIME]?.answer as? String, options)
     }
@@ -4495,9 +4429,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.EQUIPMENTS_AVAILABLE]?.answer, options)
     }
@@ -4522,9 +4454,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SLEEP_HYGIENE]?.answer as? String, options)
     }
@@ -4579,9 +4509,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Waketime" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Waketime"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SLEEP_SCHEDULE_PREFERENCE]?.answer as? String, options)
     }
@@ -4634,9 +4562,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Rarely" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Rarely")),
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SLEEP_WAKEUP_REFRESHMENT]?.answer as? String, options)
     }
@@ -4658,9 +4584,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SUNLIGHT_UPON_WAKEUP]?.answer as? String, options)
     }
@@ -4682,9 +4606,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Evening" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Evening (after 5 p.m.)"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SUNLIGHT_TIMING]?.answer as? String, options)
     }
@@ -4699,9 +4621,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Hardly Ever" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Hardly Ever"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.WELLNESS_MOTIVATION_FREQUENCY]?.answer as? String, options)
     }
@@ -4727,9 +4647,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Once a month" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Once a month / Rarely"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.WELLNESS_BOTHER_FREQUENCY]?.answer as? String, options)
     }
@@ -4753,9 +4671,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.STRESS_MANAGEMENT]?.answer as? String, options)
     }
@@ -4771,9 +4687,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Never" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Never"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.EMOTIONAL_EATING]?.answer as? String, options)
     }
@@ -4793,9 +4707,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.SNACK_PREFERENCE]?.answer, options)
     }
@@ -4821,9 +4733,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
 
         val selectedLabel = answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String
@@ -4840,9 +4750,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "No" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("No"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.IS_PREGNANT]?.answer as? String, options)
     }
@@ -4860,9 +4768,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "More than" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("More than"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.N_SMOKE]?.answer as? String, options)
     }
@@ -4887,9 +4793,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.N_ALCOHOL]?.answer as? String, options)
     }
@@ -5040,9 +4944,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.SKIN_CONDITION]?.answer, options)
     }
@@ -5070,9 +4972,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.BONE_JOINT_CONDITION]?.answer, options)
     }
@@ -5090,9 +4990,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.NEUROLOGICAL_CONDITION]?.answer, options)
     }
@@ -5121,9 +5019,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.DIABETES_STATUS]?.answer as? String, options)
     }
@@ -5140,9 +5036,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.THYROID_CONDITION]?.answer, options)
     }
@@ -5160,9 +5054,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.LIVER_CONDITION]?.answer, options)
     }
@@ -5182,9 +5074,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.KIDNEY_CONDITION]?.answer, options)
     }
@@ -5205,9 +5095,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.HEART_CONDITION]?.answer, options)
     }
@@ -5228,9 +5116,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.RESPIRATORY_CONDITION]?.answer, options)
     }
@@ -5264,9 +5150,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.AUTO_IMMUNE_CONDITION]?.answer, options)
     }
@@ -5295,9 +5179,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.CANCER_DIAGNOSIS]?.answer as? String, options)
     }
@@ -5357,9 +5239,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
         )
 
-        options.values.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkMultiSelect(answersStored[QuestionSubType.MEDICINES_TAKING]?.answer, options)
     }
@@ -5431,7 +5311,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val buttonText = normalize(locator.innerText())
 
             val isExpectedSelected = storedList.any { stored ->
-                buttonText == stored || stored == buttonText
+                buttonText == stored
             }
 
             assertEquals(
