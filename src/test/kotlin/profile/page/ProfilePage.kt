@@ -1123,7 +1123,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_non_veg()
     }
 
-
     fun question_1_veg() { //What is your food preference?
         logQuestion("What is your food preference?")
         val question =
@@ -1234,9 +1233,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             beef
         )
 
-        options.forEach { it.waitFor() }
+        (options + questionerCount).forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
         // 🎯 multi-select: choose 1–3 randomly
@@ -1480,9 +1478,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             neverTracked
         )
 
-        options.forEach { it.waitFor() }
+        (options + questionerCount).forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
         neverTracked.click()
@@ -1546,8 +1543,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             nextButton = nextButton,
             previousButton = previousButton,
         )
-
-
         //None
 
         options.forEach { it.click() }
@@ -1602,8 +1597,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
 
-        options.forEach { it.waitFor() }
-        questionerCount.waitFor()
+        (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         otherOptions.forEach {
@@ -1660,9 +1654,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             moreServings
         )
 
-        options.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
 
@@ -1722,9 +1714,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             hardlyExercise
         )
 
-        options.forEach { it.waitFor() }
-
-        questionerCount.waitFor()
+        (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         // 🔹 Select option and navigate based on activityLevel parameter
@@ -1827,9 +1817,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         nextButton.click()
         // ➡️ Go to Question 12
         question_12()
-
     }
-
 
     fun question_12() {// When do you usually work out or prefer to work out?
         logQuestion("When do you usually work out or prefer to work out?")
@@ -1857,8 +1845,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             flexible
         )
 
-        options.forEach { it.waitFor() }
-        questionerCount.waitFor()
+        (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         morning.click()
@@ -1896,7 +1883,14 @@ class ProfilePage(page: Page) : BasePage(page) {
             resistanceBands
         )
 
-        (listOf(title, subTitle, dumbbells, kettlebells, resistanceBands, none) + questionerCount).forEach { it.waitFor() }
+        (listOf(
+            title,
+            subTitle,
+            dumbbells,
+            kettlebells,
+            resistanceBands,
+            none
+        ) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         equipmentOptions.forEach { it.click() }
@@ -1913,7 +1907,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         nextButton.click()
         question_14()
     }
-
 
     fun question_14() {// How would you describe your sleep?
         logQuestion("How would you describe your sleep?")
@@ -1945,9 +1938,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             needsWork
         )
 
-        options.forEach { it.waitFor() }
+        (options + questionerCount).forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
         logAnswer(
@@ -1969,8 +1961,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val listOfField = listOf(title, timerBox)
 
         (listOfField + questionerCount).forEach { it.waitFor() }
-
-
+        assertProgressCount()
 
         timerBox.fill("23:00")
         logAnswer(
@@ -1992,6 +1983,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val listOfField = listOf(title, timerBox)
 
         (listOfField + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
 
         timerBox.fill("07:00")
         logAnswer(
@@ -2012,9 +2004,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
+        (listOfField + questionerCount).forEach {
             it.waitFor()
         }
+        assertProgressCount()
 
         timerBox.fill("23:00")
         logAnswer(
@@ -2034,9 +2027,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
+        (listOfField+questionerCount).forEach {
             it.waitFor()
         }
+        assertProgressCount()
 
         timerBox.fill("07:00")
         logAnswer(
@@ -2071,9 +2065,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             waketime
         )
 
-        options.forEach { it.waitFor() }
+        (options+questionerCount).forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
         logAnswer(
@@ -2092,9 +2085,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
+        (listOfField+questionerCount).forEach {
             it.waitFor()
         }
+        assertProgressCount()
 
         timerBox.fill("11:00")
         logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
@@ -2110,9 +2104,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        listOfField.forEach {
+        (listOfField+questionerCount).forEach {
             it.waitFor()
         }
+        assertProgressCount()
 
         timerBox.fill("07:00")
         logAnswer(QuestionSubType.WAKEUP_TIME_GOAL, "Set your ideal Waketime", "07:00")
@@ -2555,9 +2550,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             salty,
             healthy,
             others,
-            allOfTheAbove
+            allOfTheAbove,
+            questionerCount
         ).forEach { it.waitFor() }
-
+        assertProgressCount()
 
         //Scenario 1
         allOfTheAbove.click()
@@ -3247,9 +3243,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        // ✅ wait once for all elements
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3318,9 +3314,11 @@ class ProfilePage(page: Page) : BasePage(page) {
             preDiabeticNotOnMeds,
             preDiabeticOnMeds,
             diabeticNotOnMeds,
-            diabeticOnMeds
+            diabeticOnMeds,
+            questionerCount
         ).forEach { it.waitFor() }
 
+        assertProgressCount()
         // -------------------------
         // Select ONE option (wizard auto-handles navigation)
         // -------------------------
@@ -3367,8 +3365,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         // ✅ wait once for all elements
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3434,10 +3433,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        // ✅ wait once for all elements
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
-
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3502,10 +3500,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        // ✅ wait once for everything
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
-
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3572,9 +3569,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        // ✅ wait once for all elements
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3640,9 +3637,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        // ✅ wait once for everything
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
+        assertProgressCount()
 
 
         //--------Others---------
@@ -3714,8 +3711,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         // ✅ wait once for everything
-        listOf(title, others, none).plus(conditions)
+        listOf(title, others, none,questionerCount).plus(conditions)
             .forEach { it.waitFor() }
+        assertProgressCount()
 
         //--------Others---------
         val otherTextBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Please specify..."))
@@ -3777,14 +3775,16 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("Yes, but completed treatment more than a year ago")
         )
 
-        // ✅ wait once
         listOf(
             title,
             onTreatment,
             notOnTreatment,
             completedLessThanYear,
-            completedMoreThanYear
+            completedMoreThanYear,
+            questionerCount
         ).forEach { it.waitFor() }
+
+        assertProgressCount()
 
         // -------------------------
         // Select ONE option only
