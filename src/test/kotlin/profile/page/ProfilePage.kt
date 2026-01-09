@@ -1,5 +1,6 @@
 package profile.page
 
+
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
@@ -11,9 +12,8 @@ import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
 import model.profile.*
-import profile.model.ActivityLevel
-import profile.model.MedicalCondition
-import profile.model.MenstrualStatus
+import profile.model.*
+import profile.utils.ProfileUtils.answersStored
 import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
@@ -21,17 +21,12 @@ import profile.utils.ProfileUtils.calculateBMIValues
 import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import profile.utils.ProfileUtils.formatFlotTwoDecimal
+import profile.utils.ProfileUtils.isButtonChecked
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-
-
-import profile.model.QuestionAnswer
-import profile.model.QuestionSubType
-import profile.utils.ProfileUtils.answersStored
-import profile.utils.ProfileUtils.isButtonChecked
 
 class ProfilePage(page: Page) : BasePage(page) {
 
@@ -1076,6 +1071,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     /**------------Questioner----------------*/
+
+    /**
+     * Helper function to visit the next medical question in the queue.
+     * If queue is empty, proceeds to question_51 (medications).
+     */
+    private fun visitNextMedicalQuestion() {
+        if (medicalQuestionQueue.isNotEmpty()) {
+            val nextQuestion = medicalQuestionQueue.removeAt(0)
+            nextQuestion()
+        } else {
+            question_51()  // All condition questions processed, move to medications
+        }
+    }
+
+
+
     fun assertQuestionerVegInitialCheck() {
         fetchAccountInformation()
         answersStored.clear()
@@ -2838,7 +2849,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             .filter(FilterOptions().setHasText("Do you have a family history"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply)"))
 
-        val conditionNames = listOf(
+        var conditionNames = listOf(
             "Dermatological Conditions",
             "Bone or Joint Conditions",
             "Gastrointestinal Conditions",
@@ -2853,6 +2864,11 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Respiratory conditions",
             "Auto-immune condition"
         )
+
+        if (!isMale) {
+            conditionNames = conditionNames.plus("Polycystic ovary syndrome")
+        }
+
 
         val conditions = conditionNames.map {
             page.getByRole(
@@ -2894,26 +2910,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_37()
     }
 
-    /**
-     * Helper function to visit the next medical question in the queue.
-     * If queue is empty, proceeds to question_51 (medications).
-     */
-    private fun visitNextMedicalQuestion() {
-        if (medicalQuestionQueue.isNotEmpty()) {
-            val nextQuestion = medicalQuestionQueue.removeAt(0)
-            nextQuestion()
-        } else {
-            question_51()  // All condition questions processed, move to medications
-        }
-    }
-
     fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
         logQuestion("Do you currently have or have ever been diagnosed with any medical conditions?")
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you currently have or have"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply)"))
 
-        val conditionNames = listOf(
+        var conditionNames = listOf(
             "Dermatological Conditions",
             "Bone or Joint Conditions",
             "Gastrointestinal Conditions",
@@ -2928,6 +2931,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Respiratory conditions",
             "Auto-immune condition"
         )
+
+        if (!isMale) {
+            conditionNames = conditionNames.plus("Polycystic ovary syndrome")
+        }
 
         val conditions = conditionNames.map {
             page.getByRole(
