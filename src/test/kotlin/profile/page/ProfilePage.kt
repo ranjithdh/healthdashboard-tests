@@ -13,6 +13,7 @@ import config.TestConfig.json
 import model.profile.*
 import profile.model.ActivityLevel
 import profile.model.MedicalCondition
+import profile.model.MenstrualStatus
 import profile.utils.ProfileUtils.assertExclusiveSelected
 import profile.utils.ProfileUtils.bmiCategoryValues
 import profile.utils.ProfileUtils.buildAddressText
@@ -53,9 +54,14 @@ class ProfilePage(page: Page) : BasePage(page) {
     private var isMale: Boolean = true
     private val medicalQuestionQueue: MutableList<() -> Unit> = mutableListOf()
     private var shouldClickComplete: Boolean = true
+    private var menstrualStatus: MenstrualStatus = MenstrualStatus.STILL_MENSTRUATING
 
     fun setShouldClickComplete(value: Boolean) {
         this.shouldClickComplete = value
+    }
+
+    fun setMenstrualStatus(status: MenstrualStatus) {
+        this.menstrualStatus = status
     }
 
     fun setActivityType(type: ActivityLevel = ActivityLevel.SEDENTARY) {
@@ -88,7 +94,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     private fun calculateExpectedTotal(): Int {
-        var total = 30 // Base count
+        var total = 31 // Base count
 
         // Q1 Food Preference -> Q2 Type of Meat (skipped if veg)
         val foodPref = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
@@ -104,7 +110,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // Q30 Gender specific -> Q31 Menstrual Status, Q32 Pregnancy (skipped if male)
         if (!isMale) {
-            total += 2
+            total += 1 // For Q31
+            val storedMenstrualStatus = answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String
+            if (storedMenstrualStatus == MenstrualStatus.STILL_MENSTRUATING.label) {
+                total += 1 // For Q32
+            }
         }
 
         val sleepPreference = answersStored[QuestionSubType.SLEEP_SCHEDULE_PREFERENCE]?.answer as? String
@@ -2611,14 +2621,20 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionerCount.waitFor()
         assertProgressCount()
 
+        val buttonToClick = when (menstrualStatus) {
+            MenstrualStatus.STILL_MENSTRUATING -> stillMenstruating
+            MenstrualStatus.NEARING_MENOPAUSE -> nearingMenopause
+            MenstrualStatus.ATTAINED_MENOPAUSE -> attainedMenopause
+        }
+        buttonToClick.click()
+
         logAnswer(
             QuestionSubType.MENSTRUAL_STATUS,
             "What's your current menstrual status?",
-            "I'm still menstruating"
+            menstrualStatus.label
         )
-        stillMenstruating.click()
 
-        if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == "I'm still menstruating") {
+        if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == MenstrualStatus.STILL_MENSTRUATING.label) {
             question_32()
         } else {
             question_33()
@@ -4592,22 +4608,17 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_22_checker(index: Int) {
         logQuestion("Checking: Sleep satisfaction")
-        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("How satisfied are you with your"))
-            .waitFor()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("How satisfied are you with")).waitFor()
 
         val options = mapOf(
-            "Very satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Very satisfied")),
+            "Fully Satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fully Satisfied")),
             "Somewhat Satisfied" to page.getByRole(
                 AriaRole.BUTTON,
                 Page.GetByRoleOptions().setName("Somewhat Satisfied")
             ),
-            "Neutral" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Neutral")),
-            "Dissatisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Dissatisfied")),
-            "Very dissatisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Very dissatisfied"))
+            "Not Satisfied" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Not Satisfied"))
         )
-
         options.values.forEach { it.waitFor() }
-
         questionerCount.waitFor()
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.SLEEP_SATISFACTION]?.answer as? String, options)
@@ -4619,10 +4630,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val options = mapOf(
             "Always" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Always")),
-            "Often" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Often")),
             "Sometimes" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Sometimes")),
             "Rarely" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Rarely")),
-            "Never" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Never"))
         )
 
         options.values.forEach { it.waitFor() }
@@ -4816,7 +4825,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         questionerCount.waitFor()
         assertProgressCount(index)
-        checkSingleSelect(answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String, options)
+
+        val selectedLabel = answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer as? String
+        checkSingleSelect(selectedLabel, options)
     }
 
     private fun question_32_checker(index: Int) {

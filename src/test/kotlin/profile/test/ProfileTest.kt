@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
+import profile.model.MenstrualStatus
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProfileTest {
@@ -532,5 +533,24 @@ class ProfileTest {
         // Validate backward navigation
         profilePage.assertQuestionerBackwardValidationsCheck()
     }
+
+ /*   @Test
+    fun `questioner validation with non-menstruating status in Q31`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMaleConditions(isMale = false)
+        profilePage.setMenstrualStatus(MenstrualStatus.NEARING_MENOPAUSE)
+
+        profilePage.assertQuestionerVegInitialCheck()
+
+        profilePage.assertQuestionerValidationsCheck()
+    }*/
 
 }
