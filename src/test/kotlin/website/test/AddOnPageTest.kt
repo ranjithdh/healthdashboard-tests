@@ -7,6 +7,7 @@ import com.microsoft.playwright.Playwright
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.AddOnTestPage
+import website.page.LandingPage
 import website.page.OurWhyPage
 
 
@@ -57,4 +58,26 @@ class AddOnPageTest {
     }
 
 
+    @Test
+    fun `should display all the add on test`() {
+        val landingPage = AddOnTestPage(page).navigate() as AddOnTestPage
+        landingPage.waitForPageLoad()
+
+        assert(landingPage.addOnTestCards.isAllergyVisible()) { "Allergy test should be visible" }
+        assert(landingPage.addOnTestCards.isGutMicrobiomeVisible()) { "GutTest should be visible" }
+        assert(landingPage.addOnTestCards.isStressAndCortisolVisible()) { "StressAndCortisol should be visible" }
+        assert(landingPage.addOnTestCards.isGeneVisible()) { "Gene should be visible" }
+        assert(landingPage.addOnTestCards.isOmegaVisible()) { "Omega should be visible" }
+        assert(landingPage.addOnTestCards.isToxicMetalsVisible()) { "ToxicTest should be visible" }
+        assert(landingPage.addOnTestCards.isThyroidHealthVisible()) { "ThyroidHealth should be visible" }
+        assert(landingPage.addOnTestCards.isWomensHealthVisible()) { "Women health should be visible" }
+        assert(landingPage.addOnTestCards.isEssentialNutrientsVisible()) { "EssentialNutrients should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedThyroidVisible()) { "Advanced thyroid should be visible" }
+        assert(landingPage.addOnTestCards.isLiverHealthVisible()) { "Liver health should be visible" }
+        assert(landingPage.addOnTestCards.isAutoImmuneVisible()) { "Auto immune should be visible" }
+        assert(landingPage.addOnTestCards.isAdvancedHeartHealthVisible()) { "Advance heart health should be visible" }
+        assert(landingPage.addOnTestCards.isWomensFertilityVisible()) { "Women fertility should be visible" }
+        assert(landingPage.addOnTestCards.isBloodHealthVisible()) { "Blood health should be visible" }
+
+    }
 }

@@ -9,6 +9,7 @@ import utils.logger.logger
 class AddOnTestPage(page: Page) : WebSiteBasePage(page) {
 
     override val pageUrl = TestConfig.Urls.ALL_TEST
+    val addOnTestCards = AddOnTestCards(page, AddOnTestPageType.ALL_TESTS)
 
     private val header = page.getByRole(
         AriaRole.HEADING,
@@ -39,5 +40,7 @@ class AddOnTestPage(page: Page) : WebSiteBasePage(page) {
     fun clickBookNowButton() {
         bookNowButton.click()
     }
+
+
 
 }
