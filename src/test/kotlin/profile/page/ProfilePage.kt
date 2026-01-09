@@ -4811,11 +4811,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             "Vitamin E" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vitamin E")),
             "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
         )
-        // Note: Generic checker will only check if "Vitamin A" is selected if stored answer contains it.
-        // If stored answer has "Zinc" and I don't listen it here, it won't be verified.
-        // I should list all?
-        // Let's stick to the ones likely used or add "Zinc" etc if needed.
-        // Given the array in Q35 is huge, I'll rely on the fact that the test logs specific ones.
 
         questionerCount.waitFor()
         assertProgressCount(index)
