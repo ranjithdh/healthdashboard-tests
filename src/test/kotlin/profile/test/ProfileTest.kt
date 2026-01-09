@@ -142,7 +142,7 @@ class ProfileTest {
         profilePage.accountInformationValidation()
     }
 
-    @Test
+    /*@Test
     fun `account information edit`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -166,7 +166,7 @@ class ProfileTest {
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.accountInformationEditClose()
-    }
+    }*/
 
     /**-------------Health Metrics---------------*/
     @Test

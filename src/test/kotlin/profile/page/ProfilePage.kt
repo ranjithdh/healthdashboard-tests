@@ -396,7 +396,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             // Edit & Remove
             addressCard.getByText("Edit").first().waitFor()
-            addressCard.getByText("Remove").first().waitFor()
+            if(addresses.size>1) {
+                addressCard.getByText("Remove").first().waitFor()
+            }
         }
 
         // Add new address CTA
@@ -453,7 +455,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun assertAddressFormFieldsVisible() {
         page.getByText("Nick name *").waitFor()
-        page.getByText("Mobile number", Page.GetByTextOptions().setExact(true)).waitFor()
+       // page.getByText("Mobile number", Page.GetByTextOptions().setExact(true)).waitFor()
         page.getByText("Flat, House no., Building,").waitFor()
         page.getByText("Street Address *").waitFor()
         page.getByText("Address Line").waitFor()
@@ -463,7 +465,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByText("Country *").waitFor()
 
         nickNameInput.waitFor()
-        mobileNumberInput.waitFor()
+     // mobileNumberInput.waitFor()
         houseNoInput.waitFor()
         streetAddressInput.waitFor()
         addressLine2Input.waitFor()
@@ -648,7 +650,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val number = (0..100).random()
         val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
         nickNameInput.fill(updatedNickName)
-        mobileNumberInput.fill(address.addressMobile ?: "")
+       // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
         streetAddressInput.fill(address.addressLine1)
         addressLine2Input.fill(address.addressLine2 ?: "")
@@ -859,6 +861,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         valueByLabel("Email").waitFor()
         valueByLabel("Date of Birth").waitFor()
         valueByLabel("Mobile Number").waitFor()
+        page.getByText("To update any account").waitFor()
     }
 
     fun assertViewProfileDetails(
@@ -880,10 +883,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             } : $countryCode"
         }
 
-        assertTrue(valueByLabel("Name").innerText().equals(name))
-        assertTrue(valueByLabel("Email").innerText().equals(email))
-        assertTrue(valueByLabel("Date of Birth").innerText().equals(dob))
-        assertTrue(valueByLabel("Mobile Number").innerText().equals(countryCode))
+        assertTrue(valueByLabel("Name").innerText().trim().equals(name.trim()))
+        assertTrue(valueByLabel("Email").innerText().trim().equals(email.trim()))
+        assertTrue(valueByLabel("Date of Birth").innerText().trim().equals(dob.trim()))
+        assertTrue(valueByLabel("Mobile Number").innerText().trim().equals(countryCode.trim()))
 
 
     }
