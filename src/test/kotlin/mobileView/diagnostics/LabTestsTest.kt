@@ -118,10 +118,10 @@ class LabTestsTest {
         println("Found ${testCards.size} cards to verify: ${testCards.map { it.code }}")
 
         // Verify each card
-        testCards.forEach { data ->
-            println("Verifying card for code: ${data.code}")
-            labTestsPage.verifyTestCard(data.code, data.name, data.sampleType, data.price)
-            println("Verified card for code: ${data.code}")
+        testCards.forEach { card ->
+            println("Verifying card for code: ${card.code}")
+            labTestsPage.verifyTestCard(card.code, card.name, card.sampleType, card.price)
+            println("Verified card for code: ${card.code}")
         }
 
 
@@ -131,14 +131,87 @@ class LabTestsTest {
         val labTestsPage = LabTestsPage(page)
         labTestsPage.navigateToDiagnostics()
         println("Clicking View Details...")
-        val testDetailPage = labTestsPage.clickViewDetails()
-        
+        val testDetailPage = labTestsPage.clickViewDetails(code = "PROJ1056379")
+
         println("Verifying How It Works section...")
         testDetailPage.verifyHowItWorksSection()
-        
+
         println("Verifying Certified Labs section...")
         testDetailPage.verifyCertifiedLabsSection()
+
+        println("Test completed successfully.")
+    }
+
+    @Test
+    fun `verify detail page components`() {
+        val labTestsPage = LabTestsPage(page)
+        println("Starting test: verify detail page components")
         
+        // Capture the API response during navigation
+        println("Navigating to diagnostics page and capturing API response...")
+        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+            labTestsPage.navigateToDiagnostics()
+        }
+        
+        val targetCode = "PROJ1024561" //"DH_LONGEVITY_PANEL"
+        
+        // Parse list response to find the target item
+        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
+        val listData = listJson["data"]?.jsonObject
+        val productList = listData?.get("diagnostic_product_list")?.jsonObject
+        val packages = productList?.get("packages")?.jsonArray
+        
+        val targetPackage = packages?.map { it.jsonObject }?.firstOrNull { 
+            it["code"]?.jsonPrimitive?.content == targetCode 
+        } ?: throw AssertionError("Package with code $targetCode not found in API response")
+        
+        val content = targetPackage["content"]?.jsonObject ?: throw AssertionError("Content not found for $targetCode")
+        
+        // Extract descriptions
+        val whatMeasuredDesc = content["what_measured_description"]?.jsonPrimitive?.content ?: ""
+        val whatToExpectDesc = content["what_to_expect_description"]?.jsonPrimitive?.content ?: ""
+        
+        // 'who' is an array in the JSON, we take the first element
+        val whoArray = content["who"]?.jsonArray
+        val whoDesc = whoArray?.firstOrNull()?.jsonPrimitive?.content ?: ""
+        
+        println("Expected What's Measured: $whatMeasuredDesc")
+        println("Expected Who: $whoDesc")
+        println("Expected What to Expect: $whatToExpectDesc")
+
+        println("Clicking View Details for code $targetCode")
+        // Click View Details for the specific panel
+        labTestsPage.clickViewDetails(targetCode)
+
+        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
+        
+        // Verify Header Info (Name, Short Description, About Description)
+        testDetailPage.verifyTestHeaderInfo(targetCode)
+        
+        // Click and verify buttons with text
+        testDetailPage.expandAndVerifySection("What’s measured?", whatMeasuredDesc)
+        testDetailPage.expandAndVerifySection("Who should take this test?", whoDesc)
+        testDetailPage.expandAndVerifySection("What to expect?", whatToExpectDesc)
+
+        // Extract and format price
+        val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+        val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
+        numberFormat.maximumFractionDigits = 0
+        val formattedPrice = "₹" + numberFormat.format(rawPrice)
+        
+        println("Expected Price: $formattedPrice")
+        
+        // Verify Price and Booking Button
+        testDetailPage.verifyPriceAndBookingButton(targetCode, formattedPrice)
+
+        println("Test completed successfully.")
+
+//        println("Verifying How It Works section...")
+//        testDetailPage.verifyHowItWorksSection()
+
+//        println("Verifying Certified Labs section...")
+//        testDetailPage.verifyCertifiedLabsSection()
+
         println("Test completed successfully.")
     }
 }
