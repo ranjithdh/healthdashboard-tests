@@ -216,7 +216,6 @@ class ProfileTest {
 
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMaleConditions(isMale = false)
         profilePage.assertQuestionerVegInitialCheck()
 
         profilePage.assertQuestionerValidationsCheck()
@@ -233,7 +232,6 @@ class ProfileTest {
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMaleConditions(isMale = false)
 
         profilePage.assertQuestionerNonVegInitialCheck()
 
@@ -253,7 +251,6 @@ class ProfileTest {
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
-        profilePage.setMaleConditions(isMale = false)
 
         profilePage.assertQuestionerVegInitialCheck()
 
@@ -274,7 +271,6 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.NONE))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "None of the above" in Q37
         // Expected: Q37 → Q51 (skip all condition detail questions)
@@ -295,7 +291,6 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
-        profilePage.setMaleConditions(isMale = false)
 
 
         // Test: Select "Gastrointestinal Conditions" only in Q37
@@ -319,7 +314,6 @@ class ProfileTest {
         profilePage.setMedicalConditions(listOf(
             profile.model.MedicalCondition.GASTROINTESTINAL, profile.model.MedicalCondition.DERMATOLOGICAL
         ))
-        profilePage.setMaleConditions(isMale = false)
 
 
         // Test: Select "Gastrointestinal" + "Dermatological" in Q37
@@ -341,7 +335,6 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.DIABETES))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Type 2 - Diabetes" only in Q37
         // Expected: Q37 → Q42 (Diabetes status) → Q51
@@ -362,7 +355,6 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.THYROID))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Thyroid-related disorders" only in Q37
         // Expected: Q37 → Q43 (Thyroid details) → Q51
@@ -383,7 +375,6 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.CANCER))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Cancer" only in Q37
         // Expected: Q37 → Q49 (Cancer status) → Q50 (Cancer type) → Q51
@@ -406,7 +397,6 @@ class ProfileTest {
         profilePage.setMedicalConditions( listOf(
             profile.model.MedicalCondition.CARDIOVASCULAR, profile.model.MedicalCondition.KIDNEY
         ))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Cardiovascular" + "Kidney Conditions" in Q37
         // Expected: Q37 → Q46 (Heart) → Q45 (Kidney) → Q51
@@ -432,7 +422,6 @@ class ProfileTest {
             profile.model.MedicalCondition.THYROID,
             profile.model.MedicalCondition.CANCER
         ))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Diabetes" + "Thyroid" + "Cancer" in Q37
         // Expected: Q37 → Q42 (Diabetes) → Q43 (Thyroid) → Q49 (Cancer) → Q50 (Type) → Q51
@@ -455,7 +444,6 @@ class ProfileTest {
         profilePage.setMedicalConditions( listOf(
             profile.model.MedicalCondition.RESPIRATORY, profile.model.MedicalCondition.AUTO_IMMUNE
         ))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select "Respiratory" + "Auto-immune" in Q37
         // Expected: Q37 → Q47 (Respiratory) → Q48 (Auto-immune) → Q51
@@ -483,7 +471,6 @@ class ProfileTest {
             profile.model.MedicalCondition.THYROID,
             profile.model.MedicalCondition.GALL_BLADDER,
         ))
-        profilePage.setMaleConditions(isMale = false)
 
         // Test: Select multiple major conditions in Q37
         // Expected: Q37 → All selected detail questions → Q51
@@ -524,7 +511,6 @@ class ProfileTest {
         // Set flag to stop before completion
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
-        profilePage.setMaleConditions(isMale = false)
         profilePage.setShouldClickComplete(false)
 
         // Fill the questionnaire (using Veg flow as example)

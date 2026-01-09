@@ -60,10 +60,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         this.shouldClickComplete = value
     }
 
-    fun setMenstrualStatus(status: MenstrualStatus) {
-        this.menstrualStatus = status
-    }
-
     fun setActivityType(type: ActivityLevel = ActivityLevel.SEDENTARY) {
         exerciseType = type
     }
@@ -803,6 +799,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             if (responseObj.status == "success") {
                 piiData = responseObj.data.piiData
+                setMaleConditions(piiData?.gender == "male")
                 logger.info { "Current account Information from API: $piiData" }
             }
         } catch (e: Exception) {
@@ -1080,7 +1077,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /**------------Questioner----------------*/
     fun assertQuestionerVegInitialCheck() {
-
+        fetchAccountInformation()
         answersStored.clear()
         logger.info {
             "Answer count --> ${answersStored.size}"
@@ -1103,6 +1100,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun assertQuestionerNonVegInitialCheck() {
+        fetchAccountInformation()
         answersStored.clear()
         logger.info {
             "Answer count --> ${answersStored.size}"
@@ -2027,7 +2025,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        (listOfField+questionerCount).forEach {
+        (listOfField + questionerCount).forEach {
             it.waitFor()
         }
         assertProgressCount()
@@ -2065,7 +2063,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             waketime
         )
 
-        (options+questionerCount).forEach { it.waitFor() }
+        (options + questionerCount).forEach { it.waitFor() }
 
         assertProgressCount()
 
@@ -2085,7 +2083,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        (listOfField+questionerCount).forEach {
+        (listOfField + questionerCount).forEach {
             it.waitFor()
         }
         assertProgressCount()
@@ -2104,7 +2102,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val listOfField = listOf(title, timerBox)
 
-        (listOfField+questionerCount).forEach {
+        (listOfField + questionerCount).forEach {
             it.waitFor()
         }
         assertProgressCount()
@@ -3243,7 +3241,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3365,7 +3363,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         // ✅ wait once for all elements
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3433,7 +3431,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3500,7 +3498,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3569,7 +3567,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3637,7 +3635,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             Page.GetByRoleOptions().setName("None")
         )
 
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
@@ -3711,7 +3709,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         // ✅ wait once for everything
-        listOf(title, others, none,questionerCount).plus(conditions)
+        listOf(title, others, none, questionerCount).plus(conditions)
             .forEach { it.waitFor() }
         assertProgressCount()
 
