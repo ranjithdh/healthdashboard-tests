@@ -107,6 +107,11 @@ class ProfilePage(page: Page) : BasePage(page) {
             total += 2
         }
 
+        val sleepPreference = answersStored[QuestionSubType.SLEEP_SCHEDULE_PREFERENCE]?.answer as? String
+        if (sleepPreference != null) {
+            total += 1
+        }
+
         // Q37 Medical Conditions
         val conditions = answersStored[QuestionSubType.MEDICAL_CONDITION]?.answer
         if (conditions is Array<*>) {
@@ -1807,7 +1812,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val expected = questionerCount.innerText()
 
 
-        assertTrue { expectedText_veg == expected || expectedText_nonVeg== expected}
+        assertTrue { expectedText_veg == expected || expectedText_nonVeg == expected }
 
         //  assertProgressCount()
 
