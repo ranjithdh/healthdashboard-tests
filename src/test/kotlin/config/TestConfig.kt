@@ -31,7 +31,7 @@ object TestConfig {
         val HOME_PATH = "/home"
         val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
 
-       // val HOME_PAGE_URL = "$BASE_URL/home"
+        // val HOME_PAGE_URL = "$BASE_URL/home"
         val PROFILE_URL = "$BASE_URL/profile"
     }
 
@@ -92,17 +92,17 @@ object TestConfig {
             otp = "678901"
         )
 
-/*
+
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901"
         )
-*/
 
-        val EXISTING_USER = TestUser(
-            mobileNumber = "8870208411",
-            otp = "678901"
-        )
+
+          /* val EXISTING_USER = TestUser(
+               mobileNumber = "8870208411",
+               otp = "678901"
+           )*/
     }
 
     object Artifacts {
