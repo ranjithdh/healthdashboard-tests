@@ -245,6 +245,14 @@ class LabTestsTest {
         println("Verifying addresses from API...")
         testSchedulingPage.assertAddressesFromApi()
 
+        println("Testing 'Add New Address' functionality...")
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.addAddressAndValidate()
+
+        println("Testing 'Edit Address' functionality...")
+        // Edit the first address (at index 0)
+        testSchedulingPage.editUserAddress(0)
+
         // Extract price for the targetCode from listResponse
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
         val listData = listJson["data"]?.jsonObject
@@ -261,12 +269,78 @@ class LabTestsTest {
         
         val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
 
-        println("Verifying price details...")
+        println("Verifying price details on address selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
-        println("Verifying footer actions...")
+        println("Verifying footer actions on address selection page...")
+        testSchedulingPage.verifyFooterActions()
+
+        println("Clicking Proceed and navigating to Slot Selection page...")
+        testSchedulingPage.clickProceed()
+
+        println("Verifying Slot Selection Page items...")
+        testSchedulingPage.verifySlotSelectionPage()
+
+        println("Verifying Price Details on Slot Selection page...")
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+
+        println("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
 
         println("Test completed successfully.")
+    }
+
+    @Test
+    fun `verify longevity panel scheduling flow`() {
+        val labTestsPage = LabTestsPage(page)
+        val targetCode = "DH_LONGEVITY_PANEL"
+        println("Starting test: verify longevity panel scheduling flow ($targetCode)")
+
+        // Navigation and capture
+        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+            labTestsPage.navigateToDiagnostics()
+        }
+
+        println("Clicking View Details for $targetCode")
+        labTestsPage.clickViewDetails(targetCode)
+
+        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
+        val testSchedulingPage = TestSchedulingPage(page)
+
+        println("Capturing address list and booking $targetCode")
+        testSchedulingPage.captureAddressData {
+            testDetailPage.clickBookNow(targetCode)
+        }
+
+        // Verify address page
+        testSchedulingPage.verifySampleCollectionAddressHeading()
+        testSchedulingPage.assertAddressesFromApi()
+
+        // Extract price
+        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
+        val listData = listJson["data"]?.jsonObject
+        val productList = listData?.get("diagnostic_product_list")?.jsonObject
+        val packages = productList?.get("packages")?.jsonArray
+        val targetProduct = packages?.map { it.jsonObject }?.firstOrNull { 
+            it["code"]?.jsonPrimitive?.content == targetCode 
+        } ?: throw AssertionError("Product with code $targetCode not found in API response")
+        
+        val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+
+        println("Verifying Price/Footer on address page...")
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyFooterActions()
+
+        println("Clicking Proceed and verifying Slot Selection Page for Longevity Panel...")
+        testSchedulingPage.clickProceed()
+        
+        // This will now verify all slot buttons (should be 2 for longevity panel)
+        testSchedulingPage.verifySlotSelectionPage()
+
+        println("Verifying Price/Footer on slot selection page...")
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyFooterActions()
+
+        println("Longevity panel test completed successfully.")
     }
 }
