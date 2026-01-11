@@ -101,7 +101,7 @@ class LabTestsTest {
                 val rawPrice = obj["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
                 val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
                 numberFormat.maximumFractionDigits = 0
-                val formattedPrice = "₹" + numberFormat.format(rawPrice)
+                val formattedPrice = "₹ " + numberFormat.format(rawPrice)
                 
                 testCards.add(TestCardData(code, name, sampleType, formattedPrice))
             }
@@ -198,7 +198,7 @@ class LabTestsTest {
         val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
         val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
         numberFormat.maximumFractionDigits = 0
-        val formattedPrice = "₹" + numberFormat.format(rawPrice)
+        val formattedPrice = "₹ " + numberFormat.format(rawPrice)
         
         println("Expected Price: $formattedPrice")
         
@@ -227,7 +227,7 @@ class LabTestsTest {
             labTestsPage.navigateToDiagnostics()
         }
 
-        val targetCode = "DH_LONGEVITY_PANEL"
+        val targetCode = "P037"
 
         println("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
@@ -249,12 +249,17 @@ class LabTestsTest {
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
         val listData = listJson["data"]?.jsonObject
         val productList = listData?.get("diagnostic_product_list")?.jsonObject
-        val packages = productList?.get("packages")?.jsonArray
-        val targetPackage = packages?.map { it.jsonObject }?.firstOrNull { 
-            it["code"]?.jsonPrimitive?.content == targetCode 
-        } ?: throw AssertionError("Package with code $targetCode not found in API response")
         
-        val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+        val productTypes = listOf("packages", "test_profiles", "tests")
+        val allProducts = productTypes.flatMap { type ->
+            productList?.get(type)?.jsonArray?.map { it.jsonObject } ?: emptyList()
+        }
+
+        val targetProduct = allProducts.firstOrNull { 
+            it["code"]?.jsonPrimitive?.content == targetCode 
+        } ?: throw AssertionError("Product with code $targetCode not found in any of $productTypes in API response")
+        
+        val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
 
         println("Verifying price details...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
