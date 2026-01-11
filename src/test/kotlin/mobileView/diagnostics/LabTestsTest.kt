@@ -6,6 +6,7 @@ import config.TestConfig
 import kotlinx.serialization.json.*
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import forWeb.diagnostics.page.TestSchedulingPage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LabTestsTest {
@@ -211,6 +212,55 @@ class LabTestsTest {
 
 //        println("Verifying Certified Labs section...")
 //        testDetailPage.verifyCertifiedLabsSection()
+
+        println("Test completed successfully.")
+    }
+
+    @Test
+    fun `verify test scheduling`() {
+        val labTestsPage = LabTestsPage(page)
+        println("Starting test: verify test scheduling")
+
+        // Capture the API response during navigation
+        println("Navigating to diagnostics page and capturing API response...")
+        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+            labTestsPage.navigateToDiagnostics()
+        }
+
+        val targetCode = "DH_LONGEVITY_PANEL"
+
+        println("Clicking View Details for code $targetCode")
+        labTestsPage.clickViewDetails(targetCode)
+
+        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
+        
+        val testSchedulingPage = TestSchedulingPage(page)
+        println("Capturing address list and verifying scheduling page...")
+        testSchedulingPage.captureAddressData {
+            testDetailPage.clickBookNow(targetCode)
+        }
+
+        testSchedulingPage.verifySampleCollectionAddressHeading()
+
+        println("Verifying addresses from API...")
+        testSchedulingPage.assertAddressesFromApi()
+
+        // Extract price for the targetCode from listResponse
+        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
+        val listData = listJson["data"]?.jsonObject
+        val productList = listData?.get("diagnostic_product_list")?.jsonObject
+        val packages = productList?.get("packages")?.jsonArray
+        val targetPackage = packages?.map { it.jsonObject }?.firstOrNull { 
+            it["code"]?.jsonPrimitive?.content == targetCode 
+        } ?: throw AssertionError("Package with code $targetCode not found in API response")
+        
+        val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+
+        println("Verifying price details...")
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+
+        println("Verifying footer actions...")
+        testSchedulingPage.verifyFooterActions()
 
         println("Test completed successfully.")
     }
