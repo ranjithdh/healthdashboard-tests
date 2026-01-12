@@ -883,10 +883,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             } : $countryCode"
         }
 
-        assertTrue(valueByLabel("Name").innerText().trim().equals(name.trim()))
-        assertTrue(valueByLabel("Email").innerText().trim().equals(email.trim()))
-        assertTrue(valueByLabel("Date of Birth").innerText().trim().equals(dob.trim()))
-        assertTrue(valueByLabel("Mobile Number").innerText().trim().equals(countryCode.trim()))
+        assertEquals(valueByLabel("Name").innerText().trim(), name.trim())
+        assertEquals(valueByLabel("Email").innerText().trim(), email.trim())
+        assertEquals(valueByLabel("Date of Birth").innerText().trim(), dob.trim())
+        assertEquals(valueByLabel("Mobile Number").innerText().trim(), countryCode.trim())
 
 
     }
@@ -3049,7 +3049,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // Log the selected conditions
         // Log the selected conditions
-        val selectedConditionLabels = medicalConditions.mapNotNull { it.label }.toTypedArray()
+        val selectedConditionLabels = medicalConditions.map { it.label }.toTypedArray()
         logAnswer(
             QuestionSubType.MEDICAL_CONDITION,
             "Do you currently have or have ever been diagnosed with any of the following medical conditions?",
@@ -3958,11 +3958,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         val values = "24"
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("What is your waist"))
+            .filter(FilterOptions().setHasText("What is your waist"))
 
         // Helper text
         val subTitle = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Please enter the value in"))
+            .filter(FilterOptions().setHasText("Please enter the value in"))
 
         // Waist input
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
@@ -3973,7 +3973,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Please enter a value between"))
+            .filter(FilterOptions().setHasText("Please enter a value between"))
 
         waistTextBox.fill("10")
         rangeError.waitFor()
@@ -5283,7 +5283,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_52_checker(index: Int) {
         logQuestion("Checking: What is your waist circumference?")
         //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
-        val title = page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("What is your waist"))
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your waist"))
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
         title.waitFor()
