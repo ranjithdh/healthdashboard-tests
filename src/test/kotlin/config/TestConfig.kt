@@ -26,6 +26,7 @@ object TestConfig {
         val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
         val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+        val SYMPTOMS_PAGE_URL: String = "$BASE_URL/insights"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"

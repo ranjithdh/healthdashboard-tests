@@ -1,22 +1,18 @@
 package login.page
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
-import mobileView.home.HomePage
 import forWeb.diagnostics.page.LabTestsPage
-import model.profile.UserAddressResponse
+import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
+import symptoms.page.SymptomsPage
 import utils.logger.logger
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.util.Scanner
 
 private val logger = KotlinLogging.logger {}
 
@@ -177,7 +173,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToLabTestForWeb(otp: String): LabTestsPage {
         enterOtp(otp)
-        clickContinue()
+       // clickContinue()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
         val labTestPage = LabTestsPage(page)
@@ -213,5 +209,21 @@ class OtpPage(page: Page) : BasePage(page) {
     fun isIncorrectOtpMessageVisible(): Boolean {
         return page.getByText("Incorrect OTP").isVisible
     }
+
+    fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
+        enterOtp(otp)
+
+        // Create LabTestsPage instance BEFORE navigation to set up response listener
+        val symptomsPage = SymptomsPage(page)
+
+        // Navigate to diagnostics (API call happens during this navigation)
+        page.navigate(TestConfig.Urls.SYMPTOMS_PAGE_URL)
+
+        symptomsPage.waitForSymptomsPageConfirmation()
+
+
+        return symptomsPage
+    }
+
 }
 
