@@ -58,7 +58,7 @@ class SymptomsTest {
 
 
     @Test
-    fun `symptoms main page`() {
+    fun `report symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -67,6 +67,10 @@ class SymptomsTest {
             loginPage.enterMobileAndContinue(testUser.mobileNumber)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
 
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
+        symptomsMain.dialogValidation()
+        symptomsMain.reportOptionsValidations()
     }
 
 }
