@@ -75,6 +75,7 @@ class SymptomsTest {
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsButtonClick()
         symptomsMain.selectAllSymptoms()
+        symptomsMain.submitSymptoms()
     }
 
 }
