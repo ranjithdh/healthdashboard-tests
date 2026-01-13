@@ -7,10 +7,13 @@ import config.BasePage
 import config.TestConfig
 import utils.logger.logger
 import java.util.regex.Pattern
+import kotlin.random.Random
+import kotlin.test.assertEquals
 
 class SymptomsPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.SYMPTOMS_PAGE_URL
 
+    val selectionSymptoms = mutableMapOf<String, List<String>>()
 
     val symptoms = mapOf(
         "Head" to listOf(
@@ -102,9 +105,11 @@ class SymptomsPage(page: Page) : BasePage(page) {
     fun dialogValidation() {
         val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))
         val subTitle = page.getByText("Select any symptoms you're")
+        val symptomsCount = page.getByText("symptoms selected")
         val closeButton =
             page.getByRole(AriaRole.BUTTON).filter(Locator.FilterOptions().setHasText(Pattern.compile("^$")))
-        val components = listOf(title, subTitle, closeButton)
+        val submitSymptoms = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms"))
+        val components = listOf(title, subTitle, symptomsCount, closeButton, submitSymptoms)
         components.forEach { it.waitFor() }
     }
 
@@ -158,14 +163,6 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun clickSection(title: String) {
-        val button = page.getByRole(
-            AriaRole.HEADING, Page.GetByRoleOptions().setName(title)
-        )
-        button.scrollIntoViewIfNeeded()
-        button.click()
-    }
-
     private fun clickSymptoms(symptoms: List<String>) {
         symptoms.forEach { name ->
             val button = page.getByRole(
@@ -180,14 +177,32 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
     fun selectAllSymptoms() {
         symptoms.forEach { (section, symptoms) ->
-            clickSection(section)
-            clickSymptoms(symptoms)
+            val selectedSymptoms = randomSubList(symptoms, 1, 3)
+            selectionSymptoms[section] = selectedSymptoms
+            clickSymptoms(selectedSymptoms)
+            symptomsSelectedCount(selectionSymptoms)
         }
     }
 
     fun cancelButtonClick() {
         val cancelButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
         cancelButton.click()
+    }
+
+
+    fun symptomsSelectedCount(selectionSymptoms: MutableMap<String, List<String>>) {
+        val symptomsCount = page.getByText("symptoms selected")
+        var count = 0
+        selectionSymptoms.forEach { (string, symptomsList) ->
+            count = count.plus(symptomsList.size)
+        }
+        assertEquals("$count symptoms selected", symptomsCount.innerText())
+    }
+
+    fun <T> randomSubList(list: List<T>, min: Int = 1, max: Int = 3): List<T> {
+        if (list.isEmpty()) return emptyList()
+        val count = Random.nextInt(min, minOf(max, list.size) + 1)
+        return list.shuffled().take(count)
     }
 
 
