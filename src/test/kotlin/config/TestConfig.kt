@@ -27,6 +27,7 @@ object TestConfig {
         const val ALLERGY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/allergies"
         const val GUT_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gut"
         const val STRESS_CORTISOL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/stress-and-cortisol"
+        const val GENE_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gene"
 
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
