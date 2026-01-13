@@ -28,6 +28,9 @@ object TestConfig {
         const val GUT_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gut"
         const val STRESS_CORTISOL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/stress-and-cortisol"
         const val GENE_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gene"
+        const val OMEGA_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/omega-profile"
+        const val TOXIC_METALS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/toxic-metals"
+        const val THYROID_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/thyroid-health"
 
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
