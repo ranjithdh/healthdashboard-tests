@@ -71,6 +71,9 @@ class SymptomsTest {
         symptomsMain.onReportSymptomsButtonClick()
         symptomsMain.dialogValidation()
         symptomsMain.reportOptionsValidations()
+        symptomsMain.cancelButtonClick()
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
     }
 
 }
