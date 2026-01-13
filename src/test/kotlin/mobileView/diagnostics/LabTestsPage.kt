@@ -77,8 +77,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
         val priceElement = page.getByTestId("test-card-price-$code")
         if (!priceElement.isVisible) throw AssertionError("Price not visible for code: $code")
-        // Price might contain currency symbol, so check if it contains the expected price value
-        if (!priceElement.innerText().contains(price)) throw AssertionError("Price mismatch for code: $code. Expected to contain: '$price', Found: '${priceElement.innerText()}'")
+        // Price might contain currency symbol, normalize for comparison
+        val actualPrice = priceElement.innerText().replace("₹", "₹ ").replace("  ", " ").trim()
+        if (!actualPrice.contains(price)) throw AssertionError("Price mismatch for code: $code. Expected to contain: '$price', Found: '$actualPrice'")
 
         if (!page.getByTestId("test-card-view-details-$code").isVisible) throw AssertionError("View details not visible for code: $code")
     }
