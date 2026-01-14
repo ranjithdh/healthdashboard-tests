@@ -78,4 +78,20 @@ class SymptomsTest {
         symptomsMain.submitSymptoms()
     }
 
+
+    @Test
+    fun `remove symptoms`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+        symptomsMain.headerValidation()
+
+    }
+
+
+
 }

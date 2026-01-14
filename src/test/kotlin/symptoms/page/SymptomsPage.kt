@@ -203,6 +203,26 @@ class SymptomsPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms")).click()
     }
 
+    fun resetAllSymptoms() {
+        val resetAllSymptoms = page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Reset All Symptoms")
+        )
+        resetAllSymptoms.waitFor()
+        resetAllSymptoms.click()
+    }
+
+    fun resetConfirmationDialog() {
+        val dialog = page.getByRole(
+            AriaRole.ALERTDIALOG,
+            Page.GetByRoleOptions().setName("Are you absolutely sure?")
+        )
+
+        dialog.waitFor()
+
+
+    }
+
     fun <T> randomSubList(list: List<T>, min: Int = 1, max: Int = 3): List<T> {
         if (list.isEmpty()) return emptyList()
         val count = Random.nextInt(min, minOf(max, list.size) + 1)
