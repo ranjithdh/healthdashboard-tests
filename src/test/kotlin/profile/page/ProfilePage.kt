@@ -1076,7 +1076,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         editHeight.fill("10")
         page.getByText("Height must be between 60 and").waitFor()
 
-        editWeight.fill("3")
+        editWeight.fill("03")
         page.getByText("Weight must be between 10 and").waitFor()
 
 
