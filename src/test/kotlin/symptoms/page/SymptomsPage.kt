@@ -219,8 +219,25 @@ class SymptomsPage(page: Page) : BasePage(page) {
         )
 
         dialog.waitFor()
+    }
+
+    fun cancelConfirmationDialog() {
+        val cancelBtn=page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
+        cancelBtn.waitFor()
+        cancelBtn.click()
+    }
 
 
+    fun continueConfirmationDialog() {
+        val continueBtn= page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
+        continueBtn.waitFor()
+        continueBtn.click()
+    }
+
+    fun emptySymptoms() {
+        val emptyCard=page.locator("div").filter( Locator.FilterOptions().setHasText(Pattern.compile("^Report symptoms to find out possible correlations$"))).nth(1)
+        emptyCard.scrollIntoViewIfNeeded()
+        emptyCard.waitFor()
     }
 
     fun <T> randomSubList(list: List<T>, min: Int = 1, max: Int = 3): List<T> {

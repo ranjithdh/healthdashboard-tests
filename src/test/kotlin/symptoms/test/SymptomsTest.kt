@@ -89,7 +89,13 @@ class SymptomsTest {
             loginPage.enterMobileAndContinue(testUser.mobileNumber)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
         symptomsMain.headerValidation()
-
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.cancelConfirmationDialog()
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.continueConfirmationDialog()
+        symptomsMain.emptySymptoms()
     }
 
 
