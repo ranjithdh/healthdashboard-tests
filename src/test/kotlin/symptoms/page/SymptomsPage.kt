@@ -2,9 +2,15 @@ package symptoms.page
 
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Request
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import model.profile.UserAddressResponse
+import symptoms.model.SymptomsData
+import symptoms.model.UserSymptomsResponse
+import utils.json.json
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.random.Random
@@ -12,6 +18,37 @@ import kotlin.test.assertEquals
 
 class SymptomsPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.SYMPTOMS_PAGE_URL
+    private var symptomsResponse: SymptomsData? = null
+
+    init {
+        monitorTraffic()
+    }
+
+    private fun monitorTraffic() {
+        val symptomsList = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
+                logger.info { "API Response: ${response.status()} ${response.url()}" }
+                try {
+                    logger.info { "API Response Body: ${response.text()}" }
+                    if (response.status() == 200) {
+                        val responseBody = response.text()
+                        if (!responseBody.isNullOrBlank()) {
+                            val responseObj = TestConfig.json.decodeFromString<UserSymptomsResponse>(responseBody)
+                            symptomsResponse = responseObj.data
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.warn { "Could not read response body: ${e.message}" }
+                }
+            }
+        }
+
+        page.onResponse(symptomsList)
+        try {
+        } finally {
+            page.offResponse(symptomsList)
+        }
+    }
 
     val selectionSymptoms = mutableMapOf<String, List<String>>()
 
@@ -222,20 +259,22 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun cancelConfirmationDialog() {
-        val cancelBtn=page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
+        val cancelBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
         cancelBtn.waitFor()
         cancelBtn.click()
     }
 
 
     fun continueConfirmationDialog() {
-        val continueBtn= page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
+        val continueBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
         continueBtn.waitFor()
         continueBtn.click()
     }
 
     fun emptySymptoms() {
-        val emptyCard=page.locator("div").filter( Locator.FilterOptions().setHasText(Pattern.compile("^Report symptoms to find out possible correlations$"))).nth(1)
+        val emptyCard = page.locator("div").filter(
+            Locator.FilterOptions().setHasText(Pattern.compile("^Report symptoms to find out possible correlations$"))
+        ).nth(1)
         emptyCard.scrollIntoViewIfNeeded()
         emptyCard.waitFor()
     }
