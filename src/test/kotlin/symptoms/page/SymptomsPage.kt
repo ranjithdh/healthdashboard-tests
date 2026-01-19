@@ -285,16 +285,16 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun onReportSymptomsValidation() {
-        //   symptomsWhatYouMeanTitle()
+        symptomsTitleChecker()
 
-        //    symptomsNameValidation()
-        //   symptomsWhatYouMean()
+        symptomsNameValidation()
+        symptomsWhatYouMean()
 
         symptomsFactors()
-        //  connectedBiomarkers()
+        connectedBiomarkers()
     }
 
-    private fun symptomsWhatYouMeanTitle() {
+    private fun symptomsTitleChecker() {
         logger.error("symptom... symptomsWhatYouMeanTitle")
         symptomsResponse?.symptoms?.forEach { symptom ->
             val isFactorNeeded = isFactorNeeded(symptom)
@@ -406,6 +406,15 @@ class SymptomsPage(page: Page) : BasePage(page) {
             logger.info("symptom... ${symptom.symptomId}")
             val biomarkers = symptom.biomarkers
             if (biomarkers.isNotEmpty()) {
+
+                val tagNames = biomarkers.mapNotNull { biomarker -> biomarker.sourceType }.distinct()
+
+                tagNames.forEach { tagName ->
+                    page.getByTestId("correlation-biomarker-category-title-symptom-${symptom.symptomId}-$tagName")
+                        .waitFor()
+                }
+
+
                 biomarkers.forEach { biomarker ->
                     val displayNameView =
                         page.getByTestId("correlation-biomarker-name-symptom-${symptom.symptomId}-${biomarker.metricId}")
