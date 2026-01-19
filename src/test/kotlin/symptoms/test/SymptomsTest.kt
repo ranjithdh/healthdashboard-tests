@@ -99,5 +99,19 @@ class SymptomsTest {
     }
 
 
+    @Test
+    fun `reported symptoms with validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsValidation()
+
+    }
+
 
 }

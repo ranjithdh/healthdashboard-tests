@@ -12,75 +12,79 @@ data class UserSymptomsResponse(
 
 @Serializable
 data class SymptomsData(
-    val symptoms: List<Symptom>
+    val symptoms: List<Symptom> = emptyList()
 )
 
 @Serializable
 data class Symptom(
     @SerialName("symptom_id")
-    val symptomId: String,
+    val symptomId: String? = null,
 
-    val name: String,
-    val description: String,
-    val category: String,
-    val count: Int,
+    val name: String? = null,
+    val description: String? = null,
+    val category: String? = null,
+    val count: Int? = null,
 
     @SerialName("is_latest")
-    val isLatest: Boolean,
+    val isLatest: Boolean? = null,
 
     @SerialName("last_reported")
-    val lastReported: String,
+    val lastReported: String? = null,
 
     @SerialName("personalized_generated_description")
-    val personalizedGeneratedDescription: PersonalizedGeneratedDescription,
+    val personalizedGeneratedDescription: PersonalizedGeneratedDescription? = null,
 
-    val biomarkers: List<Biomarker>,
+    val biomarkers: List<Biomarker> = emptyList(),
 
     @SerialName("is_data_refresh_required")
-    val isDataRefreshRequired: Boolean
+    val isDataRefreshRequired: Boolean? = null
 )
+
 
 @Serializable
 data class PersonalizedGeneratedDescription(
     @SerialName("what_it_means_to_you")
-    val whatItMeansToYou: List<String>,
+    val whatItMeansToYou: List<String> = emptyList(),
 
     @SerialName("causing_factors_explanation")
-    val causingFactorsExplanation: List<CausingFactorExplanation>
+    val causingFactorsExplanation: List<CausingFactorExplanation> = emptyList()
 )
+
 
 @Serializable
 data class CausingFactorExplanation(
-    val factor: String,
-    val explanation: String
+    val factor: String? = null,
+    val explanation: String? = null
 )
+
 
 @Serializable
 data class Biomarker(
     @SerialName("metric_id")
-    val metricId: String,
+    val metricId: String? = null,
 
-    val metric: String,
+    val metric: String? = null,
 
     @SerialName("display_name")
-    val displayName: String,
+    val displayName: String? = null,
 
-    val value: Double?,
+    val value: Double? = null,
 
-    val unit: String,
+    val unit: String? = null,
 
-    val inference: String,
-    val description: String,
+    val inference: String? = null,
+    val description: String? = null,
 
     @SerialName("group_name")
     val groupName: String? = null,
 
     @SerialName("rating_rank")
-    val ratingRank: Int,
+    val ratingRank: Int? = null,
 
     @SerialName("source_type")
-    val sourceType: String,
+    val sourceType: String? = null,
 
     val tag: String? = null
 )
+
 

@@ -15,10 +15,12 @@ import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class SymptomsPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.SYMPTOMS_PAGE_URL
     private var symptomsResponse: SymptomsData? = null
+
 
     init {
         monitorTraffic()
@@ -285,5 +287,116 @@ class SymptomsPage(page: Page) : BasePage(page) {
         return list.shuffled().take(count)
     }
 
+    fun onReportSymptomsValidation() {
+        /*  symptomsWhatYouMeanTitle()
+          symptomsContributionTitle()
+          symptomsConnectedBioMarkerTitle()*/
 
+        symptomsNameValidation()
+        //symptomsWhatYouMean()
+       // symptomsFactors()
+        //connectedBiomarkers()
+    }
+
+    private fun symptomsWhatYouMeanTitle() {
+        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
+            val whatItMeansToYou = symptom.personalizedGeneratedDescription?.whatItMeansToYou
+            if (whatItMeansToYou?.isNotEmpty() == true) {
+                page.getByText("What this means to you").nth(index.plus(1)).waitFor()
+            }
+        }
+    }
+
+    private fun symptomsConnectedBioMarkerTitle() {
+        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
+            val biomarker = symptom.biomarkers
+            page.getByText("Connected Biomarkers").nth(index.plus(1)).waitFor()
+            if (biomarker.isEmpty()) {
+                page.locator("div:nth-child(${index}) > .p-6.pt-4 > .grid > .col-span-1 > .text-xs.text-muted-foreground.italic")
+                    .waitFor()
+            }
+        }
+    }
+
+    private fun symptomsContributionTitle() {
+        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
+            val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
+            if (causingFactorsExplanation?.isNotEmpty() == true) {
+                page.getByText("POSSIBLE FACTORS CONTRIBUTING").nth(index.plus(1)).waitFor()
+            }
+        }
+    }
+
+    private fun symptomsNameValidation() {
+        symptomsResponse?.symptoms?.forEach { symptom ->
+            logger.info("symptom... ${symptom.symptomId}")
+            val titleId = "correlation-primary-entity-name-symptom-${symptom.symptomId}"
+            val title = page.getByTestId(titleId)
+            assertEquals(normalize(title.innerText()), symptom.name)
+        }
+    }
+
+    private fun symptomsWhatYouMean() {
+        symptomsResponse?.symptoms?.forEach { symptom ->
+            logger.info("symptom... ${symptom.symptomId}")
+            val whatItMeansToYou = symptom.personalizedGeneratedDescription?.whatItMeansToYou
+            if (whatItMeansToYou?.isNotEmpty() == true) {
+                whatItMeansToYou.forEachIndexed { index, content ->
+                    val whatYouMean = page.getByTestId("correlation-inference-symptom-${symptom.symptomId}-$index")
+                    assertEquals(normalize(whatYouMean.innerText()), content)
+                }
+            }
+        }
+    }
+
+    private fun symptomsFactors() {
+        symptomsResponse?.symptoms?.reversed()?.forEach { symptom ->
+            logger.info("symptom... ${symptom.symptomId}")
+            val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
+            if (causingFactorsExplanation?.isNotEmpty() == true) {
+                causingFactorsExplanation.forEachIndexed { index, cause ->
+                    val factorView =
+                        page.getByTestId("correlation-causing-factor-tag-symptom-${symptom.symptomId}-$index")
+                    val explanation =
+                        page.getByTestId("correlation-causing-factor-explanation-symptom-${symptom.symptomId}-$index")
+
+                    factorView.waitFor()
+                    explanation.waitFor()
+
+                    assertEquals(cause.factor, normalize(factorView.innerText()))
+                    assertEquals("${cause.factor}: ${cause.explanation}", normalize(explanation.innerText()))
+                }
+            }
+        }
+    }
+
+
+    private fun connectedBiomarkers() {
+        symptomsResponse?.symptoms?.forEach { symptom ->
+            logger.info("symptom... ${symptom.symptomId}")
+            val biomarkers = symptom.biomarkers
+            if (biomarkers.isNotEmpty()) {
+                biomarkers.forEach { biomarker ->
+                    val displayNameView =
+                        page.getByTestId("correlation-biomarker-name-symptom-${symptom.symptomId}-${biomarker.metricId}")
+                    val inferenceValue =
+                        page.getByTestId("correlation-biomarker-rating-symptom-${symptom.symptomId}-${biomarker.metricId}")
+
+                    displayNameView.waitFor()
+                    inferenceValue.waitFor()
+
+                    assertEquals(displayNameView.innerText(),biomarker.displayName)
+                    assertEquals(inferenceValue.innerText(),biomarker.inference)
+                }
+            } else {
+                //Empty need to check
+            }
+        }
+    }
+
+    fun normalize(text: String): String {
+        return text
+            .replace("•", "")
+            .trim()
+    }
 }
