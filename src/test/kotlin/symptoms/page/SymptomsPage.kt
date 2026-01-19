@@ -2,20 +2,17 @@ package symptoms.page
 
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import model.profile.UserAddressResponse
+import symptoms.model.Symptom
 import symptoms.model.SymptomsData
 import symptoms.model.UserSymptomsResponse
-import utils.json.json
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class SymptomsPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.SYMPTOMS_PAGE_URL
@@ -288,72 +285,87 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun onReportSymptomsValidation() {
-        /*  symptomsWhatYouMeanTitle()
-          symptomsContributionTitle()
-          symptomsConnectedBioMarkerTitle()*/
+        symptomsWhatYouMeanTitle()
 
         symptomsNameValidation()
-        //symptomsWhatYouMean()
-       // symptomsFactors()
-        //connectedBiomarkers()
+        symptomsWhatYouMean()
+
+        symptomsFactors()
+        connectedBiomarkers()
     }
 
     private fun symptomsWhatYouMeanTitle() {
-        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
-            val whatItMeansToYou = symptom.personalizedGeneratedDescription?.whatItMeansToYou
-            if (whatItMeansToYou?.isNotEmpty() == true) {
-                page.getByText("What this means to you").nth(index.plus(1)).waitFor()
+        logger.error("symptom... symptomsWhatYouMeanTitle")
+        symptomsResponse?.symptoms?.forEach { symptom ->
+            val isFactorNeeded = isFactorNeeded(symptom)
+
+            val personalizedGeneratedDescription = symptom.personalizedGeneratedDescription
+
+            val connectedBiomarkerTitle = page.getByTestId("correlation-biomarkers-title-symptom-${symptom.symptomId}")
+            val factorContribution = page.getByTestId("correlation-causing-factors-title-symptom-${symptom.symptomId}")
+            val whatMeansYou = page.getByTestId("correlation-inference-title-symptom-${symptom.symptomId}")
+            connectedBiomarkerTitle.waitFor()
+
+            connectedBiomarkerTitle.scrollIntoViewIfNeeded()
+
+            if (personalizedGeneratedDescription != null) {
+                whatMeansYou.waitFor()
+
+            }
+
+            if (isFactorNeeded) {
+                factorContribution.waitFor()
             }
         }
     }
 
-    private fun symptomsConnectedBioMarkerTitle() {
-        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
-            val biomarker = symptom.biomarkers
-            page.getByText("Connected Biomarkers").nth(index.plus(1)).waitFor()
-            if (biomarker.isEmpty()) {
-                page.locator("div:nth-child(${index}) > .p-6.pt-4 > .grid > .col-span-1 > .text-xs.text-muted-foreground.italic")
-                    .waitFor()
-            }
-        }
-    }
-
-    private fun symptomsContributionTitle() {
-        symptomsResponse?.symptoms?.forEachIndexed { index, symptom ->
-            val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
-            if (causingFactorsExplanation?.isNotEmpty() == true) {
-                page.getByText("POSSIBLE FACTORS CONTRIBUTING").nth(index.plus(1)).waitFor()
-            }
-        }
-    }
 
     private fun symptomsNameValidation() {
+        logger.error("symptom... symptomsNameValidation")
         symptomsResponse?.symptoms?.forEach { symptom ->
             logger.info("symptom... ${symptom.symptomId}")
             val titleId = "correlation-primary-entity-name-symptom-${symptom.symptomId}"
             val title = page.getByTestId(titleId)
+            title.scrollIntoViewIfNeeded()
             assertEquals(normalize(title.innerText()), symptom.name)
         }
     }
 
     private fun symptomsWhatYouMean() {
+        logger.error("symptom... symptomsWhatYouMean")
         symptomsResponse?.symptoms?.forEach { symptom ->
             logger.info("symptom... ${symptom.symptomId}")
             val whatItMeansToYou = symptom.personalizedGeneratedDescription?.whatItMeansToYou
-            if (whatItMeansToYou?.isNotEmpty() == true) {
-                whatItMeansToYou.forEachIndexed { index, content ->
-                    val whatYouMean = page.getByTestId("correlation-inference-symptom-${symptom.symptomId}-$index")
-                    assertEquals(normalize(whatYouMean.innerText()), content)
+            val biomarkers = symptom.biomarkers.size
+            if (biomarkers == 1) {
+                if (whatItMeansToYou?.isNotEmpty() == true) {
+                    whatItMeansToYou.take(1).forEachIndexed { index, content ->
+                        val whatYouMean = page.getByTestId("correlation-inference-symptom-${symptom.symptomId}-$index")
+                        whatYouMean.scrollIntoViewIfNeeded()
+                        assertEquals(normalize(whatYouMean.innerText()), content)
+                    }
+                }
+            } else {
+                if (whatItMeansToYou?.isNotEmpty() == true) {
+                    whatItMeansToYou.forEachIndexed { index, content ->
+                        val whatYouMean = page.getByTestId("correlation-inference-symptom-${symptom.symptomId}-$index")
+                        whatYouMean.scrollIntoViewIfNeeded()
+                        assertEquals(normalize(whatYouMean.innerText()), content)
+                    }
                 }
             }
+
         }
     }
 
     private fun symptomsFactors() {
-        symptomsResponse?.symptoms?.reversed()?.forEach { symptom ->
+        logger.error("symptom... symptomsFactors")
+        symptomsResponse?.symptoms?.forEach { symptom ->
             logger.info("symptom... ${symptom.symptomId}")
+            val isFactorNeeded = isFactorNeeded(symptom)
+
             val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
-            if (causingFactorsExplanation?.isNotEmpty() == true) {
+            if (causingFactorsExplanation?.isNotEmpty() == true && isFactorNeeded) {
                 causingFactorsExplanation.forEachIndexed { index, cause ->
                     val factorView =
                         page.getByTestId("correlation-causing-factor-tag-symptom-${symptom.symptomId}-$index")
@@ -362,6 +374,9 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
                     factorView.waitFor()
                     explanation.waitFor()
+
+                    factorView.scrollIntoViewIfNeeded()
+                    explanation.scrollIntoViewIfNeeded()
 
                     assertEquals(cause.factor, normalize(factorView.innerText()))
                     assertEquals("${cause.factor}: ${cause.explanation}", normalize(explanation.innerText()))
@@ -372,6 +387,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     private fun connectedBiomarkers() {
+        logger.error("symptom... connectedBiomarkers")
         symptomsResponse?.symptoms?.forEach { symptom ->
             logger.info("symptom... ${symptom.symptomId}")
             val biomarkers = symptom.biomarkers
@@ -385,14 +401,32 @@ class SymptomsPage(page: Page) : BasePage(page) {
                     displayNameView.waitFor()
                     inferenceValue.waitFor()
 
-                    assertEquals(displayNameView.innerText(),biomarker.displayName)
-                    assertEquals(inferenceValue.innerText(),biomarker.inference)
+                    displayNameView.scrollIntoViewIfNeeded()
+                    inferenceValue.scrollIntoViewIfNeeded()
+
+                    assertEquals(displayNameView.innerText(), biomarker.displayName)
+                    assertEquals(inferenceValue.innerText(), biomarker.inference)
                 }
             } else {
-                //Empty need to check
+                val emptyText = page.getByTestId("correlation-biomarkers-empty-symptom-${symptom.symptomId}")
+                emptyText.waitFor()
             }
         }
     }
+
+    private fun isFactorNeeded(symptom: Symptom): Boolean {
+        val allBiomarkers = symptom.biomarkers
+        val causingFactors = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
+
+        val matchedTags = allBiomarkers.mapNotNull { tag ->
+            causingFactors?.find { factor -> factor.factor == tag.tag }
+        }.distinctBy {
+            it.factor
+        }
+
+        return matchedTags.isNotEmpty()
+    }
+
 
     fun normalize(text: String): String {
         return text
