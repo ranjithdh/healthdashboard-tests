@@ -180,25 +180,6 @@ class SymptomsPage(page: Page) : BasePage(page) {
         ).waitFor()
     }
 
-
-    private fun validationSection(title: String) {
-        val button = page.getByRole(
-            AriaRole.HEADING, Page.GetByRoleOptions().setName(title)
-        )
-        button.scrollIntoViewIfNeeded()
-        button.waitFor()
-    }
-
-    private fun validationSymptoms(symptoms: List<String>) {
-        symptoms.forEach { name ->
-            val button = page.getByRole(
-                AriaRole.BUTTON, Page.GetByRoleOptions().setName(name)
-            )
-            button.waitFor()
-        }
-    }
-
-
     private fun clickSymptoms(symptoms: List<String>) {
         symptoms.forEach { name ->
             val button = page.getByRole(
