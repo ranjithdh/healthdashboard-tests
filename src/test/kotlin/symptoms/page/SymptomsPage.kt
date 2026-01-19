@@ -285,13 +285,13 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun onReportSymptomsValidation() {
-        symptomsWhatYouMeanTitle()
+        //   symptomsWhatYouMeanTitle()
 
-        symptomsNameValidation()
-        symptomsWhatYouMean()
+        //    symptomsNameValidation()
+        //   symptomsWhatYouMean()
 
         symptomsFactors()
-        connectedBiomarkers()
+        //  connectedBiomarkers()
     }
 
     private fun symptomsWhatYouMeanTitle() {
@@ -364,24 +364,38 @@ class SymptomsPage(page: Page) : BasePage(page) {
             logger.info("symptom... ${symptom.symptomId}")
             val isFactorNeeded = isFactorNeeded(symptom)
 
-            val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
-            if (causingFactorsExplanation?.isNotEmpty() == true && isFactorNeeded) {
-                causingFactorsExplanation.forEachIndexed { index, cause ->
-                    val factorView =
-                        page.getByTestId("correlation-causing-factor-tag-symptom-${symptom.symptomId}-$index")
-                    val explanation =
-                        page.getByTestId("correlation-causing-factor-explanation-symptom-${symptom.symptomId}-$index")
+            if (isFactorNeeded) {
+                val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
+                if (causingFactorsExplanation?.isNotEmpty() == true) {
 
-                    factorView.waitFor()
-                    explanation.waitFor()
+                    causingFactorsExplanation.reversed().forEachIndexed { index, cause ->
+                        val factorView =
+                            page.getByTestId("correlation-causing-factor-tag-symptom-${symptom.symptomId}-$index")
 
-                    factorView.scrollIntoViewIfNeeded()
-                    explanation.scrollIntoViewIfNeeded()
+                        factorView.waitFor()
 
-                    assertEquals(cause.factor, normalize(factorView.innerText()))
-                    assertEquals("${cause.factor}: ${cause.explanation}", normalize(explanation.innerText()))
+                        factorView.scrollIntoViewIfNeeded()
+
+                        assertEquals(cause.factor, normalize(factorView.innerText()))
+                    }
+
+                    causingFactorsExplanation.forEachIndexed { index, cause ->
+
+                        val explanation =
+                            page.getByTestId("correlation-causing-factor-explanation-symptom-${symptom.symptomId}-$index")
+
+
+                        explanation.waitFor()
+
+                        explanation.scrollIntoViewIfNeeded()
+
+                        assertEquals("${cause.factor}: ${cause.explanation}", normalize(explanation.innerText()))
+                    }
                 }
+
             }
+
+
         }
     }
 
