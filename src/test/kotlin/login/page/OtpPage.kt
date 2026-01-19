@@ -1,12 +1,22 @@
 package login.page
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import config.TestConfig
+import config.TestConfig.json
 import mobileView.home.HomePage
 import forWeb.diagnostics.page.LabTestsPage
+import model.profile.UserAddressResponse
+import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
+import profile.page.ProfilePage
+import utils.logger.logger
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.util.Scanner
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,6 +24,51 @@ private val logger = KotlinLogging.logger {}
 class OtpPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
+
+    init {
+        monitorTraffic()
+    }
+
+    private fun monitorTraffic() {
+        val updateProfileRequest = { request: com.microsoft.playwright.Request ->
+            if (request.url().contains(TestConfig.APIs.API_VERIFY_OTP)) {
+                logger.info { "OTP Page-->" }
+                logger.info { "OTP Page--> API Request: ${request.method()} ${request.url()}" }
+                request.postData()?.let {
+                    logger.info { "OTP Page--> API Request Payload: $it" }
+                }
+            }
+        }
+
+
+        val updateProfileResponse = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_VERIFY_OTP)) {
+                logger.info { "OTP Page--> API Response: ${response.status()} ${response.url()}" }
+                try {
+                    if (response.status() == 200) {
+                        val responseBody = response.text()
+                        if (responseBody.isNullOrBlank()) {
+                            logger.info { "API response body is empty" }
+                        } else {
+                            val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
+                            TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
+                        }
+                    }
+                    logger.info { "OTP Page--> API Response Body: ${response.text()}" }
+                } catch (e: Exception) {
+                    logger.warn { "OTP Page--> Could not read response body: ${e.message}" }
+                }
+            }
+        }
+        page.onRequest(updateProfileRequest)
+        page.onResponse(updateProfileResponse)
+        try {
+        } finally {
+            page.offRequest(updateProfileRequest)
+            page.offResponse(updateProfileResponse)
+        }
+    }
+
 
     fun enterOtp(otp: String): OtpPage {
         logger.info { "enterOtp($otp)" }
@@ -41,6 +96,28 @@ class OtpPage(page: Page) : BasePage(page) {
     fun enterOtpAndContinueToMobileHomePage(otp: String): HomePage {
         enterOtp(otp)
         clickContinue()
+
+        val homePage = HomePage(page)
+        homePage.waitForMobileHomePageConfirmation()
+
+        return homePage
+    }
+
+    fun enterOtpAndContinueToProfile(otp: String): ProfilePage {
+        enterOtp(otp)
+        clickContinue()
+
+        val profilePage = ProfilePage(page)
+
+        profilePage.waitForConfirmation()
+
+        return profilePage
+    }
+
+
+    fun enterOtpAndContinueToHomePage(otp: String): HomePage {
+        enterOtp(otp)
+        //clickContinue()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -108,7 +185,9 @@ class OtpPage(page: Page) : BasePage(page) {
         // Set up response listener BEFORE navigation to capture API response
         var capturedResponse: Response? = null
         val listener = page.onResponse { response ->
-            if (response.url().contains("https://api.stg.dh.deepholistics.com/v4/human-token/lab-test") && response.status() == 200) {
+            if (response.url()
+                    .contains("https://api.stg.dh.deepholistics.com/v4/human-token/lab-test") && response.status() == 200
+            ) {
                 capturedResponse = response
             }
         }

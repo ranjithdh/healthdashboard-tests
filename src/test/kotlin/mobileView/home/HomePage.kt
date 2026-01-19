@@ -10,8 +10,11 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import model.home.HomeData
 import model.home.HomeDataResponse
+import profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.json.json
@@ -23,8 +26,19 @@ class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
+    val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
+
     private var homeData: HomeData? = HomeData()
-    private var appointmentDate: String?=null
+    private var appointmentDate: String? = null
+
+    @OptIn(ExperimentalSerializationApi::class)
+    val json = Json {
+        prettyPrint = true
+        isLenient = true
+        ignoreUnknownKeys = true
+        explicitNulls = true
+        encodeDefaults = true
+    }
 
     fun waitForMobileHomePageConfirmation(): HomePage {
         logger.info("Waiting for mobileView.home page confirmation...")
@@ -148,6 +162,16 @@ class HomePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         val orderPage = OrdersPage(page)
         return orderPage
+    }
+
+
+    fun clickAccountProfile(): ProfilePage {
+        val profilePage = ProfilePage(page)
+        profilePage.captureAddressData {
+            profileImage.click()
+        }
+        profilePage.waitForConfirmation()
+        return profilePage
     }
 
 

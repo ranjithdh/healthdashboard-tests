@@ -1,9 +1,24 @@
 package config
 
 import com.microsoft.playwright.BrowserType
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 
 
 object TestConfig {
+
+    var ACCESS_TOKEN = ""
+    const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+
+
+    @OptIn(ExperimentalSerializationApi::class)
+    val json = Json {
+        prettyPrint = true
+        isLenient = true
+        ignoreUnknownKeys = true
+        explicitNulls = true
+        encodeDefaults = true
+    }
 
     object Urls {
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
@@ -12,6 +27,11 @@ object TestConfig {
 
         const val LOGIN_URL = "${BASE_URL}login"
         const val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
+        val BASE_URL: String = "https://app.stg.deepholistics.com"
+        val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+        val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
+        val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
 
         const val HOME_PAGE_URL = "$BASE_URL/home"
         const val PROFILE_URL = "$BASE_URL/profile"
@@ -43,7 +63,23 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        // val HOME_PAGE_URL = "$BASE_URL/home"
+        val PROFILE_URL = "$BASE_URL/profile"
     }
+
+
+    object APIs {
+        val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+
+        val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+        val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
+        val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
+        val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
+        val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
+        val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
+        val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+    }
+
 
     object Browser {
         const val HEADLESS: Boolean = false
@@ -88,10 +124,17 @@ object TestConfig {
             otp = "678901"
         )
 
+
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901"
         )
+
+
+          /* val EXISTING_USER = TestUser(
+               mobileNumber = "8870208411",
+               otp = "678901"
+           )*/
     }
 
     object Artifacts {
