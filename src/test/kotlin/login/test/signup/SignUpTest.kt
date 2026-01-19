@@ -50,9 +50,10 @@ class SignUpTest {
         loginPage.clickSignUp()
 
         assert(loginPage.isSignUpStatsTextVisible()) { "Stats text should be visible" }
-        assert(loginPage.isLabTestsTextVisible()) { "Lab tests text should be visible" }
-        assert(loginPage.isBloodDrawTextVisible()) { "Blood draw text should be visible" }
-        assert(loginPage.isResultsTrackedTextVisible()) { "Results text should be visible" }
+        assert(loginPage.itAllStartsWith100LabTest()) { "Lab tests text should be visible" }
+        assert(loginPage.alreadyHaveAnAccountLinkVisible()) { "Blood draw text should be visible" }
+        assert(loginPage.isSendOtpOnWhatsAppVisible()) { "Results text should be visible" }
+        assert(loginPage.whatsIncludedSectionContentVisible()) { "Section content should be visible" }
 
         assert(loginPage.clickPrivacyPolicyAndVerifyPopup()) { "Privacy Policy popup header should be visible" }
         assert(loginPage.clickTermsOfServiceAndVerifyPopup()) { "Terms of Service popup header should be visible" }

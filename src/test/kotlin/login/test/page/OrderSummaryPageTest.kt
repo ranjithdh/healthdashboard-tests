@@ -37,6 +37,7 @@ class OrderSummaryPageTest {
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
     }
 
@@ -51,7 +52,7 @@ class OrderSummaryPageTest {
         val orderSummaryPage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .fillAndContinue("Test","test@test.com")
             .fillAndContinue()
             .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
             .selectSlotsAndContinue()

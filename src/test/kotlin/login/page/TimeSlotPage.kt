@@ -5,11 +5,15 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import model.addontest.AddOnTests
+import model.addontest.OnboardDiagnosticProductList
 import model.slot.SlotData
 import model.slot.SlotList
+import utils.OnboardAddOnTestDataStore
 import utils.json.json
 import utils.logger.logger
 import java.time.LocalDateTime
+import java.util.Locale
 
 
 class TimeSlotPage(page: Page) : BasePage(page) {
@@ -106,10 +110,36 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun clickSchedule(): TimeSlotPage {
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule")).click()
-        return this
+    fun clickSchedule() {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()?.contains(
+                    "https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true"
+                ) == true
+            },
+            {
+                byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule")).click()
+            }
+        )
+        parseAddOnTest(response.text())
     }
+
+    fun parseAddOnTest(response: String) {
+        try {
+            val responseObj = json.decodeFromString<AddOnTests>(response)
+            logger.error { "getAddOnTestList...$responseObj" }
+
+//            OnboardAddOnTestDataStore.update {
+//                this.tests = responseObj.tests
+//                this.test_profiles = responseObj.test_profiles
+//                this.packages = responseObj.packages
+//            }
+
+        } catch (e: Exception) {
+            logger.error { "getAddOnTestList....Failed to parse API response..${e.message}" }
+        }
+    }
+
 
     fun selectSlotsAndContinue(): OrderSummaryPage {
         val currentDate = LocalDateTime.now().plusDays(1)
@@ -198,8 +228,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         val startDateTime = utils.DateHelper.utcToLocalDateTime(start)
         val endDateTime = utils.DateHelper.utcToLocalDateTime(end)
 
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a")
-        val startStr = startDateTime.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm"))
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a",Locale.ENGLISH)
+        val startStr = startDateTime.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm",Locale.ENGLISH))
         val endStr = endDateTime.format(formatter) // 05:30 AM
 
         return "$startStr - $endStr"
@@ -252,8 +282,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
     private fun formatTimeRange(start: java.time.LocalDateTime, end: java.time.LocalDateTime): String {
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a")
-        val startStr = start.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm"))
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH)
+        val startStr = start.format(java.time.format.DateTimeFormatter.ofPattern("hh:mm",Locale.ENGLISH))
         val endStr = end.format(formatter)
         return "$startStr - $endStr"
     }
