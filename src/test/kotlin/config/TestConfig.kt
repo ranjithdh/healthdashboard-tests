@@ -30,7 +30,6 @@ object TestConfig {
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
-//        const val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
         const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
@@ -69,22 +68,14 @@ object TestConfig {
 
     object APIs {
         const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
-        val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
-        val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
-        val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
-        val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
-        val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
-        val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
-        val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
-        
-//        const val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
-//        const val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
-//        const val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
-//        const val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
-//        const val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
-//        const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
-//        const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        const val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+        const val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
+        const val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
+        const val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
+        const val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
+        const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
+        const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
     }
 
 
