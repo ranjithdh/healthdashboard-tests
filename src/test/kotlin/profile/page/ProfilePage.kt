@@ -1185,11 +1185,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
         assertFalse(previousButton.isEnabled)
-        vegan.click()
+        eggetarian.click()
         logAnswer(
             QuestionSubType.FOOD_PREFERENCE,
             "What is your food preference?",
-            "Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs"
+            "Eggetarian : Primarily plant-based but includes eggs in their diet"
         )
         question_3()
     }
@@ -1660,6 +1660,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun question_8() { //Do you have any food intolerances?
         logQuestion("Do you have any food intolerances?")
 
+        val foodPreference = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have any food"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply —"))
@@ -1677,37 +1678,33 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
 
 
-        val options = listOf(
-            title,
-            subTitle,
-            lactose,
-            caffeine,
-            gluten,
-            none,
-        )
-
-        val otherOptions = listOf(
-            lactose,
-            caffeine,
-            gluten,
-        )
-
-
-
-        (options + questionerCount).forEach { it.waitFor() }
-        assertProgressCount()
-
-        otherOptions.forEach {
-            it.click()
+        val expectedVisible = when {
+            foodPreference?.contains("Vegan") == true -> listOf(caffeine, gluten, none)
+            else -> listOf(lactose, caffeine, gluten, none)
         }
 
-        none.click()
-        assertExclusiveSelected(none, otherOptions)
+        (expectedVisible + title + subTitle + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
 
-        lactose.click()
+        // Selection logic: toggle some options then select "None" then select some again
+        // to verify exclusivity and finally log answer.
+        val toggleOptions = expectedVisible.filter { it != none }
+        if (toggleOptions.isNotEmpty()) {
+            toggleOptions.forEach { it.click() }
+            none.click()
+            assertExclusiveSelected(none, toggleOptions)
+        }
+
+        // Final selection for the test
+        val finalSelection = mutableListOf<String>()
+        if (expectedVisible.contains(lactose)) {
+            lactose.click()
+            finalSelection.add("Lactose")
+        }
         caffeine.click()
+        finalSelection.add("Caffeine")
 
-        logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", arrayOf("Lactose", "Caffeine"))
+        logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", finalSelection.toTypedArray())
 
         nextButton.click()
         question_9()
@@ -4481,22 +4478,44 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     }
 
-
-
-        private fun question_8_checker(index: Int) {
+    private fun question_8_checker(index: Int) {
         logQuestion("Checking: Food intolerances")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Do you have any food")).waitFor()
 
-        val options = mapOf(
-            "Lactose" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lactose")),
-            "Caffeine" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Caffeine")),
-            "Gluten" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten")),
-            "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+        val foodPreference = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
+            ?: error("Food preference not answered")
+
+        val lactose = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lactose"))
+        val caffeine = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Caffeine"))
+        val gluten = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten"))
+        val none = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+
+        val allOptions = mapOf(
+            "Lactose" to lactose,
+            "Caffeine" to caffeine,
+            "Gluten" to gluten,
+            "None" to none
         )
 
-        (options.values + questionerCount).forEach { it.waitFor() }
+        val expectedVisibleLabels = when {
+            foodPreference.contains("Vegan") -> setOf("Caffeine", "Gluten", "None")
+            else -> setOf("Lactose", "Caffeine", "Gluten", "None")
+        }
+
+        allOptions.forEach { (label, locator) ->
+            if (expectedVisibleLabels.contains(label)) {
+                locator.waitFor()
+                assert(locator.isVisible()) { "$label should be visible for $foodPreference" }
+            } else {
+                assert(!locator.isVisible()) { "$label should NOT be visible for $foodPreference" }
+            }
+        }
+
+        questionerCount.waitFor()
         assertProgressCount(index)
-        checkMultiSelect(answersStored[QuestionSubType.INTOLERANCE]?.answer, options)
+
+        val visibleOptions = allOptions.filterKeys { expectedVisibleLabels.contains(it) }
+        checkMultiSelect(answersStored[QuestionSubType.INTOLERANCE]?.answer, visibleOptions)
     }
 
     private fun question_9_checker(index: Int) {
