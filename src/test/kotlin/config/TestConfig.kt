@@ -30,6 +30,8 @@ object TestConfig {
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
         val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val SERVICES_URL = "https://app.stg.deepholistics.com/services"
 
         // val HOME_PAGE_URL = "$BASE_URL/home"
         val PROFILE_URL = "$BASE_URL/profile"
@@ -46,6 +48,7 @@ object TestConfig {
         val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
         val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
     }
 
 
