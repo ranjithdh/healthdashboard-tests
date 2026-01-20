@@ -46,9 +46,10 @@ class AddressPageTest {
 
     private fun navigateToAddressPage(): login.page.AddressPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
         return loginPage
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
             .fillPersonalDetails()
     }

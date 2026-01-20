@@ -46,9 +46,11 @@ class PersonalDetailsPageTest {
 
     private fun navigateToPersonalDetails(): login.page.PersonalDetailsPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         return loginPage
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
     }
 

@@ -46,9 +46,11 @@ class BasicDetailsPageTest {
 
     private fun navigateToBasicDetailsPage(): login.page.BasicDetailsPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         return loginPage
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
     }
 
     @Test

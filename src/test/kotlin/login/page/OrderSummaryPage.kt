@@ -38,9 +38,9 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun clickContinue(): HomePage {
-        logger.info { "clickContinue()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+    fun clickCheckout(): HomePage {
+        logger.info { "clickCheckout()" }
+        page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -48,11 +48,6 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    fun clickContinueToPayment(): PaymentPage {
-        logger.info { "clickContinueToPayment()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
-        return PaymentPage(page)
-    }
 
     fun waitForConfirmation(): OrderSummaryPage {
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Order summary")).waitFor()

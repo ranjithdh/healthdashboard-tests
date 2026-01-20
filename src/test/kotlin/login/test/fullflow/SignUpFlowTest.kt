@@ -8,8 +8,8 @@ import config.TestConfig
 import login.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
-import java.nio.file.Paths
 import utils.SignupDataStore
+import java.nio.file.Paths
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -59,16 +59,17 @@ class SignUpFlowTest {
     @Test
     fun `should complete full signup flow`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
-            .clickContinue()
+            .clickCheckout()
             .waitForMobileHomePageConfirmation()
 
 
@@ -86,18 +87,19 @@ class SignUpFlowTest {
     @Test
     fun `complete full signup flow with coupon code`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
             .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
-            .clickContinue()
+            .clickCheckout()
             .waitForMobileHomePageConfirmation()
 
 
@@ -114,11 +116,12 @@ class SignUpFlowTest {
     @Test
     fun `complete full signup flow with add-on tests`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
 
         val orderSummaryPage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
             .fillPersonalDetails()
             .fillAddressDetails()
@@ -152,17 +155,17 @@ class SignUpFlowTest {
             }
         }
 
-//        val homePage = orderSummaryPage
-//            .clickContinue()
-//            .waitForMobileHomePageConfirmation()
+        val homePage = orderSummaryPage
+            .clickCheckout()
+            .waitForMobileHomePageConfirmation()
 
-//        checkBloodTestBookedCardStatus(homePage)
+        checkBloodTestBookedCardStatus(homePage)
 
-//        assertTrue(
-//            homePage.isSavedFullSlotMatchingApi(),
-//            "Selected full slot (Date & Time) should match API response on HomePage"
-//        )
+        assertTrue(
+            homePage.isSavedFullSlotMatchingApi(),
+            "Selected full slot (Date & Time) should match API response on HomePage"
+        )
 
-//        homePage.takeScreenshot("signup-with-addons-placed")
+        homePage.takeScreenshot("signup-with-addons-placed")
     }
 }

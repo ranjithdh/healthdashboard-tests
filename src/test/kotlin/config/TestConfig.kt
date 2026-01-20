@@ -128,7 +128,8 @@ object TestConfig {
             address = "456 Main Road",
             city = "Delhi",
             state = "Delhi",
-            pinCode = "110001"
+            pinCode = "110001",
+            country = "Sweden"
         )
 
 
@@ -147,7 +148,8 @@ object TestConfig {
             address = "456 Main Road",
             city = "Delhi",
             state = "Delhi",
-            pinCode = "110001"
+            pinCode = "110001",
+            country = "India"
         )
     }
 
@@ -193,5 +195,6 @@ data class TestUser(
     val address: String = "456 Main Road",
     val city: String = "Delhi",
     val state: String = "Delhi",
-    val pinCode: String = "110001"
+    val pinCode: String = "110001",
+    val country: String = "India"
 )

@@ -33,7 +33,7 @@ class OrderSummaryPageTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.ANDROID
+        val viewport = TestConfig.Viewports.MOBILE_LANDSCAPE
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -52,9 +52,11 @@ class OrderSummaryPageTest {
 
     private fun navigateToOrderSummaryPage(): OrderSummaryPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         val orderSummaryPage = loginPage
-            .enterMobileAndContinue()
-            .enterOtpAndContinueToAccountCreation()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
             .fillBasicDetails()
             .fillPersonalDetails()
             .fillAddressDetails()

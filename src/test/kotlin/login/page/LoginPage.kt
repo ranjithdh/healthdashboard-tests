@@ -39,16 +39,17 @@ class LoginPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun selectCountryCode() {
+    fun selectCountryCode(countryName: String) {
+        logger.info { "selectCountryCode($countryName)" }
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
         page.getByPlaceholder("Search country...").click()
-        page.getByPlaceholder("Search country...").fill("sweden")
-        page.getByText("Sweden").nth(1).click()
+        page.getByPlaceholder("Search country...").fill(countryName)
+        page.getByText(countryName).nth(1).click()
     }
 
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
-        selectCountryCode()
+        selectCountryCode(testUser.country)
         enterMobileNumber(testUser.mobileNumber)
         clickContinue()
         val otpPage = OtpPage(page)
