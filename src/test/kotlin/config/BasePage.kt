@@ -20,10 +20,9 @@ abstract class BasePage(protected val page: Page) {
      * Navigate to this page
      */
     open fun navigate(): BasePage {
-        val fullUrl = "${TestConfig.Urls.BASE_URL}$pageUrl"
+        val fullUrl = pageUrl
         logger.info { "Navigating to: $fullUrl" }
         page.navigate(fullUrl)
-//        waitForPageLoad()
         return this
     }
     

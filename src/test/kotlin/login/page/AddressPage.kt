@@ -1,9 +1,11 @@
 package login.page
 
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import mu.KotlinLogging
+import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,7 +16,7 @@ class AddressPage(page: Page) : BasePage(page) {
 
     private val addressInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address"))
     private val cityInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("City"))
-    private val stateInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("State"))
+    private val stateInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State"))
     private val pinCodeInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code"))
     private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
@@ -58,8 +60,7 @@ class AddressPage(page: Page) : BasePage(page) {
 
     fun selectState(state: String): AddressPage {
         logger.info { "selectState($state)" }
-        stateInput.click()
-        byRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(state)).click()
+        stateInput.fill(state)
         return this
     }
 
