@@ -126,14 +126,16 @@ class TimeSlotPage(page: Page) : BasePage(page) {
 
     fun parseAddOnTest(response: String) {
         try {
-            val responseObj = json.decodeFromString<AddOnTests>(response)
-            logger.error { "getAddOnTestList...$responseObj" }
+            val result = json.decodeFromString<AddOnTests>(response)
+            logger.error { "getAddOnTestList...$result" }
 
-//            OnboardAddOnTestDataStore.update {
-//                this.tests = responseObj.tests
-//                this.test_profiles = responseObj.test_profiles
-//                this.packages = responseObj.packages
-//            }
+            val diagnosticProductList = result.diagnostic_product_list
+
+            OnboardAddOnTestDataStore.update {
+                this.tests = diagnosticProductList?.tests ?: emptyList()
+                this.test_profiles = diagnosticProductList?.test_profiles ?: emptyList()
+                this.packages = diagnosticProductList?.packages ?: emptyList()
+            }
 
         } catch (e: Exception) {
             logger.error { "getAddOnTestList....Failed to parse API response..${e.message}" }

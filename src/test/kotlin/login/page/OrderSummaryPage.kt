@@ -5,59 +5,12 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import mobileView.home.HomePage
-import model.addontest.OnboardDiagnosticProductList
 import utils.logger.logger
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.LOGIN_URL
-
-    private val addOnTestAPIUrl =
-       "https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true"
-
-    private var diagnosticProductList = OnboardDiagnosticProductList()
-
-
-    init {
-//        monitorTraffic()
-//        getAddOnTestList()
-    }
-
-
-//    private fun monitorTraffic() {
-//        val requestHandler = { request: com.microsoft.playwright.Request ->
-//            if (request.url().contains(addOnTestAPIUrl)) {
-//                logger.info { "getAddOnTestList API Request: ${request.method()} ${request.url()}" }
-//                request.postData()?.let {
-//                    logger.info { "getAddOnTestList API Request Payload: $it" }
-//                }
-//            }
-//        }
-//
-//        val responseHandler = { response: Response ->
-//            if (response.url().contains(addOnTestAPIUrl)) {
-//                logger.info { "getAddOnTestList API Response: ${response.status()} ${response.url()}" }
-//                try {
-//                    logger.info { "getAddOnTestList API Response Body: ${response.text()}" }
-//                } catch (e: Exception) {
-//                    logger.warn { "getAddOnTestList Could not read response body: ${e.message}" }
-//                }
-//            }
-//        }
-//
-//        page.onRequest(requestHandler)
-//        page.onResponse(responseHandler)
-//
-//        try {
-//        } finally {
-//            page.offRequest(requestHandler)
-//            page.offResponse(responseHandler)
-//        }
-//    }
-
-
-
 
     fun enterCouponCode(code: String): OrderSummaryPage {
         logger.info { "enterCouponCode($code)" }
@@ -152,5 +105,37 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
 
     fun isCouponValueVisible(value: String): Boolean {
         return byText(value).isVisible
+    }
+
+    private val firstTest = page.getByTestId("addon-card-add-button-11")
+    private val secondTest = page.getByTestId("addon-card-add-button-12")
+    private val thirdTest = page.getByTestId("addon-card-add-button-4")
+    private val fourthTest = page.getByTestId("addon-card-add-button-34")
+
+    private val removeFirstTest = page.getByTestId("selected-addon-remove-11")
+    private val removeSecondTest = page.getByTestId("selected-addon-remove-12")
+    private val removeThirdTest = page.getByTestId("selected-addon-remove-4")
+    private val removeFourthTest = page.getByTestId("selected-addon-remove-34")
+
+    private val firstTestName = page.getByTestId("selected-addon-name-11")
+    private val secondTestName = page.getByTestId("selected-addon-name-12")
+    private val thirdTestName = page.getByTestId("selected-addon-name-4")
+    private val fourthTestName = page.getByTestId("selected-addon-name-34")
+
+    private val totalAmount = page.getByText("Total₹9,999", Page.GetByTextOptions().setExact(true))
+
+
+    fun addAllTheAddOnTests() {
+        firstTest?.click()
+        secondTest?.click()
+        thirdTest?.click()
+        fourthTest?.click()
+    }
+
+    fun removeAllTheAddOnTests() {
+        removeFirstTest?.click()
+        removeSecondTest?.click()
+        removeThirdTest?.click()
+        removeFourthTest?.click()
     }
 }
