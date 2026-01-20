@@ -63,8 +63,8 @@ class LabTestsPageComprehensiveTest {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToLabTestForWeb(testUser.otp)
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToLabTestForWeb(testUser)
     }
 
     // ---------------------- Page Load and Basic Elements Tests ----------------------

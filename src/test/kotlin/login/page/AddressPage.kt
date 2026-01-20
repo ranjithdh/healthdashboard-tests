@@ -1,11 +1,11 @@
 package login.page
 
-import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import config.TestConfig
+import config.TestUser
 import mu.KotlinLogging
-import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 
@@ -106,15 +106,15 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun fillAndContinue(
-        flatHouseNoOrBuilding: String,
-        address: String,
-        city: String,
-        state: String,
-        pinCode: String
-    ): TimeSlotPage {
-        logger.info { "fillAndContinue()" }
-        fillAddress(flatHouseNoOrBuilding, address, city, state, pinCode)
+    fun fillAddressDetails(testUser: TestUser = TestConfig.TestUsers.NEW_USER): TimeSlotPage {
+        logger.info { "fillAddressDetails()" }
+        fillAddress(
+            testUser.flatHouseNo,
+            testUser.address,
+            testUser.city,
+            testUser.state,
+            testUser.pinCode
+        )
         clickContinue()
         val timeSlotPage = TimeSlotPage(page)
         timeSlotPage.waitForConfirmation()

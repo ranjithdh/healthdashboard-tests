@@ -9,6 +9,7 @@ import login.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import java.nio.file.Paths
+import utils.SignupDataStore
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -61,11 +62,11 @@ class SignUpFlowTest {
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue("726408396")
-            .enterOtpAndContinueToAccountCreation("")
-            .fillAndContinue("ranjith","ranjithkumar.m@mysmitch.com")
-            .fillAndContinue("Male", "170", "60")
-            .fillAndContinue("Flat 101", "456 Main Road", "Delhi", "Delhi", "110001")
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToAccountCreation()
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
             .selectSlotsAndContinue()
             .clickContinue()
             .waitForMobileHomePageConfirmation()
@@ -88,13 +89,13 @@ class SignUpFlowTest {
 
         val homePage = loginPage
             .clickSignUp()
-            .enterMobileAndContinue("726408399")
-            .enterOtpAndContinueToAccountCreation("")
-            .fillAndContinue("ranjith","ranjithkumar.m@mysmitch.com")
-            .fillAndContinue("Male", "170", "60")
-            .fillAndContinue("Flat 101", "456 Main Road", "Delhi", "Delhi", "110001")
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToAccountCreation()
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
             .selectSlotsAndContinue()
-            .enterCouponCode("D261C0")
+            .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
             .clickContinue()
             .waitForMobileHomePageConfirmation()
@@ -110,4 +111,58 @@ class SignUpFlowTest {
         homePage.takeScreenshot("signup-order-placed")
     }
 
+    @Test
+    fun `complete full signup flow with add-on tests`() {
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val orderSummaryPage = loginPage
+            .clickSignUp()
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToAccountCreation()
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
+            .selectSlotsAndContinue()
+
+        val allIndices = (1..4).toList().shuffled()
+        val selectedIndices = allIndices.take(2)
+
+        selectedIndices.forEach { index ->
+            when (index) {
+                1 -> {
+                    orderSummaryPage.addFirstAddOn()
+                    val name = orderSummaryPage.getFirstAddOnName()
+                    SignupDataStore.update { selectedAddOns.add(name) }
+                }
+                2 -> {
+                    orderSummaryPage.addSecondAddOn()
+                    val name = orderSummaryPage.getSecondAddOnName()
+                    SignupDataStore.update { selectedAddOns.add(name) }
+                }
+                3 -> {
+                    orderSummaryPage.addThirdAddOn()
+                    val name = orderSummaryPage.getThirdAddOnName()
+                    SignupDataStore.update { selectedAddOns.add(name) }
+                }
+                4 -> {
+                    orderSummaryPage.addFourthAddOn()
+                    val name = orderSummaryPage.getFourthAddOnName()
+                    SignupDataStore.update { selectedAddOns.add(name) }
+                }
+            }
+        }
+
+//        val homePage = orderSummaryPage
+//            .clickContinue()
+//            .waitForMobileHomePageConfirmation()
+
+//        checkBloodTestBookedCardStatus(homePage)
+
+//        assertTrue(
+//            homePage.isSavedFullSlotMatchingApi(),
+//            "Selected full slot (Date & Time) should match API response on HomePage"
+//        )
+
+//        homePage.takeScreenshot("signup-with-addons-placed")
+    }
 }

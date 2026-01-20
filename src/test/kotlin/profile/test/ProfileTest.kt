@@ -47,11 +47,10 @@ class ProfileTest {
     /**-----------Address----------------*/
     @Test
     fun `address information validation`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
@@ -62,12 +61,11 @@ class ProfileTest {
 
     @Test
     fun `new address add`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
@@ -83,12 +81,11 @@ class ProfileTest {
 
     @Test
     fun `remove address`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
         profilePage.clickAddressDropDown()
@@ -98,12 +95,11 @@ class ProfileTest {
 
     @Test
     fun `edit address`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         assert(profilePage.isSaveAddressDropDownVisible()) { "Save address drop down is not visible" }
@@ -115,12 +111,11 @@ class ProfileTest {
     /**-----------Tone Preference----------------*/
     @Test
     fun `tone preference selection`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.selectCommunicationOption()
@@ -131,12 +126,11 @@ class ProfileTest {
     /**------------Account Information----------------*/
     @Test
     fun `account information validation`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.accountInformationValidation()
@@ -171,12 +165,11 @@ class ProfileTest {
     /**-------------Health Metrics---------------*/
     @Test
     fun `health metrics validations`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.assertHealthMetrics()
@@ -184,12 +177,11 @@ class ProfileTest {
 
     @Test
     fun `health metrics edit`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.assertEditHealthMetrics()
@@ -199,12 +191,11 @@ class ProfileTest {
 
     @Test
     fun `questioner validation vegetarian`() { //done
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
 
@@ -216,12 +207,11 @@ class ProfileTest {
 
     @Test
     fun `questioner validation non_vegetarian`() { //done
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -234,12 +224,11 @@ class ProfileTest {
 
     @Test
     fun `questioner validation skipping the exercise`() { //done
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
 
@@ -254,12 +243,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - no conditions selected`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -274,12 +262,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - single gastrointestinal`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -295,12 +282,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - multiple conditions GI and dermatological`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -318,12 +304,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - diabetes only`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -338,12 +323,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - thyroid only`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -358,12 +342,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - cancer flow`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -378,12 +361,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - cardiovascular and kidney`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -400,12 +382,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - complex multi selection`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
 
@@ -425,12 +406,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - respiratory and auto-immune`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
@@ -447,12 +427,11 @@ class ProfileTest {
 
     @Test
     fun `medical conditions - all major conditions`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
 
@@ -493,12 +472,11 @@ class ProfileTest {
 
     @Test
     fun `questioner backward validation complete flow`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         // Set flag to stop before completion
@@ -515,12 +493,11 @@ class ProfileTest {
 
     @Test
     fun `questioner backward validation at question 20`() {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
         // Set flag to stop at question 20 and goBack

@@ -115,20 +115,40 @@ object TestConfig {
     object TestUsers {
         val NEW_USER = TestUser(
             mobileNumber = "726408324",
-            otp = "678901"
+            otp = "678901",
+            firstName = "ranjith",
+            email = "ranjithkumar.m@mysmitch.com",
+            gender = "Male",
+            height = "170",
+            weight = "60",
+            month = "2",
+            year = "1998",
+            day = "12",
+            flatHouseNo = "Flat 101",
+            address = "456 Main Road",
+            city = "Delhi",
+            state = "Delhi",
+            pinCode = "110001"
         )
 
 
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
-            otp = "678901"
+            otp = "678901",
+            firstName = "ranjith",
+            email = "ranjithkumar.m@mysmitch.com",
+            gender = "Male",
+            height = "170",
+            weight = "60",
+            month = "2",
+            year = "1998",
+            day = "12",
+            flatHouseNo = "Flat 101",
+            address = "456 Main Road",
+            city = "Delhi",
+            state = "Delhi",
+            pinCode = "110001"
         )
-
-
-          /* val EXISTING_USER = TestUser(
-               mobileNumber = "8870208411",
-               otp = "678901"
-           )*/
     }
 
     object Artifacts {
@@ -140,6 +160,12 @@ object TestConfig {
     object Timeouts {
         const val NAVIGATION_TIMEOUT = 60000L
         const val ELEMENT_TIMEOUT = 10000L
+    }
+
+    object Coupons {
+        const val VALID_COUPON = "D261C0"
+        const val INVALID_COUPON = "INVALID123"
+        const val DISCOUNT_AMOUNT = 1000f
     }
 }
 
@@ -155,4 +181,17 @@ data class Viewport(
 data class TestUser(
     val mobileNumber: String,
     val otp: String,
+    val firstName: String = "Test",
+    val email: String = "test@test.com",
+    val gender: String = "Male",
+    val height: String = "170",
+    val weight: String = "60",
+    val month: String = "2",
+    val year: String = "1998",
+    val day: String = "12",
+    val flatHouseNo: String = "Flat 101",
+    val address: String = "456 Main Road",
+    val city: String = "Delhi",
+    val state: String = "Delhi",
+    val pinCode: String = "110001"
 )

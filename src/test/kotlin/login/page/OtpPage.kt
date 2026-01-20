@@ -5,6 +5,7 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import config.TestUser
 import config.TestConfig.json
 import forWeb.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
@@ -13,7 +14,6 @@ import mu.KotlinLogging
 import profile.page.ProfilePage
 import utils.logger.logger
 
-private val logger = KotlinLogging.logger {}
 
 
 class OtpPage(page: Page) : BasePage(page) {
@@ -79,11 +79,8 @@ class OtpPage(page: Page) : BasePage(page) {
 
 
 
-
-
-    fun enterOtpAndContinueToAccountCreation(otp: String): BasicDetailsPage {
-        enterOtp(otp)
-//        clickContinue()
+    fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
+        enterOtp(testUser.otp)
 
         val basicDetailsPage = BasicDetailsPage(page)
         basicDetailsPage.waitForConfirmation()
@@ -91,9 +88,8 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    fun enterOtpAndContinueToMobileHomePage(otp: String): HomePage {
-        enterOtp(otp)
-//        clickContinue()
+    fun enterOtpAndContinueToMobileHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
+        enterOtp(testUser.otp)
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -101,10 +97,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    fun enterOtpAndContinueToProfile(otp: String): ProfilePage {
-        enterOtp(otp)
-//        clickContinue()
-
+    fun enterOtpAndContinueToProfile(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): ProfilePage {
+        enterOtp(testUser.otp)
         val profilePage = ProfilePage(page)
 
         profilePage.waitForConfirmation()
@@ -113,10 +107,8 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    fun enterOtpAndContinueToHomePage(otp: String): HomePage {
-        enterOtp(otp)
-        //clickContinue()
-
+    fun enterOtpAndContinueToHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
+        enterOtp(testUser.otp)
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
 
@@ -173,8 +165,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun enterOtpAndContinueToLabTestForWeb(otp: String): LabTestsPage {
-        enterOtp(otp)
+    fun enterOtpAndContinueToLabTestForWeb(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): LabTestsPage {
+        enterOtp(testUser.otp)
 //        clickContinue()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
@@ -203,7 +195,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
         labTestPage.waitForConfirmation()
 
-        logger.info { "enterOtpAndContinueToHomePage($otp)...${page.url()}" }
+        logger.info { "enterOtpAndContinueToHomePage(${testUser.otp}...${page.url()}" }
 
         return labTestPage
     }

@@ -49,9 +49,9 @@ class LabTestsPageTest {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterMobileAndContinue(testUser)
 //            .enterOtpAndContinueToHomePage(testUser.otp)
-            .enterOtpAndContinueToLabTestForWeb((testUser.otp))
+            .enterOtpAndContinueToLabTestForWeb((testUser))
     }
 
 

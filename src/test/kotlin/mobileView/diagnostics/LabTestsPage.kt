@@ -27,7 +27,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun navigateToDiagnostics() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(testUser.mobileNumber)
+        loginPage.enterMobileAndContinue(testUser)
         
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)

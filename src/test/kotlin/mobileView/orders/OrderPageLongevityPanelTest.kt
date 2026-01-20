@@ -31,8 +31,8 @@ class OrderPageLongevityPanelTest {
         val tesUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         val oderPage = loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+            .enterMobileAndContinue(tesUser)
+            .enterOtpAndContinueToMobileHomePage(tesUser)
             .clickProfile()
             .waitForProfilePageToLoad()
             .clickOrdersTab()
@@ -63,8 +63,8 @@ class OrderPageLongevityPanelTest {
         val tesUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         val ordersPage = loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+            .enterMobileAndContinue(tesUser)
+            .enterOtpAndContinueToMobileHomePage(tesUser)
             .clickProfile()
             .waitForProfilePageToLoad()
             .clickOrdersTab()

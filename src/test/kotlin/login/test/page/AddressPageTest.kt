@@ -45,13 +45,12 @@ class AddressPageTest {
     }
 
     private fun navigateToAddressPage(): login.page.AddressPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test","test@test.com")
-            .fillAndContinue()
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToAccountCreation()
+            .fillBasicDetails()
+            .fillPersonalDetails()
     }
 
     @Test
@@ -158,13 +157,7 @@ class AddressPageTest {
     fun `should navigate to time slot page on valid submission`() {
         val addressPage = navigateToAddressPage()
 
-        val timeSlotPage = addressPage.fillAndContinue(
-            flatHouseNoOrBuilding = "Flat 101",
-            address = "123, Test Street",
-            city = "Chennai",
-            state = "Tamil Nadu",
-            pinCode = "600001"
-        )
+        val timeSlotPage = addressPage.fillAddressDetails(TestConfig.TestUsers.NEW_USER)
 
         timeSlotPage.waitForConfirmation()
 

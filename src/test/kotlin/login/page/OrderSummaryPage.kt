@@ -138,4 +138,52 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         removeThirdTest?.click()
         removeFourthTest?.click()
     }
+
+    fun addFirstAddOn() {
+        firstTest.click()
+    }
+
+    fun addSecondAddOn() {
+        secondTest.click()
+    }
+
+    fun addThirdAddOn() {
+        thirdTest.click()
+    }
+
+    fun addFourthAddOn() {
+        fourthTest.click()
+    }
+
+    fun removeFirstAddOn() {
+        removeFirstTest.click()
+    }
+
+    fun removeSecondAddOn() {
+        removeSecondTest.click()
+    }
+
+    fun removeThirdAddOn() {
+        removeThirdTest.click()
+    }
+
+    fun removeFourthAddOn() {
+        removeFourthTest.click()
+    }
+
+    fun getFirstAddOnName(): String {
+        return firstTestName.innerText()
+    }
+
+    fun getSecondAddOnName(): String {
+        return secondTestName.innerText()
+    }
+
+    fun getThirdAddOnName(): String {
+        return thirdTestName.innerText()
+    }
+
+    fun getFourthAddOnName(): String {
+        return fourthTestName.innerText()
+    }
 }

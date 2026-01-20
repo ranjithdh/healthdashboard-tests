@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import config.TestUser
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -45,10 +46,10 @@ class LoginPage(page: Page) : BasePage(page) {
         page.getByText("Sweden").nth(1).click()
     }
 
-    fun enterMobileAndContinue(phoneNumber: String): OtpPage {
-        logger.info { "enterMobileAndContinue($phoneNumber)" }
+    fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
+        logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
         selectCountryCode()
-        enterMobileNumber(phoneNumber)
+        enterMobileNumber(testUser.mobileNumber)
         clickContinue()
         val otpPage = OtpPage(page)
         otpPage.waitForConfirmScreen()
