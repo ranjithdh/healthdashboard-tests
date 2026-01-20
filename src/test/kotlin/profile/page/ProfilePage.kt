@@ -1633,6 +1633,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
 
+
         (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
