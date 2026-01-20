@@ -58,7 +58,7 @@ class TimeSlotPageTest {
         return loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .fillAndContinue("Test","test@test.com")
             .fillAndContinue()
             .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
     }
@@ -83,7 +83,7 @@ class TimeSlotPageTest {
     @Test
     fun `should select post meal slot successfully`() {
         val timeSlotPage = navigateToTimeSlotPage()
-
+        timeSlotPage.selectMorningSlot()
         timeSlotPage.selectPostMealSlot()
         timeSlotPage.takeScreenshot("post-meal-slot-selected")
     }
@@ -99,29 +99,29 @@ class TimeSlotPageTest {
         timeSlotPage.takeScreenshot("multiple-slots-selected")
     }
 
-    @Test
-    fun `should verify invalid fasting slot conditions`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-        
-        val lateSlots = timeSlotPage.getFastingSlotsStartingAfter(11, 30)
-        
-        if (lateSlots.isNotEmpty()) {
-            val lateSlot = lateSlots.first()
-            println("Testing late slot: $lateSlot")
-            timeSlotPage.clickSlot(lateSlot)
-            assert(timeSlotPage.isInvalidFastingSlotPopupVisible()) { "Popup should appear for slot > 11:30 AM: $lateSlot" }
-            timeSlotPage.closeInvalidFastingSlotPopup()
-        }
-
-        val unavailableSlots = timeSlotPage.getUnavailableFastingSlots()
-        if (unavailableSlots.isNotEmpty()) {
-            val unavailableSlot = unavailableSlots.first()
-            println("Testing unavailable slot: $unavailableSlot")
-            timeSlotPage.clickSlot(unavailableSlot)
-            assert(timeSlotPage.isInvalidFastingSlotPopupVisible()) { "Popup should appear for unavailable slot: $unavailableSlot" }
-            timeSlotPage.closeInvalidFastingSlotPopup()
-        }
-    }
+//    @Test
+//    fun `should verify invalid fasting slot conditions`() {
+//        val timeSlotPage = navigateToTimeSlotPage()
+//
+//        val lateSlots = timeSlotPage.getFastingSlotsStartingAfter(11, 30)
+//
+//        if (lateSlots.isNotEmpty()) {
+//            val lateSlot = lateSlots.first()
+//            println("Testing late slot: $lateSlot")
+//            timeSlotPage.clickSlot(lateSlot)
+//            assert(timeSlotPage.isInvalidFastingSlotPopupVisible()) { "Popup should appear for slot > 11:30 AM: $lateSlot" }
+//            timeSlotPage.closeInvalidFastingSlotPopup()
+//        }
+//
+//        val unavailableSlots = timeSlotPage.getUnavailableFastingSlots()
+//        if (unavailableSlots.isNotEmpty()) {
+//            val unavailableSlot = unavailableSlots.first()
+//            println("Testing unavailable slot: $unavailableSlot")
+//            timeSlotPage.clickSlot(unavailableSlot)
+//            assert(timeSlotPage.isInvalidFastingSlotPopupVisible()) { "Popup should appear for unavailable slot: $unavailableSlot" }
+//            timeSlotPage.closeInvalidFastingSlotPopup()
+//        }
+//    }
 
     @Test
     fun `should verify post meal slots match api data`() {

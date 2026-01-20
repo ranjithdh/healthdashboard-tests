@@ -1,22 +1,17 @@
 package login.page
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.json
-import mobileView.home.HomePage
 import forWeb.diagnostics.page.LabTestsPage
-import model.profile.UserAddressResponse
+import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
 import utils.logger.logger
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.util.Scanner
 
 private val logger = KotlinLogging.logger {}
 
@@ -83,9 +78,12 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
+
+
+
     fun enterOtpAndContinueToAccountCreation(otp: String): BasicDetailsPage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val basicDetailsPage = BasicDetailsPage(page)
         basicDetailsPage.waitForConfirmation()
@@ -95,7 +93,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToMobileHomePage(otp: String): HomePage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -105,7 +103,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToProfile(otp: String): ProfilePage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val profilePage = ProfilePage(page)
 
@@ -177,7 +175,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToLabTestForWeb(otp: String): LabTestsPage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
         val labTestPage = LabTestsPage(page)

@@ -50,7 +50,7 @@ class PersonalDetailsPageTest {
         return loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .fillAndContinue("Test","test@test.com")
     }
 
     @Test

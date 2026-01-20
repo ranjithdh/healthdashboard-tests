@@ -57,7 +57,6 @@ class BasicDetailsPageTest {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
         assert(basicDetailsPage.isFirstNameVisible()) { "First name field should be visible" }
-        assert(basicDetailsPage.isLastNameVisible()) { "Last name field should be visible" }
         assert(basicDetailsPage.isEmailVisible()) { "Email field should be visible" }
         assert(basicDetailsPage.isContinueButtonVisible()) { "Continue button should be visible" }
 //        assert(!basicDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
@@ -79,7 +78,6 @@ class BasicDetailsPageTest {
     fun `should fill last name correctly`() {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
-        basicDetailsPage.enterLastName("DashBoard")
         basicDetailsPage.takeScreenshot("last-name-filled")
     }
 
@@ -97,7 +95,7 @@ class BasicDetailsPageTest {
     fun `should fill all details correctly`() {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
-        basicDetailsPage.fillDetails("John", "Doe", "john.doe@test.com")
+        basicDetailsPage.fillDetails("John", "john.doe@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
 
         basicDetailsPage.takeScreenshot("all-details-filled")
@@ -108,7 +106,6 @@ class BasicDetailsPageTest {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
         basicDetailsPage.enterFirstName("DH")
-        basicDetailsPage.enterLastName("DashBoard")
         basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
 
@@ -119,27 +116,10 @@ class BasicDetailsPageTest {
     }
 
     @Test
-    fun `should have Continue disabled with empty lastName`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
-        basicDetailsPage.enterFirstName("DH")
-        basicDetailsPage.enterLastName("DashBoard")
-        basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
-        assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
-
-        basicDetailsPage.clearLastName()
-        assert(!basicDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
-
-        basicDetailsPage.takeScreenshot("continue-disabled-empty")
-    }
-
-
-    @Test
     fun `should have Continue disabled with empty email`() {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
         basicDetailsPage.enterFirstName("DH")
-        basicDetailsPage.enterLastName("DashBoard")
         basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
 
@@ -154,7 +134,7 @@ class BasicDetailsPageTest {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
         val personalDetailsPage = basicDetailsPage
-            .fillAndContinue("John", "Doe", "john.doe@test.com")
+            .fillAndContinue("DH", "dh.deep@test.com")
 
         assert(personalDetailsPage.isDateOfBirthVisible()) { "Should be on personal details page" }
         personalDetailsPage.takeScreenshot("navigated-to-personal-details")

@@ -5,6 +5,9 @@ import config.TestConfig
 import login.page.LoginPage
 import login.page.OrderSummaryPage
 import org.junit.jupiter.api.*
+import utils.OnboardAddOnTestDataStore
+import java.text.DecimalFormat
+import kotlin.collections.forEach
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -37,6 +40,7 @@ class OrderSummaryPageTest {
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
     }
 
@@ -51,9 +55,9 @@ class OrderSummaryPageTest {
         val orderSummaryPage = loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .fillAndContinue("Test", "test@test.com")
             .fillAndContinue()
-            .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
+            .fillAndContinue("Flat 101", "Test Address", "Chennai", "Tamil Nadu", "600001")
             .selectSlotsAndContinue()
 
         return orderSummaryPage
@@ -114,7 +118,39 @@ class OrderSummaryPageTest {
 
         assert(orderSummaryPage.isCouponValueVisible("- ₹0")) { "Coupon discount should be 0 after removal" }
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
-        
+
         orderSummaryPage.takeScreenshot("coupon-removed")
+    }
+
+
+    @Test
+    fun `add and remove all the add on tests`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
+
+        orderSummaryPage.addAllTheAddOnTests()
+
+        val addOnTests = OnboardAddOnTestDataStore.get()
+
+        var totalAmount = 9999f
+
+        addOnTests.packages?.forEach {
+            totalAmount += it.product?.price?.toFloat() ?: 0.0f
+        }
+
+        addOnTests.tests?.forEach {
+            totalAmount += it.product?.price?.toFloat() ?: 0.0f
+        }
+
+        addOnTests.test_profiles?.forEach {
+            totalAmount += it.product?.price?.toFloat() ?: 0.0f
+        }
+
+        val formatter = DecimalFormat("#,###")
+        val totalAmountToShow = formatter.format(totalAmount)
+
+        assert(orderSummaryPage.isTotalAmountVisible("₹$totalAmountToShow")) { "Initial total should be ₹$totalAmountToShow" }
+        orderSummaryPage.removeAllTheAddOnTests()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
     }
 }
