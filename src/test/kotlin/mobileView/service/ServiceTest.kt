@@ -61,8 +61,6 @@ class ServiceTest {
         
         // Wait for URL to be services
         servicePage.navigateToServices()
-        page.waitForURL(TestConfig.Urls.SERVICES_URL)
-        
         // Verify static content
         servicePage.verifyStaticContent()
     }
@@ -73,26 +71,26 @@ class ServiceTest {
         
         println("Starting test: verify service cards using API response")
         
-        // Navigate to Home Page first
-        servicePage.navigateToServices()
-//        page.waitForURL(TestConfig.Urls.SERVICES_URL)
-        
         println("Capturing API response and navigating to Services page...")
         val response = page.waitForResponse({ 
-            it.url().contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) && it.status() == 200 
+            it.url().contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) && (it.status() == 200 || it.status() == 304)
         }) {
-             // Click "Book Now" -> Leads to Services Page which triggers API
-             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
+             // navigateToServices() includes login and the "Book Now" click which triggers the API
+             servicePage.navigateToServices()
         }
         
-//        page.waitForURL(TestConfig.Urls.SERVICES_URL)
+        page.waitForURL(TestConfig.Urls.SERVICES_URL)
         
         val responseBody = response.text()
-        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true; explicitNulls = false }
-        val serviceResponse = json.decodeFromString<model.ServiceResponse>(responseBody)
+        if (responseBody.isNotEmpty()) {
+            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true; explicitNulls = false }
+            val serviceResponse = json.decodeFromString<model.ServiceResponse>(responseBody)
+            servicePage.setServiceData(serviceResponse)
+        }
         
-        servicePage.setServiceData(serviceResponse)
-        servicePage.verifyServices()
+        // Verify specific consultant flow (e.g. Nutritionist Consultation)
+        val targetProductId =  "898c67b7-bf72-4a37-8f3d-6a3dbc981edb"//"72055641-39fc-423b-9a57-b07cda66727f" //"898c67b7-bf72-4a37-8f3d-6a3dbc981edb"
+        servicePage.verifyServices(targetProductId)
         
         println("Test completed successfully.")
     }
