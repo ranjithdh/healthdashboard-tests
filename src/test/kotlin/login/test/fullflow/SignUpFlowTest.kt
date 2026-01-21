@@ -4,6 +4,8 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.Tracing.StartOptions
+import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
 import login.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
@@ -47,12 +49,26 @@ class SignUpFlowTest {
         context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
 
+
+        context.tracing().start(
+            StartOptions()
+                .setScreenshots(true)
+                .setSnapshots(true)
+                .setSources(true)
+        )
+
         val videoPath = page.video()?.path()
         println("📹 Video saved to: $videoPath")
     }
 
     @AfterEach
     fun closeContext() {
+        val path = "build/traceView/trace_${System.currentTimeMillis()}.zip"
+        context.tracing().stop(
+            StopOptions()
+                .setPath(Paths.get(path))
+        )
+
         context.close()
     }
 

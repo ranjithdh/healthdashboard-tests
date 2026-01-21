@@ -1,9 +1,17 @@
 package login.test.login
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
+import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.Tracing.StartOptions
+import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
+import config.TestConfig.Artifacts.SCREENSHOT_DIR
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import java.nio.file.Paths
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginPageTest {
@@ -35,11 +43,24 @@ class LoginPageTest {
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
+        context.tracing().start(
+            StartOptions()
+                .setScreenshots(true)
+                .setSnapshots(true)
+                .setSources(true)
+        )
+
         page = context.newPage()
     }
 
     @AfterEach
     fun closeContext() {
+        val path = "build/traceView/trace_${System.currentTimeMillis()}.zip"
+        context.tracing().stop(
+            StopOptions()
+                .setPath(Paths.get(path))
+        )
+
         context.close()
     }
 
