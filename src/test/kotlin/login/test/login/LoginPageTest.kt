@@ -7,7 +7,6 @@ import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
-import config.TestConfig.Artifacts.SCREENSHOT_DIR
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 import java.nio.file.Paths
