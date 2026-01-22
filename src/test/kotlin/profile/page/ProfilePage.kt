@@ -1631,9 +1631,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             nextButton = nextButton,
             previousButton = previousButton,
         )
-        //None
 
-        options.forEach { it.click() }
 
         none.click()
         assertExclusiveSelected(none, (options + others))
