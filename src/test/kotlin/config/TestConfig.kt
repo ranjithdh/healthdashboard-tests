@@ -22,15 +22,15 @@ object TestConfig {
 
     object Urls {
         val BASE_URL: String = "https://app.stg.deepholistics.com"
-        val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        val DIAGNOSTICS_URL: String = "$BASE_URL/diagnostics"
         val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
-        val HOME_PAGE_URL: String = "https://app.stg.deepholistics.com/home"
+        val HOME_PAGE_URL: String = "$BASE_URL/home"
         val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
         val SYMPTOMS_PAGE_URL: String = "$BASE_URL/insights"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
-        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
+        val DIAGNOSTICS_PATH = "$BASE_URL/diagnostics"
 
         // val HOME_PAGE_URL = "$BASE_URL/home"
         val PROFILE_URL = "$BASE_URL/profile"
