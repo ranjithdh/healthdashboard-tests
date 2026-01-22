@@ -478,6 +478,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun fillMandatoryAddressFields(
         nickName: String,
         street: String,
+        doorNumber: String,
         city: String,
         state: String,
         pincode: String,
@@ -485,6 +486,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     ) {
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
+        houseNoInput.fill(doorNumber)
         cityInput.fill(city)
         stateInput.fill(state)
         pincodeInput.fill(pincode)
@@ -495,6 +497,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun addAddressAndValidate() {
         val number = (0..100).random()
         val nickName = "Home $number"
+        val doorNumber="E 4"
         val street = "5 Road, Swarnapuri"
         val city = "Salem"
         val state = "Tamil Nadu"
@@ -504,6 +507,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         fillMandatoryAddressFields(
             nickName,
             street,
+            doorNumber,
             city,
             state,
             pincode,
@@ -3296,6 +3300,12 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         (listOf(title, subTitle, notSure, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
+
+        conditions.forEach {
+            if (isButtonChecked(it)) {
+                it.click()
+            }
+        }
 
         // 🔹 Clear any previous selections (optional but good practice)
         // Note: For a clean run, we assume nothing is selected initially.
