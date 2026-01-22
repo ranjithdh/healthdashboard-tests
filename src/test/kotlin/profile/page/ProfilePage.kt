@@ -162,31 +162,31 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     private fun assertProgressCount(index: Int? = null) {
-        /* val currentIndex = index ?: (answersStored.size + 1)
-         val total = calculateExpectedTotal()
-         val expectedText = "QUESTION $currentIndex/$total"
+        val currentIndex = index ?: (answersStored.size + 1)
+        val total = calculateExpectedTotal()
+        val expectedText = "QUESTION $currentIndex/$total"
 
-         val actualText = questionerCount.innerText()
-         logger.info { "Asserting Progress: Expected [$expectedText], Actual [$actualText]" }
-         assertEquals(expectedText, actualText, "Progress counter mismatch")
+        val actualText = questionerCount.innerText()
+        logger.info { "Asserting Progress: Expected [$expectedText], Actual [$actualText]" }
+        assertEquals(expectedText, actualText, "Progress counter mismatch")
 
-         // Verify Progress Bar indicator
-         val style = progressIndicator.getAttribute("style") ?: ""
-         val expectedScale = currentIndex.toDouble() / total
+        // Verify Progress Bar indicator
+        val style = progressIndicator.getAttribute("style") ?: ""
+        val expectedScale = currentIndex.toDouble() / total
 
-         // Regex to extract scaleX value from transform: scaleX(0.02702702702702703)
-         val match = Pattern.compile("scaleX\\(([0-9.]+)\\)").matcher(style)
-         if (match.find()) {
-             val actualScale = match.group(1).toDouble()
-             logger.info { "Asserting Progress Bar: Expected Scale [~$expectedScale], Actual Scale [$actualScale]" }
-             // Use a small delta for floating point comparison
-             assertTrue(
-                 Math.abs(expectedScale - actualScale) < 0.01,
-                 "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale"
-             )
-         } else {
-             throw AssertionError("Could not find scaleX in progress indicator style: $style")
-         }*/
+        // Regex to extract scaleX value from transform: scaleX(0.02702702702702703)
+        val match = Pattern.compile("scaleX\\(([0-9.]+)\\)").matcher(style)
+        if (match.find()) {
+            val actualScale = match.group(1).toDouble()
+            logger.info { "Asserting Progress Bar: Expected Scale [~$expectedScale], Actual Scale [$actualScale]" }
+            // Use a small delta for floating point comparison
+            assertTrue(
+                Math.abs(expectedScale - actualScale) < 0.01,
+                "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale"
+            )
+        } else {
+            throw AssertionError("Could not find scaleX in progress indicator style: $style")
+        }
     }
 
     private fun formatValue(value: Any?): String {
