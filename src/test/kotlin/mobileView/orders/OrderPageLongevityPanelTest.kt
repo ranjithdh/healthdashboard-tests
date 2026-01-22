@@ -4,6 +4,8 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.SignupDataStore
+import utils.logger.logger
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -69,6 +71,8 @@ class OrderPageLongevityPanelTest {
             .waitForProfilePageToLoad()
             .clickOrdersTab()
 
+        logger.info { "ordersPage...${SignupDataStore.get().selectedAddOns}" }
+
 
         if (ordersPage.waitForLongevityPanelToLOad()) {
             ordersPage.clickOrderStatus()
@@ -84,6 +88,7 @@ class OrderPageLongevityPanelTest {
 
         ordersPage.waitForLongevityPanelToLOad()
         ordersPage.clickOrderStatus()
+
 
         if (ordersPage.isBloodTestCardVisible()) {
             if (ordersPage.isTBloodTestCancelled()) {

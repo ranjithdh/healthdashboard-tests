@@ -99,7 +99,6 @@ class SignUpFlowTest {
         homePage.takeScreenshot("signup-order-placed")
     }
 
-
     @Test
     fun `complete full signup flow with coupon code`() {
         val loginPage = LoginPage(page).navigate() as LoginPage

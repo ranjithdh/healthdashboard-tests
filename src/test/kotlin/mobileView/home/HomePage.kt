@@ -143,8 +143,8 @@ class HomePage(page: Page) : BasePage(page) {
         val signUpData = SignupDataStore.get()
         val fastingSlotTime = signUpData.fastingSlot?.split(":")
 
-        val savedLocalDate = signUpData.slotDate?.withHour(fastingSlotTime?.first()?.toInt() ?: 0)
-            ?.withMinute(fastingSlotTime?.last()?.toInt() ?: 0)?.withSecond(0)
+        val savedLocalDate = signUpData.slotDate?.withHour(fastingSlotTime?.first()?.trim()?.toInt() ?: 0)
+            ?.withMinute(fastingSlotTime?.last()?.trim()?.toInt() ?: 0)?.withSecond(0)
 
 
         val diagnostic = homeData?.diagnostics?.firstOrNull { it.blood_test_appointment_date != null }

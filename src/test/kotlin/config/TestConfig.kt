@@ -114,8 +114,8 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "726408324",
-            otp = "678901",
+            mobileNumber = "726408390",
+            otp = "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
             gender = "Male",
@@ -136,19 +136,6 @@ object TestConfig {
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901",
-            firstName = "ranjith",
-            email = "ranjithkumar.m@mysmitch.com",
-            gender = "Male",
-            height = "170",
-            weight = "60",
-            month = "2",
-            year = "1998",
-            day = "12",
-            flatHouseNo = "Flat 101",
-            address = "456 Main Road",
-            city = "Delhi",
-            state = "Delhi",
-            pinCode = "110001",
             country = "India"
         )
     }
