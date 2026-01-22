@@ -4816,23 +4816,21 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // ---- Expected visible based on FOOD_PREFERENCE ----
         val expectedVisible = when {
-            foodPreference.contains("Vegan") -> setOf(
-                "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
-            )
-
-            foodPreference.contains("Vegetarian") -> setOf(
-                "Milk or dairy", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
-            )
-
-            foodPreference.contains("Eggetarian") -> setOf(
-                "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
-            )
-
-            foodPreference.contains("Non-Vegetarian") -> setOf(
+            foodPreference.equals("Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods") -> setOf(
                 "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy",
                 "Gluten (Wheat)", "Fish", "Shellfish", "None", "Others"
             )
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
+                "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
 
+            foodPreference.equals("Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood") -> setOf(
+                "Milk or dairy", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
+
+            foodPreference.equals("Eggetarian : Primarily plant-based but includes eggs in their diet") -> setOf(
+                "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
             else -> error("Unknown food preference: $foodPreference")
         }
 
@@ -4880,7 +4878,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         val expectedVisibleLabels = when {
-            foodPreference.contains("Vegan") -> setOf("Caffeine", "Gluten", "None")
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf("Caffeine", "Gluten", "None")
             else -> setOf("Lactose", "Caffeine", "Gluten", "None")
         }
 
