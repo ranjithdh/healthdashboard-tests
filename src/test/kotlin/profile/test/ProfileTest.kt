@@ -6,6 +6,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import login.page.LoginPage
+import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -209,7 +210,41 @@ class ProfileTest {
 
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.assertQuestionerVegInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGETARIAN)
+
+        profilePage.assertQuestionerValidationsCheck()
+    }
+
+    @Test
+    fun `questioner validation vegan`() { //done
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGAN)
+
+        profilePage.assertQuestionerValidationsCheck()
+    }
+
+    @Test
+    fun `questioner validation eggetarian`() { //done
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.EGGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -226,7 +261,7 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
 
-        profilePage.assertQuestionerNonVegInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.NON_VEGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -304,9 +339,11 @@ class ProfileTest {
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(
-            profile.model.MedicalCondition.GASTROINTESTINAL, profile.model.MedicalCondition.DERMATOLOGICAL
-        ))
+        profilePage.setMedicalConditions(
+            listOf(
+                profile.model.MedicalCondition.GASTROINTESTINAL, profile.model.MedicalCondition.DERMATOLOGICAL
+            )
+        )
 
 
         // Test: Select "Gastrointestinal" + "Dermatological" in Q37
@@ -387,9 +424,11 @@ class ProfileTest {
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions( listOf(
-            profile.model.MedicalCondition.CARDIOVASCULAR, profile.model.MedicalCondition.KIDNEY
-        ))
+        profilePage.setMedicalConditions(
+            listOf(
+                profile.model.MedicalCondition.CARDIOVASCULAR, profile.model.MedicalCondition.KIDNEY
+            )
+        )
 
         // Test: Select "Cardiovascular" + "Kidney Conditions" in Q37
         // Expected: Q37 → Q46 (Heart) → Q45 (Kidney) → Q51
@@ -410,11 +449,13 @@ class ProfileTest {
 
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions( listOf(
-            profile.model.MedicalCondition.DIABETES,
-            profile.model.MedicalCondition.THYROID,
-            profile.model.MedicalCondition.CANCER
-        ))
+        profilePage.setMedicalConditions(
+            listOf(
+                profile.model.MedicalCondition.DIABETES,
+                profile.model.MedicalCondition.THYROID,
+                profile.model.MedicalCondition.CANCER
+            )
+        )
 
         // Test: Select "Diabetes" + "Thyroid" + "Cancer" in Q37
         // Expected: Q37 → Q42 (Diabetes) → Q43 (Thyroid) → Q49 (Cancer) → Q50 (Type) → Q51
@@ -434,9 +475,11 @@ class ProfileTest {
                 .clickAccountProfile().waitForConfirmation()
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions( listOf(
-            profile.model.MedicalCondition.RESPIRATORY, profile.model.MedicalCondition.AUTO_IMMUNE
-        ))
+        profilePage.setMedicalConditions(
+            listOf(
+                profile.model.MedicalCondition.RESPIRATORY, profile.model.MedicalCondition.AUTO_IMMUNE
+            )
+        )
 
         // Test: Select "Respiratory" + "Auto-immune" in Q37
         // Expected: Q37 → Q47 (Respiratory) → Q48 (Auto-immune) → Q51
@@ -457,13 +500,15 @@ class ProfileTest {
 
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions( listOf(
-            profile.model.MedicalCondition.GASTROINTESTINAL,
-            profile.model.MedicalCondition.DERMATOLOGICAL,
-            profile.model.MedicalCondition.DIABETES,
-            profile.model.MedicalCondition.THYROID,
-            profile.model.MedicalCondition.GALL_BLADDER,
-        ))
+        profilePage.setMedicalConditions(
+            listOf(
+                profile.model.MedicalCondition.GASTROINTESTINAL,
+                profile.model.MedicalCondition.DERMATOLOGICAL,
+                profile.model.MedicalCondition.DIABETES,
+                profile.model.MedicalCondition.THYROID,
+                profile.model.MedicalCondition.GALL_BLADDER,
+            )
+        )
 
         // Test: Select multiple major conditions in Q37
         // Expected: Q37 → All selected detail questions → Q51
@@ -534,7 +579,6 @@ class ProfileTest {
 
         // Validate backward navigation
         profilePage.assertQuestionerBackwardValidationsCheck()
-
     }
 
 }
