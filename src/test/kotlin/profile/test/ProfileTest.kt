@@ -534,6 +534,7 @@ class ProfileTest {
 
         // Validate backward navigation
         profilePage.assertQuestionerBackwardValidationsCheck()
+
     }
 
 }
