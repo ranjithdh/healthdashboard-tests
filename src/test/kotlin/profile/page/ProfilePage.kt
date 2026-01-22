@@ -1114,7 +1114,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    fun assertQuestionerVegInitialCheck() {
+    fun assertQuestionerVegInitialCheck(type: QuestionerMealType = QuestionerMealType.VEGETARIAN) {
         fetchAccountInformation()
         answersStored.clear()
         logger.info {
@@ -1134,7 +1134,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         questionDialog.waitFor()
 
-        question_1_veg()
+        question_1_veg(type)
     }
 
     fun assertQuestionerNonVegInitialCheck() {
@@ -1159,7 +1159,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_non_veg()
     }
 
-    fun question_1_veg() { //What is your food preference?
+    fun question_1_veg(type: QuestionerMealType) { //What is your food preference?
         logQuestion("What is your food preference?")
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
@@ -1185,13 +1185,48 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
         assertFalse(previousButton.isEnabled)
-        eggetarian.click()
-        logAnswer(
-            QuestionSubType.FOOD_PREFERENCE,
-            "What is your food preference?",
-            "Eggetarian : Primarily plant-based but includes eggs in their diet"
-        )
-        question_3()
+
+        when (type) {
+            QuestionerMealType.VEGETARIAN -> {
+                vegetarian.click()
+                logAnswer(
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
+                )
+                question_3()
+            }
+
+            QuestionerMealType.NON_VEGETARIAN -> {
+                nonVegetarian.click()
+                logAnswer(
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods"
+                )
+                question_2()
+            }
+
+            QuestionerMealType.VEGAN -> {
+                vegan.click()
+                logAnswer(
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs"
+                )
+                question_3()
+            }
+
+            QuestionerMealType.EGGETARIAN -> {
+                eggetarian.click()
+                logAnswer(
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Eggetarian : Primarily plant-based but includes eggs in their diet"
+                )
+                question_3()
+            }
+        }
     }
 
     fun question_1_non_veg() { //What is your food preference?
@@ -1219,13 +1254,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertFalse(previousButton.isEnabled)
 
-        nonVegetarian.click()
-        logAnswer(
-            QuestionSubType.FOOD_PREFERENCE,
-            "What is your food preference?",
-            "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods"
-        )
-        question_2()
+
     }
 
     private fun question_2() { //Which of the following do you consume?

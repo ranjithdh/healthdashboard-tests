@@ -6,6 +6,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import login.page.LoginPage
+import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -209,7 +210,41 @@ class ProfileTest {
 
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.assertQuestionerVegInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGETARIAN)
+
+        profilePage.assertQuestionerValidationsCheck()
+    }
+
+    @Test
+    fun `questioner validation vegan`() { //done
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGAN)
+
+        profilePage.assertQuestionerValidationsCheck()
+    }
+
+    @Test
+    fun `questioner validation eggetarian`() { //done
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val profilePage =
+            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+                .clickAccountProfile().waitForConfirmation()
+
+
+        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.EGGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
     }
@@ -226,7 +261,7 @@ class ProfileTest {
 
         profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
 
-        profilePage.assertQuestionerNonVegInitialCheck()
+        profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.NON_VEGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
     }
