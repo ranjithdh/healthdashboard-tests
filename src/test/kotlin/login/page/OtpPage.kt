@@ -203,5 +203,21 @@ class OtpPage(page: Page) : BasePage(page) {
     fun isIncorrectOtpMessageVisible(): Boolean {
         return page.getByText("Incorrect OTP").isVisible
     }
+
+    fun enterOtpAndContinueToHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
+        enterOtp(testUser.otp)
+        // Wait for login to complete (either by URL change or timeout)
+        try {
+            page.waitForURL("**/home", Page.WaitForURLOptions().setTimeout(10000.0))
+        } catch (e: Exception) {
+            // Ignore timeout if it doesn't go to home quickly, just proceed to navigate
+            logger.info { "Wait for home page timed out or skipped, proceeding to Health Data page" }
+        }
+        
+        val healthDataPage = healthdata.page.HealthDataPage(page)
+        healthDataPage.navigate()
+        healthDataPage.waitForPageLoad()
+        return healthDataPage
+    }
 }
 

@@ -29,6 +29,9 @@ dependencies {
 
     // JSON parsing for test data
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+    // JUnit Params
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
 

@@ -29,6 +29,7 @@ object TestConfig {
         const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+        const val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
         const val PROFILE_URL = "${BASE_URL}profile"
