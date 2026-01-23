@@ -497,7 +497,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun addAddressAndValidate() {
         val number = (0..100).random()
         val nickName = "Home $number"
-        val doorNumber="E 4"
+        val doorNumber = "E 4"
         val street = "5 Road, Swarnapuri"
         val city = "Salem"
         val state = "Tamil Nadu"
@@ -1216,8 +1216,6 @@ class ProfilePage(page: Page) : BasePage(page) {
                     "What is your food preference?",
                     "Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs"
                 ) { question_3() }
-                vegan.click()
-
             }
 
             QuestionerMealType.EGGETARIAN -> {
