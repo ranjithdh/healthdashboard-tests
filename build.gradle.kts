@@ -32,6 +32,9 @@ dependencies {
 
     // JSON parsing for test data
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    //Allure
+    testImplementation("io.qameta.allure:allure-junit5:2.25.0")
 }
 
 
@@ -52,6 +55,10 @@ tasks.withType<Test> {
         delete(layout.buildDirectory.dir("allure-results"))
     }
 
+    systemProperty(
+        "allure.results.directory",
+        layout.buildDirectory.dir("allure-results").get().asFile.absolutePath
+    )
 
     // Parallel execution
     systemProperty("junit.jupiter.execution.parallel.enabled", "true")
@@ -79,9 +86,9 @@ tasks.register<Exec>("installPlaywright") {
 }
 
 allure {
-    version.set("2.24.0")
+    version.set("2.25.0")
+
     adapter {
         autoconfigure.set(true)
-        aspectjWeaver.set(true)
     }
 }
