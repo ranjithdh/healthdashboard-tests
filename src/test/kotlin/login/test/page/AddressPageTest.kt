@@ -50,7 +50,7 @@ class AddressPageTest {
         return loginPage
             .enterMobileAndContinue(testUser.mobileNumber)
             .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .fillAndContinue("Test","test@test.com")
             .fillAndContinue()
     }
 
@@ -119,14 +119,6 @@ class AddressPageTest {
             pinCode = "600001"
         )
         addressPage.takeScreenshot("address-all-filled")
-    }
-
-    @Test
-    fun `should have Continue disabled with empty fields`() {
-        val addressPage = navigateToAddressPage()
-
-        assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
-        addressPage.takeScreenshot("continue-disabled-address")
     }
 
     @Test

@@ -21,40 +21,69 @@ object TestConfig {
     }
 
     object Urls {
-        val BASE_URL: String = "https://app.stg.deepholistics.com"
-        val DIAGNOSTICS_URL: String = "$BASE_URL/diagnostics"
-        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
-        val HOME_PAGE_URL: String = "$BASE_URL/home"
-        val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
-        val SYMPTOMS_PAGE_URL: String = "$BASE_URL/insights"
 
         val LOGIN_PATH = "/login"
         val HOME_PATH = "/home"
-        val DIAGNOSTICS_PATH = "$BASE_URL/diagnostics"
+        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val SERVICES_URL = "https://app.stg.deepholistics.com/services"
+        const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
-        // val HOME_PAGE_URL = "$BASE_URL/home"
-        val PROFILE_URL = "$BASE_URL/profile"
+        const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
+        const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+        const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+
+        const val HOME_PAGE_URL = "${BASE_URL}home"
+        const val PROFILE_URL = "${BASE_URL}profile"
+
+
+        const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
+        const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
+        const val WHAT_WE_TEST: String = "${WEBSITE_BASE_URL}what-we-test"
+        const val OUR_WHY: String = "${WEBSITE_BASE_URL}our-why"
+        const val FAQ: String = "${WEBSITE_BASE_URL}faq"
+        const val ALL_TEST: String = "${WEBSITE_BASE_URL}all-tests"
+        const val ALLERGY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/allergies"
+        const val GUT_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gut"
+        const val STRESS_CORTISOL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/stress-and-cortisol"
+        const val GENE_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gene"
+        const val OMEGA_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/omega-profile"
+        const val TOXIC_METALS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/toxic-metals"
+        const val THYROID_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/thyroid-health"
+        const val WOMEN_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-health"
+        const val ESSENTIAL_AND_NUTRIENTS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/essential-nutrients"
+        const val ADVANCED_THYROID_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/advanced-thyroid"
+        const val LIVER_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/liver-health"
+        const val AUTO_IMMUNE_PANEL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/autoimmune"
+        const val HEART_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/heart-health"
+        const val WOMEN_FERTILITY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-fertility"
+        const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
+
+
+        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
     }
 
 
     object APIs {
-        val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-
-        val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
-        val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
-        val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
-        val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
-        val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
-        val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
-        val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+        const val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
+        const val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
+        const val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
+        const val API_PREFERENCE = "$BASE_URL/v4/human-token/preference?fields=communication_preference"
+        const val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
+        const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
+        const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
     }
 
 
     object Browser {
-        val HEADLESS: Boolean = false
-        val SLOW_MO: Double = (1 * 1000).toDouble()
-        val TIMEOUT: Double = 60000.toDouble()
+        const val HEADLESS: Boolean = false
+        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
@@ -108,18 +137,14 @@ object TestConfig {
     }
 
     object Artifacts {
-        val SCREENSHOT_DIR = "build/screenshots"
-        val VIDEO_DIR = "build/videos"
-        val TRACE_DIR = "build/traces"
-        val SCREENSHOT_ON_FAILURE = true
-        val RECORD_VIDEO = true
+        const val SCREENSHOT_DIR = "build/screenshots"
+        const val VIDEO_DIR = "build/videos"
+        const val RECORD_VIDEO = true
     }
 
     object Timeouts {
-        const val DEFAULT_TIMEOUT = 30000L
         const val NAVIGATION_TIMEOUT = 60000L
         const val ELEMENT_TIMEOUT = 10000L
-        const val ANIMATION_TIMEOUT = 500L
     }
 }
 

@@ -58,11 +58,9 @@ class LoginFlowTest {
         val tesUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage
+      loginPage
             .enterMobileAndContinue(tesUser.mobileNumber)
             .enterOtpAndContinueToMobileHomePage(tesUser.otp)
-
-
 
     }
 }

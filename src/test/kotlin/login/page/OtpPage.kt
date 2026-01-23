@@ -11,7 +11,6 @@ import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
-import symptoms.page.SymptomsPage
 import utils.logger.logger
 
 private val logger = KotlinLogging.logger {}
@@ -79,9 +78,12 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
+
+
+
     fun enterOtpAndContinueToAccountCreation(otp: String): BasicDetailsPage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val basicDetailsPage = BasicDetailsPage(page)
         basicDetailsPage.waitForConfirmation()
@@ -91,7 +93,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToMobileHomePage(otp: String): HomePage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -101,7 +103,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToProfile(otp: String): ProfilePage {
         enterOtp(otp)
-        clickContinue()
+//        clickContinue()
 
         val profilePage = ProfilePage(page)
 
@@ -173,7 +175,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToLabTestForWeb(otp: String): LabTestsPage {
         enterOtp(otp)
-       // clickContinue()
+//        clickContinue()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
         val labTestPage = LabTestsPage(page)

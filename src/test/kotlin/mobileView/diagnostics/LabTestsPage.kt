@@ -10,7 +10,7 @@ import login.page.LoginPage
 
 class LabTestsPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/diagnostics"
+    override val pageUrl = ""
 
 
 
@@ -32,8 +32,11 @@ class LabTestsPage(page: Page) : BasePage(page) {
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)
         
-        // Direct navigation to diagnostics
-        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+        // Navigate to Home first
+//        page.navigate(TestConfig.Urls.BASE_URL)
+        
+        // Click Book Now to go to Diagnostics (this triggers the API call needed by the test)
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
     }
 
     fun clickViewDetails(): TestDetailPage {
@@ -124,5 +127,13 @@ class LabTestsPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Your privacy matters")).click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your privacy matters")).click()
         page.getByText("Your health data is always").click()
+    }
+    fun clickFilter(name: String) {
+        page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName(name)).click()
+    }
+
+    fun isTestCardVisible(code: String): Boolean {
+        // Check if the card is visible by looking for the image element which is unique per card
+        return page.getByTestId("test-card-image-$code").isVisible
     }
 }
