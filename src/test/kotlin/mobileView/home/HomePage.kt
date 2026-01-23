@@ -6,21 +6,18 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import model.home.HomeData
 import model.home.HomeDataResponse
 import profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
-import utils.json.json
 import utils.logger.logger
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class HomePage(page: Page) : BasePage(page) {
 

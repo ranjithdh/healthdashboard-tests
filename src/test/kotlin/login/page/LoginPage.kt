@@ -41,8 +41,8 @@ class LoginPage(page: Page) : BasePage(page) {
     fun selectCountryCode() {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
         page.getByPlaceholder("Search country...").click()
-        page.getByPlaceholder("Search country...").fill("sweden")
-        page.getByText("Sweden").nth(1).click()
+        page.getByPlaceholder("Search country...").fill("india")
+        page.getByText("india").nth(1).click()
     }
 
     fun enterMobileAndContinue(phoneNumber: String): OtpPage {

@@ -21,18 +21,17 @@ object TestConfig {
     }
 
     object Urls {
-        
-        val LOGIN_PATH = "/login"
-        val HOME_PATH = "/home"
-        val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
-        val SERVICES_URL = "https://app.stg.deepholistics.com/services"
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
+        val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val SERVICES_URL = "${BASE_URL}services"
+
+
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
-        const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        const val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
-        const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+        const val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
         const val PROFILE_URL = "${BASE_URL}profile"
@@ -63,6 +62,7 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
     }
 
 
@@ -76,6 +76,7 @@ object TestConfig {
         const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
+        val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
     }
 
 
@@ -123,16 +124,16 @@ object TestConfig {
         )
 
 
-        val EXISTING_USER = TestUser(
+   /*     val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901"
-        )
+        )*/
 
 
-          /* val EXISTING_USER = TestUser(
-               mobileNumber = "8870208411",
-               otp = "678901"
-           )*/
+        val EXISTING_USER = TestUser(
+             mobileNumber = "8870208411",
+             otp = "678901"
+         )
     }
 
     object Artifacts {

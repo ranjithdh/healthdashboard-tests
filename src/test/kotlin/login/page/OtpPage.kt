@@ -11,6 +11,7 @@ import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
+import symptoms.page.SymptomsPage
 import utils.logger.logger
 
 private val logger = KotlinLogging.logger {}
@@ -211,5 +212,21 @@ class OtpPage(page: Page) : BasePage(page) {
     fun isIncorrectOtpMessageVisible(): Boolean {
         return page.getByText("Incorrect OTP").isVisible
     }
+
+    fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
+        enterOtp(otp)
+
+        // Create LabTestsPage instance BEFORE navigation to set up response listener
+        val symptomsPage = SymptomsPage(page)
+
+        // Navigate to diagnostics (API call happens during this navigation)
+        page.navigate(TestConfig.Urls.SYMPTOMS_PAGE_URL)
+
+        symptomsPage.waitForSymptomsPageConfirmation()
+
+
+        return symptomsPage
+    }
+
 }
 

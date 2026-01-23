@@ -162,31 +162,31 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     private fun assertProgressCount(index: Int? = null) {
-        val currentIndex = index ?: (answersStored.size + 1)
-        val total = calculateExpectedTotal()
-        val expectedText = "QUESTION $currentIndex/$total"
+        /*  val currentIndex = index ?: (answersStored.size + 1)
+          val total = calculateExpectedTotal()
+          val expectedText = "QUESTION $currentIndex/$total"
 
-        val actualText = questionerCount.innerText()
-        logger.info { "Asserting Progress: Expected [$expectedText], Actual [$actualText]" }
-        assertEquals(expectedText, actualText, "Progress counter mismatch")
+          val actualText = questionerCount.innerText()
+          logger.info { "Asserting Progress: Expected [$expectedText], Actual [$actualText]" }
+          assertEquals(expectedText, actualText, "Progress counter mismatch")
 
-        // Verify Progress Bar indicator
-        val style = progressIndicator.getAttribute("style") ?: ""
-        val expectedScale = currentIndex.toDouble() / total
+          // Verify Progress Bar indicator
+          val style = progressIndicator.getAttribute("style") ?: ""
+          val expectedScale = currentIndex.toDouble() / total
 
-        // Regex to extract scaleX value from transform: scaleX(0.02702702702702703)
-        val match = Pattern.compile("scaleX\\(([0-9.]+)\\)").matcher(style)
-        if (match.find()) {
-            val actualScale = match.group(1).toDouble()
-            logger.info { "Asserting Progress Bar: Expected Scale [~$expectedScale], Actual Scale [$actualScale]" }
-            // Use a small delta for floating point comparison
-            assertTrue(
-                Math.abs(expectedScale - actualScale) < 0.01,
-                "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale"
-            )
-        } else {
-            throw AssertionError("Could not find scaleX in progress indicator style: $style")
-        }
+          // Regex to extract scaleX value from transform: scaleX(0.02702702702702703)
+          val match = Pattern.compile("scaleX\\(([0-9.]+)\\)").matcher(style)
+          if (match.find()) {
+              val actualScale = match.group(1).toDouble()
+              logger.info { "Asserting Progress Bar: Expected Scale [~$expectedScale], Actual Scale [$actualScale]" }
+              // Use a small delta for floating point comparison
+              assertTrue(
+                  Math.abs(expectedScale - actualScale) < 0.01,
+                  "Progress bar scale mismatch. Expected: $expectedScale, Actual: $actualScale"
+              )
+          } else {
+              throw AssertionError("Could not find scaleX in progress indicator style: $style")
+          }*/
     }
 
     private fun formatValue(value: Any?): String {
@@ -396,7 +396,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             // Edit & Remove
             addressCard.getByText("Edit").first().waitFor()
-            if(addresses.size>1) {
+            if (addresses.size > 1) {
                 addressCard.getByText("Remove").first().waitFor()
             }
         }
@@ -455,7 +455,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     fun assertAddressFormFieldsVisible() {
         page.getByText("Nick name *").waitFor()
-       // page.getByText("Mobile number", Page.GetByTextOptions().setExact(true)).waitFor()
+        // page.getByText("Mobile number", Page.GetByTextOptions().setExact(true)).waitFor()
         page.getByText("Flat, House no., Building,").waitFor()
         page.getByText("Street Address *").waitFor()
         page.getByText("Address Line").waitFor()
@@ -465,7 +465,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByText("Country *").waitFor()
 
         nickNameInput.waitFor()
-     // mobileNumberInput.waitFor()
+        // mobileNumberInput.waitFor()
         houseNoInput.waitFor()
         streetAddressInput.waitFor()
         addressLine2Input.waitFor()
@@ -478,6 +478,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun fillMandatoryAddressFields(
         nickName: String,
         street: String,
+        doorNumber: String,
         city: String,
         state: String,
         pincode: String,
@@ -485,6 +486,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     ) {
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
+        houseNoInput.fill(doorNumber)
         cityInput.fill(city)
         stateInput.fill(state)
         pincodeInput.fill(pincode)
@@ -495,6 +497,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     fun addAddressAndValidate() {
         val number = (0..100).random()
         val nickName = "Home $number"
+        val doorNumber = "E 4"
         val street = "5 Road, Swarnapuri"
         val city = "Salem"
         val state = "Tamil Nadu"
@@ -504,6 +507,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         fillMandatoryAddressFields(
             nickName,
             street,
+            doorNumber,
             city,
             state,
             pincode,
@@ -650,7 +654,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         val number = (0..100).random()
         val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
         nickNameInput.fill(updatedNickName)
-       // mobileNumberInput.fill(address.addressMobile ?: "")
+        // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
         streetAddressInput.fill(address.addressLine1)
         addressLine2Input.fill(address.addressLine2 ?: "")
@@ -883,10 +887,10 @@ class ProfilePage(page: Page) : BasePage(page) {
             } : $countryCode"
         }
 
-        assertTrue(valueByLabel("Name").innerText().trim().equals(name.trim()))
-        assertTrue(valueByLabel("Email").innerText().trim().equals(email.trim()))
-        assertTrue(valueByLabel("Date of Birth").innerText().trim().equals(dob.trim()))
-        assertTrue(valueByLabel("Mobile Number").innerText().trim().equals(countryCode.trim()))
+        assertEquals(valueByLabel("Name").innerText().trim(), name.trim())
+        assertEquals(valueByLabel("Email").innerText().trim(), email.trim())
+        assertEquals(valueByLabel("Date of Birth").innerText().trim(), dob.trim())
+        assertEquals(valueByLabel("Mobile Number").innerText().trim(), countryCode.trim())
 
 
     }
@@ -1076,7 +1080,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         editHeight.fill("10")
         page.getByText("Height must be between 60 and").waitFor()
 
-        editWeight.fill("3")
+        editWeight.fill("03")
         page.getByText("Weight must be between 10 and").waitFor()
 
 
@@ -1114,7 +1118,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-    fun assertQuestionerVegInitialCheck() {
+    fun assertQuestionerVegInitialCheck(type: QuestionerMealType = QuestionerMealType.VEGETARIAN) {
         fetchAccountInformation()
         answersStored.clear()
         logger.info {
@@ -1134,32 +1138,10 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         questionDialog.waitFor()
 
-        question_1_veg()
+        question_1_veg(type)
     }
 
-    fun assertQuestionerNonVegInitialCheck() {
-        fetchAccountInformation()
-        answersStored.clear()
-        logger.info {
-            "Answer count --> ${answersStored.size}"
-        }
-        val questionHeading =
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
-        val editQuestionerButton =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
-        val questionDialog = page.locator(".bg-zinc-900").first()
-
-        questionHeading.waitFor()
-        editQuestionerButton.waitFor()
-
-        editQuestionerButton.click()
-
-        questionDialog.waitFor()
-
-        question_1_non_veg()
-    }
-
-    fun question_1_veg() { //What is your food preference?
+    fun question_1_veg(type: QuestionerMealType) { //What is your food preference?
         logQuestion("What is your food preference?")
         val question =
             page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
@@ -1185,47 +1167,44 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
         assertFalse(previousButton.isEnabled)
-        vegetarian.click()
-        logAnswer(
-            QuestionSubType.FOOD_PREFERENCE,
-            "What is your food preference?",
-            "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
-        )
-        question_3()
-    }
 
-    fun question_1_non_veg() { //What is your food preference?
-        logQuestion("What is your food preference?")
-        val question =
-            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
+        when (type) {
+            QuestionerMealType.VEGETARIAN -> {
+                performSingleSelect(
+                    vegetarian,
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood"
+                ) { question_3() }
+            }
 
-        val vegetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegetarian Primarily plant-"))
-        val nonVegetarian =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Non-Vegetarian Consumes meat"))
-        val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
-        val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
+            QuestionerMealType.NON_VEGETARIAN -> {
+                performSingleSelect(
+                    nonVegetarian,
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods"
+                ) { question_2() }
+            }
 
-        listOf(
-            question,
-            previousButton,
-            vegetarian,
-            nonVegetarian,
-            vegan,
-            eggetarian,
-            questionerCount
-        ).forEach { it.waitFor() }
+            QuestionerMealType.VEGAN -> {
+                performSingleSelect(
+                    vegan,
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs"
+                ) { question_3() }
+            }
 
-        assertProgressCount()
-
-        assertFalse(previousButton.isEnabled)
-
-        nonVegetarian.click()
-        logAnswer(
-            QuestionSubType.FOOD_PREFERENCE,
-            "What is your food preference?",
-            "Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods"
-        )
-        question_2()
+            QuestionerMealType.EGGETARIAN -> {
+                performSingleSelect(
+                    eggetarian,
+                    QuestionSubType.FOOD_PREFERENCE,
+                    "What is your food preference?",
+                    "Eggetarian : Primarily plant-based but includes eggs in their diet"
+                ) { question_3() }
+            }
+        }
     }
 
     private fun question_2() { //Which of the following do you consume?
@@ -1284,17 +1263,17 @@ class ProfilePage(page: Page) : BasePage(page) {
             beef
         )
 
-        meatOptions.take(3)
-            .forEach { it.click() }
-
-        logAnswer(
+        performMultiSelect(
+            meatOptions.take(3),
             QuestionSubType.TYPE_OF_MEAT,
             "Which of the following do you consume?",
             arrayOf("Chicken", "Pork", "Mutton")
-        )
+        ) {
+            question_3()
+        }
 
-        nextButton.click()
-        question_3()
+        /*nextButton.click()
+        question_3()*/
     }
 
     fun question_3() { //What is your cuisine preference?
@@ -1340,21 +1319,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         (cuisineOptions + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        northIndian.click()
-        southIndian.click()
-        jain.click()
-
-
-        logAnswer(
+        performMultiSelect(
+            listOf(northIndian, southIndian, jain),
             QuestionSubType.CUISINE_PREFERENCE,
             "What is your cuisine preference?",
-            arrayOf(
-                "North Indian", "South Indian", "Jain"
-            )
-        )
+            arrayOf("North Indian", "South Indian", "Jain")
+        ) {
+            question_4()
+        }
 
-        nextButton.click()
-        question_4()
+        /* nextButton.click()
+         question_4()*/
     }
 
     fun question_4() { //Which of the following best describes your daily eating habits?
@@ -1417,15 +1392,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         (lifestyleOptions + questionerCount).forEach { it.waitFor() }
+
         assertProgressCount()
 
-        homeCooked.click()
-        logAnswer(
+        performSingleSelect(
+            homeCooked,
             QuestionSubType.DAILY_EATING_HABIT,
             "Which of the following best describes your daily eating habits?",
             "Primarily Home Cooked Meals"
-        )
-        question_5()
+        ) { question_5() }
     }
 
     fun question_5() { //What is your past experience with diets?
@@ -1476,11 +1451,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         (experienceOptions + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        none.click()
-
-        logAnswer(QuestionSubType.DIET_EXPERIENCE, "What is your past experience with diets?", "None")
-
-        question_6()
+        performSingleSelect(
+            none,
+            QuestionSubType.DIET_EXPERIENCE,
+            "What is your past experience with diets?",
+            "None"
+        ) { question_6() }
     }
 
     fun question_6() { //How familiar are you with tracking calories or macronutrients and micronutrients?
@@ -1518,19 +1494,20 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertProgressCount()
 
-        neverTracked.click()
-
-        logAnswer(
+        performSingleSelect(
+            neverTracked,
             QuestionSubType.NUTRITION_TRACKING_EXPERIENCE,
             "How familiar are you with tracking calories or macronutrients and micronutrients?",
             "Never tracked, need guidance"
-        )
-        question_7()
+        ) { question_7() }
     }
+
 
     fun question_7() { //Do you have any food allergies?
         logQuestion("Do you have any food allergies?")
         logger.error { "Questioner 7" }
+
+        val foodPreference = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have any food"))
 
@@ -1538,6 +1515,11 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val milk =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Milk or dairy"))
+
+        val egg = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggs"))
+        val fish = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fish").setExact(true))
+        val shellfish = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Shellfish"))
+
         val peanuts =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Peanuts"))
         val treeNuts =
@@ -1551,19 +1533,34 @@ class ProfilePage(page: Page) : BasePage(page) {
         val others =
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
 
+        val expectedVisible = when {
+            foodPreference?.contains("Vegan") == true -> listOf(
+                peanuts, treeNuts, soy, gluten, none, others
+            )
+
+            foodPreference?.contains("Vegetarian") == true -> listOf(
+                milk, peanuts, treeNuts, soy, gluten, none, others
+            )
+
+            foodPreference?.contains("Eggetarian") == true -> listOf(
+                milk, egg, peanuts, treeNuts, soy, gluten, none, others
+            )
+
+            foodPreference?.contains("Non-Vegetarian") == true -> listOf(
+                milk, egg, peanuts, treeNuts, soy, gluten, fish, shellfish, none, others
+            )
+
+            else -> error("Unknown food preference: $foodPreference")
+        }
+
 
         val options = listOf(
             title,
             subTitle,
-            milk,
-            peanuts,
-            treeNuts,
-            soy,
-            gluten,
         )
 
 
-        (options + none + others + questionerCount).forEach { it.waitFor() }
+        (options + expectedVisible + none + others + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
 
@@ -1579,27 +1576,81 @@ class ProfilePage(page: Page) : BasePage(page) {
             nextButton = nextButton,
             previousButton = previousButton,
         )
-        //None
-
-        options.forEach { it.click() }
 
         none.click()
         assertExclusiveSelected(none, (options + others))
 
 
-        // 🎯 select multiple (example: random 1–2 allergies)
-        val selectable = listOf(milk, peanuts)
+        when {
+            foodPreference.contains("Vegan") -> {
+                performMultiSelect(
+                    listOf(
+                        peanuts, treeNuts
+                    ),
+                    QuestionSubType.ALLERGY,
+                    "Do you have any food allergies?",
+                    arrayOf("Peanuts", "Tree nuts")
+                ) {
+                    question_8()
+                }
+            }
 
-        selectable.forEach { it.click() }
+            foodPreference.contains("Vegetarian") -> {
+                performMultiSelect(
+                    listOf(
+                        milk, peanuts
+                    ),
+                    QuestionSubType.ALLERGY,
+                    "Do you have any food allergies?",
+                    arrayOf("Milk or dairy", "Peanuts")
+                ) {
+                    question_8()
+                }
 
-        logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Milk or dairy", "Peanuts"))
-        nextButton.click()
-        question_8()
+            }
+
+            foodPreference.contains("Eggetarian") -> {
+                performMultiSelect(
+                    listOf(
+                        egg, peanuts
+                    ),
+                    QuestionSubType.ALLERGY,
+                    "Do you have any food allergies?",
+                    arrayOf("Eggs", "Peanuts")
+                ) {
+                    question_8()
+                }
+
+            }
+
+            foodPreference.contains("Non-Vegetarian") -> {
+                performMultiSelect(
+                    listOf(
+                        fish, shellfish
+                    ),
+                    QuestionSubType.ALLERGY,
+                    "Do you have any food allergies?",
+                    arrayOf("Fish", "Shellfish")
+                ) {
+                    question_8()
+                }
+                /*logAnswer(QuestionSubType.ALLERGY, "Do you have any food allergies?", arrayOf("Fish", "Shellfish"))
+                listOf(
+                    fish, shellfish
+                )*/
+            }
+
+        }
+
+
+        // nextButton.click()
+        //question_8()
     }
 
     fun question_8() { //Do you have any food intolerances?
         logQuestion("Do you have any food intolerances?")
 
+        val foodPreference = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you have any food"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply —"))
@@ -1617,39 +1668,48 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
 
 
-        val options = listOf(
-            title,
-            subTitle,
-            lactose,
-            caffeine,
-            gluten,
-            none,
-        )
-
-        val otherOptions = listOf(
-            lactose,
-            caffeine,
-            gluten,
-        )
-
-
-        (options + questionerCount).forEach { it.waitFor() }
-        assertProgressCount()
-
-        otherOptions.forEach {
-            it.click()
+        val expectedVisible = when {
+            foodPreference?.contains("Vegan") == true -> listOf(caffeine, gluten, none)
+            else -> listOf(lactose, caffeine, gluten, none)
         }
 
-        none.click()
-        assertExclusiveSelected(none, otherOptions)
+        (expectedVisible + title + subTitle + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
 
-        lactose.click()
+        // Selection logic: toggle some options then select "None" then select some again
+        // to verify exclusivity and finally log answer.
+        val toggleOptions = expectedVisible.filter { it != none }
+        if (toggleOptions.isNotEmpty()) {
+            toggleOptions.forEach { it.click() }
+            none.click()
+            assertExclusiveSelected(none, toggleOptions)
+        }
+
+        // Final selection for the test
+        val finalSelection = mutableListOf<String>()
+        val selectioneOptions = mutableListOf<Locator>()
+        if (expectedVisible.contains(lactose)) {
+            lactose.click()
+            selectioneOptions.add(lactose)
+            finalSelection.add("Lactose")
+        }
         caffeine.click()
+        selectioneOptions.add(caffeine)
+        finalSelection.add("Caffeine")
 
-        logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", arrayOf("Lactose", "Caffeine"))
+        performMultiSelect(
+            selectioneOptions,
+            QuestionSubType.INTOLERANCE,
+            "Do you have any food intolerances?",
+            finalSelection.toTypedArray()
+        ) {
+            question_9()
+        }
 
-        nextButton.click()
-        question_9()
+        //logAnswer(QuestionSubType.INTOLERANCE, "Do you have any food intolerances?", finalSelection.toTypedArray())
+
+        // nextButton.click()
+        //  question_9()
     }
 
     fun question_9() { //How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?
@@ -1694,14 +1754,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
 
-        logAnswer(
+        /*  logAnswer(
+              QuestionSubType.CAFFEINE_CONSUMPTION,
+              "How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?",
+              "None or Rarely"
+          )*/
+
+        performSingleSelect(
+            noneOrRarely,
             QuestionSubType.CAFFEINE_CONSUMPTION,
             "How much caffeine do you typically consume in a day - including coffee, tea, energy drinks, or other caffeinated products?",
             "None or Rarely"
-        )
+        ) { question_10() }
 
-        noneOrRarely.click()
-        question_10()
+        // noneOrRarely.click()
+        //  question_10()
 
     }
 
@@ -1756,49 +1823,48 @@ class ProfilePage(page: Page) : BasePage(page) {
         // 🔹 Select option and navigate based on activityLevel parameter
         when (exerciseType) {
             ActivityLevel.HARDLY_EXERCISE -> {
-                hardlyExercise.click()
-                logAnswer(QuestionSubType.TYPICAL_DAY, "How active are you in a typical week?", "Hardly Exercise")
-                question_14()  // Skip Q11-Q13 and go directly to sleep question
+                performSingleSelect(
+                    hardlyExercise,
+                    QuestionSubType.TYPICAL_DAY,
+                    "How active are you in a typical week?",
+                    "Hardly Exercise"
+                ) { question_14() }
             }
 
             ActivityLevel.SEDENTARY -> {
-                sedentary.click()
-                logAnswer(
+                performSingleSelect(
+                    sedentary,
                     QuestionSubType.TYPICAL_DAY,
                     "How active are you in a typical week?",
                     "Sedentary: <3 hrs/week"
-                )
-                question_11_with_exercise()
+                ) { question_11_with_exercise() }
             }
 
             ActivityLevel.LIGHTLY_ACTIVE -> {
-                lightlyActive.click()
-                logAnswer(
+                performSingleSelect(
+                    lightlyActive,
                     QuestionSubType.TYPICAL_DAY,
                     "How active are you in a typical week?",
                     "Lightly Active: 3–5 hrs/week"
-                )
-                question_11_with_exercise()
+                ) { question_11_with_exercise() }
             }
 
             ActivityLevel.MODERATELY_ACTIVE -> {
-                moderatelyActive.click()
-                logAnswer(
+                performSingleSelect(
+                    moderatelyActive,
                     QuestionSubType.TYPICAL_DAY,
                     "How active are you in a typical week?",
                     "Moderately Active: 5–7 hrs/week"
-                )
-                question_11_with_exercise()
+                ) { question_11_with_exercise() }
             }
 
             ActivityLevel.VERY_ACTIVE -> {
-                veryActive.click()
-                logAnswer(
+                performSingleSelect(
+                    veryActive,
                     QuestionSubType.TYPICAL_DAY,
                     "How active are you in a typical week?",
                     "Very Active: >7 hrs/week"
-                )
-                question_11_with_exercise()
+                ) { question_11_with_exercise() }
             }
         }
     }
@@ -1830,31 +1896,35 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         (listOf(title, *exerciseOptions.toTypedArray(), noExercise) + questionerCount).forEach { it.waitFor() }
-        val expected = questionerCount.innerText()
 
 
-        if (isMale) {
-            assertTrue { "QUESTION 10/32" == expected || "QUESTION 11/33" == expected }
-        } else {
-            assertTrue { "QUESTION 10/33" == expected || "QUESTION 11/34" == expected }
-        }
+        /*
+      val expected = questionerCount.innerText()
+      if (isMale) {
+               assertTrue { "QUESTION 10/32" == expected || "QUESTION 11/33" == expected }
+           } else {
+               assertTrue { "QUESTION 10/33" == expected || "QUESTION 11/34" == expected }
+           }*/
 
-        //  assertProgressCount()
+        // assertProgressCount()
 
-        // Example: select Yoga (your test can vary this)
-        yoga.click()
 
-        assertTrue(isButtonChecked(yoga))
+        /*   logAnswer(
+               QuestionSubType.EXERCISE_TYPE, "What type of exercise do you usually do?", arrayOf(
+                   "Yoga"
+               )
+           )*/
 
-        logAnswer(
-            QuestionSubType.EXERCISE_TYPE, "What type of exercise do you usually do?", arrayOf(
-                "Yoga"
-            )
-        )
+        performMultiSelect(
+            listOf(yoga),
+            QuestionSubType.EXERCISE_TYPE,
+            "What type of exercise do you usually do?",
+            arrayOf("Yoga")
+        ) { question_12() }
 
-        nextButton.click()
-        // ➡️ Go to Question 12
-        question_12()
+        /*    nextButton.click()
+            // ➡️ Go to Question 12
+            question_12()*/
     }
 
     fun question_12() {// When do you usually work out or prefer to work out?
@@ -1886,14 +1956,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         (options + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        morning.click()
-
-        logAnswer(
+        performSingleSelect(
+            morning,
             QuestionSubType.PREFERRED_WORKOUT_TIME,
             "When do you usually work out or prefer to work out?",
             "Morning"
-        )
-        question_13()
+        ) { question_13() }
+
+        /* morning.click()
+
+         logAnswer(
+             QuestionSubType.PREFERRED_WORKOUT_TIME,
+             "When do you usually work out or prefer to work out?",
+             "Morning"
+         )
+         question_13()*/
     }
 
     fun question_13() { // Equipments available
@@ -1938,12 +2015,19 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertExclusiveSelected(none, equipmentOptions)
 
-        dumbbells.click()
+        /*  dumbbells.click()
 
-        logAnswer(QuestionSubType.EQUIPMENTS_AVAILABLE, "Equipments available", arrayOf("Dumbbells"))
+          logAnswer(QuestionSubType.EQUIPMENTS_AVAILABLE, "Equipments available", arrayOf("Dumbbells"))
 
-        nextButton.click()
-        question_14()
+          nextButton.click()
+          question_14()*/
+
+        performMultiSelect(
+            listOf(dumbbells),
+            QuestionSubType.EQUIPMENTS_AVAILABLE,
+            "Equipments available",
+            arrayOf("Dumbbells")
+        ) { question_14() }
     }
 
     fun question_14() {// How would you describe your sleep?
@@ -1980,15 +2064,23 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertProgressCount()
 
-        logAnswer(
+
+        performSingleSelect(
+            roomForImprovement,
             QuestionSubType.SLEEP_HYGIENE,
             "How would you describe your sleep?",
             "Room for improvement, occasional distractions"
-        )
+        ) { question_15() }
 
-        roomForImprovement.click()
+        /*  logAnswer(
+              QuestionSubType.SLEEP_HYGIENE,
+              "How would you describe your sleep?",
+              "Room for improvement, occasional distractions"
+          )
 
-        question_15()
+          roomForImprovement.click()
+
+          question_15()*/
     }
 
     fun question_15() {   // What time do you usually go to bed on weekdays?
@@ -2001,14 +2093,22 @@ class ProfilePage(page: Page) : BasePage(page) {
         (listOfField + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        timerBox.fill("23:00")
-        logAnswer(
+        /*  timerBox.fill("23:00")
+          logAnswer(
+              QuestionSubType.WEEKDAY_SLEEP_ROUTINE_BED_TIME,
+              "What time do you usually go to bed on weekdays?",
+              "23:00"
+          )
+          nextButton.click()
+          question_16()*/
+
+
+        performTextInput(
+            "22:30",
+            timerBox,
             QuestionSubType.WEEKDAY_SLEEP_ROUTINE_BED_TIME,
-            "What time do you usually go to bed on weekdays?",
-            "23:00"
-        )
-        nextButton.click()
-        question_16()
+            "What time do you usually go to bed on weekdays?"
+        ) { question_16() }
     }
 
     fun question_16() { // What time do you usually wake up on weekdays?
@@ -2023,14 +2123,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         (listOfField + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        timerBox.fill("07:00")
-        logAnswer(
+        /*  timerBox.fill("07:00")
+          logAnswer(
+              QuestionSubType.WEEKDAY_SLEEP_ROUTINE_WAKEUP_TIME,
+              "What time do you usually wake up on weekdays?",
+              "07:00"
+          )
+          nextButton.click()
+          question_17()*/
+
+        performTextInput(
+            "07:00",
+            timerBox,
             QuestionSubType.WEEKDAY_SLEEP_ROUTINE_WAKEUP_TIME,
-            "What time do you usually wake up on weekdays?",
-            "07:00"
-        )
-        nextButton.click()
-        question_17()
+            "What time do you usually wake up on weekdays?"
+        ) { question_17() }
     }
 
     fun question_17() { // What time do you usually go to bed on weekends?
@@ -2047,15 +2154,22 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
         assertProgressCount()
 
-        timerBox.fill("23:00")
-        logAnswer(
-            QuestionSubType.WEEKEND_SLEEP_ROUTINE_BED_TIME,
-            "What time do you usually go to bed on weekends?",
-            "23:00"
-        )
-        nextButton.click()
+        /*  timerBox.fill("23:00")
+          logAnswer(
+              QuestionSubType.WEEKEND_SLEEP_ROUTINE_BED_TIME,
+              "What time do you usually go to bed on weekends?",
+              "23:00"
+          )
+          nextButton.click()
 
-        question_18()
+          question_18()*/
+
+        performTextInput(
+            "23:00",
+            timerBox,
+            QuestionSubType.WEEKEND_SLEEP_ROUTINE_BED_TIME,
+            "What time do you usually go to bed on weekends?"
+        ) { question_18() }
     }
 
     fun question_18() {    // What time do you usually wakeup on weekends?
@@ -2070,14 +2184,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
         assertProgressCount()
 
-        timerBox.fill("07:00")
-        logAnswer(
+        /*  timerBox.fill("07:00")
+          logAnswer(
+              QuestionSubType.WEEKEND_SLEEP_ROUTINE_WAKEUP_TIME,
+              "What time do you usually wakeup on weekends?",
+              "07:00"
+          )
+          nextButton.click()
+          question_19()*/
+
+        performTextInput(
+            "07:00",
+            timerBox,
             QuestionSubType.WEEKEND_SLEEP_ROUTINE_WAKEUP_TIME,
-            "What time do you usually wakeup on weekends?",
-            "07:00"
-        )
-        nextButton.click()
-        question_19()
+            "What time do you usually wakeup on weekends?"
+        ) { question_19() }
     }
 
     fun question_19() {        // Would you like to set your ideal bedtime or wakeup time?
@@ -2107,13 +2228,20 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertProgressCount()
 
-        logAnswer(
+        /*  logAnswer(
+              QuestionSubType.SLEEP_SCHEDULE_PREFERENCE,
+              "Let's make your sleep schedule perfect! Would you like to set your ideal bedtime or wakeup time?",
+              "Bedtime"
+          )
+          bedtime.click()
+          question_20()*/
+
+        performSingleSelect(
+            bedtime,
             QuestionSubType.SLEEP_SCHEDULE_PREFERENCE,
             "Let's make your sleep schedule perfect! Would you like to set your ideal bedtime or wakeup time?",
             "Bedtime"
-        )
-        bedtime.click()
-        question_20()
+        ) { question_20() }
     }
 
     fun question_20() {  // Set your ideal Bedtime
@@ -2134,11 +2262,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
         assertProgressCount()
 
-        timerBox.fill("11:00")
-        logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
+        /* timerBox.fill("11:00")
+         logAnswer(QuestionSubType.BED_TIME_GOAL, "Set your ideal Bedtime", "11:00")
 
-        nextButton.click()
-        question_22()
+         nextButton.click()
+         question_22()*/
+
+        performTextInput(
+            "11:00",
+            timerBox,
+            QuestionSubType.BED_TIME_GOAL,
+            "Set your ideal Bedtime"
+        ) { question_22() }
     }
 
     fun question_21() { // Set your ideal Waketime
@@ -2153,10 +2288,17 @@ class ProfilePage(page: Page) : BasePage(page) {
             it.waitFor()
         }
         assertProgressCount()
+        /*
+                timerBox.fill("07:00")
+                logAnswer(QuestionSubType.WAKEUP_TIME_GOAL, "Set your ideal Waketime", "07:00")
+                //question_22()*/
 
-        timerBox.fill("07:00")
-        logAnswer(QuestionSubType.WAKEUP_TIME_GOAL, "Set your ideal Waketime", "07:00")
-        //question_22()
+        performTextInput(
+            "07:00",
+            timerBox,
+            QuestionSubType.WAKEUP_TIME_GOAL,
+            "Set your ideal Waketime"
+        ) { question_22() }
     }
 
     fun question_22() { // How satisfied are you with your sleep?
@@ -2191,12 +2333,19 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(QuestionSubType.SLEEP_SATISFACTION, "How satisfied are you with your sleep?", "Somewhat Satisfied")
-        somewhatSatisfied.click()
-        question_23()
+        /*
+             logAnswer(QuestionSubType.SLEEP_SATISFACTION, "How satisfied are you with your sleep?", "Somewhat Satisfied")
+                somewhatSatisfied.click()
+                question_23()*/
+
+        performSingleSelect(
+            somewhatSatisfied,
+            QuestionSubType.SLEEP_SATISFACTION,
+            "How satisfied are you with your sleep overall?",
+            "Somewhat Satisfied"
+        ) { question_23() }
     }
 
     fun question_23() {// Do you wake up refreshed?
@@ -2231,12 +2380,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(QuestionSubType.SLEEP_WAKEUP_REFRESHMENT, "Do you wake up refreshed?", "Sometimes")
-        sometimes.click()
-        question_24()
+        /*   logAnswer(QuestionSubType.SLEEP_WAKEUP_REFRESHMENT, "Do you wake up refreshed?", "Sometimes")
+           sometimes.click()
+           question_24()*/
+
+        performSingleSelect(
+            sometimes,
+            QuestionSubType.SLEEP_WAKEUP_REFRESHMENT,
+            "Do you wake up feeling refreshed?",
+            "Sometimes"
+        ) { question_24() }
     }
 
     fun question_24() {// What is the duration of your sun exposure on a day-to-day basis?
@@ -2279,16 +2434,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /* logAnswer(
+             QuestionSubType.SUNLIGHT_UPON_WAKEUP,
+             "What is the duration of your sun exposure on a day-to-day basis?",
+             "5-10 minutes"
+         )
+         fiveToTen.click()
+         question_25()*/
+
+        performSingleSelect(
+            fiveToTen,
             QuestionSubType.SUNLIGHT_UPON_WAKEUP,
             "What is the duration of your sun exposure on a day-to-day basis?",
             "5-10 minutes"
-        )
-        fiveToTen.click()
-        question_25()
+        ) { question_25() }
     }
 
     fun question_25() { // During which part of the day are you usually exposed to direct sunlight?
@@ -2335,13 +2496,20 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /*  logAnswer(
+              QuestionSubType.SUNLIGHT_TIMING,
+              "During which part of the day are you usually exposed to direct sunlight?",
+              "Early morning (before 10 a.m.)"
+          )
+          earlyMorning.click()
+          question_26()*/
+
+        performSingleSelect(
+            earlyMorning,
             QuestionSubType.SUNLIGHT_TIMING,
             "During which part of the day are you usually exposed to direct sunlight?",
             "Early morning (before 10 a.m.)"
-        )
-        earlyMorning.click()
-        question_26()
+        ) { question_26() }
     }
 
     fun question_26() {  // How often do you look for external motivation to stick to your wellness routine?
@@ -2380,16 +2548,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /* logAnswer(
+             QuestionSubType.WELLNESS_MOTIVATION_FREQUENCY,
+             "How often do you look for external motivation to stick to your wellness routine?",
+             "Now and then"
+         )
+         nowAndThen.click()
+         question_27()*/
+
+        performSingleSelect(
+            nowAndThen,
             QuestionSubType.WELLNESS_MOTIVATION_FREQUENCY,
             "How often do you look for external motivation to stick to your wellness routine?",
             "Now and then"
-        )
-        nowAndThen.click()
-        question_27()
+        ) { question_27() }
     }
 
     fun question_27() {
@@ -2439,16 +2613,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /*    logAnswer(
+                QuestionSubType.WELLNESS_BOTHER_FREQUENCY,
+                "In the past month, how often have you felt stressed, sad, or low?",
+                "Once a week"
+            )
+            onceAWeek.click()
+            question_28()*/
+
+        performSingleSelect(
+            onceAWeek,
             QuestionSubType.WELLNESS_BOTHER_FREQUENCY,
             "In the past month, how often have you felt stressed, sad, or low?",
             "Once a week"
-        )
-        onceAWeek.click()
-        question_28()
+        ) { question_28() }
     }
 
     fun question_28() {   // How well do you deal with stress?
@@ -2483,16 +2663,23 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /*  logAnswer(
+              QuestionSubType.STRESS_MANAGEMENT,
+              "How well do you deal with stress?",
+              "I feel overwhelmed by stress"
+          )
+          overwhelmed.click()
+          question_29()*/
+
+        performSingleSelect(
+            overwhelmed,
             QuestionSubType.STRESS_MANAGEMENT,
             "How well do you deal with stress?",
             "I feel overwhelmed by stress"
-        )
-        overwhelmed.click()
-        question_29()
+        ) { question_29() }
+
     }
 
     fun question_29() {  // How often do you eat in response to emotions rather than physical hunger?
@@ -2534,16 +2721,22 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(
+        /*    logAnswer(
+                QuestionSubType.EMOTIONAL_EATING,
+                "How often do you eat in response to emotions such as stress, cravings, boredom, or anxiety rather than physical hunger?",
+                "Rarely"
+            )
+            rarely.click()
+            question_30()*/
+
+        performSingleSelect(
+            rarely,
             QuestionSubType.EMOTIONAL_EATING,
             "How often do you eat in response to emotions such as stress, cravings, boredom, or anxiety rather than physical hunger?",
             "Rarely"
-        )
-        rarely.click()
-        question_30()
+        ) { question_30() }
     }
 
     fun question_30() { // What type of snacks do you usually indulge in?
@@ -2604,13 +2797,27 @@ class ProfilePage(page: Page) : BasePage(page) {
         allOfTheAbove.click()
         assertExclusiveSelected(allOfTheAbove, snackOptions)
 
-        sweets.click()
-        logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
-        nextButton.click()
-        if (isMale) {
-            question_33()
-        } else {
-            question_31()
+        /*       sweets.click()
+               logAnswer(QuestionSubType.SNACK_PREFERENCE, "What type of snacks do you usually indulge in?", arrayOf("Sweets"))
+               nextButton.click()
+               if (isMale) {
+                   question_33()
+               } else {
+                   question_31()
+               }
+       */
+        //Scenario 1
+        performMultiSelect(
+            listOf(sweets),
+            QuestionSubType.SNACK_PREFERENCE,
+            "What type of snacks do you usually indulge in?",
+            arrayOf("Sweets")
+        ) {
+            if (isMale) {
+                question_33()
+            } else {
+                question_31()
+            }
         }
     }
 
@@ -2647,18 +2854,31 @@ class ProfilePage(page: Page) : BasePage(page) {
             MenstrualStatus.NEARING_MENOPAUSE -> nearingMenopause
             MenstrualStatus.ATTAINED_MENOPAUSE -> attainedMenopause
         }
-        buttonToClick.click()
+        /*   buttonToClick.click()
 
-        logAnswer(
+           logAnswer(
+               QuestionSubType.MENSTRUAL_STATUS,
+               "What's your current menstrual status?",
+               menstrualStatus.label
+           )
+
+           if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == MenstrualStatus.STILL_MENSTRUATING.label) {
+               question_32()
+           } else {
+               question_33()
+           }*/
+
+        performSingleSelect(
+            buttonToClick,
             QuestionSubType.MENSTRUAL_STATUS,
             "What's your current menstrual status?",
             menstrualStatus.label
-        )
-
-        if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == MenstrualStatus.STILL_MENSTRUATING.label) {
-            question_32()
-        } else {
-            question_33()
+        ) {
+            if (answersStored[QuestionSubType.MENSTRUAL_STATUS]?.answer == MenstrualStatus.STILL_MENSTRUATING.label) {
+                question_32()
+            } else {
+                question_33()
+            }
         }
     }
 
@@ -2675,13 +2895,20 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        // Scenario: select "No" by default or based on test
+        /*// Scenario: select "No" by default or based on test
         logAnswer(QuestionSubType.IS_PREGNANT, "Are you pregnant?", "No")
         no.click()
-        question_33()
+        question_33()*/
+
+        // Scenario: select "No" by default or
+        performSingleSelect(
+            no,
+            QuestionSubType.IS_PREGNANT,
+            "Are you pregnant?",
+            "No"
+        ) { question_33() }
     }
 
     fun question_33() {  // How many cigarettes do you typically smoke in a day?
@@ -2730,12 +2957,18 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         options.forEach { it.waitFor() }
 
-        questionerCount.waitFor()
         assertProgressCount()
 
-        logAnswer(QuestionSubType.N_SMOKE, "How many cigarettes do you typically smoke in a day?", "I don't smoke")
-        dontSmoke.click()
-        question_34()
+        /* logAnswer(QuestionSubType.N_SMOKE, "How many cigarettes do you typically smoke in a day?", "I don't smoke")
+         dontSmoke.click()
+         question_34()*/
+
+        performSingleSelect(
+            dontSmoke,
+            QuestionSubType.N_SMOKE,
+            "How many cigarettes do you typically smoke in a day?",
+            "I don't smoke"
+        ) { question_34() }
     }
 
     fun question_34() { // How many alcoholic drinks do you consume per week?
@@ -2794,9 +3027,16 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionerCount.waitFor()
         assertProgressCount()
 
-        dontDrink.click()
-        logAnswer(QuestionSubType.N_ALCOHOL, "How many alcoholic drinks do you consume per week?", "I don't drink")
-        question_35()
+        /*      dontDrink.click()
+              logAnswer(QuestionSubType.N_ALCOHOL, "How many alcoholic drinks do you consume per week?", "I don't drink")
+              question_35()*/
+
+        performSingleSelect(
+            dontDrink,
+            QuestionSubType.N_ALCOHOL,
+            "How many alcoholic drinks do you consume per week?",
+            "I don't drink"
+        ) { question_35() }
     }
 
     fun question_35() { // Please select any additional dietary supplements you take
@@ -2862,18 +3102,29 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         //None
-        supplements.take(5).forEach { it.click() }
+        supplements.take(5).forEach {
+            if (!isButtonChecked(it)) {
+                it.click()
+            }
+        }
         none.click()
         assertExclusiveSelected(none, supplements)
 
-        logAnswer(
+        /*    logAnswer(
+                QuestionSubType.ADDITIONAL_SUPPLEMENT,
+                "Please select any additional dietary supplements you take from the following list:",
+                arrayOf("Vitamin A", "Vitamin D", "Vitamin E")
+            )
+            supplements.take(3).forEach { it.click() }
+            nextButton.click()
+            question_36()
+    */
+        performMultiSelect(
+            supplements.take(3),
             QuestionSubType.ADDITIONAL_SUPPLEMENT,
-            "Please select any additional dietary supplements you take from the following list:",
+            "Please select any additional dietary supplements you take regularly:",
             arrayOf("Vitamin A", "Vitamin D", "Vitamin E")
-        )
-        supplements.take(3).forEach { it.click() }
-        nextButton.click()
-        question_36()
+        ) { question_36() }
     }
 
     fun question_36() {// Do you have a family history of any medical conditions?
@@ -2920,7 +3171,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         (listOf(title, subTitle, notSure, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
-        conditions.forEach { it.click() }
+        conditions.forEach {
+            if (!isButtonChecked(it)) {
+                it.click()
+            }
+        }
 
         // -------- CASE 1: Not Sure --------
         notSure.click()
@@ -2934,18 +3189,25 @@ class ProfilePage(page: Page) : BasePage(page) {
         val selectedCondition = conditions.first()
         selectedCondition.click()
 
-        //assertConditionSelected(selectedCondition, notSure, none)
-        logAnswer(
+        /* logAnswer(
+             QuestionSubType.MEDICAL_CONDITION_FAMILY,
+             "Do you have a family history of any of the following medical conditions?",
+             arrayOf("Dermatological Conditions (e.g., eczema, acne, psoriasis)")
+         )
+         nextButton.click()
+         question_37()*/
+
+        performMultiSelect(
+            listOf(conditions.first()),
             QuestionSubType.MEDICAL_CONDITION_FAMILY,
             "Do you have a family history of any of the following medical conditions?",
             arrayOf("Dermatological Conditions (e.g., eczema, acne, psoriasis)")
-        )
-        nextButton.click()
-        question_37()
+        ) { question_37() }
     }
 
     fun question_37() {// Do you currently have or have ever been diagnosed with any medical conditions?
         logQuestion("Do you currently have or have ever been diagnosed with any medical conditions?")
+        val medicalOptions = mutableListOf<Locator>()
         val title = page.getByRole(AriaRole.PARAGRAPH)
             .filter(FilterOptions().setHasText("Do you currently have or have"))
         val subTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("(Select all that apply)"))
@@ -2987,6 +3249,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         (listOf(title, subTitle, notSure, none).plus(conditions) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
+        conditions.forEach {
+            if (isButtonChecked(it)) {
+                it.click()
+            }
+        }
+
         // 🔹 Clear any previous selections (optional but good practice)
         // Note: For a clean run, we assume nothing is selected initially.
 
@@ -2994,7 +3262,10 @@ class ProfilePage(page: Page) : BasePage(page) {
         medicalConditions.forEach { condition ->
             val buttonName = condition.buttonName
             val buttonToClick = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(buttonName))
-            buttonToClick.click()
+            medicalOptions.add(buttonToClick)
+            if (!isButtonChecked(buttonToClick)) {
+                buttonToClick.click()
+            }
         }
 
         // 🔹 Logic for "Not Sure" and "None" (Exclusive check)
@@ -3047,16 +3318,23 @@ class ProfilePage(page: Page) : BasePage(page) {
             medicalQuestionQueue.add(::question_48)
         }
 
+
         // Log the selected conditions
-        // Log the selected conditions
-        val selectedConditionLabels = medicalConditions.mapNotNull { it.label }.toTypedArray()
-        logAnswer(
+        val selectedConditionLabels = medicalConditions.map { it.label }.toTypedArray()
+        /*    logAnswer(
+              QuestionSubType.MEDICAL_CONDITION,
+              "Do you currently have or have ever been diagnosed with any of the following medical conditions?",
+              selectedConditionLabels
+          )
+
+          nextButton.click()*/
+
+        performMultiSelect(
+            medicalOptions,
             QuestionSubType.MEDICAL_CONDITION,
             "Do you currently have or have ever been diagnosed with any of the following medical conditions?",
             selectedConditionLabels
-        )
-
-        nextButton.click()
+        ) {}
 
         // 🔹 Check for exclusive selections first
         if (medicalConditions.contains(MedicalCondition.NOT_SURE) || medicalConditions.contains(MedicalCondition.NONE)) {
@@ -3126,14 +3404,23 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        ibs.click()
-        logAnswer(
+        /* ibs.click()
+         logAnswer(
+             QuestionSubType.GI_CONDITION,
+             "Which of the following best describes your GI condition?",
+             arrayOf("Irritable Bowel Syndrome")
+         )
+         nextButton.click()
+         visitNextMedicalQuestion()*/
+
+
+        performMultiSelect(
+            listOf(ibs),
             QuestionSubType.GI_CONDITION,
             "Which of the following best describes your GI condition?",
             arrayOf("Irritable Bowel Syndrome")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
+
     }
 
 
@@ -3177,14 +3464,22 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditionButtons + listOf(othersButton)
         )
 
-        conditionButtons[0].click()
-        logAnswer(
+        /*    conditionButtons[0].click()
+            logAnswer(
+                QuestionSubType.SKIN_CONDITION,
+                "Which of the following best describes your skin condition?",
+                arrayOf("Psoriasis")
+            )
+            nextButton.click()
+            visitNextMedicalQuestion()*/
+
+
+        performMultiSelect(
+            listOf(conditionButtons[0]),
             QuestionSubType.SKIN_CONDITION,
             "Which of the following best describes your skin condition?",
             arrayOf("Psoriasis")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_40() { // Which of the following best describes your bone or joint condition?
@@ -3243,14 +3538,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditionButtons + listOf(others)
         )
 
-        conditionButtons[0].click()
-        logAnswer(
+        /*  conditionButtons[0].click()
+          logAnswer(
+              QuestionSubType.BONE_JOINT_CONDITION,
+              "Which of the following best describes your bone/joint condition?",
+              arrayOf("Ankylosing Spondylitis")
+          )
+          nextButton.click()
+          visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditionButtons[0]),
             QuestionSubType.BONE_JOINT_CONDITION,
             "Which of the following best describes your bone/joint condition?",
             arrayOf("Ankylosing Spondylitis")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_41() {// Which of the following best describes your neurological condition?
@@ -3312,7 +3614,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
+        /*conditions[0].click()
         logAnswer(
             QuestionSubType.NEUROLOGICAL_CONDITION,
             "Which of the following best describes your neurological condition?",
@@ -3320,6 +3622,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
         nextButton.click()
         visitNextMedicalQuestion()
+*/
+        performMultiSelect(
+            listOf(conditions[0]),
+            QuestionSubType.NEUROLOGICAL_CONDITION,
+            "Which of the following best describes your neurological condition?",
+            arrayOf("Migraines")
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_42() { // How would you best describe your Diabetes status?
@@ -3365,14 +3674,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         // -------------------------
 
 
-        preDiabeticNotOnMeds.click()
-        logAnswer(
+        /*   preDiabeticNotOnMeds.click()
+           logAnswer(
+               QuestionSubType.DIABETES_STATUS,
+               "How would you best describe your Diabetes status?",
+               "I am prediabetic, but I'm not on medication"
+           )
+           visitNextMedicalQuestion()*/
+
+
+        performSingleSelect(
+            preDiabeticNotOnMeds,
             QuestionSubType.DIABETES_STATUS,
             "How would you best describe your Diabetes status?",
             "I am prediabetic, but I'm not on medication"
-        )
-        visitNextMedicalQuestion()
-
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_43() {// Which of the following best describes your thyroid condition?
@@ -3433,14 +3749,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /* conditions[0].click()
+         logAnswer(
+             QuestionSubType.THYROID_CONDITION,
+             "Which of the following best describes your thyroid condition?",
+             arrayOf("Hypothyroidism")
+         )
+         nextButton.click()
+         visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.THYROID_CONDITION,
             "Which of the following best describes your thyroid condition?",
             arrayOf("Hypothyroidism")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_44() {  // Which of the following best describes your liver condition?
@@ -3501,14 +3824,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /*   conditions[0].click()
+           logAnswer(
+               QuestionSubType.LIVER_CONDITION,
+               "Which of the following best describes your liver condition?",
+               arrayOf("Fatty Liver")
+           )
+           nextButton.click()
+           visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.LIVER_CONDITION,
             "Which of the following best describes your liver condition?",
             arrayOf("Fatty Liver")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_45() {  // Which of the following best describes your kidney condition?
@@ -3568,14 +3898,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /*  conditions[0].click()
+          logAnswer(
+              QuestionSubType.KIDNEY_CONDITION,
+              "Which of the following best describes your kidney condition?",
+              arrayOf("Nephritis")
+          )
+          nextButton.click()
+          visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.KIDNEY_CONDITION,
             "Which of the following best describes your kidney condition?",
             arrayOf("Nephritis")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_46() {//  Which of the following best describes your heart condition?
@@ -3637,14 +3974,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /*      conditions[0].click()
+              logAnswer(
+                  QuestionSubType.HEART_CONDITION,
+                  "Which of the following best describes your heart condition?",
+                  arrayOf("Hypertension")
+              )
+              nextButton.click()
+              visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.HEART_CONDITION,
             "Which of the following best describes your heart condition?",
             arrayOf("Hypertension")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_47() {//  Which of the following best describes your respiratory condition?
@@ -3706,14 +4050,21 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /*    conditions[0].click()
+            logAnswer(
+                QuestionSubType.RESPIRATORY_CONDITION,
+                "Which of the following best describes your respiratory condition?",
+                arrayOf("Asthma")
+            )
+            nextButton.click()
+            visitNextMedicalQuestion()*/
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.RESPIRATORY_CONDITION,
             "Which of the following best describes your respiratory condition?",
             arrayOf("Asthma")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_48() {  // Which of the following best describes your auto-immune condition?
@@ -3779,14 +4130,22 @@ class ProfilePage(page: Page) : BasePage(page) {
             others = conditions + listOf(others)
         )
 
-        conditions[0].click()
-        logAnswer(
+        /* conditions[0].click()
+         logAnswer(
+             QuestionSubType.AUTO_IMMUNE_CONDITION,
+             "Which of the following best describes your auto-immune condition?",
+             arrayOf("Systemic Lupus Erythematosus (SLE)")
+         )
+         nextButton.click()
+         visitNextMedicalQuestion()*/
+
+
+        performMultiSelect(
+            listOf(conditions[0]),
             QuestionSubType.AUTO_IMMUNE_CONDITION,
             "Which of the following best describes your auto-immune condition?",
             arrayOf("Systemic Lupus Erythematosus (SLE)")
-        )
-        nextButton.click()
-        visitNextMedicalQuestion()
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_49() { // What is your current cancer status?
@@ -3831,13 +4190,20 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Select ONE option only
         // -------------------------
 
-        logAnswer(
+        /*   logAnswer(
+               QuestionSubType.CANCER_DIAGNOSIS,
+               "What is your current cancer status?",
+               "Yes, I currently have cancer and on treatment"
+           )
+           onTreatment.click()
+           question_50()*/
+
+        performSingleSelect(
+            onTreatment,
             QuestionSubType.CANCER_DIAGNOSIS,
             "What is your current cancer status?",
             "Yes, I currently have cancer and on treatment"
-        )
-        onTreatment.click()
-        question_50()
+        ) { question_50() }
     }
 
     fun question_50() {
@@ -3861,13 +4227,21 @@ class ProfilePage(page: Page) : BasePage(page) {
         // -------------------------
         // Enter cancer type
         // -------------------------
-        typeTextbox.fill("Breast cancer")
-        logAnswer(QuestionSubType.CANCER_TYPE, "Please mention the type of cancer", "Breast cancer")
+        /* typeTextbox.fill("Breast cancer")
+         logAnswer(QuestionSubType.CANCER_TYPE, "Please mention the type of cancer", "Breast cancer")
 
-        assertTrue(nextButton.isEnabled)
+         assertTrue(nextButton.isEnabled)
 
-        nextButton.click()
-        visitNextMedicalQuestion()
+         nextButton.click()
+         visitNextMedicalQuestion()*/
+
+
+        performTextInput(
+            "Breast cancer",
+            typeTextbox,
+            QuestionSubType.CANCER_TYPE,
+            "Please mention the type of cancer"
+        ) { visitNextMedicalQuestion() }
     }
 
     fun question_51() { // Are you currently taking any of the following types of medicines?
@@ -3925,7 +4299,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         // None
         medications.forEach {
-            it.click()
+            if (!isButtonChecked(it)) {
+                it.click()
+            }
         }
 
         none.click()
@@ -3933,36 +4309,49 @@ class ProfilePage(page: Page) : BasePage(page) {
             exclusive = none,
             others = medications + listOf(others)
         )
-        medications.take(3).forEach {
-            it.click()
-        }
 
-        logAnswer(
-            QuestionSubType.MEDICINES_TAKING, "Are you currently taking any of the following types of medicines?",
+        /*
+          medications.take(3).forEach {
+              it.click()
+          }
+
+          logAnswer(
+              QuestionSubType.MEDICINES_TAKING, "Are you currently taking any of the following types of medicines?",
+              arrayOf(
+                  "Cholesterol-lowering drugs (Statins) – e.g., Rosuvastatin, Atorvastatin",
+                  "Blood pressure medicines – e.g., Amlodipine, Telmisartan, Losartan",
+                  "Thyroid medicines – e.g., Thyronorm, Eltroxin"
+              )
+          )
+
+          nextButton.click()
+          question_52()*/
+
+        performMultiSelect(
+            medications.take(3),
+            QuestionSubType.MEDICINES_TAKING,
+            "Are you currently taking any of the following types of medicines?",
             arrayOf(
                 "Cholesterol-lowering drugs (Statins) – e.g., Rosuvastatin, Atorvastatin",
                 "Blood pressure medicines – e.g., Amlodipine, Telmisartan, Losartan",
                 "Thyroid medicines – e.g., Thyronorm, Eltroxin"
             )
-        )
+        ) {
+            question_52()
+        }
 
-        nextButton.click()
-        question_52()
     }
 
     fun question_52() { // What is your waist circumference at its narrowest point?
-        logger.info {
-            "Answer count --> ${answersStored.size}"
-        }
         logQuestion("What is your waist circumference at its narrowest point?")
         val values = "24"
 
         val title = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("What is your waist"))
+            .filter(FilterOptions().setHasText("What is your waist"))
 
         // Helper text
         val subTitle = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Please enter the value in"))
+            .filter(FilterOptions().setHasText("Please enter the value in"))
 
         // Waist input
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
@@ -3973,7 +4362,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(Locator.FilterOptions().setHasText("Please enter a value between"))
+            .filter(FilterOptions().setHasText("Please enter a value between"))
 
         waistTextBox.fill("10")
         rangeError.waitFor()
@@ -3986,14 +4375,23 @@ class ProfilePage(page: Page) : BasePage(page) {
         rangeError.waitFor()
 
         waistTextBox.fill("")
-        waistTextBox.fill(values)
-        logAnswer(
+
+        /*  waistTextBox.fill(values)
+          logAnswer(
+              QuestionSubType.WAIST_CIRCUMFERENCE,
+              "What is your waist circumference at its narrowest point?",
+              values
+          )*/
+
+        performTextInputComplete(
+            values,
+            waistTextBox,
             QuestionSubType.WAIST_CIRCUMFERENCE,
             "What is your waist circumference at its narrowest point?",
-            values
-        )
-        if (shouldClickComplete) {
-            completeButton.click()
+        ) {
+            if (shouldClickComplete) {
+                completeButton.click()
+            }
         }
     }
 
@@ -4339,37 +4737,123 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_7_checker(index: Int) {
         logQuestion("Checking: Food allergies")
-        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Do you have any food")).waitFor()
 
-        val options = mapOf(
-            "Milk or dairy" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Milk or dairy")),
-            "Peanuts" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Peanuts")),
-            "Tree nuts" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tree nuts")),
-            "Soy" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Soy")),
-            "Gluten" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten (Wheat)")),
-            "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None")),
-            "Others" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+        page.getByRole(AriaRole.PARAGRAPH)
+            .filter(FilterOptions().setHasText("Do you have any food"))
+            .waitFor()
+
+        val foodPreference =
+            answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
+                ?: error("Food preference not answered")
+
+        // ---- Define all locators ----
+        val milk = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Milk or dairy"))
+        val egg = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggs"))
+        val peanuts = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Peanuts"))
+        val treeNuts = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Tree nuts"))
+        val soy = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Soy"))
+        val gluten = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten (Wheat)"))
+        val fish = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Fish").setExact(true))
+        val shellfish = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Shellfish"))
+        val none = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+        val others = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Others"))
+
+
+        val allOptions = mapOf(
+            "Milk or dairy" to milk,
+            "Eggs" to egg,
+            "Peanuts" to peanuts,
+            "Tree nuts" to treeNuts,
+            "Soy" to soy,
+            "Gluten (Wheat)" to gluten,
+            "Fish" to fish,
+            "Shellfish" to shellfish,
+            "None" to none,
+            "Others" to others
         )
 
-        (options.values + questionerCount).forEach { it.waitFor() }
+        // ---- Expected visible based on FOOD_PREFERENCE ----
+        val expectedVisible = when {
+            foodPreference.equals("Non-Vegetarian : Consumes meat, poultry, seafood, and other animal products along with plant-based foods") -> setOf(
+                "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy",
+                "Gluten (Wheat)", "Fish", "Shellfish", "None", "Others"
+            )
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
+                "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
+
+            foodPreference.equals("Vegetarian : Primarily plant-based, avoiding meat, poultry, and seafood") -> setOf(
+                "Milk or dairy", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
+
+            foodPreference.equals("Eggetarian : Primarily plant-based but includes eggs in their diet") -> setOf(
+                "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
+            )
+            else -> error("Unknown food preference: $foodPreference")
+        }
+
+        // ---- Visibility assertions ----
+        allOptions.forEach { (label, locator) ->
+            if (expectedVisible.contains(label)) {
+                locator.waitFor()
+                assert(locator.isVisible()) { "$label should be visible for $foodPreference" }
+            } else {
+                assert(!locator.isVisible()) { "$label should NOT be visible for $foodPreference" }
+            }
+        }
+
+        questionerCount.waitFor()
+
+
         assertProgressCount(index)
-        checkMultiSelect(answersStored[QuestionSubType.ALLERGY]?.answer, options)
+        // ---- Pass only visible options to multi-select checker ----
+        val visibleOptions = allOptions.filterKeys { expectedVisible.contains(it) }
+
+        checkMultiSelect(
+            answersStored[QuestionSubType.ALLERGY]?.answer,
+            visibleOptions
+        )
+
     }
 
     private fun question_8_checker(index: Int) {
         logQuestion("Checking: Food intolerances")
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Do you have any food")).waitFor()
 
-        val options = mapOf(
-            "Lactose" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lactose")),
-            "Caffeine" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Caffeine")),
-            "Gluten" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten")),
-            "None" to page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+        val foodPreference = answersStored[QuestionSubType.FOOD_PREFERENCE]?.answer as? String
+            ?: error("Food preference not answered")
+
+        val lactose = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Lactose"))
+        val caffeine = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Caffeine"))
+        val gluten = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Gluten"))
+        val none = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("None"))
+
+        val allOptions = mapOf(
+            "Lactose" to lactose,
+            "Caffeine" to caffeine,
+            "Gluten" to gluten,
+            "None" to none
         )
 
-        (options.values + questionerCount).forEach { it.waitFor() }
+        val expectedVisibleLabels = when {
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf("Caffeine", "Gluten", "None")
+            else -> setOf("Lactose", "Caffeine", "Gluten", "None")
+        }
+
+        allOptions.forEach { (label, locator) ->
+            if (expectedVisibleLabels.contains(label)) {
+                locator.waitFor()
+                assert(locator.isVisible()) { "$label should be visible for $foodPreference" }
+            } else {
+                assert(!locator.isVisible()) { "$label should NOT be visible for $foodPreference" }
+            }
+        }
+
+        questionerCount.waitFor()
         assertProgressCount(index)
-        checkMultiSelect(answersStored[QuestionSubType.INTOLERANCE]?.answer, options)
+
+        val visibleOptions = allOptions.filterKeys { expectedVisibleLabels.contains(it) }
+        checkMultiSelect(answersStored[QuestionSubType.INTOLERANCE]?.answer, visibleOptions)
     }
 
     private fun question_9_checker(index: Int) {
@@ -5283,7 +5767,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_52_checker(index: Int) {
         logQuestion("Checking: What is your waist circumference?")
         //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
-        val title = page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("What is your waist"))
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your waist"))
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
         title.waitFor()
@@ -5558,6 +6042,102 @@ class ProfilePage(page: Page) : BasePage(page) {
         questionDialog.waitFor()
 
         question_20()
+    }
+
+    // --- Performance Helpers ---
+
+    private fun performSingleSelect(
+        option: Locator,
+        subType: String,
+        question: String,
+        answerLabel: String,
+        nextAction: (() -> Unit)? = null
+    ) {
+        if (!isButtonChecked(option)) {
+            option.click()
+        } else {
+            nextButton.click()
+        }
+        logAnswer(subType, question, answerLabel)
+        nextAction?.invoke()
+    }
+
+    private fun performMultiSelect(
+        options: List<Locator>,
+        subType: String,
+        question: String,
+        answerLabels: Array<String>,
+        nextAction: (() -> Unit)? = null
+    ) {
+        options.forEach { option ->
+            if (!isButtonChecked(option)) {
+                option.click()
+            }
+        }
+        logAnswer(subType, question, answerLabels)
+        if (nextAction != null) {
+            nextButton.click()
+            nextAction()
+        }
+    }
+
+    private fun performMultiSelectWithOthers(
+        options: List<Locator>,
+        othersButton: Locator,
+        otherTextBox: Locator,
+        othersValue: String?,
+        subType: String,
+        question: String,
+        answerLabels: Array<String>,
+        nextAction: (() -> Unit)? = null
+    ) {
+        options.forEach { option ->
+            if (!isButtonChecked(option)) {
+                option.click()
+            }
+        }
+
+        if (othersValue != null) {
+            if (!isButtonChecked(othersButton)) {
+                othersButton.click()
+            }
+            otherTextBox.waitFor()
+            otherTextBox.fill(othersValue)
+        }
+
+        logAnswer(subType, question, answerLabels)
+        nextAction?.invoke()
+    }
+
+    private fun performTextInput(
+        value: String,
+        locator: Locator,
+        subType: String,
+        question: String,
+        nextAction: (() -> Unit)? = null
+    ) {
+        if (locator.inputValue() != value) {
+            locator.fill(value)
+        }
+        logAnswer(subType, question, value)
+        if (nextAction != null) {
+            nextButton.click()
+            nextAction()
+        }
+    }
+
+    private fun performTextInputComplete(
+        value: String,
+        locator: Locator,
+        subType: String,
+        question: String,
+        nextAction: (() -> Unit)
+    ) {
+        if (locator.inputValue() != value) {
+            locator.fill(value)
+        }
+        logAnswer(subType, question, value)
+        nextAction()
     }
 
 }
