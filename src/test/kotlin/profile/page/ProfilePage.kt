@@ -1141,28 +1141,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         question_1_veg(type)
     }
 
-    /*   fun assertQuestionerNonVegInitialCheck() {
-           fetchAccountInformation()
-           answersStored.clear()
-           logger.info {
-               "Answer count --> ${answersStored.size}"
-           }
-           val questionHeading =
-               page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
-           val editQuestionerButton =
-               page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
-           val questionDialog = page.locator(".bg-zinc-900").first()
-
-           questionHeading.waitFor()
-           editQuestionerButton.waitFor()
-
-           editQuestionerButton.click()
-
-           questionDialog.waitFor()
-
-           question_1_non_veg()
-       }*/
-
     fun question_1_veg(type: QuestionerMealType) { //What is your food preference?
         logQuestion("What is your food preference?")
         val question =
@@ -1228,34 +1206,6 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         }
     }
-
-    /*   fun question_1_non_veg() { //What is your food preference?
-           logQuestion("What is your food preference?")
-           val question =
-               page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your food preference?"))
-
-           val vegetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegetarian Primarily plant-"))
-           val nonVegetarian =
-               page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Non-Vegetarian Consumes meat"))
-           val vegan = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Vegan Exclusively plant-based"))
-           val eggetarian = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Eggetarian Primarily plant-"))
-
-           listOf(
-               question,
-               previousButton,
-               vegetarian,
-               nonVegetarian,
-               vegan,
-               eggetarian,
-               questionerCount
-           ).forEach { it.waitFor() }
-
-           assertProgressCount()
-
-           assertFalse(previousButton.isEnabled)
-
-
-       }*/
 
     private fun question_2() { //Which of the following do you consume?
         logQuestion("Which of the following do you consume?")
