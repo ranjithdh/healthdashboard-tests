@@ -31,7 +31,7 @@ object TestConfig {
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
         const val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
-        const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+        const val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
         const val PROFILE_URL = "${BASE_URL}profile"
@@ -62,7 +62,7 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
-        val SYMPTOMS_PAGE_URL: String = "$BASE_URL/insights"
+        val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
     }
 
 
