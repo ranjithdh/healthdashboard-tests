@@ -52,12 +52,12 @@ tasks.register<Exec>("installPlaywright") {
 tasks.withType<Test> {
     useJUnitPlatform()
 
-/*
+
     // ✅ CLEAR allure-results BEFORE tests
     doFirst {
         delete(layout.buildDirectory.dir("allure-results"))
     }
-*/
+
 
     systemProperty("buildDir", layout.buildDirectory.get().asFile.absolutePath)
 

@@ -6,6 +6,7 @@ import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
+import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
@@ -495,7 +496,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun addAddressAndValidate() {
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val nickName = "Home $number"
         val doorNumber = "E 4"
         val street = "5 Road, Swarnapuri"
@@ -651,7 +652,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         updateAddressDialog.waitFor()
 
         // Fill inputs (UI)
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
@@ -921,7 +922,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             countryCode = mobileNumber
         )
 
-        val randomNumber = (1..100).random()
+        val randomNumber = (500..1000).random()
 
         val updateName = editableInputByLabel("Name").inputValue().plus(" $randomNumber")
 
@@ -4778,6 +4779,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy",
                 "Gluten (Wheat)", "Fish", "Shellfish", "None", "Others"
             )
+
             foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
                 "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
             )
@@ -4789,6 +4791,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             foodPreference.equals("Eggetarian : Primarily plant-based but includes eggs in their diet") -> setOf(
                 "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
             )
+
             else -> error("Unknown food preference: $foodPreference")
         }
 
@@ -4836,7 +4839,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         val expectedVisibleLabels = when {
-            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf("Caffeine", "Gluten", "None")
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
+                "Caffeine",
+                "Gluten",
+                "None"
+            )
+
             else -> setOf("Lactose", "Caffeine", "Gluten", "None")
         }
 
