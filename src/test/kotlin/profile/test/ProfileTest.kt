@@ -10,6 +10,7 @@ import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ProfileTest {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -36,7 +37,11 @@ class ProfileTest {
                 .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
+
+     /*   context = browser.newContext(contextOptions)
+        page = context.newPage()*/
     }
 
     @AfterEach
@@ -47,6 +52,7 @@ class ProfileTest {
 
     /**-----------Address----------------*/
     @Test
+    @Order(1)
     fun `address information validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -62,6 +68,7 @@ class ProfileTest {
 
 
     @Test
+    @Order(2)
     fun `new address add`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -83,6 +90,7 @@ class ProfileTest {
 
 
     @Test
+    @Order(3)
     fun `remove address`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -98,6 +106,7 @@ class ProfileTest {
 
 
     @Test
+    @Order(4)
     fun `edit address`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -115,6 +124,7 @@ class ProfileTest {
 
     /**-----------Tone Preference----------------*/
     @Test
+    @Order(5)
     fun `tone preference selection`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -131,6 +141,7 @@ class ProfileTest {
 
     /**------------Account Information----------------*/
     @Test
+    @Order(6)
     fun `account information validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -171,6 +182,7 @@ class ProfileTest {
 
     /**-------------Health Metrics---------------*/
     @Test
+    @Order(7)
     fun `health metrics validations`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -184,6 +196,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(8)
     fun `health metrics edit`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -199,6 +212,7 @@ class ProfileTest {
     /**-------------Questioner---------------*/
 
     @Test
+    @Order(11)
     fun `questioner validation vegetarian`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -216,6 +230,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(10)
     fun `questioner validation vegan`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -233,6 +248,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(12)
     fun `questioner validation eggetarian`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -250,6 +266,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(13)
     fun `questioner validation non_vegetarian`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -268,6 +285,7 @@ class ProfileTest {
 
 
     @Test
+    @Order(14)
     fun `questioner validation skipping the exercise`() { //done
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -288,6 +306,7 @@ class ProfileTest {
     //Medical Conditions Flow Tests
 
     @Test
+    @Order(15)
     fun `medical conditions - no conditions selected`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -308,6 +327,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(16)
     fun `medical conditions - single gastrointestinal`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -329,6 +349,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(17)
     fun `medical conditions - multiple conditions GI and dermatological`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -354,6 +375,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(18)
     fun `medical conditions - diabetes only`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -374,6 +396,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(19)
     fun `medical conditions - thyroid only`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -394,6 +417,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(20)
     fun `medical conditions - cancer flow`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -414,6 +438,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(21)
     fun `medical conditions - cardiovascular and kidney`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -438,6 +463,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(22)
     fun `medical conditions - complex multi selection`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -465,6 +491,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(23)
     fun `medical conditions - respiratory and auto-immune`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -489,6 +516,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(24)
     fun `medical conditions - all major conditions`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -537,6 +565,7 @@ class ProfileTest {
    */
 
     @Test
+    @Order(25)
     fun `questioner backward validation complete flow`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -559,6 +588,7 @@ class ProfileTest {
     }
 
     @Test
+    @Order(9)
     fun `questioner backward validation at question 20`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
