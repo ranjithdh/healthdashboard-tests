@@ -495,7 +495,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun addAddressAndValidate() {
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val nickName = "Home $number"
         val doorNumber = "E 4"
         val street = "5 Road, Swarnapuri"
@@ -651,7 +651,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         updateAddressDialog.waitFor()
 
         // Fill inputs (UI)
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
@@ -921,7 +921,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             countryCode = mobileNumber
         )
 
-        val randomNumber = (1..100).random()
+        val randomNumber = (500..1000).random()
 
         val updateName = editableInputByLabel("Name").inputValue().plus(" $randomNumber")
 
