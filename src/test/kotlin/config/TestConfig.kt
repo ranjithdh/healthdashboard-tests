@@ -63,6 +63,7 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        val SYMPTOMS_PAGE_URL: String = "$BASE_URL/insights"
     }
 
 

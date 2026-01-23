@@ -11,6 +11,7 @@ import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
+import symptoms.page.SymptomsPage
 import utils.logger.logger
 
 private val logger = KotlinLogging.logger {}
