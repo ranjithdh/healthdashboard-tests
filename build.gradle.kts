@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    // Kotlin test library
+
     testImplementation(kotlin("test"))
 
     // Playwright
@@ -34,6 +34,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 }
 
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -43,15 +44,8 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "17"
 }
 
-// Playwright browser installation
-tasks.register<Exec>("installPlaywright") {
-    commandLine("npx", "playwright", "install", "--with-deps")
-}
-
-// Test configuration
 tasks.withType<Test> {
     useJUnitPlatform()
-
 
     // ✅ CLEAR allure-results BEFORE tests
     doFirst {
@@ -59,10 +53,9 @@ tasks.withType<Test> {
     }
 
 
-    systemProperty("buildDir", layout.buildDirectory.get().asFile.absolutePath)
-
-    // Allure results folder
-    systemProperty("allure.results.directory", "$buildDir/allure-results")
+    // Parallel execution
+    systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+    systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
 
     testLogging {
         events("passed", "skipped", "failed")
@@ -70,7 +63,21 @@ tasks.withType<Test> {
     }
 }
 
-// Allure plugin configuration
+// Custom task to run only mobile tests
+tasks.register<Test>("mobileTests") {
+    useJUnitPlatform()
+}
+
+// Custom task to run only desktop tests
+tasks.register<Test>("desktopTests") {
+    useJUnitPlatform()
+}
+
+// Install Playwright browsers
+tasks.register<Exec>("installPlaywright") {
+    commandLine("npx", "playwright", "install", "--with-deps")
+}
+
 allure {
     version.set("2.24.0")
     adapter {
