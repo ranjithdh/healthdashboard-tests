@@ -355,7 +355,101 @@ class LabTestsTest {
         // Verify Header Info (Name, Short Description, About Description)
         testDetailPage.verifyTestHeaderInfo(targetCode)
         testDetailPage.verifyHighlights(expectedHighlights)
+        // Verify "How it Works?" section
+        println("Verifying How it Works section...")
+        val howItWorksBySampleType = mapOf(
+            "saliva" to mapOf(
+                "title" to "Get Gene Kit Delivered",
+                "description" to "Your DNA kit arrives at your doorstep with simple cheek swab instructions."
+            ),
+            "stool" to mapOf(
+                "title" to "Get Gut Kit Delivered",
+                "description" to "Your gut test kit arrives at your doorstep with easy sample collection instructions."
+            ),
+            "dried_blood_spot" to mapOf(
+                "title" to "Get Omega Test Kit Delivered",
+                "description" to "Your Omega test kit arrives at your doorstep with an easy DBS tool."
+            ),
+            "saliva_stress" to mapOf(
+                "title" to "Get Cortisol Test Kit Delivered",
+                "description" to "Your cortisol test kit arrives at your doorstep with an easy saliva collection tube."
+            )
+        )
 
+        val sampleCollectionDescription = mapOf(
+            "saliva" to "Schedule a quick home visit — our technician collects your sample in minutes.",
+            "stool" to "Collect your stool sample and schedule a quick pickup from home.",
+            "blood" to "Schedule the blood sample collection from the comfort of your home.",
+            "dried_blood_spot" to "Do easy DBS test by yourself and schedule a quick pickup from home.",
+            "saliva_stress" to "Collect your saliva sample as per the instructions and schedule a quick pickup from home."
+        )
+
+        val consultDescription = mapOf(
+            "saliva" to "Chat with our experts to understand your results and get personalised guidance.",
+            "stool" to "Discuss your gut health report with our experts and get personalised guidance.",
+            "blood" to "See how your antibody levels connect with your symptoms by talking to our experts.",
+            "dried_blood_spot" to "Discuss your Omega panel report with our experts and get personalised guidance.",
+            "saliva_stress" to "Discuss your stress and cortisol report with our experts and get personalised guidance."
+        )
+
+        val getResultsDescription = mapOf(
+            "saliva" to "Your sample is analysed in a certified lab, and your report goes live on your dashboard.",
+            "stool" to "Your sample is analysed in a certified lab, and results are shared on your dashboard.",
+            "blood" to "Your sample is processed at a certified lab, and your report is ready online in 72 hours.", // Note: Blood handled dynamically usually, but logic map exists
+            "dried_blood_spot" to "Your sample is analysed in a certified lab, and results are shared on your dashboard.",
+            "saliva_stress" to "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+        )
+
+        val sampleType = targetPackage["sample_type"]?.jsonPrimitive?.content?.lowercase() ?: ""
+        val reportGenHr = targetPackage["report_generation_hr"]?.jsonPrimitive?.content ?: "72 hours"
+        val highlightsList = content["highlights"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+
+        val baseSteps = mutableListOf<Map<String, String>>()
+
+        // Item 1 (Base/Blood)
+        val title1 = if (listOf("saliva", "blood").contains(sampleType)) "At-Home Sample Collection" else "At-Home Self-Test Kit"
+        val desc1 = sampleCollectionDescription[sampleType] ?: "Schedule the ${
+            highlightsList.getOrNull(0) ?: "blood sample"
+        } collection from the comfort of your home."
+        baseSteps.add(mapOf("title" to title1, "description" to desc1))
+
+        // Item 2 (Base/Blood)
+        val title2 = highlightsList.getOrNull(3) ?: "Get Results in 72 Hours"
+        val desc2 = if (sampleType == "blood") {
+            "Your sample is processed at a certified lab, and your report is ready online in  $reportGenHr."
+        } else {
+            getResultsDescription[sampleType] ?: ""
+        }
+        baseSteps.add(mapOf("title" to title2, "description" to desc2))
+
+        // Item 3 (Base/Blood)
+        val title3 = "1-on-1 Expert Consultation"
+        val desc3 = consultDescription[sampleType] ?: "See how your antibody levels connect with your symptoms by talking to our experts."
+        baseSteps.add(mapOf("title" to title3, "description" to desc3))
+
+        // Item 4 (Blood only append)
+        if (sampleType == "blood") {
+            baseSteps.add(mapOf(
+                "title" to "Track Progress Overtime",
+                "description" to "Monitor these markers over time to understand changes and treatment response."
+            ))
+        }
+
+        val expectedHowItWorksSteps = mutableListOf<Map<String, String>>()
+
+        if (sampleType != "blood" && sampleType.isNotEmpty()) {
+            val prepend = howItWorksBySampleType[sampleType]
+            if (prepend != null) {
+                expectedHowItWorksSteps.add(prepend)
+            }
+            // Append base steps
+            expectedHowItWorksSteps.addAll(baseSteps)
+        } else {
+            // Blood or others not in map
+             expectedHowItWorksSteps.addAll(baseSteps)
+        }
+        testDetailPage.verifyHowItWorks(expectedHowItWorksSteps)
+        testDetailPage.verifyCertifiedLabsSection()
         // Click and verify buttons with text
         testDetailPage.expandAndVerifySection("What’s measured?", whatMeasuredDesc)
         testDetailPage.expandAndVerifySection("Who should take this test?", whoDesc)
