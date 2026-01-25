@@ -284,9 +284,67 @@ class LabTestsTest {
         println("Expected Who: $whoDesc")
         println("Expected What to Expect: $whatToExpectDesc")
 
+        // Logic to determine expected highlights based on React frontend logic
         val highlightsJson = content["highlights"]?.jsonArray
-        val highlights = highlightsJson?.map { it.jsonPrimitive.content } ?: emptyList()
-        println("Expected Highlights: $highlights")
+        val rawHighlights = highlightsJson?.map { it.jsonPrimitive.content } ?: emptyList()
+        val expectedHighlights = mutableListOf<String>()
+
+        // 1. highlights[0]
+        if (rawHighlights.isNotEmpty()) expectedHighlights.add(rawHighlights[0])
+
+        val hasHighlight5 = rawHighlights.size > 5 && rawHighlights[5].isNotBlank()
+
+        // 2. Prep/Fasting block (Only if !hasHighlight5)
+        if (!hasHighlight5) {
+            val code = targetPackage["code"]?.jsonPrimitive?.content
+            val vendorProductId = targetPackage["product"]?.jsonObject?.get("vendor_product_id")?.jsonPrimitive?.content
+
+            if (code == "DH_LONGEVITY_PANEL" || vendorProductId == "DH_LONGEVITY_PANEL" ||
+                code == "DH_METABOLIC_PANEL" || vendorProductId == "DH_METABOLIC_PANEL") {
+
+                if (code == "DH_METABOLIC_PANEL" || vendorProductId == "DH_METABOLIC_PANEL") {
+                    expectedHighlights.add("Two Blood Draws Required: Fasting and Post-Breakfast")
+                } else {
+                    expectedHighlights.add("Fasting Required")
+                    expectedHighlights.add("Post-Meal Blood Draw Required")
+                }
+
+            } else {
+                val sampleType = targetPackage["sample_type"]?.jsonPrimitive?.content?.lowercase()
+                val preparation = content["preparation"]?.jsonPrimitive?.content
+                val isFastingRequired = targetPackage["is_fasting_required"]?.jsonPrimitive?.boolean == true
+
+                if (sampleType == "stool" || sampleType == "saliva") {
+                    expectedHighlights.add(preparation ?: "No preparation required")
+                } else if (isFastingRequired) {
+                    val fastingInfo = content["fasting_info"]?.jsonPrimitive?.content
+                    val cleanedFastingInfo = fastingInfo?.replace(Regex("fasting\\s*", RegexOption.IGNORE_CASE), "")?.trim() ?: "required"
+                    expectedHighlights.add("Fasting $cleanedFastingInfo")
+                } else {
+                    expectedHighlights.add("No fasting required")
+                }
+            }
+        }
+
+        // 3. when_to_take
+        val whenToTake = content["when_to_take"]?.jsonPrimitive?.content
+        if (!whenToTake.isNullOrBlank()) {
+            expectedHighlights.add(whenToTake)
+        }
+
+        // 4. highlights[2]
+        if (rawHighlights.size > 2) expectedHighlights.add(rawHighlights[2])
+
+        // 5. highlights[5] - if exists
+        if (hasHighlight5) expectedHighlights.add(rawHighlights[5])
+
+        // 6. highlights[3]
+        if (rawHighlights.size > 3) expectedHighlights.add(rawHighlights[3])
+
+        // 7. highlights[4]
+        if (rawHighlights.size > 4) expectedHighlights.add(rawHighlights[4])
+
+        println("Calculated Expected Highlights (Frontend Logic): $expectedHighlights")
 
         println("Clicking View Details for code $targetCode")
         // Click View Details for the specific panel
@@ -294,9 +352,9 @@ class LabTestsTest {
 
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
-        // Verify Header Info (Name, Short Description, About Description) // addtionally, need to verify the highlights as well
+        // Verify Header Info (Name, Short Description, About Description)
         testDetailPage.verifyTestHeaderInfo(targetCode)
-        testDetailPage.verifyHighlights(highlights)
+        testDetailPage.verifyHighlights(expectedHighlights)
 
         // Click and verify buttons with text
         testDetailPage.expandAndVerifySection("What’s measured?", whatMeasuredDesc)
@@ -312,7 +370,7 @@ class LabTestsTest {
         println("Expected Price: $formattedPrice")
 
         // Verify Price and Booking Button
-//        testDetailPage.verifyPriceAndBookingButton(targetCode, formattedPrice)
+        testDetailPage.verifyPriceAndBookingButton(targetCode, formattedPrice)
 
         println("Test completed successfully.")
 
