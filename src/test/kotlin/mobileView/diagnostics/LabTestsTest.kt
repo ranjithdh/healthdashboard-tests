@@ -365,7 +365,7 @@ class LabTestsTest {
         val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
         val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
         numberFormat.maximumFractionDigits = 0
-        val formattedPrice = "₹ " + numberFormat.format(rawPrice)
+        val formattedPrice = "₹" + numberFormat.format(rawPrice)
 
         println("Expected Price: $formattedPrice")
 
