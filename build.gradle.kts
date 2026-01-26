@@ -50,6 +50,24 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 
+
+    val env = System.getProperty("env") ?: "stg"
+
+    doFirst {
+        val resultsDir = layout.buildDirectory.dir("allure-results").get().asFile
+        resultsDir.mkdirs()
+
+        val envFile = File(resultsDir, "environment.properties")
+        envFile.writeText(
+            """
+            Environment=$env
+            BaseURL=${if (env == "prod") "https://api.prod.com" else "https://api.stg.com"}
+            Platform=Web
+            Browser=Chromium
+            """.trimIndent()
+        )
+    }
+
     // ✅ CLEAR allure-results BEFORE tests
     doFirst {
         delete(layout.buildDirectory.dir("allure-results"))

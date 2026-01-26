@@ -7,6 +7,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
+import io.qameta.allure.Allure
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
@@ -81,6 +82,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun logAnswer(key: String, question: String, answer: Any) {
         val questionAnswer = QuestionAnswer(question, answer)
+        Allure.addAttachment("[QUESTIONER]",question)
+        Allure.addAttachment("[QUESTIONER]",answer.toString())
         answersStored[key] = questionAnswer
         logger.info {
             "[ANSWERS STORED SNAPSHOT]: ${
