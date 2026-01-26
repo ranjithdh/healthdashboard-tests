@@ -36,12 +36,12 @@ class ProfileTest {
             Browser.NewContextOptions().setViewportSize(viewport.width, viewport.height).setHasTouch(viewport.hasTouch)
                 .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
-        context = browser.newContext(contextOptions)
+    /*    context = browser.newContext(contextOptions)
         context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
-        page = context.newPage()
-
-     /*   context = browser.newContext(contextOptions)
         page = context.newPage()*/
+
+        context = browser.newContext(contextOptions)
+        page = context.newPage()
     }
 
     @AfterEach

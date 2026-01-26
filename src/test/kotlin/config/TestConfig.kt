@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 object TestConfig {
 
     var ACCESS_TOKEN = ""
-    const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+    const val CLIENT_ID = "6wkFaU5pxWn4R3C87Z6ceNQgzLJvD2OVKoXB"
 
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -21,7 +21,7 @@ object TestConfig {
     }
 
     object Urls {
-        val BASE_URL: String = "https://app.stg.deepholistics.com"
+        val BASE_URL: String = "https://app.deepholistics.com"
         val DIAGNOSTICS_URL: String = "$BASE_URL/diagnostics"
         val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val HOME_PAGE_URL: String = "$BASE_URL/home"
@@ -38,7 +38,7 @@ object TestConfig {
 
 
     object APIs {
-        val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+        val BASE_URL: String = "https://api.dh.deepholistics.com"
 
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
@@ -48,7 +48,9 @@ object TestConfig {
         val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        val API_MARKETPLACE = "$BASE_URL/v4/human-token/market-place/home"
     }
+
 
 
     object Browser {
@@ -95,16 +97,16 @@ object TestConfig {
         )
 
 
-        /*val EXISTING_USER = TestUser(
-                    mobileNumber = "7373791414",
-                    otp = "678901"
-                )*/
-
-
         val EXISTING_USER = TestUser(
-            mobileNumber = "8870208411",
+            mobileNumber = "9952538864",
             otp = "678901"
         )
+
+
+        /*    val EXISTING_USER = TestUser(
+                mobileNumber = "8870208411",
+                otp = "678901"
+            )*/
     }
 
     object Artifacts {

@@ -6,6 +6,7 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import config.TestConfig.APIs.API_MARKETPLACE
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
@@ -62,7 +63,7 @@ class HomePage(page: Page) : BasePage(page) {
         val response = page.waitForResponse(
             { response: Response? ->
                 response?.url()
-                    ?.contains("https://api.stg.dh.deepholistics.com/v4/human-token/market-place/home") == true && response.status() == 200
+                    ?.contains(API_MARKETPLACE) == true && response.status() == 200
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
