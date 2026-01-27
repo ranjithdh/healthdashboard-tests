@@ -6,9 +6,6 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
-/**
- * Utility class to parse biomarker data from CSV export file.
- */
 object BiomarkerCsvParser {
     
     /**
@@ -26,7 +23,6 @@ object BiomarkerCsvParser {
         val lines = file.readLines()
         require(lines.isNotEmpty()) { "CSV file is empty" }
         
-        // Skip header row
         val dataLines = lines.drop(1)
         
         val biomarkers = dataLines.mapNotNull { line ->
@@ -41,11 +37,7 @@ object BiomarkerCsvParser {
         logger.info { "Parsed ${biomarkers.size} biomarkers from CSV" }
         return biomarkers
     }
-    
-    /**
-     * Parse a single CSV line into a Biomarker object.
-     * Handles quoted fields with commas inside.
-     */
+
     private fun parseLine(line: String): Biomarker? {
         if (line.isBlank()) return null
         
@@ -66,10 +58,7 @@ object BiomarkerCsvParser {
             systemName = fields[6].trim()
         )
     }
-    
-    /**
-     * Parse a CSV line with proper handling of quoted fields.
-     */
+
     private fun parseQuotedCsv(line: String): List<String> {
         val fields = mutableListOf<String>()
         val currentField = StringBuilder()
@@ -85,41 +74,9 @@ object BiomarkerCsvParser {
                 else -> currentField.append(char)
             }
         }
-        // Add the last field
         fields.add(currentField.toString())
         
         return fields
     }
-    
-    /**
-     * Parse CSV and group biomarkers by system name.
-     */
-    fun parseGroupedBySystem(filePath: String): Map<String, List<Biomarker>> {
-        return parse(filePath).groupBy { it.systemName }
-    }
-    
-    /**
-     * Get all unique system names from the CSV.
-     */
-    fun getSystemNames(filePath: String): List<String> {
-        return parse(filePath)
-            .map { it.systemName }
-            .distinct()
-            .filter { it.isNotBlank() }
-            .sorted()
-    }
-    
-    /**
-     * Get biomarkers filtered by status.
-     */
-    fun getBiomarkersByStatus(filePath: String, status: String): List<Biomarker> {
-        return parse(filePath).filter { it.status.equals(status, ignoreCase = true) }
-    }
-    
-    /**
-     * Get biomarkers that need attention (not Normal/Optimal).
-     */
-    fun getBiomarkersNeedingAttention(filePath: String): List<Biomarker> {
-        return parse(filePath).filter { it.needsAttention() }
-    }
+
 }

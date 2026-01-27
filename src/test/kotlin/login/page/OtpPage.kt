@@ -6,12 +6,12 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
-import config.TestConfig.json
 import forWeb.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
+import utils.json.json
 import utils.logger.logger
 
 

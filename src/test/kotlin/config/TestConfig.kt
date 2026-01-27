@@ -10,16 +10,6 @@ object TestConfig {
     var ACCESS_TOKEN = ""
     const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
 
-
-    @OptIn(ExperimentalSerializationApi::class)
-    val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        explicitNulls = true
-        encodeDefaults = true
-    }
-
     object Urls {
 
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
@@ -115,7 +105,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "726408390",
+            mobileNumber = "573583618",
             otp = "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -127,10 +117,10 @@ object TestConfig {
             day = "12",
             flatHouseNo = "Flat 101",
             address = "456 Main Road",
-            city = "Delhi",
-            state = "Delhi",
-            pinCode = "110001",
-            country = "Sweden"
+            city = "Coimbatore",
+            state = "TamilNadu",
+            pinCode = "641005",
+            country = "Poland"
         )
 
 
