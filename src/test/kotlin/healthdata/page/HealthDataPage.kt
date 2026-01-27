@@ -1,5 +1,6 @@
 package healthdata.page
 
+import com.microsoft.playwright.Download
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
@@ -17,7 +18,6 @@ class HealthDataPage(page: Page) : BasePage(page) {
     fun waitForPageLoad() {
         logger.info { "Waiting for Health Data page to load" }
         waitForVisible("h1:has-text('Health data')")
-        // Wait for at least one biomarker row to appear
         waitForVisible(".grid.grid-cols-12", TestConfig.Timeouts.ELEMENT_TIMEOUT)
     }
 
@@ -37,7 +37,7 @@ class HealthDataPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun getBiomarkerRow(name: String): com.microsoft.playwright.Locator? {
+    private fun getBiomarkerRow(name: String): Locator? {
 
         val row = page.locator("div.grid.grid-cols-12")
             .filter(
@@ -85,8 +85,6 @@ class HealthDataPage(page: Page) : BasePage(page) {
         val valueMatches = rowText.contains(expectedValue, ignoreCase = true)
         val statusMatches = rowText.contains(expectedStatus, ignoreCase = true)
 
-        // Range often contains "to" or symbols, check carefully
-        // Standardize range format for comparison if needed
         val rangeMatches = rowText.contains(expectedRange, ignoreCase = true)
 
         if (!valueMatches) logger.error { "Value mismatch for $name. Expected: $expectedValue, Found in: $rowText" }
@@ -94,5 +92,14 @@ class HealthDataPage(page: Page) : BasePage(page) {
         if (!rangeMatches) logger.error { "Range mismatch for $name. Expected: $expectedRange, Found in: $rowText" }
 
         return valueMatches && statusMatches && rangeMatches
+    }
+
+
+    fun downloadReport(): Download {
+        logger.info { "Downloading biomarker report" }
+        val download = page.waitForDownload {
+            byTestId("download-report-button").click()
+        }
+        return download
     }
 }
