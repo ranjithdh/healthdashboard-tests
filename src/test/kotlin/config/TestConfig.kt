@@ -75,7 +75,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
                 .setHeadless(HEADLESS)
-              //  .setSlowMo(SLOW_MO)
+                .setSlowMo(SLOW_MO)
         }
     }
 

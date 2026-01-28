@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.deepholistics"
-version = "1.0-SNAPSHOT"
+version = "2.1.29"
 
 repositories {
     mavenCentral()
@@ -52,36 +52,46 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 
-
     val env = System.getProperty("env") ?: "stg"
+    val appVersion = project.version.toString()
+
+    // ✅ CLEAR allure-results BEFORE tests
+     doFirst {
+         delete(layout.buildDirectory.dir("allure-results"))
+     }
 
     doFirst {
         val resultsDir = layout.buildDirectory.dir("allure-results").get().asFile
         resultsDir.mkdirs()
 
-        val envFile = File(resultsDir, "environment.properties")
-        envFile.writeText(
+        // environment.properties
+        File(resultsDir, "environment.properties").writeText(
             """
             Environment=$env
-            BaseURL=${if (env == "prod") "https://api.prod.com" else "https://api.stg.com"}
             Platform=Web
             Browser=Chromium
-            Version=2.1.28
+            Version=$appVersion
+            """.trimIndent()
+        )
+
+        // executor.json
+        File(resultsDir, "executor.json").writeText(
+            """
+            {
+              "name": "IntelliJ",
+              "type": "manual",
+              "buildName": "v$appVersion",
+              "reportName": "Playwright Tests v$appVersion"
+            }
             """.trimIndent()
         )
     }
-
-    // ✅ CLEAR allure-results BEFORE tests
-   /* doFirst {
-        delete(layout.buildDirectory.dir("allure-results"))
-    }*/
 
     systemProperty(
         "allure.results.directory",
         layout.buildDirectory.dir("allure-results").get().asFile.absolutePath
     )
 
-    // Parallel execution
     systemProperty("junit.jupiter.execution.parallel.enabled", "true")
     systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
 
@@ -90,6 +100,7 @@ tasks.withType<Test> {
         showStandardStreams = true
     }
 }
+
 
 // Custom task to run only mobile tests
 tasks.register<Test>("mobileTests") {
@@ -113,3 +124,4 @@ allure {
         autoconfigure.set(true)
     }
 }
+
