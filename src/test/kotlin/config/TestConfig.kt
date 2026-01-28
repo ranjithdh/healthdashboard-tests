@@ -1,8 +1,6 @@
 package config
 
 import com.microsoft.playwright.BrowserType
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 
 
 object TestConfig {
@@ -52,7 +50,6 @@ object TestConfig {
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
     }
 
-
     object APIs {
         const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
 
@@ -64,7 +61,6 @@ object TestConfig {
         const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
     }
-
 
     object Browser {
         const val HEADLESS: Boolean = false
