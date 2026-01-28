@@ -1106,6 +1106,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(saveButton.isEnabled)
         saveButton.click()
 
+        edit.waitFor()
+
         fetchAccountInformation()
 
         val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
