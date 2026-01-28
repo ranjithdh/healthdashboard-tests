@@ -2,7 +2,7 @@ name: E2E Tests - Playwright + Kotlin
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop,website-test]
   pull_request:
     branches: [main]
   schedule:
