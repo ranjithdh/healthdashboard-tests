@@ -23,7 +23,7 @@ jobs:
   # Run all tests
   test-all:
     name: Run All E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event_name != 'workflow_dispatch'
     
     steps:
@@ -72,7 +72,7 @@ jobs:
   # Mobile-only tests
   test-mobile:
     name: Mobile Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_tags == 'Mobile'
     
     steps:
@@ -108,7 +108,7 @@ jobs:
   # Website-only tests
   test-website:
     name: Website Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_tags == 'Website'
     
     steps:
@@ -141,7 +141,7 @@ jobs:
   # App-only tests (Login, Profile, etc.)
   test-app:
     name: App Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_tags == 'App'
     
     steps:
@@ -177,7 +177,7 @@ jobs:
   # Cross-browser tests
   test-cross-browser:
     name: Cross-Browser Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
