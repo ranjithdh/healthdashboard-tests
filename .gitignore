@@ -21,6 +21,7 @@ build/videos/
 build/traces/
 build/logs/
 build/allure-results/
+bin/test/
 
 # Environment
 .env
