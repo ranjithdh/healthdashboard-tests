@@ -68,7 +68,7 @@ object TestConfig {
     }
 
     object Browser {
-        const val HEADLESS: Boolean = false
+        const val HEADLESS: Boolean = true
         const val SLOW_MO: Double = (1 * 1000).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
