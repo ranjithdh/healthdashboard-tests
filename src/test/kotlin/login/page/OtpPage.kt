@@ -12,6 +12,7 @@ import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import profile.page.ProfilePage
 import utils.json.json
+import symptoms.page.SymptomsPage
 import utils.logger.logger
 
 
@@ -213,11 +214,27 @@ class OtpPage(page: Page) : BasePage(page) {
             // Ignore timeout if it doesn't go to home quickly, just proceed to navigate
             logger.info { "Wait for home page timed out or skipped, proceeding to Health Data page" }
         }
-        
+
         val healthDataPage = healthdata.page.HealthDataPage(page)
         healthDataPage.navigate()
         healthDataPage.waitForPageLoad()
         return healthDataPage
     }
+
+    fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
+        enterOtp(otp)
+
+        // Create LabTestsPage instance BEFORE navigation to set up response listener
+        val symptomsPage = SymptomsPage(page)
+
+        // Navigate to diagnostics (API call happens during this navigation)
+        page.navigate(TestConfig.Urls.SYMPTOMS_PAGE_URL)
+
+        symptomsPage.waitForSymptomsPageConfirmation()
+
+
+        return symptomsPage
+    }
+
 }
 

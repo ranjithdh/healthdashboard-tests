@@ -9,14 +9,17 @@ object TestConfig {
     const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
 
     object Urls {
-
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
+        val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val SERVICES_URL = "${BASE_URL}services"
+
+
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
-        const val DIAGNOSTICS_PATH = "https://app.stg.deepholistics.com/diagnostics"
-        const val DIAGNOSTICS_URL: String = "https://app.stg.deepholistics.com/diagnostics"
+        const val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
-        const val PROFILE_PAGE_URL: String = "$BASE_URL/profile"
+        const val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         const val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
@@ -48,11 +51,11 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
     }
 
     object APIs {
         const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-
         const val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         const val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         const val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
@@ -60,6 +63,8 @@ object TestConfig {
         const val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
         const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
+        const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
+        val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
     }
 
     object Browser {
