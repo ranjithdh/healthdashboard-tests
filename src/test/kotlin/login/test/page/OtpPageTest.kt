@@ -4,6 +4,7 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.logger.logger
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
