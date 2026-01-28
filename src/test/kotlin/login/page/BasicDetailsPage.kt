@@ -3,6 +3,8 @@ package login.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import config.TestConfig
+import config.TestUser
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -13,7 +15,6 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     override val pageUrl = "/login"
 
     private val firstNameInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name"))
-    private val lastNameInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Last name"))
     private val emailInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email"))
 
 
@@ -23,11 +24,6 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun enterLastName(lastName: String): BasicDetailsPage {
-        logger.info { "enterLastName($lastName)" }
-        lastNameInput.fill(lastName)
-        return this
-    }
 
     fun enterEmail(email: String): BasicDetailsPage {
         logger.info { "enterEmail($email)" }
@@ -41,11 +37,6 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun clearLastName(): BasicDetailsPage {
-        logger.info { "clearLastName()" }
-        lastNameInput.clear()
-        return this
-    }
 
     fun clearEmail(): BasicDetailsPage {
         logger.info { "clearEmail()" }
@@ -53,15 +44,13 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun fillDetails(firstName: String, lastName: String, email: String): BasicDetailsPage {
-        logger.info { "fillDetails($firstName, $lastName, $email)" }
+    fun fillDetails(firstName: String,email: String): BasicDetailsPage {
+        logger.info { "fillDetails($firstName, $email)" }
         utils.SignupDataStore.update {
             this.firstName = firstName
-            this.lastName = lastName
             this.email = email
         }
         enterFirstName(firstName)
-        enterLastName(lastName)
         enterEmail(email)
         return this
     }
@@ -73,9 +62,11 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun fillAndContinue(firstName: String, lastName: String, email: String): PersonalDetailsPage {
-        logger.info { "fillAndContinue()" }
-        fillDetails(firstName, lastName, email)
+    fun fillBasicDetails(): PersonalDetailsPage {
+        val testUser: TestUser = TestConfig.TestUsers.NEW_USER
+
+        logger.info { "fillBasicDetails()" }
+        fillDetails(testUser.firstName, testUser.email)
         clickContinue()
         val personalDetailsPage = PersonalDetailsPage(page)
         personalDetailsPage.waitForConfirmation()
@@ -92,9 +83,7 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return firstNameInput.isVisible
     }
 
-    fun isLastNameVisible(): Boolean {
-        return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Last name")).isVisible
-    }
+
 
     fun isEmailVisible(): Boolean {
         return byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email")).isVisible

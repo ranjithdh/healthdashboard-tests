@@ -2,7 +2,7 @@ package forWeb.diagnostics.test
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import forWeb.diagnostics.page.LabTestsPage
+import webView.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
@@ -49,9 +49,9 @@ class LabTestsPageTest {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
+            .enterMobileAndContinue(testUser)
 //            .enterOtpAndContinueToHomePage(testUser.otp)
-            .enterOtpAndContinueToLabTestForWeb((testUser.otp))
+            .enterOtpAndContinueToLabTestForWeb((testUser))
     }
 
 

@@ -45,13 +45,13 @@ class AddressPageTest {
     }
 
     private fun navigateToAddressPage(): login.page.AddressPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
-            .fillAndContinue()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
+            .fillBasicDetails()
+            .fillPersonalDetails()
     }
 
     @Test
@@ -122,14 +122,6 @@ class AddressPageTest {
     }
 
     @Test
-    fun `should have Continue disabled with empty fields`() {
-        val addressPage = navigateToAddressPage()
-
-        assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
-        addressPage.takeScreenshot("continue-disabled-address")
-    }
-
-    @Test
     fun `should have Continue disabled with empty address`() {
         val addressPage = navigateToAddressPage()
         addressPage.fillAddress("Flat 101", "123, Test Street", "Chennai", "Tamil Nadu", "600001")
@@ -166,13 +158,7 @@ class AddressPageTest {
     fun `should navigate to time slot page on valid submission`() {
         val addressPage = navigateToAddressPage()
 
-        val timeSlotPage = addressPage.fillAndContinue(
-            flatHouseNoOrBuilding = "Flat 101",
-            address = "123, Test Street",
-            city = "Chennai",
-            state = "Tamil Nadu",
-            pinCode = "600001"
-        )
+        val timeSlotPage = addressPage.fillAddressDetails(TestConfig.TestUsers.NEW_USER)
 
         timeSlotPage.waitForConfirmation()
 

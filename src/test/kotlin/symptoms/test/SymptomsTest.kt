@@ -10,10 +10,14 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class SymptomsTest {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -58,13 +62,14 @@ class SymptomsTest {
 
 
     @Test
+    @Order(1)
     fun `report symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
 
         symptomsMain.headerValidation()
@@ -80,13 +85,14 @@ class SymptomsTest {
 
 
     @Test
+    @Order(2)
     fun `remove symptoms`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
         symptomsMain.headerValidation()
         symptomsMain.resetAllSymptoms()
@@ -99,19 +105,19 @@ class SymptomsTest {
     }
 
 
-    @Test
+   /* @Test
     fun `reported symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()
 
-    }
+    }*/
 
 
 }

@@ -45,12 +45,13 @@ class PersonalDetailsPageTest {
     }
 
     private fun navigateToPersonalDetails(): login.page.PersonalDetailsPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "User", "test@test.com")
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
+            .fillBasicDetails()
     }
 
     @Test
@@ -146,7 +147,7 @@ class PersonalDetailsPageTest {
     fun `should navigate to address page on valid submission`() {
         val personalDetailsPage = navigateToPersonalDetails()
 
-        val addressPage = personalDetailsPage.fillAndContinue()
+        val addressPage = personalDetailsPage.fillPersonalDetails()
 
         assert(addressPage.isAddressVisible()) { "Should be on address page" }
         addressPage.takeScreenshot("navigated-to-address")

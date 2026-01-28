@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import config.TestUser
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -11,7 +12,7 @@ private val logger = KotlinLogging.logger {}
 
 class LoginPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = TestConfig.Urls.LOGIN_PATH
+    override val pageUrl = TestConfig.Urls.LOGIN_URL
 
 
     fun enterMobileNumber(phoneNumber: String): LoginPage {
@@ -38,10 +39,18 @@ class LoginPage(page: Page) : BasePage(page) {
         return this
     }
 
+    fun selectCountryCode(countryName: String) {
+        logger.info { "selectCountryCode($countryName)" }
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
+        page.getByPlaceholder("Search country...").click()
+        page.getByPlaceholder("Search country...").fill(countryName)
+        page.getByText(countryName).nth(1).click()
+    }
 
-    fun enterMobileAndContinue(phoneNumber: String): OtpPage {
-        logger.info { "enterMobileAndContinue($phoneNumber)" }
-        enterMobileNumber(phoneNumber)
+    fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
+        logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
+        selectCountryCode(testUser.country)
+        enterMobileNumber(testUser.mobileNumber)
         clickContinue()
         val otpPage = OtpPage(page)
         otpPage.waitForConfirmScreen()
@@ -94,7 +103,7 @@ class LoginPage(page: Page) : BasePage(page) {
 
 
     fun isDontHaveAccountLinkVisible(): Boolean {
-        return byText("Don't have an account?").isVisible
+        return byText("Don’t have an account? Sign up here").isVisible
     }
 
     fun isPrivacyPolicyLinkVisible(): Boolean {
@@ -119,20 +128,31 @@ class LoginPage(page: Page) : BasePage(page) {
 
 
     fun isSignUpStatsTextVisible(): Boolean {
-        return byText("It all starts with 100+ lab").isVisible
+        return page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Signup")).isVisible
     }
 
-    fun isLabTestsTextVisible(): Boolean {
-        return byText("100+ lab tests for your whole body").isVisible
+    fun itAllStartsWith100LabTest(): Boolean {
+        return page.getByText("It all starts with 100+ biomarkers. All for just ₹9,999.").isVisible
     }
 
-    fun isBloodDrawTextVisible(): Boolean {
-        return byText("At-mobileView.home blood-draw").isVisible
+    fun alreadyHaveAnAccountLinkVisible(): Boolean {
+        return page.getByText("Already have an account? Log in").isVisible
     }
 
-    fun isResultsTrackedTextVisible(): Boolean {
-        return byText("Results tracked over your lifetime in one secure place").isVisible
+    fun isSendOtpOnWhatsAppVisible(): Boolean {
+        return page.getByText("Send OTP on WhatsApp").isVisible &&
+                page.getByRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isVisible
     }
+
+
+    fun whatsIncludedSectionContentVisible(): Boolean {
+        return page.getByText("100+ biomarkers for your whole body").isVisible &&
+                page.getByText("1:1 consultation with our expert included").isVisible &&
+                page.getByText("Expert-led personalised action plan").isVisible &&
+                page.getByText("One secure place for all your health results").isVisible
+    }
+
+
 
     fun clickPrivacyPolicyAndVerifyPopup(): Boolean {
         logger.info { "clickPrivacyPolicyAndVerifyPopup()" }
@@ -140,7 +160,10 @@ class LoginPage(page: Page) : BasePage(page) {
             byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Privacy Policy")).click()
         }
         popup.waitForLoadState()
-        val headingVisible = popup.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Deep Holistics Privacy Policy")).isVisible
+        val headingVisible = popup.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Deep Holistics Privacy Policy")
+        ).isVisible
         popup.close()
         return headingVisible
     }
@@ -151,7 +174,8 @@ class LoginPage(page: Page) : BasePage(page) {
             byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Terms of Service")).click()
         }
         popup.waitForLoadState()
-        val headingVisible = popup.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Deep Holistics Terms of Use")).isVisible
+        val headingVisible =
+            popup.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Deep Holistics Terms of Use")).isVisible
         popup.close()
         return headingVisible
     }

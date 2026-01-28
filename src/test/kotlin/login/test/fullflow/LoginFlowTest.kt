@@ -4,9 +4,7 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
-import utils.TestUtils
 import java.nio.file.Paths
-
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -55,15 +53,10 @@ class LoginFlowTest {
 
     @Test
     fun `login flow`() {
-        val tesUser = TestConfig.TestUsers.EXISTING_USER
-
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
-
-
-
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToMobileHomePage()
     }
 }
 

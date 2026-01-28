@@ -21,4 +21,5 @@ data class SignupData(
     var fastingSlot: String? = null,
     var postMealSlot: String? = null,
     var slotDate: LocalDateTime? = null,
+    var selectedAddOns: MutableList<String> = mutableListOf(),
 )
