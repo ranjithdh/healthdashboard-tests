@@ -29,7 +29,8 @@ dependencies {
     // JSON parsing for test data
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     
-    // JUnit Params
+    // Allure
+    testImplementation("io.qameta.allure:allure-junit5:2.24.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
@@ -91,4 +92,11 @@ tasks.register<Exec>("installPlaywright") {
 
 allure {
     version.set("2.24.0")
+    adapter {
+        frameworks {
+            junit5 {
+                adapterVersion.set("2.24.0")
+            }
+        }
+    }
 }
