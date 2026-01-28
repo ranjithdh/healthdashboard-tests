@@ -59,11 +59,29 @@ tasks.withType<Test> {
 // Custom task to run only mobile tests
 tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
+    filter {
+        includeTestsMatching("mobileView.*")
+    }
 }
 
-// Custom task to run only desktop tests
-tasks.register<Test>("desktopTests") {
+// Custom task to run only website tests
+tasks.register<Test>("websiteTests") {
     useJUnitPlatform()
+    filter {
+        includeTestsMatching("website.*")
+    }
+}
+
+// Custom task to run only desktop/app tests
+tasks.register<Test>("appTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("login.*")
+        includeTestsMatching("healthdata.*")
+        includeTestsMatching("profile.*")
+        includeTestsMatching("symptoms.*")
+        includeTestsMatching("webView.*")
+    }
 }
 
 // Install Playwright browsers
