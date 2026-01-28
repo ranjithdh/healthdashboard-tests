@@ -495,7 +495,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun addAddressAndValidate() {
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val nickName = "Home $number"
         val doorNumber = "E 4"
         val street = "5 Road, Swarnapuri"
@@ -651,7 +651,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         updateAddressDialog.waitFor()
 
         // Fill inputs (UI)
-        val number = (0..100).random()
+        val number = (500..1000).random()
         val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
@@ -921,7 +921,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             countryCode = mobileNumber
         )
 
-        val randomNumber = (1..100).random()
+        val randomNumber = (500..1000).random()
 
         val updateName = editableInputByLabel("Name").inputValue().plus(" $randomNumber")
 
@@ -1047,10 +1047,24 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.getByText("Height (cm):").waitFor()
         page.getByText("Weight (kg):").waitFor()
 
-        page.getByText(weight).waitFor()
-        page.getByText(height).waitFor()
-        page.getByText(bmiStatus).waitFor()
-        page.getByText("${bmi}BMI").waitFor()
+        /*   page.getByText(weight).waitFor()
+           page.getByText(height).waitFor()
+           page.getByText(bmiStatus).waitFor()
+           page.getByText("${bmi}BMI").waitFor()*/
+
+        val status = page.getByTestId("health-metrics-bmi-category").innerText() //status
+        val bmiValue = page.getByTestId("health-metrics-bmi-value").innerText() //value
+        val heightTxt = page.getByTestId("health-metrics-height-display").innerText() //height
+        val weightTxt = page.getByTestId("health-metrics-weight-display").innerText() //weight
+
+        logger.info {
+            "BMI:${bmi}:${bmiValue} | BMI:${status}:${bmiStatus} |  height:${height}:${heightTxt} weight:${weight}:${weightTxt}"
+        }
+
+        assertEquals(weight, weightTxt)
+        assertEquals(height, heightTxt)
+        assertEquals(bmi.toString().plus("BMI"), bmiValue)
+        assertEquals(bmiStatus, status)
     }
 
     fun assertEditHealthMetrics() {
@@ -1061,7 +1075,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val healthMetricsEdit = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit"))
         val edit =
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Health Metrics Edit")).locator("span")
+            page.getByTestId("health-metrics-edit-button")
+
         healthMetricsEdit.waitFor()
 
         edit.click()
@@ -1070,18 +1085,18 @@ class ProfilePage(page: Page) : BasePage(page) {
         val height = formatFlotTwoDecimal(piiData?.height ?: 0f)
 
 
-        val editHeight = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter height in cm"))
-        val editWeight = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter weight in kg"))
+        val editHeight = page.getByTestId("health-metrics-height-input")
+        val editWeight = page.getByTestId("health-metrics-weight-input")
 
         assertEquals(editHeight.inputValue(), height)
         assertEquals(editWeight.inputValue(), weight)
 
 
         editHeight.fill("10")
-        page.getByText("Height must be between 60 and").waitFor()
+        page.getByTestId("health-metrics-height-validation").waitFor()
 
         editWeight.fill("03")
-        page.getByText("Weight must be between 10 and").waitFor()
+        page.getByTestId("health-metrics-weight-validation").waitFor()
 
 
         editHeight.fill(newHeight)
@@ -1096,9 +1111,11 @@ class ProfilePage(page: Page) : BasePage(page) {
         val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
         val updateHeight = formatFlotTwoDecimal(piiData?.height ?: 0f)
 
-        assertEquals(newHeight, updateHeight)
-        assertEquals(newWeight, updateWeight)
+        val heightTxt = page.getByTestId("health-metrics-height-display").innerText() //height
+        val weightTxt = page.getByTestId("health-metrics-weight-display").innerText() //weight
 
+        assertEquals(heightTxt, updateHeight)
+        assertEquals(weightTxt, updateWeight)
     }
 
 
@@ -4778,6 +4795,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy",
                 "Gluten (Wheat)", "Fish", "Shellfish", "None", "Others"
             )
+
             foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
                 "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
             )
@@ -4789,6 +4807,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             foodPreference.equals("Eggetarian : Primarily plant-based but includes eggs in their diet") -> setOf(
                 "Milk or dairy", "Eggs", "Peanuts", "Tree nuts", "Soy", "Gluten (Wheat)", "None", "Others"
             )
+
             else -> error("Unknown food preference: $foodPreference")
         }
 
@@ -4836,7 +4855,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         val expectedVisibleLabels = when {
-            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf("Caffeine", "Gluten", "None")
+            foodPreference.equals("Vegan : Exclusively plant-based, avoiding all animal products including dairy and eggs") -> setOf(
+                "Caffeine",
+                "Gluten",
+                "None"
+            )
+
             else -> setOf("Lactose", "Caffeine", "Gluten", "None")
         }
 
