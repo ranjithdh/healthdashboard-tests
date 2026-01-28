@@ -76,10 +76,10 @@ object ProfileUtils {
         return localDate.format(formatter)
     }
 
-    fun calculateBMIValues(heightCm: Float, weightKg: Float): Float {
+    fun calculateBMIValues(heightCm: Float, weightKg: Float): String {
         val heightMeters = heightCm / 100
         val bmi = weightKg / (heightMeters * heightMeters)
-        return String.format("%.2f", bmi).toFloat()
+        return String.format("%.2f", bmi)
     }
 
 
