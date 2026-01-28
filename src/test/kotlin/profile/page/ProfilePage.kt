@@ -1042,7 +1042,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         healthMetricsEdit.waitFor()
 
         val bmi = calculateBMIValues(height.toFloat(), weight.toFloat())
-        val bmiStatus = bmiCategoryValues(bmi)
+        val bmiStatus = bmiCategoryValues(bmi.toFloat())
 
         page.getByText("Height (cm):").waitFor()
         page.getByText("Weight (kg):").waitFor()
@@ -1063,7 +1063,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         assertEquals(weight, weightTxt)
         assertEquals(height, heightTxt)
-        assertEquals(bmi.toString().plus("BMI"), bmiValue)
+        assertEquals(bmi.plus("BMI"), bmiValue)
         assertEquals(bmiStatus, status)
     }
 
