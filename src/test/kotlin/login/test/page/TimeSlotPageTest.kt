@@ -2,11 +2,8 @@ package login.test.page
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.BrowserType.LaunchOptions
-import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
-import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import login.page.LoginPage
 import login.page.TimeSlotPage
@@ -53,14 +50,15 @@ class TimeSlotPageTest {
     }
 
     private fun navigateToTimeSlotPage(): TimeSlotPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test","test@test.com")
-            .fillAndContinue()
-            .fillAndContinue("Flat 101","Test Address", "Chennai", "Tamil Nadu", "600001")
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
     }
 
     @Test

@@ -69,7 +69,7 @@ class SymptomsTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
 
         symptomsMain.headerValidation()
@@ -92,7 +92,7 @@ class SymptomsTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
         symptomsMain.headerValidation()
         symptomsMain.resetAllSymptoms()
@@ -112,7 +112,7 @@ class SymptomsTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber)
+            loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()

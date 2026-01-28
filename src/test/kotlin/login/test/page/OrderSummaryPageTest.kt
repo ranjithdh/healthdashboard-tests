@@ -6,6 +6,7 @@ import login.page.LoginPage
 import login.page.OrderSummaryPage
 import org.junit.jupiter.api.*
 import utils.OnboardAddOnTestDataStore
+import utils.SignupDataStore
 import java.text.DecimalFormat
 import kotlin.collections.forEach
 
@@ -32,7 +33,7 @@ class OrderSummaryPageTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.ANDROID
+        val viewport = TestConfig.Viewports.MOBILE_LANDSCAPE
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -50,14 +51,15 @@ class OrderSummaryPageTest {
     }
 
     private fun navigateToOrderSummaryPage(): OrderSummaryPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         val orderSummaryPage = loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
-            .fillAndContinue("Test", "test@test.com")
-            .fillAndContinue()
-            .fillAndContinue("Flat 101", "Test Address", "Chennai", "Tamil Nadu", "600001")
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
             .selectSlotsAndContinue()
 
         return orderSummaryPage
@@ -77,8 +79,8 @@ class OrderSummaryPageTest {
     @Test
     fun `should handle invalid coupon code`() {
         val orderSummaryPage = navigateToOrderSummaryPage()
-
-        orderSummaryPage.enterCouponCode("INVALID123")
+        
+        orderSummaryPage.enterCouponCode(TestConfig.Coupons.INVALID_COUPON)
         orderSummaryPage.clickApplyCoupon()
 
         assert(orderSummaryPage.isInvalidCouponErrorVisible()) { "Error should be visible for invalid code" }
@@ -103,7 +105,7 @@ class OrderSummaryPageTest {
 
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
 
-        val couponCode = "D261C0"
+        val couponCode = TestConfig.Coupons.VALID_COUPON
         orderSummaryPage.enterCouponCode(couponCode)
         orderSummaryPage.clickApplyCoupon()
 
@@ -152,5 +154,108 @@ class OrderSummaryPageTest {
         assert(orderSummaryPage.isTotalAmountVisible("₹$totalAmountToShow")) { "Initial total should be ₹$totalAmountToShow" }
         orderSummaryPage.removeAllTheAddOnTests()
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
+    }
+
+    @Test
+    fun `should add and remove first add-on test`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        orderSummaryPage.addFirstAddOn()
+        val addOnName = orderSummaryPage.getFirstAddOnName()
+        SignupDataStore.update { selectedAddOns.add(addOnName) }
+        
+        val price = getAddOnPrice(addOnName)
+        val expectedTotal = DecimalFormat("#,###").format(9999f + price)
+        assert(orderSummaryPage.isTotalAmountVisible("₹$expectedTotal")) { "Total should be ₹$expectedTotal after adding $addOnName" }
+        assert(orderSummaryPage.isProductNameVisible(addOnName)) { "Add-on $addOnName should be visible" }
+        
+        orderSummaryPage.removeFirstAddOn()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+    }
+
+    @Test
+    fun `should add and remove second add-on test`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        orderSummaryPage.addSecondAddOn()
+        val addOnName = orderSummaryPage.getSecondAddOnName()
+        SignupDataStore.update { selectedAddOns.add(addOnName) }
+
+        val price = getAddOnPrice(addOnName)
+        val expectedTotal = DecimalFormat("#,###").format(9999f + price)
+        assert(orderSummaryPage.isTotalAmountVisible("₹$expectedTotal")) { "Total should be ₹$expectedTotal after adding $addOnName" }
+        assert(orderSummaryPage.isProductNameVisible(addOnName)) { "Add-on $addOnName should be visible" }
+        
+        orderSummaryPage.removeSecondAddOn()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+    }
+
+    @Test
+    fun `should add and remove third add-on test`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        orderSummaryPage.addThirdAddOn()
+        val addOnName = orderSummaryPage.getThirdAddOnName()
+        SignupDataStore.update { selectedAddOns.add(addOnName) }
+
+        val price = getAddOnPrice(addOnName)
+        val expectedTotal = DecimalFormat("#,###").format(9999f + price)
+        assert(orderSummaryPage.isTotalAmountVisible("₹$expectedTotal")) { "Total should be ₹$expectedTotal after adding $addOnName" }
+        assert(orderSummaryPage.isProductNameVisible(addOnName)) { "Add-on $addOnName should be visible" }
+        
+        orderSummaryPage.removeThirdAddOn()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+    }
+
+    @Test
+    fun `should add and remove fourth add-on test`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        orderSummaryPage.addFourthAddOn()
+        val addOnName = orderSummaryPage.getFourthAddOnName()
+        SignupDataStore.update { selectedAddOns.add(addOnName) }
+
+        val price = getAddOnPrice(addOnName)
+        val expectedTotal = DecimalFormat("#,###").format(9999f + price)
+        assert(orderSummaryPage.isTotalAmountVisible("₹$expectedTotal")) { "Total should be ₹$expectedTotal after adding $addOnName" }
+        assert(orderSummaryPage.isProductNameVisible(addOnName)) { "Add-on $addOnName should be visible" }
+        
+        orderSummaryPage.removeFourthAddOn()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+    }
+
+    @Test
+    fun `should add add-on and apply coupon`() {
+        val orderSummaryPage = navigateToOrderSummaryPage()
+        
+        orderSummaryPage.addFirstAddOn()
+        val addOnName = orderSummaryPage.getFirstAddOnName()
+        val price = getAddOnPrice(addOnName)
+        
+        val couponCode = TestConfig.Coupons.VALID_COUPON
+        orderSummaryPage.enterCouponCode(couponCode)
+        orderSummaryPage.clickApplyCoupon()
+        
+        val expectedTotal = DecimalFormat("#,###").format(9999f + price - TestConfig.Coupons.DISCOUNT_AMOUNT)
+        
+        assert(orderSummaryPage.isCouponAppliedSuccessVisible()) { "Success message should be visible" }
+        assert(orderSummaryPage.isTotalAmountVisible("₹$expectedTotal")) { 
+            "Total should be ₹$expectedTotal after adding $addOnName and applying coupon $couponCode" 
+        }
+        
+        orderSummaryPage.removeFirstAddOn()
+        orderSummaryPage.removeCoupon()
+        assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Total should revert to ₹9,999" }
+    }
+
+    private fun getAddOnPrice(name: String): Float {
+        val addOnTests = OnboardAddOnTestDataStore.get()
+        
+        val packagePrice = addOnTests.packages?.find { it.name == name }?.product?.price?.toFloat()
+        if (packagePrice != null) return packagePrice
+
+        val testProfilePrice = addOnTests.test_profiles?.find { it.name == name }?.product?.price?.toFloat()
+        if (testProfilePrice != null) return testProfilePrice
+
+        val testPrice = addOnTests.tests?.find { it.name == name }?.product?.price?.toFloat()
+        if (testPrice != null) return testPrice
+
+        return 0.0f
     }
 }

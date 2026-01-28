@@ -38,9 +38,9 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun clickContinue(): HomePage {
-        logger.info { "clickContinue()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+    fun clickCheckout(): HomePage {
+        logger.info { "clickCheckout()" }
+        page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -48,11 +48,6 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    fun clickContinueToPayment(): PaymentPage {
-        logger.info { "clickContinueToPayment()" }
-        byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
-        return PaymentPage(page)
-    }
 
     fun waitForConfirmation(): OrderSummaryPage {
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Order summary")).waitFor()
@@ -137,5 +132,53 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         removeSecondTest?.click()
         removeThirdTest?.click()
         removeFourthTest?.click()
+    }
+
+    fun addFirstAddOn() {
+        firstTest.click()
+    }
+
+    fun addSecondAddOn() {
+        secondTest.click()
+    }
+
+    fun addThirdAddOn() {
+        thirdTest.click()
+    }
+
+    fun addFourthAddOn() {
+        fourthTest.click()
+    }
+
+    fun removeFirstAddOn() {
+        removeFirstTest.click()
+    }
+
+    fun removeSecondAddOn() {
+        removeSecondTest.click()
+    }
+
+    fun removeThirdAddOn() {
+        removeThirdTest.click()
+    }
+
+    fun removeFourthAddOn() {
+        removeFourthTest.click()
+    }
+
+    fun getFirstAddOnName(): String {
+        return firstTestName.innerText()
+    }
+
+    fun getSecondAddOnName(): String {
+        return secondTestName.innerText()
+    }
+
+    fun getThirdAddOnName(): String {
+        return thirdTestName.innerText()
+    }
+
+    fun getFourthAddOnName(): String {
+        return fourthTestName.innerText()
     }
 }

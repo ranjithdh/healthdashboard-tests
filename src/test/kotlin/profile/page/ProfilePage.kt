@@ -10,7 +10,6 @@ import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
-import config.TestConfig.json
 import model.profile.*
 import profile.model.*
 import profile.utils.ProfileUtils.answersStored
@@ -22,6 +21,7 @@ import profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import profile.utils.ProfileUtils.formatDobWithAge
 import profile.utils.ProfileUtils.formatFlotTwoDecimal
 import profile.utils.ProfileUtils.isButtonChecked
+import utils.json.json
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
