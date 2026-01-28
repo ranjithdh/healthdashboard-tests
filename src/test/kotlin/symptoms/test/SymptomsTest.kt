@@ -105,7 +105,7 @@ class SymptomsTest {
     }
 
 
-   /* @Test
+    @Test
     fun `reported symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -117,7 +117,7 @@ class SymptomsTest {
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()
 
-    }*/
+    }
 
 
 }
