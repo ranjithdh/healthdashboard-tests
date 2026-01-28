@@ -4367,8 +4367,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             .filter(FilterOptions().setHasText("What is your waist"))
 
         // Helper text
-        val subTitle = page.getByRole(AriaRole.PARAGRAPH)
-            .filter(FilterOptions().setHasText("Please enter the value in"))
+        val subTitle =page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
+
 
         // Waist input
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
@@ -4392,13 +4392,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         rangeError.waitFor()
 
         waistTextBox.fill("")
-
-        /*  waistTextBox.fill(values)
-          logAnswer(
-              QuestionSubType.WAIST_CIRCUMFERENCE,
-              "What is your waist circumference at its narrowest point?",
-              values
-          )*/
 
         performTextInputComplete(
             values,
