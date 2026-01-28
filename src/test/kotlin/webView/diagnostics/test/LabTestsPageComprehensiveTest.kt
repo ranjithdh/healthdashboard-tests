@@ -4,11 +4,8 @@ import com.microsoft.playwright.*
 import com.microsoft.playwright.Page  // ← Add this explicit import
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
-import forWeb.diagnostics.page.LabTestsPage
+import webView.diagnostics.page.LabTestsPage
 import login.page.LoginPage
-import model.LabTestPackage
-import model.LabTestProfile
-import model.LabTestItem
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
 

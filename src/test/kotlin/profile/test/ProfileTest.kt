@@ -228,7 +228,7 @@ class ProfileTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue(testUser).enterOtpAndContinueToHomePage(testUser)
                 .clickAccountProfile().waitForConfirmation()
 
 
@@ -246,7 +246,7 @@ class ProfileTest {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val profilePage =
-            loginPage.enterMobileAndContinue(testUser.mobileNumber).enterOtpAndContinueToHomePage(testUser.otp)
+            loginPage.enterMobileAndContinue(testUser).enterOtpAndContinueToHomePage(testUser)
                 .clickAccountProfile().waitForConfirmation()
 
 

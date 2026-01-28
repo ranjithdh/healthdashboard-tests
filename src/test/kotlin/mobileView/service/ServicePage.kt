@@ -35,7 +35,7 @@ class ServicePage(page: Page) : BasePage(page) {
     fun navigateToServices() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(testUser.mobileNumber)
+        loginPage.enterMobileAndContinue()
 
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)

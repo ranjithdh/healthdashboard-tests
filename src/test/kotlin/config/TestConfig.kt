@@ -11,9 +11,9 @@ object TestConfig {
     object Urls {
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
-        val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
-        val SERVICES_URL = "${BASE_URL}services"
+        const val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
+        const val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        const val SERVICES_URL = "${BASE_URL}services"
 
 
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
@@ -51,7 +51,7 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
-        val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
+        const val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
     }
 
     object APIs {

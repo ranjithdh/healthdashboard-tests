@@ -1,4 +1,4 @@
-package forWeb.diagnostics.page
+package webView.diagnostics.page
 
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.AriaRole
@@ -13,7 +13,6 @@ import model.LabTestProfile
 import model.LabTestItem
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
-import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 

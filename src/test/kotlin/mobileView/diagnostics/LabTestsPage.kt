@@ -5,7 +5,6 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import forWeb.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 
 class LabTestsPage(page: Page) : BasePage(page) {

@@ -2,7 +2,7 @@ package forWeb.diagnostics.test
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import forWeb.diagnostics.page.LabTestsPage
+import webView.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 import org.junit.jupiter.api.*
 
