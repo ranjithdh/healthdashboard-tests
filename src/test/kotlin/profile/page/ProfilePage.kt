@@ -81,8 +81,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun logAnswer(key: String, question: String, answer: Any) {
         val questionAnswer = QuestionAnswer(question, answer)
-        Allure.addAttachment("[QUESTIONER]",question)
-        Allure.addAttachment("[Answer]",formatAnswerReadable(answer))
+        Allure.addAttachment("[QUESTIONER]", question)
+        Allure.addAttachment("[Answer]", formatAnswerReadable(answer))
         answersStored[key] = questionAnswer
         logger.info {
             "[ANSWERS STORED SNAPSHOT]: ${
@@ -1061,9 +1061,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         val weightTxt = page.getByTestId("health-metrics-weight-display").innerText() //weight
 
         logger.info {
-            "BMI:${bmi}:${bmiValue} | BMI:${status}:${bmiStatus} |  height:${height}:${heightTxt} weight:${weight}:${weightTxt}"
+            "BMI:Expected ${bmi}: Actual ${bmiValue} | BMI:Expected ${status}:Actual ${bmiStatus} |  height:Expected ${height}: Actual ${heightTxt} weight:Expected ${weight}: Actual${weightTxt}"
         }
 
+        Allure.addAttachment(
+            "HealthMetrics",
+            "BMI:Expected ${bmi}: Actual ${bmiValue} | BMI:Expected ${status}:Actual ${bmiStatus} |  height:Expected ${height}: Actual ${heightTxt} weight:Expected ${weight}: Actual${weightTxt}"
+        )
         assertEquals(weight, weightTxt)
         assertEquals(height, heightTxt)
         assertEquals(bmi.plus("BMI"), bmiValue)
@@ -1109,10 +1113,14 @@ class ProfilePage(page: Page) : BasePage(page) {
         assertTrue(saveButton.isEnabled)
         saveButton.click()
 
+        edit.waitFor()
+
         fetchAccountInformation()
 
         val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
         val updateHeight = formatFlotTwoDecimal(piiData?.height ?: 0f)
+
+        Allure.addAttachment("HealthMetrics", "updateHeight:$updateHeight updateWeight:$updateWeight")
 
         assertEquals(newHeight, updateHeight)
         assertEquals(newWeight, updateWeight)

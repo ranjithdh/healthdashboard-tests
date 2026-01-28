@@ -66,15 +66,15 @@ tasks.withType<Test> {
             BaseURL=${if (env == "prod") "https://api.prod.com" else "https://api.stg.com"}
             Platform=Web
             Browser=Chromium
-            Version=2.1.27
+            Version=2.1.28
             """.trimIndent()
         )
     }
 
     // ✅ CLEAR allure-results BEFORE tests
-    doFirst {
+   /* doFirst {
         delete(layout.buildDirectory.dir("allure-results"))
-    }
+    }*/
 
     systemProperty(
         "allure.results.directory",
