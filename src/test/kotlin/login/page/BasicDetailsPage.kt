@@ -3,6 +3,8 @@ package login.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import config.TestConfig
+import config.TestUser
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -60,9 +62,11 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun fillAndContinue(firstName: String,email: String): PersonalDetailsPage {
-        logger.info { "fillAndContinue()" }
-        fillDetails(firstName, email)
+    fun fillBasicDetails(): PersonalDetailsPage {
+        val testUser: TestUser = TestConfig.TestUsers.NEW_USER
+
+        logger.info { "fillBasicDetails()" }
+        fillDetails(testUser.firstName, testUser.email)
         clickContinue()
         val personalDetailsPage = PersonalDetailsPage(page)
         personalDetailsPage.waitForConfirmation()

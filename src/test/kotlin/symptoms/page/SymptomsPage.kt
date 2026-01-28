@@ -9,6 +9,7 @@ import config.TestConfig
 import symptoms.model.Symptom
 import symptoms.model.SymptomsData
 import symptoms.model.UserSymptomsResponse
+import utils.json.json
 import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.random.Random
@@ -32,7 +33,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
                     if (response.status() == 200) {
                         val responseBody = response.text()
                         if (!responseBody.isNullOrBlank()) {
-                            val responseObj = TestConfig.json.decodeFromString<UserSymptomsResponse>(responseBody)
+                            val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
                             symptomsResponse = responseObj.data
                         }
                     }

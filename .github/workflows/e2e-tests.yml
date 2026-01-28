@@ -16,7 +16,7 @@ on:
         default: ''
 
 env:
-  BASE_URL: https://app.stg.deepholistics.com
+  BASE_URL: https://app.stg.deepholistics.com/login
   HEADLESS: true
 
 jobs:

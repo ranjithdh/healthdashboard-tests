@@ -5,7 +5,6 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import forWeb.diagnostics.page.LabTestsPage
 import login.page.LoginPage
 
 class LabTestsPage(page: Page) : BasePage(page) {
@@ -27,7 +26,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun navigateToDiagnostics() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(testUser.mobileNumber)
+        loginPage.enterMobileAndContinue(testUser)
         
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)

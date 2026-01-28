@@ -14,7 +14,7 @@ object DateHelper {
             val serverFormatter = DateTimeFormatter.ofPattern(SERVER_FORMAT)
             val utcDate = LocalDateTime.parse(utcTime, serverFormatter)
             val utcTimeStamp = ZonedDateTime.of(utcDate, ZoneId.of("UTC"))
-            return utcTimeStamp.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+            utcTimeStamp.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
         } else {
             LocalDateTime.now()
         }

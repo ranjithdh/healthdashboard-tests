@@ -1,8 +1,6 @@
 package config
 
 import com.microsoft.playwright.BrowserType
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 
 
 object TestConfig {
@@ -10,28 +8,19 @@ object TestConfig {
     var ACCESS_TOKEN = ""
     const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
 
-
-    @OptIn(ExperimentalSerializationApi::class)
-    val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        explicitNulls = true
-        encodeDefaults = true
-    }
-
     object Urls {
         const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
-        val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
-        val SERVICES_URL = "${BASE_URL}services"
+        const val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
+        const val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        const val SERVICES_URL = "${BASE_URL}services"
 
 
         const val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
         const val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         const val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
+        const val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
         const val PROFILE_URL = "${BASE_URL}profile"
@@ -62,9 +51,8 @@ object TestConfig {
 
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
-        val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
+        const val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
     }
-
 
     object APIs {
         const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
@@ -78,7 +66,6 @@ object TestConfig {
         const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
     }
-
 
     object Browser {
         const val HEADLESS: Boolean = false
@@ -119,21 +106,30 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "726408324",
-            otp = "678901"
+            mobileNumber = "573583618",
+            otp = "",
+            firstName = "ranjith",
+            email = "ranjithkumar.m@mysmitch.com",
+            gender = "Male",
+            height = "170",
+            weight = "60",
+            month = "2",
+            year = "1998",
+            day = "12",
+            flatHouseNo = "Flat 101",
+            address = "456 Main Road",
+            city = "Coimbatore",
+            state = "TamilNadu",
+            pinCode = "641005",
+            country = "Poland"
         )
 
 
-   /*     val EXISTING_USER = TestUser(
-            mobileNumber = "7373791414",
-            otp = "678901"
-        )*/
-
-
         val EXISTING_USER = TestUser(
-             mobileNumber = "8870208411",
-             otp = "678901"
-         )
+            mobileNumber = "9159439327",
+            otp = "678901",
+            country = "India"
+        )
     }
 
     object Artifacts {
@@ -145,6 +141,12 @@ object TestConfig {
     object Timeouts {
         const val NAVIGATION_TIMEOUT = 60000L
         const val ELEMENT_TIMEOUT = 10000L
+    }
+
+    object Coupons {
+        const val VALID_COUPON = "D261C0"
+        const val INVALID_COUPON = "INVALID123"
+        const val DISCOUNT_AMOUNT = 1000f
     }
 }
 
@@ -160,4 +162,18 @@ data class Viewport(
 data class TestUser(
     val mobileNumber: String,
     val otp: String,
+    val firstName: String = "Test",
+    val email: String = "test@test.com",
+    val gender: String = "Male",
+    val height: String = "170",
+    val weight: String = "60",
+    val month: String = "2",
+    val year: String = "1998",
+    val day: String = "12",
+    val flatHouseNo: String = "Flat 101",
+    val address: String = "456 Main Road",
+    val city: String = "Delhi",
+    val state: String = "Delhi",
+    val pinCode: String = "110001",
+    val country: String = "India"
 )

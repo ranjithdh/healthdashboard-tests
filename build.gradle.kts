@@ -25,10 +25,12 @@ dependencies {
 
     // Logging
     testImplementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-    testImplementation("ch.qos.logback:logback-classic:1.4.14")
 
     // JSON parsing for test data
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+    // JUnit Params
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
 

@@ -45,11 +45,12 @@ class BasicDetailsPageTest {
     }
 
     private fun navigateToBasicDetailsPage(): login.page.BasicDetailsPage {
-        val testUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
         return loginPage
-            .enterMobileAndContinue(testUser.mobileNumber)
-            .enterOtpAndContinueToAccountCreation(testUser.otp)
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
     }
 
     @Test
@@ -134,7 +135,7 @@ class BasicDetailsPageTest {
         val basicDetailsPage = navigateToBasicDetailsPage()
 
         val personalDetailsPage = basicDetailsPage
-            .fillAndContinue("DH", "dh.deep@test.com")
+            .fillBasicDetails()
 
         assert(personalDetailsPage.isDateOfBirthVisible()) { "Should be on personal details page" }
         personalDetailsPage.takeScreenshot("navigated-to-personal-details")
