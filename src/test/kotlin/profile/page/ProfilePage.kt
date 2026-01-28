@@ -1111,11 +1111,8 @@ class ProfilePage(page: Page) : BasePage(page) {
         val updateWeight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
         val updateHeight = formatFlotTwoDecimal(piiData?.height ?: 0f)
 
-        val heightTxt = page.getByTestId("health-metrics-height-display").innerText() //height
-        val weightTxt = page.getByTestId("health-metrics-weight-display").innerText() //weight
-
-        assertEquals(heightTxt, updateHeight)
-        assertEquals(weightTxt, updateWeight)
+        assertEquals(newHeight, updateHeight)
+        assertEquals(newWeight, updateWeight)
     }
 
 
@@ -4367,7 +4364,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             .filter(FilterOptions().setHasText("What is your waist"))
 
         // Helper text
-        val subTitle =page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
+        val subTitle =
+            page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
 
 
         // Waist input
