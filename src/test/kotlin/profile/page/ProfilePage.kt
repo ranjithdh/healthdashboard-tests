@@ -82,7 +82,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun logAnswer(key: String, question: String, answer: Any) {
         val questionAnswer = QuestionAnswer(question, answer)
         Allure.addAttachment("[QUESTIONER]",question)
-        Allure.addAttachment("[Answer]",answer.toString())
+        Allure.addAttachment("[Answer]",formatAnswerReadable(answer))
         answersStored[key] = questionAnswer
         logger.info {
             "[ANSWERS STORED SNAPSHOT]: ${
@@ -6157,6 +6157,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(subType, question, value)
         nextAction()
     }
+
+    private fun formatAnswerReadable(answer: Any?): String {
+        return when (answer) {
+            null -> "null"
+            is String -> answer
+            is Array<*> -> answer.filterNotNull().joinToString(", ")
+            is List<*> -> answer.filterNotNull().joinToString(", ")
+            else -> answer.toString()
+        }
+    }
+
 
 }
 
