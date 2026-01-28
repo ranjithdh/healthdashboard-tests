@@ -66,6 +66,7 @@ tasks.withType<Test> {
             BaseURL=${if (env == "prod") "https://api.prod.com" else "https://api.stg.com"}
             Platform=Web
             Browser=Chromium
+            Version=2.1.27
             """.trimIndent()
         )
     }
