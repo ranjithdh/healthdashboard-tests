@@ -141,19 +141,13 @@ class LabTestsTest {
             testCards.forEach { card ->
                 val category = getCategory(card.rawSampleType)
 
-                // Logic:
-                // If "All" is active, everything is visible.
-                // Otherwise, card is visible ONLY if its category is in activeFilters.
+
                 val shouldBeVisible = if (activeFilters.contains("All")) {
                     true
                 } else {
                     activeFilters.contains(category)
                 }
 
-                // Important: Scroll to verify visibility logic reliably,
-                // although isVisible checks attached state, sometimes it helps to ensure it's not virtualized.
-                // However, if we expect it NOT to be visible, scrolling might fail if we try to scroll to it?
-                // No, we use check logic.
 
                 val isVisible = labTestsPage.isTestCardVisible(card.code)
 
