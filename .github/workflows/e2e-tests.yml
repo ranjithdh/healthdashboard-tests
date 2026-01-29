@@ -52,10 +52,10 @@ jobs:
           cache: 'gradle'
 
       - name: Install Playwright browsers
-        run: npx playwright@1.44.0 install --with-deps chromium webkit
+        run: npx playwright@1.49.0 install --with-deps chromium webkit
 
       - name: Install Playwright dependencies
-        run: npx playwright install-deps
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run mobile tests
         run: ./gradlew mobileTests
@@ -100,10 +100,10 @@ jobs:
           cache: 'gradle'
 
       - name: Install Playwright browsers
-        run: npx playwright@1.44.0 install --with-deps chromium
+        run: npx playwright@1.49.0 install --with-deps chromium
 
       - name: Install Playwright dependencies
-        run: npx playwright install-deps
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run website tests
         run: ./gradlew websiteTests
@@ -145,10 +145,10 @@ jobs:
           cache: 'gradle'
 
       - name: Install Playwright browsers
-        run: npx playwright@1.44.0 install --with-deps chromium firefox
+        run: npx playwright@1.49.0 install --with-deps chromium firefox
 
       - name: Install Playwright dependencies
-        run: npx playwright install-deps
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run app tests
         run: ./gradlew appTests
