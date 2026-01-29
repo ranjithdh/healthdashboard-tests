@@ -105,8 +105,9 @@ allure {
 tasks.register<Exec>("allure3Report") {
     group = "verification"
     description = "Generates Allure Report v3"
-    dependsOn("test")
-    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3")
+    
+    val env = project.findProperty("environment") ?: "Local"
+    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3", "--environment", env)
 }
 
 tasks.register<Exec>("allure3Serve") {

@@ -15,6 +15,10 @@ on:
         required: false
         default: ''
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   BASE_URL: https://app.stg.deepholistics.com/
   HEADLESS: true
@@ -48,7 +52,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        run: ./gradlew allure3Report
+        run: ./gradlew allure3Report -Penvironment=Mobile
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -86,7 +90,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        run: ./gradlew allure3Report
+        run: ./gradlew allure3Report -Penvironment=Website
 
       - name: Upload results
         uses: actions/upload-artifact@v4
@@ -127,7 +131,7 @@ jobs:
 
       - name: Generate Allure report
         if: always()
-        run: ./gradlew allure3Report
+        run: ./gradlew allure3Report -Penvironment=App
 
       - name: Upload results
         uses: actions/upload-artifact@v4
