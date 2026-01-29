@@ -13,6 +13,8 @@ repositories {
     mavenCentral()
 }
 
+val agent: Configuration by configurations.creating
+
 dependencies {
 
     testImplementation(kotlin("test"))
@@ -32,6 +34,7 @@ dependencies {
     // Allure
     testImplementation("io.qameta.allure:allure-junit5:2.29.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    agent("org.aspectj:aspectjweaver:1.9.22")
 }
 
 
@@ -46,6 +49,9 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    
+    // Attach AspectJ Agent for Allure steps and attachments
+    jvmArgs("-javaagent:${agent.singleFile}")
 
     // Parallel execution
     systemProperty("junit.jupiter.execution.parallel.enabled", "true")
@@ -123,7 +129,7 @@ tasks.register<Exec>("allure3Report") {
         }
     }
     
-    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3")
+    commandLine("npx", "allure", "generate", "--config", "allurerc.mjs", "build/allure-results", "-o", "build/allure-report-v3", "--clean")
 }
 
 tasks.register<Exec>("allure3Serve") {
