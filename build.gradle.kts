@@ -110,9 +110,16 @@ tasks.register<Exec>("allure3Report") {
     
     doFirst {
         val resultsDir = file("build/allure-results")
-        if (resultsDir.exists()) {
-            val envFile = resultsDir.resolve("environment.properties")
-            envFile.writeText("Environment=$env")
+        if (!resultsDir.exists()) {
+            throw GradleException("Allure results directory 'build/allure-results' does not exist. Run tests first.")
+        }
+        val envFile = resultsDir.resolve("environment.properties")
+        envFile.writeText("Environment=$env")
+        
+        // Clean up old report
+        val reportDir = file("build/allure-report-v3")
+        if (reportDir.exists()) {
+            reportDir.deleteRecursively()
         }
     }
     
