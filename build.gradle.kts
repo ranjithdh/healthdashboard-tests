@@ -129,7 +129,7 @@ tasks.register<Exec>("allure3Report") {
         }
     }
     
-    commandLine("npx", "allure", "generate", "--config", "allurerc.mjs", "build/allure-results", "-o", "build/allure-report-v3", "--clean")
+    commandLine("npx", "allure", "generate", "--config", "allurerc.mjs", "build/allure-results", "-o", "build/allure-report-v3")
 }
 
 tasks.register<Exec>("allure3Serve") {
