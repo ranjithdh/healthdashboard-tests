@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.serialization") version "1.9.21"
-    id("io.qameta.allure") version "2.11.2"
+    id("io.qameta.allure") version "2.12.0"
 }
 
 group = "com.deepholistics"
@@ -18,7 +18,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // Playwright
-    testImplementation("com.microsoft.playwright:playwright:1.44.0")
+    testImplementation("com.microsoft.playwright:playwright:1.49.0")
 
     // Coroutines for async testing
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
@@ -30,7 +30,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     
     // Allure
-    testImplementation("io.qameta.allure:allure-junit5:2.24.0")
+    testImplementation("io.qameta.allure:allure-junit5:2.29.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
@@ -91,12 +91,26 @@ tasks.register<Exec>("installPlaywright") {
 }
 
 allure {
-    version.set("2.24.0")
+    version.set("2.29.0")
     adapter {
         frameworks {
             junit5 {
-                adapterVersion.set("2.24.0")
+                adapterVersion.set("2.29.0")
             }
         }
     }
+}
+
+// Allure v3 tasks using npx
+tasks.register<Exec>("allure3Report") {
+    group = "verification"
+    description = "Generates Allure Report v3"
+    dependsOn("test")
+    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3")
+}
+
+tasks.register<Exec>("allure3Serve") {
+    group = "verification"
+    description = "Serves Allure Report v3"
+    commandLine("npx", "allure", "serve", "build/allure-results")
 }
