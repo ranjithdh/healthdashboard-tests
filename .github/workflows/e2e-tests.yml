@@ -4,16 +4,22 @@ on:
   push:
     branches: [main, develop, website_test]
   pull_request:
+    types: [opened, synchronize, reopened]
     branches: [main]
   schedule:
-    # Run daily at 2 AM UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       test_tags:
-        description: 'Test tags to run (e.g., Mobile, Desktop)'
-        required: false
-        default: ''
+        description: 'Target area to test'
+        required: true
+        default: 'All'
+        type: choice
+        options:
+          - All
+          - Mobile
+          - Website
+          - App
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,7 +34,11 @@ jobs:
   test-mobile:
     name: Mobile Tests
     runs-on: ubuntu-22.04
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.test_tags == 'Mobile'
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Mobile'))
 
     steps:
       - name: Checkout code
@@ -69,7 +79,11 @@ jobs:
   test-website:
     name: Website Tests
     runs-on: ubuntu-22.04
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.test_tags == 'Website'
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Website'))
 
     steps:
       - name: Checkout code
@@ -107,7 +121,11 @@ jobs:
   test-app:
     name: App Tests
     runs-on: ubuntu-22.04
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.test_tags == 'App'
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'App'))
 
     steps:
       - name: Checkout code
