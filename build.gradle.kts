@@ -107,7 +107,16 @@ tasks.register<Exec>("allure3Report") {
     description = "Generates Allure Report v3"
     
     val env = project.findProperty("environment") ?: "Local"
-    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3", "--environment", env)
+    
+    doFirst {
+        val resultsDir = file("build/allure-results")
+        if (resultsDir.exists()) {
+            val envFile = resultsDir.resolve("environment.properties")
+            envFile.writeText("Environment=$env")
+        }
+    }
+    
+    commandLine("npx", "allure", "generate", "build/allure-results", "-o", "build/allure-report-v3")
 }
 
 tasks.register<Exec>("allure3Serve") {
