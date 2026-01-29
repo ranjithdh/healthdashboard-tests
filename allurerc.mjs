@@ -1,4 +1,4 @@
-// Allure 3 Configuration - Simplified for npx usage
+// Allure 3 Configuration - Single file mode for easy local viewing
 export default {
     name: "HealthDashboard E2E Tests",
     output: "build/allure-report-v3",
@@ -7,7 +7,7 @@ export default {
         awesome: {
             options: {
                 reportName: "HealthDashboard E2E Tests",
-                singleFile: false,
+                singleFile: true,  // Creates a single HTML file that opens directly
                 reportLanguage: "en",
                 groupBy: ["parentSuite", "suite", "subSuite"],
             },
