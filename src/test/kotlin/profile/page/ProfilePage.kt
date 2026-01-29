@@ -4369,12 +4369,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         val subTitle =page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
 
 
+        val faittyIndex =
+            page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Required to calculate Fatty"))
+
         // Waist input
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
         val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
 
-        (listOf(title, subTitle, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
+        (listOf(title, subTitle,faittyIndex, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
