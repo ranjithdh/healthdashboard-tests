@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import io.qameta.allure.Step
 import webView.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
@@ -65,12 +66,14 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Enter OTP: {otp}")
     fun enterOtp(otp: String): OtpPage {
         logger.info { "enterOtp($otp)" }
         byRole(AriaRole.TEXTBOX).fill(otp)
         return this
     }
 
+    @Step("Click Continue button")
     fun clickContinue(): OtpPage {
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
@@ -79,6 +82,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
 
 
+    @Step("Enter OTP and continue to account creation")
     fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
         enterOtp(testUser.otp)
 
@@ -88,6 +92,7 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Enter OTP and continue to mobile home page")
     fun enterOtpAndContinueToMobileHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
         enterOtp(testUser.otp)
 

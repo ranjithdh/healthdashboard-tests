@@ -5,6 +5,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import io.qameta.allure.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -15,6 +16,7 @@ class LoginPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.LOGIN_URL
 
 
+    @Step("Enter mobile number: {phoneNumber}")
     fun enterMobileNumber(phoneNumber: String): LoginPage {
         logger.info { "enterMobileNumber($phoneNumber)" }
         utils.SignupDataStore.update { mobileNumber = phoneNumber }
@@ -33,12 +35,14 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Click Continue button")
     fun clickContinue(): LoginPage {
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
     }
 
+    @Step("Select country code: {countryName}")
     fun selectCountryCode(countryName: String) {
         logger.info { "selectCountryCode($countryName)" }
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
@@ -47,6 +51,7 @@ class LoginPage(page: Page) : BasePage(page) {
         page.getByText(countryName).nth(1).click()
     }
 
+    @Step("Login with mobile number and continue to OTP")
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
         selectCountryCode(testUser.country)
