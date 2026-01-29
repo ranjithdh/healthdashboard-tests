@@ -1,3 +1,4 @@
+// Allure 3 Configuration - Simplified for npx usage
 export default {
     name: "HealthDashboard E2E Tests",
     output: "build/allure-report-v3",
@@ -5,19 +6,11 @@ export default {
     plugins: {
         awesome: {
             options: {
-                reportName: "HealthDashboard: All Reports",
+                reportName: "HealthDashboard E2E Tests",
                 singleFile: false,
                 reportLanguage: "en",
-                groupBy: ["epic", "feature", "story"],
+                groupBy: ["parentSuite", "suite", "subSuite"],
             },
         },
-        awesomeE2E: {
-            options: {
-                reportName: "HealthDashboard: Awesome E2E",
-                singleFile: false,
-                reportLanguage: "en",
-                groupBy: ["epic", "feature", "story"],
-            },
-        }
     },
 };
