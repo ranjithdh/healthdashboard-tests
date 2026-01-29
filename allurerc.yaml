@@ -1,16 +1,13 @@
 # Allure 3 Configuration
-reportName: "HealthDashboard E2E Tests"
+name: "HealthDashboard E2E Tests"
 output: "build/allure-report-v3"
-
-# Modern "Awesome" report view
-plugins:
-  - "@allurereport/plugin-awesome"
-
-# Grouping and hierarchies
-groupBy:
-  - epic
-  - feature
-  - story
-
-# History tracking (JSONL format)
 historyPath: "build/allure-history.jsonl"
+
+plugins:
+  awesome:
+    options:
+      reportName: "HealthDashboard E2E Tests"
+      groupBy:
+        - epic
+        - feature
+        - story
