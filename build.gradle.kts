@@ -91,6 +91,14 @@ tasks.register<Test>("appTests") {
     }
 }
 
+// Custom task to run only login tests
+tasks.register<Test>("loginTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("login.*")
+    }
+}
+
 // Install Playwright browsers
 tasks.register<Exec>("installPlaywright") {
     commandLine("npx", "playwright", "install", "--with-deps")

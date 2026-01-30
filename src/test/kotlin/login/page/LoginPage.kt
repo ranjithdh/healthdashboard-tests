@@ -24,6 +24,7 @@ class LoginPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Clear Mobile Number")
     fun clearMobileNumber(): LoginPage {
         logger.info { "clearMobileNumber()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).clear()
@@ -71,6 +72,7 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Toggle WhatsApp checkbox")
     fun toggleWhatsAppCheckbox(): LoginPage {
         logger.info { "toggleWhatsAppCheckbox()" }
         byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).click()
@@ -119,12 +121,14 @@ class LoginPage(page: Page) : BasePage(page) {
         return byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Terms of Service")).isVisible
     }
 
+    @Step("Click Login link")
     fun clickLogin(): LoginPage {
         logger.info { "clickLogin()" }
         byText("Log in").click()
         return this
     }
 
+    @Step("Click Sign Up link")
     fun clickSignUp(): LoginPage {
         logger.info { "clickSignUp()" }
         byText("Sign up here").click()
@@ -159,6 +163,7 @@ class LoginPage(page: Page) : BasePage(page) {
 
 
 
+    @Step("Click Privacy Policy and verify popup")
     fun clickPrivacyPolicyAndVerifyPopup(): Boolean {
         logger.info { "clickPrivacyPolicyAndVerifyPopup()" }
         val popup = page.waitForPopup {
@@ -173,6 +178,7 @@ class LoginPage(page: Page) : BasePage(page) {
         return headingVisible
     }
 
+    @Step("Click Terms of Service and verify popup")
     fun clickTermsOfServiceAndVerifyPopup(): Boolean {
         logger.info { "clickTermsOfServiceAndVerifyPopup()" }
         val popup = page.waitForPopup {

@@ -4,9 +4,13 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
 import java.nio.file.Paths
 
 
+@Epic("Login")
+@Feature("End-to-End Login Flow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginFlowTest {
 

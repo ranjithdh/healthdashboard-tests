@@ -9,9 +9,13 @@ import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
 import java.nio.file.Paths
 
 
+@Epic("Login")
+@Feature("Login Page UI")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginPageTest {
 

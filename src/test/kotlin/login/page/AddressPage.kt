@@ -5,6 +5,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import io.qameta.allure.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -22,6 +23,7 @@ class AddressPage(page: Page) : BasePage(page) {
 
     private val flatHouseNoOrBuildingInput = page.getByText("Flat, House no., Building,")
 
+    @Step("Enter Flat/House No: {value}")
     fun enterFlatHouseNoOrBuilding(value: String): AddressPage {
         logger.info { "enterFlatHouseNoOrBuilding($value)" }
         flatHouseNoOrBuildingInput.fill(value)
@@ -34,6 +36,7 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Enter Address: {address}")
     fun enterAddress(address: String): AddressPage {
         logger.info { "enterAddress($address)" }
         addressInput.fill(address)
@@ -46,6 +49,7 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Enter City: {city}")
     fun enterCity(city: String): AddressPage {
         logger.info { "enterCity($city)" }
         cityInput.fill(city)
@@ -58,12 +62,14 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Select State: {state}")
     fun selectState(state: String): AddressPage {
         logger.info { "selectState($state)" }
         stateInput.fill(state)
         return this
     }
 
+    @Step("Enter Pin Code: {pinCode}")
     fun enterPinCode(pinCode: String): AddressPage {
         logger.info { "enterPinCode($pinCode)" }
         pinCodeInput.fill(pinCode)
@@ -76,6 +82,7 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Fill Address Form")
     fun fillAddress(
         flatHouseNoOrBuilding: String,
         address: String,
@@ -100,12 +107,14 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Click Continue")
     fun clickContinue(): AddressPage {
         logger.info { "clickContinue()" }
         continueButton.click()
         return this
     }
 
+    @Step("Fill Address Details and Continue")
     fun fillAddressDetails(testUser: TestUser = TestConfig.TestUsers.NEW_USER): TimeSlotPage {
         logger.info { "fillAddressDetails()" }
         fillAddress(
