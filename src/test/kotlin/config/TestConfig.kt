@@ -68,7 +68,7 @@ object TestConfig {
     }
 
     object Browser {
-        const val HEADLESS: Boolean = true
+        const val HEADLESS: Boolean = false
         const val SLOW_MO: Double = (1 * 1000).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
@@ -126,7 +126,7 @@ object TestConfig {
 
 
         val EXISTING_USER = TestUser(
-            mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9159439327",
+            mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9677004512",
             otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
             country = "India"
         )
