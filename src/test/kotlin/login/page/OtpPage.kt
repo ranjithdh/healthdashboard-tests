@@ -12,7 +12,7 @@ import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
 import profile.page.ProfilePage
 import utils.json.json
-import symptoms.page.SymptomsPage
+import webView.diagnostics.symptoms.page.SymptomsPage
 import utils.logger.logger
 
 

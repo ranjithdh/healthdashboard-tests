@@ -86,7 +86,6 @@ tasks.register<Test>("appTests") {
         includeTestsMatching("login.*")
         includeTestsMatching("healthdata.*")
         includeTestsMatching("profile.*")
-        includeTestsMatching("symptoms.*")
         includeTestsMatching("webView.*")
     }
 }

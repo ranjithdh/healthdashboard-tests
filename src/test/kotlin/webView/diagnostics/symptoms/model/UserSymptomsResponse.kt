@@ -1,4 +1,4 @@
-package symptoms.model
+package webView.diagnostics.symptoms.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

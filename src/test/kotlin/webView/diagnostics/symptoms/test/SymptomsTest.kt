@@ -1,4 +1,4 @@
-package symptoms.test
+package webView.diagnostics.symptoms.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
