@@ -69,6 +69,7 @@ class SymptomsTest : BaseTest() {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
 
+
         val symptomsMain =
             loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
