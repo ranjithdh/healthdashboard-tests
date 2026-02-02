@@ -75,7 +75,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
                 .setHeadless(HEADLESS)
-//                .setSlowMo(SLOW_MO)
+               .setSlowMo(SLOW_MO)
         }
     }
 
@@ -131,8 +131,14 @@ object TestConfig {
             country = "India"
         )*/
 
-        val EXISTING_USER = TestUser(
+      /*  val EXISTING_USER = TestUser(
             mobileNumber = "8870208411",
+            otp = "678901",
+            country = "India"
+        )*/
+
+        val EXISTING_USER = TestUser(
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India"
         )
