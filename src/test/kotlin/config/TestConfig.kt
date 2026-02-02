@@ -67,7 +67,7 @@ object TestConfig {
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
     }
 
-    object Browser {
+   /* object Browser {
         const val HEADLESS: Boolean = false
         const val SLOW_MO: Double = (1 * 1000).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
@@ -76,6 +76,21 @@ object TestConfig {
             return BrowserType.LaunchOptions()
                 .setHeadless(HEADLESS)
                .setSlowMo(SLOW_MO)
+        }
+    }*/
+
+    object Browser {
+        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val TIMEOUT: Double = 60000.toDouble()
+
+        fun launchOptions(): BrowserType.LaunchOptions {
+            val isHeadless = System.getenv("HEADLESS")?.toBoolean()
+                ?: System.getProperty("headless")?.toBoolean()
+                ?: true   // default safe for CI
+
+            return BrowserType.LaunchOptions()
+                .setHeadless(isHeadless)
+                .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
         }
     }
 
