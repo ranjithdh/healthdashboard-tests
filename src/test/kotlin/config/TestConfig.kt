@@ -125,9 +125,15 @@ object TestConfig {
         )
 
 
-        val EXISTING_USER = TestUser(
+/*        val EXISTING_USER = TestUser(
             mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9677004512",
             otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
+            country = "India"
+        )*/
+
+        val EXISTING_USER = TestUser(
+            mobileNumber = "8870208411",
+            otp = "678901",
             country = "India"
         )
     }
