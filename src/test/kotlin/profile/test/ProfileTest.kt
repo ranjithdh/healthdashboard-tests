@@ -5,7 +5,7 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
 

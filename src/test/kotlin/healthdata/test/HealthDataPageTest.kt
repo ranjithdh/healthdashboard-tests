@@ -6,8 +6,8 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
 import healthdata.page.HealthDataPage
-import login.page.LoginPage
-import login.page.OtpPage
+import onboard.page.LoginPage
+import onboard.page.OtpPage
 import model.healthdata.Biomarker
 import org.junit.jupiter.api.*
 import utils.BiomarkerCsvParser

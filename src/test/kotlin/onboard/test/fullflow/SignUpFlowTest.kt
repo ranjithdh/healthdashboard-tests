@@ -1,4 +1,4 @@
-package login.test.fullflow
+package onboard.test.fullflow
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
@@ -7,7 +7,7 @@ import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import utils.SignupDataStore

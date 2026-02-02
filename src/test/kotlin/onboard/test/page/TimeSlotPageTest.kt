@@ -1,12 +1,12 @@
-package login.test.page
+package onboard.test.page
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
-import login.page.LoginPage
-import login.page.TimeSlotPage
+import onboard.page.LoginPage
+import onboard.page.TimeSlotPage
 import org.junit.jupiter.api.*
 import utils.logger.logger
 

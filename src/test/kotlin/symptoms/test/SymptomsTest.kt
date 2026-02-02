@@ -5,7 +5,7 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll

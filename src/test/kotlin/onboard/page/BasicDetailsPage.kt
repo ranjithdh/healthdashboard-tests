@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
@@ -13,7 +13,7 @@ private val logger = KotlinLogging.logger {}
 
 class BasicDetailsPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     private val firstNameInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name"))
     private val emailInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email"))

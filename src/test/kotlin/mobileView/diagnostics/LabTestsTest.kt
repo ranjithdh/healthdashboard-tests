@@ -1,11 +1,9 @@
 package mobileView.diagnostics
 
 import com.microsoft.playwright.*
-import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
 import kotlinx.serialization.json.*
-import login.page.LoginPage
 import org.junit.jupiter.api.*
 
 

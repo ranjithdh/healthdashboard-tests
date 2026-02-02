@@ -1,8 +1,8 @@
-package login.test.signup
+package onboard.test.signup
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature

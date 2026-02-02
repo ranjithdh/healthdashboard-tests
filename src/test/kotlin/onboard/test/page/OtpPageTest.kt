@@ -1,10 +1,9 @@
-package login.test.page
+package onboard.test.page
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
-import utils.logger.logger
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

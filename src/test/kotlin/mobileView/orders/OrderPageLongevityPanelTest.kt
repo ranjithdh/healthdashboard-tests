@@ -2,11 +2,10 @@ package mobileView.orders
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.SignupDataStore
 import utils.logger.logger
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderPageLongevityPanelTest {

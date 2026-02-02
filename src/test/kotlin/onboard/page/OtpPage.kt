@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
@@ -19,7 +19,7 @@ import utils.logger.logger
 
 class OtpPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     init {
         monitorTraffic()

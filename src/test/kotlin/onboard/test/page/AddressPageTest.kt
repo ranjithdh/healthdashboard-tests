@@ -1,8 +1,8 @@
-package login.test.page
+package onboard.test.page
 
 import com.microsoft.playwright.*
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
 
@@ -44,7 +44,7 @@ class AddressPageTest {
         context.close()
     }
 
-    private fun navigateToAddressPage(): login.page.AddressPage {
+    private fun navigateToAddressPage(): onboard.page.AddressPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.NEW_USER
         return loginPage
