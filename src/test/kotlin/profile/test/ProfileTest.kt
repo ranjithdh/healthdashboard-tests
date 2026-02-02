@@ -8,6 +8,8 @@ import config.TestConfig
 import login.page.LoginPage
 import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.RegisterExtension
+import utils.screenshots.ScreenshotOnTestCompletionExtension
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -16,6 +18,9 @@ class ProfileTest {
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
     private lateinit var page: Page
+
+    @RegisterExtension
+    val screenshotExtension = ScreenshotOnTestCompletionExtension { page }
 
     @BeforeAll
     fun setup() {
