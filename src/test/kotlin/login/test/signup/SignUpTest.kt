@@ -1,6 +1,7 @@
 package login.test.signup
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
@@ -10,12 +11,11 @@ import io.qameta.allure.Feature
 @Epic("Login")
 @Feature("Sign Up UI")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SignUpTest {
+class SignUpTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

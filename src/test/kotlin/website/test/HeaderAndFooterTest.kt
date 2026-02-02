@@ -1,17 +1,17 @@
 package website.test
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.LandingPage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class HeaderAndFooterTest {
+class HeaderAndFooterTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

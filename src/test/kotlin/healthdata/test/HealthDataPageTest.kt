@@ -4,6 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import config.BaseTest
 import config.TestConfig
 import healthdata.page.HealthDataPage
 import login.page.LoginPage
@@ -19,12 +20,11 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class HealthDataPageTest {
+class HealthDataPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
     private lateinit var healthDataPage: HealthDataPage
 
     private val csvPath = "/Users/apple/Downloads/Deep-Holistics-Biomarkers-export.csv"

@@ -6,11 +6,11 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import utils.json.json
+import utils.logger.logger
 import webView.diagnostics.symptoms.model.Symptom
 import webView.diagnostics.symptoms.model.SymptomsData
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
-import utils.json.json
-import utils.logger.logger
 import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -127,7 +127,9 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
     fun waitForSymptomsPageConfirmation(): SymptomsPage {
         logger.info("Waiting for mobileView.home page confirmation...")
+        println("url-->"+TestConfig.Urls.SYMPTOMS_PAGE_URL)
         page.waitForURL(TestConfig.Urls.SYMPTOMS_PAGE_URL)
+
         return this
     }
 
