@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import mobileView.home.HomePage
 import mu.KotlinLogging
+import io.qameta.allure.Step
 
 private val logger = KotlinLogging.logger {}
 
@@ -14,6 +15,7 @@ class PaymentPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
 
+    @Step("Complete Payment")
     fun completePayment(): PaymentPage {
         logger.info { "completePayment()" }
 
@@ -34,6 +36,7 @@ class PaymentPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Manually Navigate to Home")
     fun manuallyNavigateToHome(): HomePage {
         logger.info { "manuallyNavigateToHome()" }
         page.navigate("https://app.stg.deepholistics.com/home")

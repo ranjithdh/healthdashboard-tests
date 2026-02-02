@@ -75,7 +75,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
                 .setHeadless(HEADLESS)
-                .setSlowMo(SLOW_MO)
+//                .setSlowMo(SLOW_MO)
         }
     }
 
@@ -106,8 +106,8 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = "573583618",
-            otp = "",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583618",
+            otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
             gender = "Male",
@@ -126,8 +126,8 @@ object TestConfig {
 
 
 /*        val EXISTING_USER = TestUser(
-            mobileNumber = "9159439327",
-            otp = "678901",
+            mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9677004512",
+            otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
             country = "India"
         )*/
 

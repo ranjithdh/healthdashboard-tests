@@ -11,9 +11,13 @@ import login.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import utils.SignupDataStore
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
 import java.nio.file.Paths
 import kotlin.test.assertTrue
 
+@Epic("Login")
+@Feature("Sign Up Flow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SignUpFlowTest {
 

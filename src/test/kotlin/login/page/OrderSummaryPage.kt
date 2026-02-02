@@ -6,12 +6,14 @@ import config.BasePage
 import config.TestConfig
 import mobileView.home.HomePage
 import utils.logger.logger
+import io.qameta.allure.Step
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.LOGIN_URL
 
+    @Step("Enter Coupon Code: {code}")
     fun enterCouponCode(code: String): OrderSummaryPage {
         logger.info { "enterCouponCode($code)" }
         if (!isCouponInputVisible()) {
@@ -21,6 +23,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Click Apply Coupon")
     fun clickApplyCoupon(): OrderSummaryPage {
         logger.info { "clickApplyCoupon()" }
         val button = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Apply"))
@@ -32,12 +35,14 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Clear Coupon Code")
     fun clearCouponCode(): OrderSummaryPage {
         logger.info { "clearCouponCode()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter code")).clear()
         return this
     }
 
+    @Step("Click Checkout")
     fun clickCheckout(): HomePage {
         logger.info { "clickCheckout()" }
         page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
@@ -88,6 +93,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             .isVisible
     }
 
+    @Step("Remove Coupon")
     fun removeCoupon(): OrderSummaryPage {
         logger.info { "removeCoupon()" }
         byRole(AriaRole.IMG).nth(3).click()
@@ -120,6 +126,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     private val totalAmount = page.getByText("Total₹9,999", Page.GetByTextOptions().setExact(true))
 
 
+    @Step("Add All Add-on Tests")
     fun addAllTheAddOnTests() {
         firstTest?.click()
         secondTest?.click()
@@ -127,6 +134,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         fourthTest?.click()
     }
 
+    @Step("Remove All Add-on Tests")
     fun removeAllTheAddOnTests() {
         removeFirstTest?.click()
         removeSecondTest?.click()
@@ -134,10 +142,12 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         removeFourthTest?.click()
     }
 
+    @Step("Add First Add-on")
     fun addFirstAddOn() {
         firstTest.click()
     }
 
+    @Step("Add Second Add-on")
     fun addSecondAddOn() {
         secondTest.click()
     }

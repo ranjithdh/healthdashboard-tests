@@ -5,6 +5,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import io.qameta.allure.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -18,6 +19,7 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     private val emailInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email"))
 
 
+    @Step("Enter First Name: {firstName}")
     fun enterFirstName(firstName: String): BasicDetailsPage {
         logger.info { "enterFirstName($firstName)" }
         firstNameInput.fill(firstName)
@@ -25,6 +27,7 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Enter Email: {email}")
     fun enterEmail(email: String): BasicDetailsPage {
         logger.info { "enterEmail($email)" }
         emailInput.fill(email)
@@ -44,6 +47,7 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Fill Basic Details")
     fun fillDetails(firstName: String,email: String): BasicDetailsPage {
         logger.info { "fillDetails($firstName, $email)" }
         utils.SignupDataStore.update {
@@ -56,15 +60,17 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Click Continue")
     fun clickContinue(): BasicDetailsPage {
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
     }
 
+    @Step("Fill Basic Details and Continue")
     fun fillBasicDetails(): PersonalDetailsPage {
         val testUser: TestUser = TestConfig.TestUsers.NEW_USER
-
+        
         logger.info { "fillBasicDetails()" }
         fillDetails(testUser.firstName, testUser.email)
         clickContinue()

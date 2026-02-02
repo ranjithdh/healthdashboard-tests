@@ -4,7 +4,11 @@ import com.microsoft.playwright.*
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
 
+@Epic("Login")
+@Feature("Sign Up UI")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SignUpTest {
 

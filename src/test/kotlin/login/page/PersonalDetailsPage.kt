@@ -5,6 +5,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import io.qameta.allure.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -20,6 +21,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
     private val weightInput = byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg)"))
     private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
+    @Step("Select Date of Birth: {month}/{day}/{year}")
     fun selectDateOfBirth(month: String, year: String, day: String): PersonalDetailsPage {
         logger.info { "selectDateOfBirth($month/$day/$year)" }
         dateOfBirthLabel.click()
@@ -29,6 +31,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Select Gender: {gender}")
     fun selectGender(gender: String): PersonalDetailsPage {
         logger.info { "selectGender($gender)" }
         genderInput.click()
@@ -36,6 +39,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Enter Height: {height}")
     fun enterHeight(height: String): PersonalDetailsPage {
         logger.info { "enterHeight($height)" }
         heightInput.fill(height)
@@ -48,6 +52,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Enter Weight: {weight}")
     fun enterWeight(weight: String): PersonalDetailsPage {
         logger.info { "enterWeight($weight)" }
         weightInput.fill(weight)
@@ -60,6 +65,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Fill Personal Details")
     fun fillDetails(
         gender: String = "Male",
         height: String = "170",
@@ -84,6 +90,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
+    @Step("Click Continue")
     fun clickContinue(): PersonalDetailsPage {
         logger.info { "clickContinue()" }
         continueButton.click()
@@ -91,6 +98,7 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
     }
 
 
+    @Step("Fill personal details and continue")
     fun fillPersonalDetails(testUser: TestUser = TestConfig.TestUsers.NEW_USER): AddressPage {
         logger.info { "fillPersonalDetails()" }
         fillDetails(
