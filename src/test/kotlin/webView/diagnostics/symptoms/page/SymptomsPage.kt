@@ -4,8 +4,10 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import model.profile.PiiUserResponse
 import utils.json.json
 import utils.logger.logger
 import webView.diagnostics.symptoms.model.PersonalizedGeneratedDescription
@@ -24,10 +26,48 @@ class SymptomsPage(page: Page) : BasePage(page) {
     private val pendingDescriptionIds = mutableSetOf<String>()
     private val receivedDescriptionIds = mutableSetOf<String>()
     private var readyForValidation = false
+    private var isMale = true
 
 
     init {
         monitorTraffic()
+    }
+
+    /**------------Account Information----------------*/
+    fun fetchAccountInformation() {
+        try {
+            logger.info { "Fetching current preference from API..." }
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_ACCOUNT_INFORMATION,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", "Asia/Calcutta")
+            )
+
+            if (response.status() != 200) {
+                logger.error { "API returned status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            logger.info { "API response...${responseBody}" }
+
+            val responseObj = json.decodeFromString<PiiUserResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                setMaleConditions(responseObj.data.piiData.gender == "male")
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch current preference: ${e.message}" }
+        }
     }
 
     /* private fun monitorTraffic() {
@@ -190,26 +230,54 @@ class SymptomsPage(page: Page) : BasePage(page) {
             "Poor memory", "Poor concentration"
         ), "Mood" to listOf(
             "Mood swings", "Anxiety / fear / nervousness", "Anger / irritability", "Depression"
-        ), "Other" to listOf(
-            "Cold intolerance",
-            "Cold extremities (feeling",
-            "Low libido",
-            "Persistent low-grade fever",
-            "Frequent illness",
-            "Frequent/urgent urination",
-            "Burning Sensation in Feet",
-            "Poor Coordination / Unsteady",
-            "Cold Hands/Feet",
-            "Swelling in Legs/Ankles",
-            "Night Sweats",
-            "Fever/Chills",
-            "Frequent Infections",
-            "Increased Thirst"
-        ), "Lungs / Respiratory" to listOf(
+        ), "Other" to if (isMale) {
+            listOf(
+                "Cold intolerance",
+                "Cold extremities (feeling",
+                "Low libido",
+                "Persistent low-grade fever",
+                "Frequent illness",
+                "Frequent/urgent urination",
+                "Burning Sensation in Feet",
+                "Poor Coordination / Unsteady",
+                "Cold Hands/Feet",
+                "Swelling in Legs/Ankles",
+                "Night Sweats",
+                "Fever/Chills",
+                "Frequent Infections",
+                "Increased Thirst"
+            )
+        } else {
+            listOf(
+                "Cold intolerance",
+                "Cold extremities (feeling",
+                "Irregular periods",
+                "Infertility",
+                "Low libido",
+                "Persistent low-grade fever",
+                "Frequent illness",
+                "Frequent/urgent urination",
+                "Burning Sensation in Feet",
+                "Poor Coordination / Unsteady",
+                "Cold Hands/Feet",
+                "Swelling in Legs/Ankles",
+                "Night Sweats",
+                "Fever/Chills",
+                "Frequent Infections",
+                "Increased Thirst"
+            )
+        }, "Lungs / Respiratory" to listOf(
             "Wheezing", "Chronic Cough with Phlegm"
-        ), "Urinary" to listOf(
-            "UTI"
-        )
+        ), "Urinary" to if (isMale) {
+            listOf(
+                "UTI"
+            )
+        } else {
+            listOf(
+                "UTI",
+                "Urinary Incontinence"
+            )
+        }
     )
 
 
@@ -246,6 +314,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     fun reportOptionsValidations() {
+        fetchAccountInformation()
         symptoms.forEach { (section, symptomList) ->
             expandSection(section)
             symptomList.forEach { symptom ->
@@ -283,6 +352,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     fun selectAllSymptoms() {
+        fetchAccountInformation()
         symptoms.forEach { (section, symptoms) ->
             val selectedSymptoms = randomSubList(symptoms, 1, 3)
             selectionSymptoms[section] = selectedSymptoms
@@ -528,4 +598,10 @@ class SymptomsPage(page: Page) : BasePage(page) {
             .replace("•", "")
             .trim()
     }
+
+
+    fun setMaleConditions(isMale: Boolean) {
+        this.isMale = isMale
+    }
+
 }
