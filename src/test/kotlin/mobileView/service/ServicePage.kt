@@ -40,11 +40,10 @@ class ServicePage(page: Page) : BasePage(page) {
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)
 
-        // Navigate to Home first
-//        page.navigate(TestConfig.Urls.BASE_URL)
-
-        // Click Book Now to go to Services (this triggers the API call needed by the test)
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
+        // Direct navigation to Services after login, with a short delay for session stability
+        // Replacing: page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.SERVICES_URL)
     }
 
     /**
