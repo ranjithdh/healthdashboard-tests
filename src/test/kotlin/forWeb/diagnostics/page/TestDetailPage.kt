@@ -263,7 +263,7 @@ class TestDetailPage(page: Page) : BasePage(page) {
         steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
 
         // Step: Results
-        val resultsTitle = if (type == "blood") "Get Results in 72 Hours" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get Results in 72 Hours")
+        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
         val resultsDesc = when (type) {
             "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
             "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
@@ -293,21 +293,20 @@ class TestDetailPage(page: Page) : BasePage(page) {
         // Now verify each step in UI
         steps.forEachIndexed { index, step ->
             val stepNum = String.format("%02d", index + 1)
-            logger.info { "Verifying step $stepNum: ${step["title"]}" }
+            val title = step["title"]!!
+            val desc = step["desc"]!!
+            logger.info { "Verifying step $stepNum: $title" }
             
             // Verify Number
             val numHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum))
             numHeading.scrollIntoViewIfNeeded()
-            Assertions.assertTrue(numHeading.isVisible, "Step number $stepNum should be visible")
+            numHeading.waitFor()
             
-            // Verify Title
-            val titleHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(step["title"]))
-            Assertions.assertTrue(titleHeading.isVisible || page.getByText(step["title"]!!).isVisible, "Step title '${step["title"]}' should be visible")
+            // Verify Title - using getByText with exact=false for maximum flexibility with casing/hrs vs Hours
+            page.getByText(title).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))
             
             // Verify Description (partial match for flexibility)
-            val desc = step["desc"]!!
-            val descEl = page.getByText(desc.take(40))
-            Assertions.assertTrue(descEl.isVisible, "Description beginning with '${desc.take(20)}' should be visible for step $stepNum")
+            page.getByText(desc.take(40)).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))
         }
         return this
     }

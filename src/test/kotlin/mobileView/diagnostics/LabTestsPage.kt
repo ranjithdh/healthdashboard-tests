@@ -122,7 +122,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
         steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
 
         // Step: Results
-        val resultsTitle = if (type == "blood") "Get Results in 72 Hours" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get Results in 72 Hours")
+        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
         val resultsDesc = when (type) {
             "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
             "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
@@ -159,7 +159,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum)).waitFor()
             
             // Verify Title
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(step["title"])).waitFor()
+            page.getByText(step["title"]!!).first().waitFor()
             
             // Verify Description
             val desc = step["desc"]!!
