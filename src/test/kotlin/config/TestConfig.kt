@@ -87,11 +87,11 @@ object TestConfig {
             fun launchOptions(): BrowserType.LaunchOptions {
                 val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                     ?: System.getProperty("headless")?.toBoolean()
-                    ?: false   // default safe for CI
+                    ?: false   //TODO default safe for CI is true
 
                 return BrowserType.LaunchOptions()
                     .setHeadless(isHeadless)
-                    //.setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
+                    .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
             }
         }
 
