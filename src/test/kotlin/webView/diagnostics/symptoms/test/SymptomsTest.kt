@@ -2,19 +2,11 @@ package webView.diagnostics.symptoms.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import login.page.LoginPage
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -116,6 +108,7 @@ class SymptomsTest : BaseTest() {
         val symptomsMain =
             loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()
 
