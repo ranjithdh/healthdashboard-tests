@@ -217,11 +217,18 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
     @Step("Enter OTP and continue to Health Data")
-    fun enterOtpAndContinueToHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
+    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
 
         enterOtp(testUser.otp)
-        val homePage = HomePage(page)
-        homePage.waitForMobileHomePageConfirmation()
+
+        page.waitForURL {
+            page.url().contains(TestConfig.Urls.BASE_URL)
+        }
+        page.navigate(TestConfig.Urls.HOME_PAGE_URL)
+
+        val homePage = webView.HomePage(page)
+        homePage.waitForHomePageConfirmation()
+
         val healthData = homePage.getHealthDataResponse()
 
         homePage.clickHealthTab()

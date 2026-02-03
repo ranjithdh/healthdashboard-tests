@@ -6,17 +6,19 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
+import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import healthdata.page.HealthDataPage
 import model.healthdata.Biomarker
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import utils.BiomarkerCsvParser
 import utils.logger.logger
+import utils.waitUntilDetached
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -44,7 +46,7 @@ class HealthDataPageTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.ANDROID
+        val viewport = TestConfig.Viewports.DESKTOP_FHD
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -79,13 +81,13 @@ class HealthDataPageTest {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         val otpPage = loginPage.enterMobileAndContinue(testUser)
-        healthDataPage = otpPage.enterOtpAndContinueToHealthData(testUser)
+        healthDataPage = otpPage.enterOtpAndContinueToWebViewHealthData(testUser)
     }
 
     @Test
     @Order(1)
     fun `show empty state if the health data is empty`() {
-        if (healthDataPage.healthData?.data?.blood?.data?.isEmpty() == true){
+        if (healthDataPage.healthData?.data?.blood?.data?.isEmpty() == true) {
             assertTrue(healthDataPage.shouldShowEmptyState(), "Empty state")
             assertTrue(healthDataPage.shouldShowTrackResult(), "show track result")
 
@@ -96,11 +98,11 @@ class HealthDataPageTest {
             }
 
             println("checkEmptyState...............${page.url()}")
-            Assertions.assertTrue(
+            assertTrue(
                 page.url().contains(TestConfig.Urls.TRACK_RESULT),
                 "Should navigate to track result, but was ${page.url()}"
             )
-        }else{
+        } else {
             assertTrue(true, "Health data found")
         }
     }
@@ -188,9 +190,73 @@ class HealthDataPageTest {
             } else {
                 println("All ${biomarkers.size} biomarkers verified successfully!")
             }
-        }else{
+        } else {
             assertTrue(true, "Health data not found")
         }
+    }
+
+
+    @Test
+    @Order(4)
+    fun `should show update waist circumference description and update dialog for fatty liver index`() {
+
+        val description = page.getByText("Add waist circumference to calculate FLI")
+
+        if (description.isVisible){
+            val fattyLiverLocator = healthDataPage.getBiomarkerRow("Fatty Liver Index (FLI)")
+            if (fattyLiverLocator != null) {
+
+                if (
+                    fattyLiverLocator.textContent()
+                        .contains(page.getByText("—").first().innerText()) && fattyLiverLocator.textContent()
+                        .contains(page.getByText("—").nth(1).innerText())
+                ) {
+                    assertTrue(description.isVisible) { "add waist circumference to calculate FLI should visible" }
+
+                    description.click()
+
+                    assertTrue(
+                        page.getByRole(
+                            AriaRole.HEADING,
+                            Page.GetByRoleOptions().setName("Waist Circumference")
+                        ).isVisible
+                    )
+                    assertTrue(page.getByText("What is your waist circumference at its narrowest point (just above your hips)?").isVisible)
+                    assertTrue(page.getByText("Value in inches (20-54)").isVisible)
+
+                    val textBox = page.getByRole(AriaRole.TEXTBOX).nth(1)
+                    val saveButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save"))
+                    val closePopup = page.locator(".text-muted-foreground.hover\\:text-foreground")
+
+                    textBox.fill("19")
+                    assertTrue(page.getByText("Enter value between 20-54").isVisible)
+                    assertTrue(saveButton.isDisabled)
+
+                    textBox.clear()
+
+                    textBox.fill("55")
+                    assertTrue(page.getByText("Enter value between 20-54").isVisible)
+                    assertTrue(saveButton.isDisabled)
+
+                    textBox.fill("30")
+                    assertTrue(saveButton.isEnabled)
+
+                    closePopup.click()
+                    description.click()
+
+                    assertTrue(textBox.inputValue() == "30","30")
+                    assertTrue(saveButton.isEnabled)
+
+                    saveButton.click()
+
+                }
+
+                description.waitUntilDetached()
+                assertTrue(!description.isVisible) { "add waist circumference to calculate FLI should not be visible" }
+            }
+        }
+
+
     }
 
     private fun verifyBiomarker(biomarker: Biomarker) {
@@ -198,13 +264,14 @@ class HealthDataPageTest {
             try {
                 healthDataPage.clickSystemTab(biomarker.systemName)
             } catch (_: Exception) {
+                println("Failed to click system biomarker: ${biomarker.name}")
             }
         }
 
         healthDataPage.scrollToBiomarker(biomarker.name)
 
         val isVisible = healthDataPage.isBiomarkerVisible(biomarker.name)
-        Assertions.assertTrue(isVisible, "Biomarker should be visible")
+        assertTrue(isVisible, "Biomarker should be visible")
 
         val matches = healthDataPage.verifyBiomarkerData(
             name = biomarker.name,
@@ -213,7 +280,7 @@ class HealthDataPageTest {
             expectedRange = biomarker.idealRange
         )
 
-        Assertions.assertTrue(matches, "Data mismatch")
+        assertTrue(matches, "Data mismatch")
     }
 
 }
