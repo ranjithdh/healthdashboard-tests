@@ -71,7 +71,7 @@ class ServicePage(page: Page) : BasePage(page) {
             val response = page.waitForResponse(
                 { response: Response? ->
                     response?.url()
-                        ?.contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) == true && (response.status() == 200 || response.status() == 304)
+                        ?.contains(TestConfig.APIs.SERVICE_SEARCH_API_URL) == true && (response.status() == 200 || response.status() == 304)
                 },
                 {
                     // Optional: Assert page URL or similar if needed to ensure trigger

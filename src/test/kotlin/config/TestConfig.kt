@@ -17,13 +17,13 @@ object TestConfig {
         // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+
         val SERVICES_URL = "${BASE_URL}services"
 
 
         val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
-        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
@@ -68,6 +68,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"

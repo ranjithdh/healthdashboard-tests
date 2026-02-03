@@ -87,7 +87,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
             val response = page.waitForResponse(
                 { response: Response? ->
                     response?.url()
-                        ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
+                        ?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true && response.status() == 200
                 },
                 {
                     // Callback - wait for diagnostics URL to ensure page is loaded
