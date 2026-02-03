@@ -73,7 +73,7 @@ class ServiceTest : BaseTest() {
         
         println("Capturing API response and navigating to Services page...")
         val response = page.waitForResponse({ 
-            it.url().contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) && (it.status() == 200 || it.status() == 304)
+            it.url().contains(TestConfig.APIs.SERVICE_SEARCH_API_URL) && (it.status() == 200 || it.status() == 304)
         }) {
              // navigateToServices() includes login and the "Book Now" click which triggers the API
              servicePage.navigateToServices()
