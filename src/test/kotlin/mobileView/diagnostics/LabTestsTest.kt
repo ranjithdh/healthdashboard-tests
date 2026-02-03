@@ -251,7 +251,7 @@ class LabTestsTest {
             labTestsPage.navigateToDiagnostics()
         }
 
-        val targetCode = "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "P250" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
@@ -447,12 +447,14 @@ class LabTestsTest {
             // Blood or others not in map
             expectedHowItWorksSteps.addAll(baseSteps)
         }
-        testDetailPage.verifyHowItWorks(expectedHowItWorksSteps)
-        testDetailPage.verifyCertifiedLabsSection()
+
         // Click and verify buttons with text
         testDetailPage.expandAndVerifySection("What’s measured?", whatMeasuredDesc)
         testDetailPage.expandAndVerifySection("Who should take this test?", whoDesc)
         testDetailPage.expandAndVerifySection("What to expect?", whatToExpectDesc)
+
+//        testDetailPage.verifyHowItWorks(expectedHowItWorksSteps)
+//        testDetailPage.verifyCertifiedLabsSection()
 
         // Extract and format price
         val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
@@ -467,11 +469,14 @@ class LabTestsTest {
 
         println("Test completed successfully.")
 
-//        println("Verifying How It Works section...")
-//        testDetailPage.verifyHowItWorksSection()
+        println("Verifying How It Works section...")
+        val sampleTypes = targetPackage["sample_type"]?.jsonPrimitive?.content ?: ""
+        val reportGenerationHr = targetPackage["report_generation_hr"]?.jsonPrimitive?.content
+        val firstHighlight = if (rawHighlights.isNotEmpty()) rawHighlights[0] else null
+        testDetailPage.verifyHowItWorksSection(sampleTypes, targetCode, reportGenerationHr, firstHighlight)
 
-//        println("Verifying Certified Labs section...")
-//        testDetailPage.verifyCertifiedLabsSection()
+        println("Verifying Certified Labs section...")
+        testDetailPage.verifyCertifiedLabsSection()
 
         println("Test completed successfully.")
     }
@@ -483,10 +488,10 @@ class LabTestsTest {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+        val listResponse = page.waitForResponse({
+            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
-
         val targetCode = "P037"
 
         println("Clicking View Details for code $targetCode")
