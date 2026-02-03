@@ -8,8 +8,10 @@ import config.BasePage
 import config.TestConfig
 import utils.json.json
 import utils.logger.logger
+import webView.diagnostics.symptoms.model.PersonalizedGeneratedDescription
 import webView.diagnostics.symptoms.model.Symptom
 import webView.diagnostics.symptoms.model.SymptomsData
+import webView.diagnostics.symptoms.model.UserSymptomDetailResponse
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.util.regex.Pattern
 import kotlin.random.Random
@@ -19,36 +21,122 @@ class SymptomsPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.SYMPTOMS_PAGE_URL
     private var symptomsResponse: SymptomsData? = null
 
+    private val pendingDescriptionIds = mutableSetOf<String>()
+    private val receivedDescriptionIds = mutableSetOf<String>()
+    private var readyForValidation = false
+
 
     init {
         monitorTraffic()
     }
 
+    /* private fun monitorTraffic() {
+         val symptomsList = { response: Response ->
+             if (response.url().contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
+                 logger.info { "API Response: ${response.status()} ${response.url()}" }
+                 try {
+                     logger.info { "API Response Body: ${response.text()}" }
+                     if (response.status() == 200) {
+                         val responseBody = response.text()
+                         if (!responseBody.isNullOrBlank()) {
+                             val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
+                             symptomsResponse = responseObj.data
+                         }
+                     }
+                 } catch (e: Exception) {
+                     logger.warn { "Could not read response body: ${e.message}" }
+                 }
+             }
+         }
+
+         page.onResponse(symptomsList)
+         try {
+         } finally {
+             page.offResponse(symptomsList)
+         }
+     }*/
+
     private fun monitorTraffic() {
-        val symptomsList = { response: Response ->
-            if (response.url().contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
-                logger.info { "API Response: ${response.status()} ${response.url()}" }
-                try {
-                    logger.info { "API Response Body: ${response.text()}" }
+        val responseListener = { response: Response ->
+
+            try {
+                val url = response.url()
+
+                // 1️⃣ LIST API
+                if (url.contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
+                    logger.info { "LIST API: ${response.status()} $url" }
+
                     if (response.status() == 200) {
-                        val responseBody = response.text()
-                        if (!responseBody.isNullOrBlank()) {
-                            val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
-                            symptomsResponse = responseObj.data
+                        val responseObj =
+                            json.decodeFromString<UserSymptomsResponse>(response.text())
+
+                        symptomsResponse = responseObj.data
+
+                        // collect IDs that need refresh
+                        responseObj.data.symptoms
+                            .filter { it.isDataRefreshRequired == true }
+                            .forEach { pendingDescriptionIds.add(it.symptomId!!) }
+
+                        logger.info { "Pending description calls: $pendingDescriptionIds" }
+
+                        // If nothing to wait for → validate immediately
+                        if (pendingDescriptionIds.isEmpty()) {
+                            readyForValidation = true
                         }
                     }
-                } catch (e: Exception) {
-                    logger.warn { "Could not read response body: ${e.message}" }
                 }
+
+                // 2️⃣ DESCRIPTION API
+                if (url.contains("/v4/human-token/health-data/symptom/description/")) {
+                    val id = url.substringAfterLast("/")
+
+                    if (response.status() == 200) {
+                        val detailsObject =
+                            json.decodeFromString<UserSymptomDetailResponse>(response.text())
+
+                        val selectedSymptom = symptomsResponse?.symptoms?.find { it.symptomId == id }
+
+
+                        if (selectedSymptom != null) {
+                            if (selectedSymptom.personalizedGeneratedDescription == null) {
+                                selectedSymptom.personalizedGeneratedDescription =
+                                    PersonalizedGeneratedDescription()
+                            }
+
+                            selectedSymptom.personalizedGeneratedDescription?.whatItMeansToYou =
+                                detailsObject.data.description.whatItMeansToYou
+
+                            selectedSymptom.personalizedGeneratedDescription?.causingFactorsExplanation =
+                                detailsObject.data.description.causingFactorsExplanation
+                        }
+
+                    }
+
+                    if (pendingDescriptionIds.contains(id)) {
+                        logger.info { "DESCRIPTION API received for symptomId=$id" }
+                        receivedDescriptionIds.add(id)
+                    }
+
+                    // When all are received → trigger validation
+                    if (receivedDescriptionIds.containsAll(pendingDescriptionIds)) {
+                        logger.info { "All description APIs received" }
+                        readyForValidation = true
+                    }
+                }
+
+            } catch (e: Exception) {
+                logger.warn { "Traffic parse failed: ${e.message}" }
             }
         }
 
-        page.onResponse(symptomsList)
-        try {
-        } finally {
-            page.offResponse(symptomsList)
-        }
+        page.onResponse(responseListener)
     }
+
+    fun waitForApiAndValidate() {
+        page.waitForCondition({ readyForValidation })
+        onReportSymptomsValidation()
+    }
+
 
     val selectionSymptoms = mutableMapOf<String, List<String>>()
 
@@ -127,7 +215,6 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
     fun waitForSymptomsPageConfirmation(): SymptomsPage {
         logger.info("Waiting for mobileView.home page confirmation...")
-        println("url-->"+TestConfig.Urls.SYMPTOMS_PAGE_URL)
         page.waitForURL(TestConfig.Urls.SYMPTOMS_PAGE_URL)
 
         return this
@@ -318,8 +405,8 @@ class SymptomsPage(page: Page) : BasePage(page) {
     private fun symptomsWhatYouMean() {
         logger.error("symptom... symptomsWhatYouMean")
         symptomsResponse?.symptoms?.forEach { symptom ->
-            logger.info("symptom... ${symptom.symptomId}")
             val whatItMeansToYou = symptom.personalizedGeneratedDescription?.whatItMeansToYou
+            logger.info("symptom... ${symptom.symptomId} isEmpty:${whatItMeansToYou?.joinToString { "," }}")
             val biomarkers = symptom.biomarkers.size
             if (biomarkers == 1) {
                 if (whatItMeansToYou?.isNotEmpty() == true) {
@@ -350,6 +437,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
             if (isFactorNeeded) {
                 val causingFactorsExplanation = symptom.personalizedGeneratedDescription?.causingFactorsExplanation
+                logger.info("symptom... causingFactorsExplanation:${causingFactorsExplanation.toString()}")
                 if (causingFactorsExplanation?.isNotEmpty() == true) {
 
                     causingFactorsExplanation.reversed().forEachIndexed { index, cause ->

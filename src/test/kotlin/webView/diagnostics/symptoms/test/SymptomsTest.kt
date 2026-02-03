@@ -75,6 +75,9 @@ class SymptomsTest : BaseTest() {
         symptomsMain.onReportSymptomsButtonClick()
         symptomsMain.selectAllSymptoms()
         symptomsMain.submitSymptoms()
+
+        // 🔥 NEW: wait for all APIs + then validate
+        symptomsMain.waitForApiAndValidate()
     }
 
 
