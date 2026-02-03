@@ -1,5 +1,7 @@
 package forWeb.diagnostics.test
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -9,6 +11,7 @@ import org.junit.jupiter.api.*
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_BOOKLABTEST_WEB)
 class LabTestsPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

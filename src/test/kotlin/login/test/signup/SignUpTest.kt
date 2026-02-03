@@ -1,16 +1,16 @@
 package login.test.signup
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
-import io.qameta.allure.Epic
-import io.qameta.allure.Feature
 
-@Epic("Login")
-@Feature("Sign Up UI")
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_ONBOARDING)
 class SignUpTest : BaseTest() {
 
     private lateinit var playwright: Playwright

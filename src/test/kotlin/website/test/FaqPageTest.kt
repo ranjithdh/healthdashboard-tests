@@ -1,14 +1,18 @@
 package website.test
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
+import utils.report.Modules
 import website.page.FaqPage
-import kotlin.math.ln
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_WEBSITE)
 class FaqPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

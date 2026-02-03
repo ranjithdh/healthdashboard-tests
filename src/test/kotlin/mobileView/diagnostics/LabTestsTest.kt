@@ -1,16 +1,19 @@
 package mobileView.diagnostics
 
-import com.microsoft.playwright.*
-import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
+import io.qameta.allure.Epic
 import kotlinx.serialization.json.*
-import login.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.report.Modules
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_BOOKLABTEST)
 class LabTestsTest : BaseTest() {
 
     private lateinit var playwright: Playwright

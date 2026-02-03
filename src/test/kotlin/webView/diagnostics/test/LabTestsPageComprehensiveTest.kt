@@ -1,14 +1,15 @@
 package forWeb.diagnostics.test
 
 import com.microsoft.playwright.*
-import com.microsoft.playwright.Page  // ← Add this explicit import
 import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
-import webView.diagnostics.page.LabTestsPage
+import io.qameta.allure.Epic
 import login.page.LoginPage
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
+import utils.report.Modules
+import webView.diagnostics.page.LabTestsPage
 
 private val logger = KotlinLogging.logger {}
 
@@ -17,6 +18,7 @@ private val logger = KotlinLogging.logger {}
  * Verifies UI elements match backend JSON response data
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_BOOKLABTEST_WEB)
 class LabTestsPageComprehensiveTest : BaseTest() {
 
     private lateinit var playwright: Playwright

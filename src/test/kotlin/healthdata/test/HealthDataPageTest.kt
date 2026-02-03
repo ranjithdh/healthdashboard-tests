@@ -2,17 +2,18 @@ package healthdata.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import healthdata.page.HealthDataPage
+import io.qameta.allure.Epic
 import login.page.LoginPage
 import login.page.OtpPage
 import model.healthdata.Biomarker
 import org.junit.jupiter.api.*
 import utils.BiomarkerCsvParser
 import utils.logger.logger
+import utils.report.Modules
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -20,6 +21,7 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@Epic(Modules.EPIC_HEALTH_DATA)
 class HealthDataPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

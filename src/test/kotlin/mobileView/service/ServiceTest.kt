@@ -1,14 +1,16 @@
 package mobileView.service
 
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
-import kotlinx.serialization.json.*
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
-import com.microsoft.playwright.options.AriaRole
-import mobileView.service.ServicePage
+import utils.report.Modules
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_CONSULTATIONS)
 class ServiceTest : BaseTest() {
 
     private lateinit var playwright: Playwright

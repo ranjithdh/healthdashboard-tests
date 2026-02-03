@@ -7,11 +7,11 @@ import login.page.LoginPage
 import org.junit.jupiter.api.*
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
+import utils.report.Modules
 import java.nio.file.Paths
 
 
-@Epic("Login")
-@Feature("End-to-End Login Flow")
+@Epic(Modules.EPIC_LOGIN)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginFlowTest : BaseTest() {
 
