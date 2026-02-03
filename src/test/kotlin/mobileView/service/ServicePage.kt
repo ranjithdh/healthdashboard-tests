@@ -4,6 +4,7 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -11,9 +12,13 @@ import kotlinx.serialization.json.Json
 import login.page.LoginPage
 import model.ServiceResponse
 import model.ServiceProduct
+import model.profile.PiiUserResponse
 import mu.KotlinLogging
 import java.text.NumberFormat
 import java.util.Locale
+import java.util.regex.Pattern
+import kotlin.random.Random
+import kotlin.test.assertEquals
 
 private val logger = KotlinLogging.logger {}
 
@@ -282,5 +287,242 @@ class ServicePage(page: Page) : BasePage(page) {
         } else {
             logger.info { "Item status is '$status', skipping schedule button verification" }
         }
+    }
+    val selectionSymptoms = mutableMapOf<String, List<String>>()
+
+    private var isMale = true
+
+    val symptoms = mapOf(
+        "Head" to listOf(
+            "Headaches", "Faintness", "Insomnia"
+        ), "Eyes" to listOf(
+            "Bags, dark circles", "Light Sensitivity"
+        ), "Ears" to listOf(
+            "Ringing / hearing loss"
+        ), "Nose" to listOf(
+            "Sinus problems", "Hay fever", "Sneezing attacks"
+        ), "Mouth / Throat" to listOf(
+            "Chronic coughing", "Canker sores", "Sore Tongue / Glossitis", "Cracks at Mouth Corners", "Metallic Taste"
+        ), "Skin" to listOf(
+            "Acne",
+            "Hives / rashes / dry skin",
+            "Hair loss",
+            "Flushing / hot flashes",
+            "Excessive sweating",
+            "Easy Bruising",
+            "Slow Wound Healing",
+            "Skin Pigmentation Changes",
+            "Brittle Nails"
+        ), "Heart" to listOf(
+            "Rapid/pounding beats", "Frequent Chest pain", "Palpitations"
+        ), "Lungs" to listOf(
+            "Chest congestion", "Asthma / bronchitis", "Shortness of breath", "Difficulty breathing"
+        ), "Digestive Tract" to listOf(
+            "Frequent Diarrhea", "Constipation", "Bloating / gas", "Belching / passing gas"
+        ), "Joint / Muscles" to listOf(
+            "Pain in joints",
+            "Arthritis",
+            "Stiffness / limited movement",
+            "Pain in muscles",
+            "Feeling of weakness",
+            "Bone Pain/Tenderness",
+            "Muscle Cramps/Spasms",
+            "Muscle Weakness"
+        ), "Weight" to listOf(
+            "Binge eating / drinking",
+            "Craving certain foods",
+            "Difficulty in losing weight",
+            "Underweight",
+            "Persistent weight gain",
+            "Unexplained Weight Gain",
+            "Unexplained Weight Loss"
+        ), "Energy / Activity" to listOf(
+            "Fatigue / sluggishness", "Apathy / lethargy", "Hyperactivity", "Restless leg"
+        ), "Mind" to listOf(
+            "Poor memory", "Poor concentration"
+        ), "Mood" to listOf(
+            "Mood swings", "Anxiety / fear / nervousness", "Anger / irritability", "Depression"
+        ), "Other" to if (isMale) {
+            listOf(
+                "Cold intolerance",
+                "Cold extremities (feeling",
+                "Low libido",
+                "Persistent low-grade fever",
+                "Frequent illness",
+                "Frequent/urgent urination",
+                "Burning Sensation in Feet",
+                "Poor Coordination / Unsteady",
+                "Cold Hands/Feet",
+                "Swelling in Legs/Ankles",
+                "Night Sweats",
+                "Fever/Chills",
+                "Frequent Infections",
+                "Increased Thirst"
+            )
+        } else {
+            listOf(
+                "Cold intolerance",
+                "Cold extremities (feeling",
+                "Irregular periods",
+                "Infertility",
+                "Low libido",
+                "Persistent low-grade fever",
+                "Frequent illness",
+                "Frequent/urgent urination",
+                "Burning Sensation in Feet",
+                "Poor Coordination / Unsteady",
+                "Cold Hands/Feet",
+                "Swelling in Legs/Ankles",
+                "Night Sweats",
+                "Fever/Chills",
+                "Frequent Infections",
+                "Increased Thirst"
+            )
+        }, "Lungs / Respiratory" to listOf(
+            "Wheezing", "Chronic Cough with Phlegm"
+        ), "Urinary" to if (isMale) {
+            listOf(
+                "UTI"
+            )
+        } else {
+            listOf(
+                "UTI",
+                "Urinary Incontinence"
+            )
+        }
+    )
+
+
+
+    /**------------Account Information----------------*/
+    fun fetchAccountInformation() {
+        try {
+            logger.info { "Fetching current preference from API..." }
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_ACCOUNT_INFORMATION,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", "Asia/Calcutta")
+            )
+
+            if (response.status() != 200) {
+                logger.error { "API returned status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            logger.info { "API response...${responseBody}" }
+
+            val responseObj = utils.json.json.decodeFromString<PiiUserResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                setMaleConditions(responseObj.data.piiData.gender == "male")
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch current preference: ${e.message}" }
+        }
+    }
+
+
+    fun setMaleConditions(isMale: Boolean) {
+        this.isMale = isMale
+    }
+
+
+
+
+    fun dialogValidation() {
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))
+        val subTitle = page.getByText("Select any symptoms you're")
+        val symptomsCount = page.getByText("symptoms selected")
+        val cancel = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
+        val closeButton =
+            page.getByRole(AriaRole.BUTTON).filter(Locator.FilterOptions().setHasText(Pattern.compile("^$")))
+        val submitSymptoms = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms"))
+        val components = listOf(title, subTitle, symptomsCount, closeButton, submitSymptoms, cancel)
+        components.forEach { it.waitFor() }
+    }
+
+
+    fun reportOptionsValidations() {
+        fetchAccountInformation()
+        symptoms.forEach { (section, symptomList) ->
+            expandSection(section)
+            symptomList.forEach { symptom ->
+                selectSymptom(symptom)
+            }
+        }
+    }
+
+    fun expandSection(section: String) {
+        val heading = page.getByRole(AriaRole.HEADING)
+            .filter(
+                Locator.FilterOptions().setHasText(section)
+            )
+            .first() // pick the first matching element
+        heading.scrollIntoViewIfNeeded()
+        heading.waitFor()
+    }
+
+    fun selectSymptom(symptomName: String) {
+        page.getByRole(
+            AriaRole.BUTTON, Page.GetByRoleOptions().setName(symptomName)
+        ).waitFor()
+    }
+
+    fun cancelButtonClick() {
+        val cancelButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
+        cancelButton.click()
+    }
+
+    fun selectAllSymptoms() {
+        fetchAccountInformation()
+        symptoms.forEach { (section, symptoms) ->
+            val selectedSymptoms = randomSubList(symptoms, 1, 3)
+            selectionSymptoms[section] = selectedSymptoms
+            clickSymptoms(selectedSymptoms)
+            symptomsSelectedCount(selectionSymptoms)
+        }
+    }
+
+    fun <T> randomSubList(list: List<T>, min: Int = 1, max: Int = 3): List<T> {
+        if (list.isEmpty()) return emptyList()
+        val count = Random.nextInt(min, minOf(max, list.size) + 1)
+        return list.shuffled().take(count)
+    }
+
+    private fun clickSymptoms(symptoms: List<String>) {
+        symptoms.forEach { name ->
+            val button = page.getByRole(
+                AriaRole.BUTTON, Page.GetByRoleOptions().setName(name)
+            )
+
+            button.scrollIntoViewIfNeeded()
+            button.click()
+        }
+    }
+
+
+    fun symptomsSelectedCount(selectionSymptoms: MutableMap<String, List<String>>) {
+        val symptomsCount = page.getByText("symptoms selected")
+        var count = 0
+        selectionSymptoms.forEach { (string, symptomsList) ->
+            count = count.plus(symptomsList.size)
+        }
+        assertEquals("$count symptoms selected", symptomsCount.innerText())
+    }
+
+
+
+    fun submitSymptoms() {
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms")).click()
     }
 }

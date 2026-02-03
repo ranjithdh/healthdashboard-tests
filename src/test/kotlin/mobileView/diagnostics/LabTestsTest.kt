@@ -246,21 +246,28 @@ class LabTestsTest {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+        val listResponse = page.waitForResponse({
+            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
 
-        val targetCode = "GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
         val listData = listJson["data"]?.jsonObject
         val productList = listData?.get("diagnostic_product_list")?.jsonObject
-        val packages = productList?.get("packages")?.jsonArray
+        // Helper to search in multiple arrays
+        fun findItem(section: String): JsonObject? {
+            return productList?.get(section)?.jsonArray?.map { it.jsonObject }?.firstOrNull {
+                it["code"]?.jsonPrimitive?.content == targetCode
+            }
+        }
 
-        val targetPackage = packages?.map { it.jsonObject }?.firstOrNull {
-            it["code"]?.jsonPrimitive?.content == targetCode
-        } ?: throw AssertionError("Package with code $targetCode not found in API response")
+        val targetPackage = findItem("packages")
+            ?: findItem("test_profiles")
+            ?: findItem("tests")
+            ?: throw AssertionError("Item with code $targetCode not found in API response (packages, test_profiles, tests)")
 
         val content = targetPackage["content"]?.jsonObject ?: throw AssertionError("Content not found for $targetCode")
 
@@ -573,10 +580,12 @@ class LabTestsTest {
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
         val listData = listJson["data"]?.jsonObject
         val productList = listData?.get("diagnostic_product_list")?.jsonObject
-        val packages = productList?.get("packages")?.jsonArray
-        val targetProduct = packages?.map { it.jsonObject }?.firstOrNull {
-            it["code"]?.jsonPrimitive?.content == targetCode
-        } ?: throw AssertionError("Product with code $targetCode not found in API response")
+        // Helper to search in multiple arrays
+        val targetProduct = listOf("packages", "test_profiles", "tests").mapNotNull { section ->
+            productList?.get(section)?.jsonArray?.map { it.jsonObject }?.firstOrNull {
+                it["code"]?.jsonPrimitive?.content == targetCode
+            }
+        }.firstOrNull() ?: throw AssertionError("Product with code $targetCode not found in API response (packages, test_profiles, tests)")
 
         val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
 
