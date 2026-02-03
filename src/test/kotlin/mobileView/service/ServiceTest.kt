@@ -35,6 +35,7 @@ class ServiceTest : BaseTest() {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
+//            .setExtraHTTPHeaders(mapOf("Cache-Control" to "no-cache", "Pragma" to "no-cache"))
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
@@ -52,14 +53,7 @@ class ServiceTest : BaseTest() {
     fun `verify service page static texts`() {
         val servicePage = ServicePage(page)
         
-        // Navigate to Home Page
-//        page.navigate(TestConfig.Urls.HOME_PAGE_URL)
-
-        // Click "Book Now" -> Leads to Services Page
-        // page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Book Now")).nth(1).click();
-//        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
-        
-        // Wait for URL to be services
+        // Navigate to Services page using the robust helper
         servicePage.navigateToServices()
         // Verify static content
         servicePage.verifyStaticContent()
@@ -73,13 +67,16 @@ class ServiceTest : BaseTest() {
         
         println("Capturing API response and navigating to Services page...")
         val response = page.waitForResponse({ 
-            it.url().contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) && (it.status() == 200 || it.status() == 304)
+            it.url().contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) && it.status() == 200
         }) {
              // navigateToServices() includes login and the "Book Now" click which triggers the API
              servicePage.navigateToServices()
         }
         
-        page.waitForURL(TestConfig.Urls.SERVICES_URL)
+        println("Response Status: ${response.status()}")
+        if (response.status() == 304) {
+             throw AssertionError("API returned 304 Not Modified. Playwright cannot read body of 304 responses. Header 'Cache-Control: no-cache' should have prevented this.")
+        }
         
         val responseBody = response.text()
         if (responseBody.isNotEmpty()) {
