@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import healthdata.page.HealthDataPage
 import io.qameta.allure.Step
 import webView.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
@@ -217,17 +218,15 @@ class OtpPage(page: Page) : BasePage(page) {
 
     @Step("Enter OTP and continue to Health Data")
     fun enterOtpAndContinueToHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
-        enterOtp(testUser.otp)
-        // Wait for login to complete (either by URL change or timeout)
-        try {
-            page.waitForURL("**/home", Page.WaitForURLOptions().setTimeout(10000.0))
-        } catch (e: Exception) {
-            // Ignore timeout if it doesn't go to home quickly, just proceed to navigate
-            logger.info { "Wait for home page timed out or skipped, proceeding to Health Data page" }
-        }
 
-        val healthDataPage = healthdata.page.HealthDataPage(page)
-        healthDataPage.navigate()
+        enterOtp(testUser.otp)
+        val homePage = HomePage(page)
+        homePage.waitForMobileHomePageConfirmation()
+        val healthData = homePage.getHealthDataResponse()
+
+        homePage.clickHealthTab()
+
+        val healthDataPage = HealthDataPage(page,healthData)
         healthDataPage.waitForPageLoad()
         return healthDataPage
     }

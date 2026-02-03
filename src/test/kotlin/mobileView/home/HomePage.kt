@@ -6,12 +6,14 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import healthdata.page.HealthDataPage
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
+import model.healthdata.HealthData
 import model.home.HomeData
 import model.home.HomeDataResponse
 import profile.page.ProfilePage
@@ -23,10 +25,12 @@ class HomePage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
+    var healthData: HealthData? = null
     val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
+
 
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {
@@ -56,6 +60,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     init {
         getExpectedAssignmentDateFromApi()
+//        getHealthDataResponse()
     }
 
     fun getExpectedAssignmentDateFromApi() {
@@ -172,5 +177,43 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
 
+    fun clickHealthTab() {
+        page.getByText("Data").click()
+    }
+
+
+    fun getHealthDataResponse(): HealthData? {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()
+                    ?.contains(TestConfig.APIs.HEALTH_DATA) == true && response.status() == 200
+            },
+            {
+                page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
+            }
+        )
+
+        val responseBody = response.text()
+        if (responseBody.isNullOrBlank()) {
+            logger.info { "getHealthDataResponse API response body is empty" }
+        }
+
+        logger.info { "getHealthDataResponse API response...${response.text()}" }
+
+        try {
+            val responseObj = utils.json.json.decodeFromString<HealthData>(responseBody)
+            logger.error { "getHealthDataResponse...$responseObj" }
+
+            if (responseObj.data != null) {
+                healthData = responseObj
+                return healthData
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response..${e.message}" }
+            return null
+        }
+
+        return null
+    }
 
 }

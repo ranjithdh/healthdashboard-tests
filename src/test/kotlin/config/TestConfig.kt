@@ -21,6 +21,7 @@ object TestConfig {
         const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         const val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         const val HEALTH_DATA_URL = "${BASE_URL}health-data"
+        const val BIOMARKERS = "${BASE_URL}biomarkers"
 
         const val HOME_PAGE_URL = "${BASE_URL}home"
         const val PROFILE_URL = "${BASE_URL}profile"
@@ -52,6 +53,8 @@ object TestConfig {
         const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
         const val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
+
+        const val TRACK_RESULT = "${BASE_URL}order/"
     }
 
     object APIs {
@@ -64,7 +67,8 @@ object TestConfig {
         const val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         const val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         const val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
-        val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        const val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        const val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
     }
 
     object Browser {
@@ -75,7 +79,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
                 .setHeadless(HEADLESS)
-//                .setSlowMo(SLOW_MO)
+                .setSlowMo(SLOW_MO)
         }
     }
 
@@ -130,7 +134,6 @@ object TestConfig {
             otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
             country = "India"
         )*/
-
         val EXISTING_USER = TestUser(
             mobileNumber = "8870208411",
             otp = "678901",

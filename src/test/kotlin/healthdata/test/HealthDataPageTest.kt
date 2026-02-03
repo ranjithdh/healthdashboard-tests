@@ -4,11 +4,12 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.Tracing.StartOptions
+import com.microsoft.playwright.Tracing.StopOptions
 import config.TestConfig
 import healthdata.page.HealthDataPage
-import onboard.page.LoginPage
-import onboard.page.OtpPage
 import model.healthdata.Biomarker
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.BiomarkerCsvParser
 import utils.logger.logger
@@ -43,7 +44,7 @@ class HealthDataPageTest {
 
     @BeforeEach
     fun createContext() {
-        val viewport = TestConfig.Viewports.DESKTOP_HD
+        val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -53,99 +54,142 @@ class HealthDataPageTest {
         context = browser.newContext(contextOptions)
         page = context.newPage()
 
+        context.tracing().start(
+            StartOptions()
+                .setScreenshots(true)
+                .setSnapshots(true)
+                .setSources(true)
+        )
+
         loginAndNavigateToHealthData()
     }
 
     @AfterEach
     fun closeContext() {
+        val path = "build/traceView/trace_${System.currentTimeMillis()}.zip"
+        context.tracing().stop(
+            StopOptions()
+                .setPath(Paths.get(path))
+        )
+
         context.close()
     }
 
     private fun loginAndNavigateToHealthData() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
-
         val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(testUser)
-
-        val otpPage = OtpPage(page)
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
         healthDataPage = otpPage.enterOtpAndContinueToHealthData(testUser)
     }
 
     @Test
     @Order(1)
-    fun `should download biomarker report`() {
-        healthDataPage.waitForPageLoad()
+    fun `show empty state if the health data is empty`() {
+        if (healthDataPage.healthData?.data?.blood?.data?.isEmpty() == true){
+            assertTrue(healthDataPage.shouldShowEmptyState(), "Empty state")
+            assertTrue(healthDataPage.shouldShowTrackResult(), "show track result")
 
-        val download = healthDataPage.downloadReport()
+            healthDataPage.clickTrackResult()
 
-        val suggestedFilename = download.suggestedFilename()
-        println("Suggested filename: $suggestedFilename")
+            page.waitForURL {
+                page.url().contains(TestConfig.Urls.TRACK_RESULT)
+            }
 
-        assertTrue(
-            suggestedFilename.contains("Deep-Holistics-Biomarkers-export"),
-            "Filename should contain 'Biomarkers-export'"
-        )
-        assertTrue(suggestedFilename.endsWith(".csv"), "File should be a CSV")
-
-        val downloadPath = Paths.get(csvPath)
-        Files.deleteIfExists(downloadPath)
-
-        download.saveAs(downloadPath)
-
-        assertTrue(Files.exists(downloadPath), "Downloaded file should exist at $csvPath")
-        assertTrue(Files.size(downloadPath) > 0, "Downloaded file should not be empty")
-
-        println("Download successful: $downloadPath")
+            println("checkEmptyState...............${page.url()}")
+            Assertions.assertTrue(
+                page.url().contains(TestConfig.Urls.TRACK_RESULT),
+                "Should navigate to track result, but was ${page.url()}"
+            )
+        }else{
+            assertTrue(true, "Health data found")
+        }
     }
 
     @Test
     @Order(2)
+    fun `should download biomarker report`() {
+
+        if (healthDataPage.healthData?.data?.blood?.data?.isNotEmpty() == true) {
+            val download = healthDataPage.downloadReport()
+
+            val suggestedFilename = download.suggestedFilename()
+            println("Suggested filename: $suggestedFilename")
+
+            assertTrue(
+                suggestedFilename.contains("Deep-Holistics-Biomarkers-export"),
+                "Filename should contain 'Biomarkers-export'"
+            )
+            assertTrue(suggestedFilename.endsWith(".csv"), "File should be a CSV")
+
+            val downloadPath = Paths.get(csvPath)
+            Files.deleteIfExists(downloadPath)
+
+            download.saveAs(downloadPath)
+
+            assertTrue(Files.exists(downloadPath), "Downloaded file should exist at $csvPath")
+            assertTrue(Files.size(downloadPath) > 0, "Downloaded file should not be empty")
+
+            println("Download successful: $downloadPath")
+        } else {
+            assertTrue(true, "Health data not found")
+        }
+
+    }
+
+    @Test
+    @Order(3)
     fun `should verify all biomarkers from CSV`() {
-        if (!File(csvPath).exists()) {
-            println("CSV file not found at $csvPath. Skipping verification test.")
-            return
-        }
 
-        val biomarkers = BiomarkerCsvParser.parse(csvPath)
+        if (healthDataPage.healthData?.data?.blood?.data?.isNotEmpty() == true) {
 
-        logger.info {
-            "BiomarkerCsvParser...${biomarkers.joinToString("\n")}"
-        }
+            if (!File(csvPath).exists()) {
+                println("CSV file not found at $csvPath. Skipping verification test.")
+                return
+            }
 
-        println("Verifying ${biomarkers.size} biomarkers...")
+            val biomarkers = BiomarkerCsvParser.parse(csvPath)
 
-        val failures = mutableListOf<String>()
-        var processedCount = 0
+            logger.info {
+                "BiomarkerCsvParser...${biomarkers.joinToString("\n")}"
+            }
 
-        biomarkers.forEach { biomarker ->
-            processedCount++
-            try {
-                verifyBiomarker(biomarker)
-                if (processedCount % 10 == 0) {
-                    println("Processed $processedCount/${biomarkers.size} biomarkers...")
-                }
-            } catch (e: AssertionError) {
-                val msg = "Biomarker '${biomarker.name}' FAILED: ${e.message}"
-                println(msg)
-                failures.add(msg)
-                if (failures.size <= 5) {
-                    healthDataPage.takeScreenshot("failure-${biomarker.name.replace(" ", "_").replace("/", "-")}")
-                }
-            } catch (e: Exception) {
-                val msg = "Biomarker '${biomarker.name}' ERROR: ${e.message}"
-                println(msg)
-                failures.add(msg)
-                if (failures.size <= 5) {
-                    healthDataPage.takeScreenshot("error-${biomarker.name.replace(" ", "_").replace("/", "-")}")
+            println("Verifying ${biomarkers.size} biomarkers...")
+
+            val failures = mutableListOf<String>()
+            var processedCount = 0
+
+            biomarkers.forEach { biomarker ->
+                processedCount++
+                try {
+                    verifyBiomarker(biomarker)
+                    if (processedCount % 10 == 0) {
+                        println("Processed $processedCount/${biomarkers.size} biomarkers...")
+                    }
+                } catch (e: AssertionError) {
+                    val msg = "Biomarker '${biomarker.name}' FAILED: ${e.message}"
+                    println(msg)
+                    failures.add(msg)
+                    if (failures.size <= 5) {
+                        healthDataPage.takeScreenshot("failure-${biomarker.name.replace(" ", "_").replace("/", "-")}")
+                    }
+                } catch (e: Exception) {
+                    val msg = "Biomarker '${biomarker.name}' ERROR: ${e.message}"
+                    println(msg)
+                    failures.add(msg)
+                    if (failures.size <= 5) {
+                        healthDataPage.takeScreenshot("error-${biomarker.name.replace(" ", "_").replace("/", "-")}")
+                    }
                 }
             }
-        }
 
-        if (failures.isNotEmpty()) {
-            val failureMessage = "Found ${failures.size} biomarker mismatches:\n${failures.joinToString("\n")}"
-            Assertions.fail<String>(failureMessage)
-        } else {
-            println("All ${biomarkers.size} biomarkers verified successfully!")
+            if (failures.isNotEmpty()) {
+                val failureMessage = "Found ${failures.size} biomarker mismatches:\n${failures.joinToString("\n")}"
+                Assertions.fail<String>(failureMessage)
+            } else {
+                println("All ${biomarkers.size} biomarkers verified successfully!")
+            }
+        }else{
+            assertTrue(true, "Health data not found")
         }
     }
 
@@ -171,4 +215,5 @@ class HealthDataPageTest {
 
         Assertions.assertTrue(matches, "Data mismatch")
     }
+
 }

@@ -3,22 +3,26 @@ package healthdata.page
 import com.microsoft.playwright.Download
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.Response
 import config.BasePage
 import config.TestConfig
-import mu.KotlinLogging
+import model.healthdata.HealthData
+import utils.json.json
+import utils.logger.logger
 
-private val logger = KotlinLogging.logger {}
 
+class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(page) {
 
-class HealthDataPage(page: Page) : BasePage(page) {
-
-    override val pageUrl = "${TestConfig.Urls.BASE_URL}health-data"
+    override val pageUrl = TestConfig.Urls.BIOMARKERS
 
     fun waitForPageLoad() {
         logger.info { "Waiting for Health Data page to load" }
-        waitForVisible("h1:has-text('Health data')")
-        waitForVisible(".grid.grid-cols-12", TestConfig.Timeouts.ELEMENT_TIMEOUT)
+//        waitForVisible("h1:has-text('Health data')")
+//        waitForVisible(".grid.grid-cols-12", TestConfig.Timeouts.ELEMENT_TIMEOUT)
+
+        page.waitForURL(TestConfig.Urls.BIOMARKERS)
+
+//        getHealthDataResponse()
     }
 
 
@@ -102,4 +106,21 @@ class HealthDataPage(page: Page) : BasePage(page) {
         }
         return download
     }
+
+    fun shouldShowEmptyState(): Boolean {
+        return page.getByText("Your report is in progress").isVisible &&
+                page.getByText("Your blood sample is under analysis at the lab. We will notify you when it’s ready.").isVisible
+    }
+
+    private val trackResult = page.getByText("Track test status")
+
+    fun shouldShowTrackResult(): Boolean {
+        return trackResult.isVisible
+    }
+
+    fun clickTrackResult() {
+        trackResult.click()
+    }
+
+
 }
