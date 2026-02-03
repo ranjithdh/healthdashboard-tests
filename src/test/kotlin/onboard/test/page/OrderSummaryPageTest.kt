@@ -1,8 +1,8 @@
-package login.test.page
+package onboard.test.page
 
 import com.microsoft.playwright.*
-import login.page.LoginPage
-import login.page.OrderSummaryPage
+import onboard.page.LoginPage
+import onboard.page.OrderSummaryPage
 import config.BaseTest
 import config.TestConfig
 import org.junit.jupiter.api.*
