@@ -17,6 +17,16 @@ private val logger = KotlinLogging.logger {}
 abstract class BasePage(protected val page: Page) {
     
     abstract val pageUrl: String
+    
+    init {
+        page.onRequest { request ->
+            val token = request.headers()["access_token"]
+            if (!token.isNullOrBlank() && (TestConfig.ACCESS_TOKEN.isEmpty())) {
+                TestConfig.ACCESS_TOKEN = token
+                // Silent capture to avoid log clutter, but it works globally
+            }
+        }
+    }
 
     /**
      * Navigate to this page

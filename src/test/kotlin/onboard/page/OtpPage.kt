@@ -29,7 +29,6 @@ class OtpPage(page: Page) : BasePage(page) {
     private fun monitorTraffic() {
         val updateProfileRequest = { request: com.microsoft.playwright.Request ->
             if (request.url().contains(TestConfig.APIs.API_VERIFY_OTP)) {
-                logger.info { "OTP Page-->" }
                 logger.info { "OTP Page--> API Request: ${request.method()} ${request.url()}" }
                 request.postData()?.let {
                     logger.info { "OTP Page--> API Request Payload: $it" }
@@ -37,32 +36,26 @@ class OtpPage(page: Page) : BasePage(page) {
             }
         }
 
-
-        val updateProfileResponse = { response: Response ->
-            if (response.url().contains(TestConfig.APIs.API_VERIFY_OTP)) {
-                logger.info { "OTP Page--> API Response: ${response.status()} ${response.url()}" }
-                try {
-                    if (response.status() == 200) {
-                        val responseBody = response.text()
-                        if (responseBody.isNullOrBlank()) {
-                            logger.info { "API response body is empty" }
-                        } else {
-                            val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
-                            TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
-                        }
-                    }
-                    logger.info { "OTP Page--> API Response Body: ${response.text()}" }
-                } catch (e: Exception) {
-                    logger.warn { "OTP Page--> Could not read response body: ${e.message}" }
-                }
-            }
-        }
         page.onRequest(updateProfileRequest)
-        page.onResponse(updateProfileResponse)
+    }
+
+    private fun captureToken(action: () -> Unit) {
         try {
-        } finally {
-            page.offRequest(updateProfileRequest)
-            page.offResponse(updateProfileResponse)
+            val response = page.waitForResponse(
+                { response: Response? ->
+                    response?.url()?.contains(TestConfig.APIs.API_VERIFY_OTP) == true &&
+                            response.status() == 200
+                }, action
+            )
+
+            val responseBody = response.text()
+            if (!responseBody.isNullOrBlank()) {
+                val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
+                TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
+                logger.info { "Captured Access Token: ${TestConfig.ACCESS_TOKEN.take(10)}..." }
+            }
+        } catch (e: Exception) {
+            logger.warn { "Failed to capture access token during OTP verification: ${e.message}" }
         }
     }
 
@@ -85,7 +78,12 @@ class OtpPage(page: Page) : BasePage(page) {
 
     @Step("Enter OTP and continue to account creation")
     fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
-        enterOtp(testUser.otp)
+        captureToken {
+            enterOtp(testUser.otp)
+            if (isContinueButtonEnabled()) {
+                clickContinue()
+            }
+        }
 
         val basicDetailsPage = BasicDetailsPage(page)
         basicDetailsPage.waitForConfirmation()
@@ -95,7 +93,12 @@ class OtpPage(page: Page) : BasePage(page) {
 
     @Step("Enter OTP and continue to mobile home page")
     fun enterOtpAndContinueToMobileHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
-        enterOtp(testUser.otp)
+        captureToken {
+            enterOtp(testUser.otp)
+            if (isContinueButtonEnabled()) {
+                clickContinue()
+            }
+        }
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -105,18 +108,26 @@ class OtpPage(page: Page) : BasePage(page) {
 
     @Step("Enter OTP and continue to profile")
     fun enterOtpAndContinueToProfile(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): ProfilePage {
-        enterOtp(testUser.otp)
+        captureToken {
+            enterOtp(testUser.otp)
+            if (isContinueButtonEnabled()) {
+                clickContinue()
+            }
+        }
         val profilePage = ProfilePage(page)
-
         profilePage.waitForConfirmation()
-
         return profilePage
     }
 
 
     @Step("Enter OTP and continue to home page")
     fun enterOtpAndContinueToHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
-        enterOtp(testUser.otp)
+        captureToken {
+            enterOtp(testUser.otp)
+            if (isContinueButtonEnabled()) {
+                clickContinue()
+            }
+        }
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
 
