@@ -1,6 +1,7 @@
 package login.test.page
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import login.page.LoginPage
 import org.junit.jupiter.api.*
@@ -8,12 +9,11 @@ import utils.logger.logger
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OtpPageTest {
+class OtpPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

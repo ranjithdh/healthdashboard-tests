@@ -3,6 +3,7 @@ package forWeb.diagnostics.test
 import com.microsoft.playwright.*
 import com.microsoft.playwright.Page  // ← Add this explicit import
 import com.microsoft.playwright.options.AriaRole
+import config.BaseTest
 import config.TestConfig
 import webView.diagnostics.page.LabTestsPage
 import login.page.LoginPage
@@ -16,12 +17,11 @@ private val logger = KotlinLogging.logger {}
  * Verifies UI elements match backend JSON response data
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LabTestsPageComprehensiveTest {
+class LabTestsPageComprehensiveTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

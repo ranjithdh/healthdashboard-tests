@@ -1,6 +1,7 @@
 package mobileView.service
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import kotlinx.serialization.json.*
 import org.junit.jupiter.api.*
@@ -8,12 +9,11 @@ import com.microsoft.playwright.options.AriaRole
 import mobileView.service.ServicePage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ServiceTest {
+class ServiceTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

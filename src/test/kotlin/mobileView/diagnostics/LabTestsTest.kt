@@ -2,6 +2,7 @@ package mobileView.diagnostics
 
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.AriaRole
+import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
 import kotlinx.serialization.json.*
@@ -10,12 +11,11 @@ import org.junit.jupiter.api.*
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LabTestsTest {
+class LabTestsTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {
