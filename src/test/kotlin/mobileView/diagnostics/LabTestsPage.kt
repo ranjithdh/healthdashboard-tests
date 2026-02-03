@@ -23,19 +23,24 @@ class LabTestsPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
     }
 
-    fun navigateToDiagnostics() {
+    fun login() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue(testUser)
         
         val otpPage = login.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)
-        
-        // Navigate to Home first
-//        page.navigate(TestConfig.Urls.BASE_URL)
-        
-        // Click Book Now to go to Diagnostics (this triggers the API call needed by the test)
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+    }
+
+    fun goToDiagnosticsUrl() {
+        //  page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+    }
+
+    fun navigateToDiagnostics() {
+        login()
+        goToDiagnosticsUrl()
     }
 
     fun clickViewDetails(): TestDetailPage {

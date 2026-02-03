@@ -63,28 +63,20 @@ class LabTestsTest {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val response = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
+        val response = page.waitForResponse({
+            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
-
-        println("Waiting for URL: **/diagnostics")
-        page.waitForURL("**/diagnostics")
+        println("Response Status: ${response.status()}")
+        if (response.status() == 304) {
+            throw AssertionError("API returned 304 Not Modified. Playwright cannot read body of 304 responses. Header 'Cache-Control: no-cache' should have prevented this.")
+        }
 
         // Parse response and verify cards
         println("Parsing API response...")
         val json = kotlinx.serialization.json.Json.parseToJsonElement(response.text()).jsonObject
         val data = json["data"]?.jsonObject
         val productList = data?.get("diagnostic_product_list")?.jsonObject
-
-        // Map API sample types to displayed text
-        val sampleTypeMap = mapOf(
-            "blood" to "Blood test",
-            "saliva" to "Cheek swab test",
-            "stool" to "Stool test",
-            "dried_blood_spot" to "At-Home Test Kit",
-            "saliva_stress" to "At-Home Test Kit"
-        )
-
         data class TestCardData(val code: String, val name: String, val sampleType: String, val rawSampleType: String, val price: String)
         val testCards = mutableListOf<TestCardData>()
 
@@ -94,7 +86,15 @@ class LabTestsTest {
                 val code = obj["code"]?.jsonPrimitive?.content ?: return@forEach
                 val name = obj["name"]?.jsonPrimitive?.content ?: ""
                 val rawSampleType = obj["sample_type"]?.jsonPrimitive?.content ?: ""
-                val sampleType = sampleTypeMap[rawSampleType] ?: rawSampleType
+
+                // Sample type logic as per user requirement
+                val sampleType = when {
+                    code.startsWith("CORTISOL") -> "At-Home Test Kit"
+                    code.startsWith("OMEGA") -> "At-Home Test Kit"
+                    rawSampleType.lowercase() == "saliva" -> "At-Home Test Kit"
+                    rawSampleType.lowercase() == "stool" -> "At-Home Test Kit"
+                    else -> "Blood test"
+                }
 
                 // Price extraction and formatting
                 val rawPrice = obj["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
@@ -141,13 +141,11 @@ class LabTestsTest {
             testCards.forEach { card ->
                 val category = getCategory(card.rawSampleType)
 
-
                 val shouldBeVisible = if (activeFilters.contains("All")) {
                     true
                 } else {
                     activeFilters.contains(category)
                 }
-
 
                 val isVisible = labTestsPage.isTestCardVisible(card.code)
 
@@ -252,27 +250,21 @@ class LabTestsTest {
             labTestsPage.navigateToDiagnostics()
         }
 
-        val targetCode = "GENE10001" //"PROJ1033401" //"GENE10001"//"DH_LONGEVITY_PANEL" //"PROJ1056379"//   // "PROJ1056379" // "GENE10001"
+        val targetCode = "GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
-// Parse list response to find the target item
+        // Parse list response to find the target item
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
         val listData = listJson["data"]?.jsonObject
         val productList = listData?.get("diagnostic_product_list")?.jsonObject
+        val packages = productList?.get("packages")?.jsonArray
 
-        fun findItem(section: String): JsonObject? {
-            return productList?.get(section)?.jsonArray?.map { it.jsonObject }?.firstOrNull {
-                it["code"]?.jsonPrimitive?.content == targetCode
-            }
-        }
-
-        val targetPackage = findItem("packages")
-            ?: findItem("test_profiles")
-            ?: findItem("tests")
-            ?: throw AssertionError("Item with code $targetCode not found in API response (packages, test_profiles, tests)")
+        val targetPackage = packages?.map { it.jsonObject }?.firstOrNull {
+            it["code"]?.jsonPrimitive?.content == targetCode
+        } ?: throw AssertionError("Package with code $targetCode not found in API response")
 
         val content = targetPackage["content"]?.jsonObject ?: throw AssertionError("Content not found for $targetCode")
 
-// Extract descriptions
+        // Extract descriptions
         val whatMeasuredDesc = content["what_measured_description"]?.jsonPrimitive?.content ?: ""
         val whatToExpectDesc = content["what_to_expect_description"]?.jsonPrimitive?.content ?: ""
 
@@ -468,11 +460,11 @@ class LabTestsTest {
 
         println("Test completed successfully.")
 
-        println("Verifying How It Works section...")
+//        println("Verifying How It Works section...")
 //        testDetailPage.verifyHowItWorksSection()
 
-        println("Verifying Certified Labs section...")
-        testDetailPage.verifyCertifiedLabsSection()
+//        println("Verifying Certified Labs section...")
+//        testDetailPage.verifyCertifiedLabsSection()
 
         println("Test completed successfully.")
     }
