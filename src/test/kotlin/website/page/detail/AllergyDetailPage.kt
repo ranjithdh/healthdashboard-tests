@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import utils.logger.logger
+import utils.report.StepHelper
 import website.page.WebSiteBasePage
 
 
@@ -16,6 +17,7 @@ class AllergyDetailPage(page: Page) : WebSiteBasePage(page) {
     val certifiedLabsSection = CertifiedLabsSection(page)
 
     fun waitForPageLoad(): AllergyDetailPage {
+        StepHelper.step(StepHelper.WAIT_WEBSITE_PAGE_LOAD + "Allergies Test Panel")
         header.waitFor()
         logger.info { "AllergyDetailPage loaded" }
         return this

@@ -4,6 +4,8 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
 private val logger = KotlinLogging.logger {}
 
@@ -21,6 +23,7 @@ class OurWhyPage(page: Page) : WebSiteBasePage(page) {
     )
 
     fun waitForPageLoad(): OurWhyPage {
+        StepHelper.step(WAIT_WEBSITE_PAGE_LOAD + "Our Why")
         header.waitFor()
         logger.info { "Our Why page loaded" }
         return this

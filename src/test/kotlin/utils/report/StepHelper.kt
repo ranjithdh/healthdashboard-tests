@@ -88,4 +88,76 @@ object StepHelper {
     // PaymentPage
     const val COMPLETE_PAYMENT = "Complete Payment"
     const val MANUAL_NAVIGATE_HOME = "Manually Navigate to Home"
+
+    // ProfilePage - Questionnaire
+    const val ANSWER_QUESTION = "Answer question: "
+
+    // ProfilePage - Address
+    const val FETCH_ADDRESS_DATA = "Fetch address data"
+    const val CLICK_ADDRESS_DROPDOWN = "Click address dropdown"
+    const val CLICK_ADD_NEW_ADDRESS = "Click Add New Address"
+    const val FILL_ADDRESS_FORM_MANDATORY = "Fill mandatory address fields"
+    const val REMOVE_USER_ADDRESS = "Remove user address"
+    const val EDIT_USER_ADDRESS = "Edit user address"
+    const val SUBMIT_ADDRESS = "Submit address"
+    const val YES_DELETE = "Yes delete"
+    const val CLICK_ACCOUNT_PROFILE = "Click Account Profile"
+
+    // ProfilePage - Preference
+    const val FETCH_PREFERENCE = "Fetch communication preference"
+    const val SELECT_COMMUNICATION_OPTION = "Select communication option"
+
+    // ProfilePage - Account Info
+    const val FETCH_ACCOUNT_INFORMATION = "Fetch account information"
+    const val ACCOUNT_INFO_VALIDATION = "Account information validation"
+    const val EDIT_PROFILE = "Edit profile"
+    const val SAVE_CHANGES = "Save changes"
+
+    // mobileView - HomePage
+    const val WAIT_MOBILE_HOME_CONFIRMATION = "Wait for Mobile Home Page confirmation"
+    const val CLICK_PROFILE_ICON = "Click Profile icon"
+
+    // mobileView - LabTestsPage
+    const val NAVIGATE_TO_DIAGNOSTICS = "Navigate to Diagnostics"
+    const val VIEW_TEST_DETAILS = "View test details: "
+    const val CLICK_FILTER = "Click filter: "
+
+    // mobileView - OrdersPage
+    const val CLICK_ORDERS_TAB = "Click Orders tab"
+    const val CLICK_ORDER_STATUS = "Click Order Status"
+
+    // mobileView - ServicePage
+    const val NAVIGATE_TO_SERVICES = "Navigate to Services"
+    const val FETCH_SERVICE_DATA = "Fetch service data"
+    const val VERIFY_SERVICE_CARD = "Verify service card: "
+    const val CLICK_SCHEDULE_NOW = "Click Schedule Now"
+
+    // webView - LabTestsPage
+    const val WAIT_LAB_TESTS_PAGE_LOAD = "Wait for Lab Tests page load"
+    const val SEARCH_LAB_TESTS = "Search in lab tests: "
+    const val CLICK_TEST_PANEL_ELEMENT = "Click test panel element: "
+
+    // webView - SymptomsPage
+    const val WAIT_SYMPTOMS_PAGE_LOAD = "Wait for Symptoms page load"
+    const val OPEN_REPORT_SYMPTOMS_DIALOG = "Open Report Symptoms dialog"
+    const val EXPAND_SYMPTOMS_SECTION = "Expand symptoms section: "
+    const val SELECT_SYMPTOM = "Select symptom: "
+    const val SUBMIT_SYMPTOMS = "Submit symptoms"
+    const val RESET_SYMPTOMS = "Reset all symptoms"
+
+    // website - General & LandingPage
+    const val WAIT_WEBSITE_PAGE_LOAD = "Wait for website page load: "
+    const val CLICK_HERO_BOOK_NOW = "Click Hero Book Now"
+    const val CLICK_LEARN_MORE = "Click Learn More"
+    const val CLICK_WHAT_WE_TEST = "Click What We Test"
+
+    // website - HeaderSection
+    const val NAVIGATE_TO_PAGE = "Navigate to page: "
+
+    // website - WhatWeTestPage
+    const val CLICK_BIOMARKER = "Click biomarker: "
+
+    // website - FaqSection
+    const val CLICK_FAQ_TAB = "Click FAQ tab: "
+    const val VIEW_FAQ_QUESTION = "View FAQ question: "
 }

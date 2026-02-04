@@ -14,6 +14,11 @@ import model.ServiceProduct
 import mu.KotlinLogging
 import java.text.NumberFormat
 import java.util.Locale
+import utils.report.StepHelper
+import utils.report.StepHelper.FETCH_SERVICE_DATA
+import utils.report.StepHelper.NAVIGATE_TO_SERVICES
+import utils.report.StepHelper.VERIFY_SERVICE_CARD
+import utils.report.StepHelper.CLICK_SCHEDULE_NOW
 
 private val logger = KotlinLogging.logger {}
 
@@ -33,6 +38,7 @@ class ServicePage(page: Page) : BasePage(page) {
 
 
     fun navigateToServices() {
+        StepHelper.step(NAVIGATE_TO_SERVICES)
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue()
@@ -61,6 +67,7 @@ class ServicePage(page: Page) : BasePage(page) {
      * Should be called when the page is loading or about to load the services
      */
     fun fetchServiceDataFromApi(): ServiceResponse? {
+        StepHelper.step(FETCH_SERVICE_DATA)
         if (serviceData != null) {
             logger.info { "Using cached service data" }
             return serviceData
@@ -128,6 +135,7 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     private fun verifyServiceCard(product: ServiceProduct) {
+        StepHelper.step(VERIFY_SERVICE_CARD + product.name)
         logger.info { "Verifying product card for: ${product.name}" }
 
         // Image Verification - Check Visibility
@@ -255,6 +263,7 @@ class ServicePage(page: Page) : BasePage(page) {
 
             // Schedule Now Button Logic
             // Handle potentially opening in new tab or same tab
+            StepHelper.step(CLICK_SCHEDULE_NOW)
             val currentUrl = page.url()
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
             

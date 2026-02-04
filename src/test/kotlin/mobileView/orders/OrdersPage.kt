@@ -12,6 +12,9 @@ import mobileView.LabTestDateHelper.getSampleCollectionDate
 import model.orders.Orders
 import utils.json.json
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_ORDERS_TAB
+import utils.report.StepHelper.CLICK_ORDER_STATUS
 
 
 class OrdersPage(page: Page) : BasePage(page) {
@@ -33,6 +36,7 @@ class OrdersPage(page: Page) : BasePage(page) {
 
 
     fun clickOrdersTab(): OrdersPage {
+        StepHelper.step(CLICK_ORDERS_TAB)
         page.waitForResponse(
             { response: Response? ->
                 response?.url()
@@ -87,6 +91,7 @@ class OrdersPage(page: Page) : BasePage(page) {
     }
 
     fun clickOrderStatus() {
+        StepHelper.step(CLICK_ORDER_STATUS)
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("ORDER STATUS")).click()
     }
 

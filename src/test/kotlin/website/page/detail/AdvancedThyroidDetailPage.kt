@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import utils.logger.logger
+import utils.report.StepHelper
 import website.page.WebSiteBasePage
 
 
@@ -16,6 +17,7 @@ class AdvancedThyroidDetailPage(page: Page) : WebSiteBasePage(page) {
     val certifiedLabsSection = CertifiedLabsSection(page)
 
     fun waitForPageLoad(): AdvancedThyroidDetailPage {
+        StepHelper.step(StepHelper.WAIT_WEBSITE_PAGE_LOAD + "Advanced Thyroid Panel")
         header.waitFor()
         logger.info { "Advanced Thyroid Panel loaded" }
         return this

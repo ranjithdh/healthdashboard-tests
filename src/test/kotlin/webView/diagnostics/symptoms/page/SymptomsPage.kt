@@ -10,6 +10,13 @@ import config.TestConfig
 import model.profile.PiiUserResponse
 import utils.json.json
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.EXPAND_SYMPTOMS_SECTION
+import utils.report.StepHelper.OPEN_REPORT_SYMPTOMS_DIALOG
+import utils.report.StepHelper.RESET_SYMPTOMS
+import utils.report.StepHelper.SELECT_SYMPTOM
+import utils.report.StepHelper.SUBMIT_SYMPTOMS
+import utils.report.StepHelper.WAIT_SYMPTOMS_PAGE_LOAD
 import webView.diagnostics.symptoms.model.PersonalizedGeneratedDescription
 import webView.diagnostics.symptoms.model.Symptom
 import webView.diagnostics.symptoms.model.SymptomsData
@@ -282,6 +289,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     fun waitForSymptomsPageConfirmation(): SymptomsPage {
+        StepHelper.step(WAIT_SYMPTOMS_PAGE_LOAD)
         logger.info("Waiting for mobileView.home page confirmation...")
         page.waitForURL(TestConfig.Urls.SYMPTOMS_PAGE_URL)
 
@@ -308,6 +316,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun onReportSymptomsButtonClick() {
+        StepHelper.step(OPEN_REPORT_SYMPTOMS_DIALOG)
         val reportButton = page.getByTestId("create-symptoms-button")
         reportButton.click()
     }
@@ -324,6 +333,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun expandSection(section: String) {
+        StepHelper.step(EXPAND_SYMPTOMS_SECTION + section)
         val heading = page.getByRole(AriaRole.HEADING)
             .filter(
                 Locator.FilterOptions().setHasText(section)
@@ -334,6 +344,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun selectSymptom(symptomName: String) {
+        StepHelper.step(SELECT_SYMPTOM + symptomName)
         page.getByRole(
             AriaRole.BUTTON, Page.GetByRoleOptions().setName(symptomName)
         ).waitFor()
@@ -377,10 +388,12 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun submitSymptoms() {
+        StepHelper.step(SUBMIT_SYMPTOMS)
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms")).click()
     }
 
     fun resetAllSymptoms() {
+        StepHelper.step(RESET_SYMPTOMS)
         val resetAllSymptoms = page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Reset All Symptoms")

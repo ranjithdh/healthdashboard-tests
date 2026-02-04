@@ -6,6 +6,10 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import login.page.LoginPage
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_FILTER
+import utils.report.StepHelper.NAVIGATE_TO_DIAGNOSTICS
+import utils.report.StepHelper.VIEW_TEST_DETAILS
 
 class LabTestsPage(page: Page) : BasePage(page) {
 
@@ -24,6 +28,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun navigateToDiagnostics() {
+        StepHelper.step(NAVIGATE_TO_DIAGNOSTICS)
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue(testUser)
@@ -39,11 +44,13 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun clickViewDetails(): TestDetailPage {
+        StepHelper.step(VIEW_TEST_DETAILS + "first test card")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).first().click()
         return TestDetailPage(page)
     }
 
     fun clickViewDetails(code: String): TestDetailPage {
+        StepHelper.step(VIEW_TEST_DETAILS + code)
         val button = page.getByTestId("test-card-view-details-$code")
         button.scrollIntoViewIfNeeded()
         button.click()
@@ -128,6 +135,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
         page.getByText("Your health data is always").click()
     }
     fun clickFilter(name: String) {
+        StepHelper.step(CLICK_FILTER + name)
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName(name)).click()
     }
 

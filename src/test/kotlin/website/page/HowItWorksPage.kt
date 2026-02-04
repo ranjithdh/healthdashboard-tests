@@ -3,6 +3,8 @@ package website.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
+import utils.report.StepHelper
+import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
 
 class HowItWorksPage(page: Page) : WebSiteBasePage(page) {
@@ -30,6 +32,7 @@ class HowItWorksPage(page: Page) : WebSiteBasePage(page) {
     private val header = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("F r o m T e s t t o C l a r i t y ."))
 
     fun waitForPageLoad(): HowItWorksPage {
+        StepHelper.step(WAIT_WEBSITE_PAGE_LOAD + "How It Works")
         header.waitFor()
         return this
     }

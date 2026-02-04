@@ -13,6 +13,11 @@ import model.LabTestProfile
 import model.LabTestItem
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_FILTER
+import utils.report.StepHelper.CLICK_TEST_PANEL_ELEMENT
+import utils.report.StepHelper.SEARCH_LAB_TESTS
+import utils.report.StepHelper.WAIT_LAB_TESTS_PAGE_LOAD
 
 private val logger = KotlinLogging.logger {}
 
@@ -38,12 +43,14 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Wait for page to load and verify key elements
      */
     fun waitForPageLoad(): LabTestsPage {
+        StepHelper.step(WAIT_LAB_TESTS_PAGE_LOAD)
         byText("Book Lab Tests").waitFor()
         logger.info { "Lab Tests page loaded" }
         return this
     }
 
     fun waitForConfirmation() {
+        StepHelper.step(WAIT_LAB_TESTS_PAGE_LOAD)
         // Just wait for URL - API response is already captured by OtpPage.onResponse listener
         // No need to wait for response again if data is already cached
         if (labTestData == null) {
@@ -193,6 +200,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Enter search query
      */
     fun enterSearchQuery(query: String): LabTestsPage {
+        StepHelper.step(SEARCH_LAB_TESTS + query)
         logger.info { "Entering search query: $query" }
         val searchInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in lab tests"))
         searchInput.fill(query)
@@ -221,6 +229,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click filter switch (All, Blood, Gene, Gut, Recommended for You)
      */
     fun clickFilterSwitch(filterName: String): LabTestsPage {
+        StepHelper.step(CLICK_FILTER + filterName)
         logger.info { "Clicking filter switch: $filterName" }
         byRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName(filterName)).click()
         return this
@@ -240,6 +249,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun clickFilter(filterName: String): LabTestsPage {
+        StepHelper.step(CLICK_FILTER + filterName)
         val filter = page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName(filterName)
@@ -254,6 +264,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on first image (Longevity Panel featured card)
      */
     fun clickLongevityPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Longevity Panel image")
         logger.info { "Clicking Longevity Panel image" }
         page.locator("img").first().click()
         return this
@@ -263,6 +274,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "102 BIOMARKERS" text
      */
     fun click102Biomarkers(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "102 BIOMARKERS")
         logger.info { "Clicking '102 BIOMARKERS' text" }
         byText("102 BIOMARKERS").click()
         return this
@@ -290,6 +302,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click Book Now button for Longevity Panel using test ID
      */
     fun clickLongevityBookNow(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Longevity Panel Book Now")
         logger.info { "Clicking Longevity Panel Book Now button" }
         byTestId("longevity-card-book-now").click()
         return this
@@ -308,6 +321,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Longevity Panel" heading
      */
     fun clickLongevityPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Longevity Panel heading")
         logger.info { "Clicking 'Longevity Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Longevity Panel")).click()
         return this
@@ -335,6 +349,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click View Details button for Longevity Panel (first)
      */
     fun clickLongevityPanelViewDetails(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Longevity Panel View Details")
         logger.info { "Clicking View Details for Longevity Panel" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).first().click()
         return this
@@ -364,6 +379,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Advanced Thyroid Panel image
      */
     fun clickAdvancedThyroidPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Thyroid Panel image")
         logger.info { "Clicking Advanced Thyroid Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Advanced Thyroid Panel")).click()
         return this
@@ -382,6 +398,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Advanced Thyroid Panel" heading
      */
     fun clickAdvancedThyroidPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Thyroid Panel heading")
         logger.info { "Clicking 'Advanced Thyroid Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Advanced Thyroid Panel")).click()
         return this
@@ -429,6 +446,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Autoimmune Panel image
      */
     fun clickAutoimmunePanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Autoimmune Panel image")
         logger.info { "Clicking Autoimmune Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Autoimmune Panel")).click()
         return this
@@ -438,6 +456,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Autoimmune Panel" heading
      */
     fun clickAutoimmunePanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Autoimmune Panel heading")
         logger.info { "Clicking 'Autoimmune Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Autoimmune Panel")).click()
         return this
@@ -467,6 +486,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Advanced Genetic Analysis image
      */
     fun clickAdvancedGeneticAnalysisImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Genetic Analysis image")
         logger.info { "Clicking Advanced Genetic Analysis image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Advanced Genetic Analysis")).click()
         return this
@@ -476,6 +496,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Advanced Genetic Analysis" heading
      */
     fun clickAdvancedGeneticAnalysisHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Genetic Analysis heading")
         logger.info { "Clicking 'Advanced Genetic Analysis' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Advanced Genetic Analysis")).click()
         return this
@@ -514,6 +535,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Advanced Gut Microbiome image
      */
     fun clickAdvancedGutMicrobiomeImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Gut Microbiome image")
         logger.info { "Clicking Advanced Gut Microbiome image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Advanced Gut Microbiome")).click()
         return this
@@ -523,6 +545,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Advanced Gut Microbiome" heading
      */
     fun clickAdvancedGutMicrobiomeHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Gut Microbiome heading")
         logger.info { "Clicking 'Advanced Gut Microbiome' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Advanced Gut Microbiome")).click()
         return this
@@ -561,6 +584,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Advanced Heart Health Panel image
      */
     fun clickAdvancedHeartHealthPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Heart Health Panel image")
         logger.info { "Clicking Advanced Heart Health Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Advanced Heart Health Panel")).click()
         return this
@@ -570,6 +594,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Advanced Heart Health Panel" heading
      */
     fun clickAdvancedHeartHealthPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Advanced Heart Health Panel heading")
         logger.info { "Clicking 'Advanced Heart Health Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Advanced Heart Health Panel")).click()
         return this
@@ -590,6 +615,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Essential Nutrients Panel image
      */
     fun clickEssentialNutrientsPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Essential Nutrients Panel image")
         logger.info { "Clicking Essential Nutrients Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Essential Nutrients Panel")).click()
         return this
@@ -599,6 +625,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Essential Nutrients Panel" heading
      */
     fun clickEssentialNutrientsPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Essential Nutrients Panel heading")
         logger.info { "Clicking 'Essential Nutrients Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Essential Nutrients Panel")).click()
         return this
@@ -646,6 +673,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Thyroid Health Panel image
      */
     fun clickThyroidHealthPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Thyroid Health Panel image")
         logger.info { "Clicking Thyroid Health Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Thyroid Health Panel")).click()
         return this
@@ -655,6 +683,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Thyroid Health Panel" heading
      */
     fun clickThyroidHealthPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Thyroid Health Panel heading")
         logger.info { "Clicking 'Thyroid Health Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Thyroid Health Panel")).click()
         return this
@@ -684,6 +713,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Omega Profile Panel image
      */
     fun clickOmegaProfilePanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Omega Profile Panel image")
         logger.info { "Clicking Omega Profile Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Omega Profile Panel")).click()
         return this
@@ -693,6 +723,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Omega Profile Panel" heading
      */
     fun clickOmegaProfilePanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Omega Profile Panel heading")
         logger.info { "Clicking 'Omega Profile Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Omega Profile Panel")).click()
         return this
@@ -731,6 +762,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Stress and Cortisol Rhythm image
      */
     fun clickStressAndCortisolRhythmImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Stress and Cortisol Rhythm image")
         logger.info { "Clicking Stress and Cortisol Rhythm image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Stress and Cortisol Rhythm")).click()
         return this
@@ -740,6 +772,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Stress and Cortisol Rhythm" heading
      */
     fun clickStressAndCortisolRhythmHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Stress and Cortisol Rhythm heading")
         logger.info { "Clicking 'Stress and Cortisol Rhythm' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress and Cortisol Rhythm")).click()
         return this
@@ -778,6 +811,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on Liver Health Panel image
      */
     fun clickLiverHealthPanelImage(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Liver Health Panel image")
         logger.info { "Clicking Liver Health Panel image" }
         byRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Liver Health Panel")).click()
         return this
@@ -787,6 +821,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Liver Health Panel" heading
      */
     fun clickLiverHealthPanelHeading(): LabTestsPage {
+        StepHelper.step(CLICK_TEST_PANEL_ELEMENT + "Liver Health Panel heading")
         logger.info { "Clicking 'Liver Health Panel' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Liver Health Panel")).click()
         return this

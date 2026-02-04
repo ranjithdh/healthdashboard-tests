@@ -18,6 +18,10 @@ import profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
+import utils.report.StepHelper.CLICK_PROFILE_ICON
+import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -38,6 +42,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun waitForMobileHomePageConfirmation(): HomePage {
+        StepHelper.step(WAIT_MOBILE_HOME_CONFIRMATION)
         logger.info("Waiting for mobileView.home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
         return this
@@ -156,6 +161,7 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun clickProfile(): OrdersPage {
+        StepHelper.step(CLICK_PROFILE_ICON)
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         val orderPage = OrdersPage(page)
         return orderPage
@@ -163,6 +169,7 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun clickAccountProfile(): ProfilePage {
+        StepHelper.step(CLICK_ACCOUNT_PROFILE)
         val profilePage = ProfilePage(page)
         profilePage.captureAddressData {
             profileImage.click()
