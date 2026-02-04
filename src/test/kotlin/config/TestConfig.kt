@@ -142,7 +142,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "9159439327",
+            mobileNumber = "8870208411",
             otp = "678901",
             country = "India"
         )
