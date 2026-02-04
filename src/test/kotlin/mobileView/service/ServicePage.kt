@@ -188,7 +188,7 @@ class ServicePage(page: Page) : BasePage(page) {
             verifyServiceDetailPage(product)
 
             // Go Back to Services Page
-            logger.info { "Navigating back to Services page" }
+//            logger.info { "Navigating back to Services page" }
 //            page.goBack()
 
             // Ensure we are back on the Services page before continuing
@@ -275,7 +275,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 page.waitForURL({ url -> url != currentUrl }, Page.WaitForURLOptions().setTimeout(3000.0))
                 // If we reached here, URL changed in the same tab
                 logger.info { "Schedule Now navigated to new URL. Going back." }
-                page.goBack()
+//                page.goBack()
             } catch (e: Exception) {
                 // Timeout means URL didn't change (likely opened in new tab)
                 logger.info { "Schedule Now did not change URL (likely new tab). Verifying if new page exists." }
@@ -540,7 +540,7 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     fun verifySymptomReportFeedbackDialog() {
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+//        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
         logger.info { "Verifying Symptom Report Feedback/Acknowledge Dialog" }
         page.getByRole(AriaRole.DIALOG)
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))

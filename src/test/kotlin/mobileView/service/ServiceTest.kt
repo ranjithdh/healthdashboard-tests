@@ -96,7 +96,7 @@ class ServiceTest : BaseTest() {
             servicePage.dialogValidation()
             servicePage.reportOptionsValidations()
             servicePage.cancelButtonClick()
-
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
             servicePage.onReportSymptomsButtonClick()
             servicePage.selectAllSymptoms()
             servicePage.submitSymptoms()
