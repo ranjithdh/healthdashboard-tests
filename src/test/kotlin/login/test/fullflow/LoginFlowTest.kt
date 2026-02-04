@@ -58,6 +58,7 @@ class LoginFlowTest : BaseTest() {
     @Test
     fun `login flow`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
+
         loginPage
             .enterMobileAndContinue()
             .enterOtpAndContinueToMobileHomePage()
