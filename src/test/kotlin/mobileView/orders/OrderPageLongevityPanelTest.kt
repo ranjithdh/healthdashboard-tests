@@ -1,18 +1,19 @@
 package mobileView.orders
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
-import kotlin.test.assertTrue
+import utils.SignupDataStore
+import utils.logger.logger
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OrderPageLongevityPanelTest {
+class OrderPageLongevityPanelTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {
@@ -31,8 +32,8 @@ class OrderPageLongevityPanelTest {
         val tesUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         val oderPage = loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+            .enterMobileAndContinue(tesUser)
+            .enterOtpAndContinueToMobileHomePage(tesUser)
             .clickProfile()
             .waitForProfilePageToLoad()
             .clickOrdersTab()
@@ -63,11 +64,13 @@ class OrderPageLongevityPanelTest {
         val tesUser = TestConfig.TestUsers.NEW_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         val ordersPage = loginPage
-            .enterMobileAndContinue(tesUser.mobileNumber)
-            .enterOtpAndContinueToMobileHomePage(tesUser.otp)
+            .enterMobileAndContinue(tesUser)
+            .enterOtpAndContinueToMobileHomePage(tesUser)
             .clickProfile()
             .waitForProfilePageToLoad()
             .clickOrdersTab()
+
+        logger.info { "ordersPage...${SignupDataStore.get().selectedAddOns}" }
 
 
         if (ordersPage.waitForLongevityPanelToLOad()) {
@@ -84,6 +87,7 @@ class OrderPageLongevityPanelTest {
 
         ordersPage.waitForLongevityPanelToLOad()
         ordersPage.clickOrderStatus()
+
 
         if (ordersPage.isBloodTestCardVisible()) {
             if (ordersPage.isTBloodTestCancelled()) {

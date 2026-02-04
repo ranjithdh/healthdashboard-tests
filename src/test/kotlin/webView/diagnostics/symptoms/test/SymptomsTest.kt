@@ -1,0 +1,121 @@
+package webView.diagnostics.symptoms.test
+
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
+import config.BaseTest
+import config.TestConfig
+import onboard.page.LoginPage
+import org.junit.jupiter.api.*
+import kotlin.test.Test
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+class SymptomsTest : BaseTest() {
+    private lateinit var playwright: Playwright
+    private lateinit var browser: Browser
+    private lateinit var context: BrowserContext
+
+    @BeforeAll
+    fun setup() {
+        playwright = Playwright.create()
+        browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
+    }
+
+    @AfterAll
+    fun teardown() {
+        browser.close()
+        playwright.close()
+    }
+
+    @BeforeEach
+    fun createContext() {
+        /*  val viewport = TestConfig.Viewports.ANDROID
+          val contextOptions =
+              Browser.NewContextOptions().setViewportSize(viewport.width, viewport.height).setHasTouch(viewport.hasTouch)
+                  .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
+
+          context = browser.newContext(contextOptions)
+          page = context.newPage()*/
+
+        val contextOptions = Browser.NewContextOptions()
+            .setViewportSize(1366, 768)   // Desktop resolution
+            .setIsMobile(false)
+            .setHasTouch(false)
+
+        context = browser.newContext(contextOptions)
+        page = context.newPage()
+    }
+
+    @AfterEach
+    fun closeContext() {
+        context.close()
+    }
+
+
+    @Test
+    @Order(1)
+    fun `report symptoms with validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
+        symptomsMain.dialogValidation()
+        symptomsMain.reportOptionsValidations()
+        symptomsMain.cancelButtonClick()
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
+        symptomsMain.selectAllSymptoms()
+        symptomsMain.submitSymptoms()
+
+        // 🔥 NEW: wait for all APIs + then validate
+        symptomsMain.waitForApiAndValidate()
+    }
+
+
+    @Test
+    @Order(2)
+    fun `remove symptoms`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+        symptomsMain.headerValidation()
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.cancelConfirmationDialog()
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.continueConfirmationDialog()
+        symptomsMain.emptySymptoms()
+    }
+
+
+/*    @Test
+    fun `reported symptoms with validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsValidation()
+
+    }*/
+
+
+}

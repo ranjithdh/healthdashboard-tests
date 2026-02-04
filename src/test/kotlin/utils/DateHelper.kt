@@ -14,10 +14,16 @@ object DateHelper {
             val serverFormatter = DateTimeFormatter.ofPattern(SERVER_FORMAT)
             val utcDate = LocalDateTime.parse(utcTime, serverFormatter)
             val utcTimeStamp = ZonedDateTime.of(utcDate, ZoneId.of("UTC"))
-            return utcTimeStamp.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+            utcTimeStamp.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
         } else {
             LocalDateTime.now()
         }
+    }
+
+    fun localDateTimeToUtc(localDateTime: LocalDateTime?): String {
+        val formatter = DateTimeFormatter.ofPattern(SERVER_FORMAT)
+        val zonedLocal = (localDateTime ?: LocalDateTime.now()).atZone(ZoneId.systemDefault())
+        return zonedLocal.withZoneSameInstant(ZoneId.of("UTC")).format(formatter)
     }
 
     fun getTomorrowDate(): String {
