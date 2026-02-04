@@ -343,18 +343,6 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
 
         logger.info { "Automation API Payload: $payload" }
 
-        // Wait for ACCESS_TOKEN to be populated (up to 10 seconds)
-        var tokenRetries = 0
-        while (TestConfig.ACCESS_TOKEN.isEmpty() && tokenRetries < 20) {
-            logger.info { "Waiting for ACCESS_TOKEN... (attempt ${tokenRetries + 1})" }
-            page.waitForTimeout(500.0)
-            tokenRetries++
-        }
-
-        if (TestConfig.ACCESS_TOKEN.isEmpty()) {
-            logger.error { "ACCESS_TOKEN is still empty after waiting. Automation API will likely fail." }
-        }
-
         val response = page.context().request().post(
             "https://api.stg.dh.deepholistics.com/v4/human-token/automate-order-workflow-v2",
             RequestOptions.create()
