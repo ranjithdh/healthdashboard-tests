@@ -2,14 +2,21 @@ package mobileView.diagnostics
 
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import model.LabTestResponse
+import mu.KotlinLogging
 import onboard.page.LoginPage
+import utils.json.json
+
+private val logger = KotlinLogging.logger {}
 
 class LabTestsPage(page: Page) : BasePage(page) {
 
     override val pageUrl = ""
+     var labTestData: LabTestResponse? = null
 
 
 
@@ -33,14 +40,51 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun goToDiagnosticsUrl() {
-        //  page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-        page.waitForTimeout(2000.0)
-        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+//        page.waitForTimeout(2000.0)
+//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
         login()
         goToDiagnosticsUrl()
+    }
+
+
+    init {
+        getLabTestsResponse()
+    }
+
+    fun getLabTestsResponse() {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()
+                    ?.contains(TestConfig.Urls.LAB_TEST_API_URL) == true && response.status() == 200
+            },
+            {
+                navigateToDiagnostics()
+            }
+        )
+
+        val responseBody = response.text()
+        if (responseBody.isNullOrBlank()) {
+            logger.info { "getLabTestsResponse API response body is empty" }
+//            return null
+        }
+
+        try {
+            val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
+
+            if (responseObj.data != null) {
+                labTestData = responseObj
+//                return labTestData
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response..${e.message}" }
+//            return null
+        }
+
+//        return null
     }
 
     fun clickViewDetails(): TestDetailPage {
