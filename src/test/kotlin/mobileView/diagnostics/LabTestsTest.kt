@@ -495,26 +495,26 @@ class LabTestsTest : BaseTest() {
         println("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
 
-//        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
+        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
         val testSchedulingPage = TestSchedulingPage(page)
         println("Capturing address list and verifying scheduling page...")
-//        testSchedulingPage.captureAddressData {
-//            testDetailPage.clickBookNow(targetCode)
-//        }
 
-//        testSchedulingPage.verifySampleCollectionAddressHeading()
+        testSchedulingPage.captureAddressData {
+            testDetailPage.clickBookNow(targetCode)
+        }
 
-//        println("Verifying addresses from API...")
-//        testSchedulingPage.assertAddressesFromApi()
+        testSchedulingPage.verifySampleCollectionAddressHeading()
+        println("Testing 'Add New Address' functionality...")
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.assertAddressFormFieldsVisible()
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.addAddressAndValidate()
 
-//        println("Testing 'Add New Address' functionality...")
-//        testSchedulingPage.clickAddNewAddress()
-//        testSchedulingPage.addAddressAndValidate()
+        println("Testing 'Edit Address' functionality...")
+        // Edit the first address
+        testSchedulingPage.editUserAddress()
 
-//        println("Testing 'Edit Address' functionality...")
-        // Edit the first address (at index 0)
-//        testSchedulingPage.editUserAddress(0)
 
         // Extract price for the targetCode from listResponse
         val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
