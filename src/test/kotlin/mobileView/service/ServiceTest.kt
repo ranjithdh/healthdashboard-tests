@@ -80,15 +80,30 @@ class ServiceTest : BaseTest() {
         
         val responseBody = response.text()
         if (responseBody.isNotEmpty()) {
-            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true; explicitNulls = false }
+            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true;  }
             val serviceResponse = json.decodeFromString<model.ServiceResponse>(responseBody)
             servicePage.setServiceData(serviceResponse)
         }
         
         // Verify specific consultant flow (e.g. Nutritionist Consultation)
-        val targetProductId =  "898c67b7-bf72-4a37-8f3d-6a3dbc981edb"//"72055641-39fc-423b-9a57-b07cda66727f" //"898c67b7-bf72-4a37-8f3d-6a3dbc981edb"
+        val targetProductId =  "72055641-39fc-423b-9a57-b07cda66727f"//"72055641-39fc-423b-9a57-b07cda66727f" //"898c67b7-bf72-4a37-8f3d-6a3dbc981edb"
         servicePage.verifyServices(targetProductId)
-        
+
+        val status = product.item_purchase_status
+        if (!status.equals("paid", ignoreCase = true)) {
+            servicePage.verifySymptomReportFeedbackDialog()
+
+            servicePage.dialogValidation()
+            servicePage.reportOptionsValidations()
+            servicePage.cancelButtonClick()
+
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+
+            servicePage.onReportSymptomsButtonClick()
+            servicePage.selectAllSymptoms()
+            servicePage.submitSymptoms()
+        }
+        // Final verification for the feedback/acknowledgement dialog
         println("Test completed successfully.")
     }
 }
