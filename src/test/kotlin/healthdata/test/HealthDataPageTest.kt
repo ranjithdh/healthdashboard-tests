@@ -2,6 +2,7 @@ package healthdata.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
@@ -10,9 +11,7 @@ import config.BaseTest
 import config.TestConfig
 import healthdata.page.HealthDataPage
 import onboard.page.LoginPage
-import onboard.page.OtpPage
 import model.healthdata.Biomarker
-import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import utils.BiomarkerCsvParser

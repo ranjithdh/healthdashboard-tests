@@ -1,8 +1,6 @@
 package onboard.test.page
 
 import com.microsoft.playwright.*
-import onboard.page.LoginPage
-import onboard.page.OrderSummaryPage
 import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
