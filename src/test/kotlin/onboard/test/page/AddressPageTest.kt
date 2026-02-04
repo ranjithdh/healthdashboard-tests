@@ -1,6 +1,9 @@
 package onboard.test.page
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
@@ -8,12 +11,12 @@ import org.junit.jupiter.api.*
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AddressPageTest {
+@Epic(Modules.EPIC_ONBOARDING)
+class AddressPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
     private lateinit var addressPage: onboard.page.AddressPage
 
     @BeforeAll

@@ -11,7 +11,19 @@ import model.slot.SlotList
 import utils.OnboardAddOnTestDataStore
 import utils.json.json
 import utils.logger.logger
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_SCHEDULE_BUTTON
+import utils.report.StepHelper.CLICK_SLOT
+import utils.report.StepHelper.CLOSE_INVALID_FASTING_SLOT_POPUP
+import utils.report.StepHelper.OPEN_DATE_PICKER
+import utils.report.StepHelper.SELECT_CALENDAR_DATE
+import utils.report.StepHelper.SELECT_DATE
+import utils.report.StepHelper.SELECT_DATE_FILTER
+import utils.report.StepHelper.SELECT_DATE_VIEW
+import utils.report.StepHelper.SELECT_MORNING_SLOT
+import utils.report.StepHelper.SELECT_POST_MEAL_SLOT
+import utils.report.StepHelper.SELECT_SLOT
+import utils.report.StepHelper.SELECT_SLOTS_CONTINUE
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -59,16 +71,16 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Select Date: {day}")
     fun selectDate(day: String): TimeSlotPage {
+        StepHelper.step(SELECT_DATE + day)
         logger.info { "selectDate($day)" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Select Date")).click()
         byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day)).click()
         return this
     }
 
-    @Step("Select Slot: {slotName} at index {index}")
     fun selectSlot(slotName: String, index: Int = 0): TimeSlotPage {
+        StepHelper.step(SELECT_SLOT + slotName + " at index " + index)
         logger.info { "selectSlot($slotName, index: $index)" }
         val slot = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(slotName))
         if (index == 0) {
@@ -79,8 +91,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Select Morning Slot")
     fun selectMorningSlot(): TimeSlotPage {
+        StepHelper.step(SELECT_MORNING_SLOT)
         val availableSlots = getAvailableFastingSlots()
         if (availableSlots.isNotEmpty()) {
             val slotName = availableSlots[0]
@@ -94,8 +106,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         }
     }
 
-    @Step("Select Post Meal Slot")
     fun selectPostMealSlot(): TimeSlotPage {
+        StepHelper.step(SELECT_POST_MEAL_SLOT)
         val availableSlots = getAvailableFastingSlots()
         if (availableSlots.isNotEmpty()) {
             val firstFastingSlot = availableSlots[0]
@@ -115,8 +127,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Click Schedule Button")
     fun clickSchedule() {
+        StepHelper.step(CLICK_SCHEDULE_BUTTON)
         val response = page.waitForResponse(
             { response: Response? ->
                 response?.url()?.contains(
@@ -149,8 +161,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Select Slots and Continue")
     fun selectSlotsAndContinue(): OrderSummaryPage {
+        StepHelper.step(SELECT_SLOTS_CONTINUE)
         val currentDate = LocalDateTime.now().plusDays(1)
 
         val dayFormatted = currentDate.format(
@@ -215,8 +227,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return availableSlots.isNotEmpty() && isTimeSlotVisible(availableSlots[0])
     }
 
-    @Step("Click Slot: {slotName}")
     fun clickSlot(slotName: String): TimeSlotPage {
+        StepHelper.step(CLICK_SLOT + slotName)
         logger.info { "clickSlot($slotName)" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(slotName)).click()
         return this
@@ -226,15 +238,15 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return byText("Invalid Fasting Slot").isVisible
     }
 
-    @Step("Close Invalid Fasting Slot Popup")
     fun closeInvalidFastingSlotPopup(): TimeSlotPage {
+        StepHelper.step(CLOSE_INVALID_FASTING_SLOT_POPUP)
         logger.info { "closeInvalidFastingSlotPopup()" }
         byText("Invalid Fasting Slot").click()
         return this
     }
 
-    @Step("Select Date by Filter: {dateText}")
     fun selectDateByFilter(dateText: String): TimeSlotPage {
+        StepHelper.step(SELECT_DATE_FILTER + dateText)
         logger.info { "selectDateByFilter($dateText)" }
         byRole(AriaRole.BUTTON).filter(FilterOptions().setHasText("Select Date")).click()
         byText(dateText).click()
@@ -322,15 +334,15 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return generatedSlots
     }
 
-    @Step("Open Date Picker")
     fun openDatePicker(): TimeSlotPage {
+        StepHelper.step(OPEN_DATE_PICKER)
         logger.info { "openDatePicker()" }
         byRole(AriaRole.BUTTON).filter(FilterOptions().setHasText("Select Date")).click()
         return this
     }
 
-    @Step("Select Calendar Date: {day}")
     fun selectCalendarDate(day: String): TimeSlotPage {
+        StepHelper.step(SELECT_CALENDAR_DATE + day)
         logger.info { "selectCalendarDate($day)" }
         byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day)).first().click()
         return this
@@ -344,8 +356,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return byText(dateText).isVisible
     }
 
-    @Step("Select Date View: {day}")
     fun selectDateView(day: String): TimeSlotPage {
+        StepHelper.step(SELECT_DATE_VIEW + day)
         logger.info { "selectDateView($day)" }
         page.getByText(day, Page.GetByTextOptions().setExact(true)).first().click()
         return this

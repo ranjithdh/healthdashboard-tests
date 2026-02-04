@@ -2,6 +2,9 @@ package website.page
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_FAQ_TAB
+import utils.report.StepHelper.VIEW_FAQ_QUESTION
 
 /**
  * Reusable FAQ section component that can be used across multiple pages.
@@ -49,43 +52,50 @@ class FaqSection(private val page: Page,private val isFaqPage: Boolean = false) 
 
 
     fun clickGeneralTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "General")
         generalTab.scrollIntoViewIfNeeded()
         generalTab.click()
     }
 
     fun clickAppointmentAndProcessTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Appointment & Process")
         appointmentAndProcessTab.scrollIntoViewIfNeeded()
         appointmentAndProcessTab.click()
     }
 
     fun clickTestCoverageTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Test Coverage")
         testCoverageTab.scrollIntoViewIfNeeded()
         testCoverageTab.click()
     }
 
     fun clickPrivacyAndDataSecurityTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Privacy & Data Security")
         privacyAndDataSecurityTab.scrollIntoViewIfNeeded()
         privacyAndDataSecurityTab.click()
     }
 
     fun clickConsultTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Consult")
         consultTab.scrollIntoViewIfNeeded()
         consultTab.click()
     }
 
     fun clickActionPlanTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Action Plan")
         actionPlanTab.scrollIntoViewIfNeeded()
         actionPlanTab.click()
     }
 
     fun clickPointsTab() {
+        StepHelper.step(CLICK_FAQ_TAB + "Points")
         pointsTab.scrollIntoViewIfNeeded()
         pointsTab.click()
     }
 
 
     fun isFaqQuestionAndAnswerVisible(questionText: String, answerText: String): Boolean {
-
+        StepHelper.step(VIEW_FAQ_QUESTION + questionText)
         val question = if (isFaqPage) {
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(questionText))
         }else{

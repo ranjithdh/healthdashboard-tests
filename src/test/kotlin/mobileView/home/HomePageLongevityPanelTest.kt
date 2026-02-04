@@ -1,5 +1,7 @@
 package mobileView.home
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.*
 import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_HOME)
 class BloodTestWaitingCardTest : BaseTest() {
 
     private lateinit var playwright: Playwright

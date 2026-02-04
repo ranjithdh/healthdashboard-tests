@@ -1,4 +1,4 @@
-package profile.model
+package mobileView.profile.model
 
 data class QuestionAnswer(
     val question: String,

@@ -1,4 +1,4 @@
-package profile.model
+package mobileView.profile.model
 
 /**
  * Enum representing menstrual status for question 31

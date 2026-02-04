@@ -1,4 +1,4 @@
-package profile.page
+package mobileView.profile.page
 
 
 import com.microsoft.playwright.Locator
@@ -11,18 +11,39 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import model.profile.*
-import profile.model.*
-import profile.utils.ProfileUtils.answersStored
-import profile.utils.ProfileUtils.assertExclusiveSelected
-import profile.utils.ProfileUtils.bmiCategoryValues
-import profile.utils.ProfileUtils.buildAddressText
-import profile.utils.ProfileUtils.calculateBMIValues
-import profile.utils.ProfileUtils.formatDobToDdMmYyyy
-import profile.utils.ProfileUtils.formatDobWithAge
-import profile.utils.ProfileUtils.formatFlotTwoDecimal
-import profile.utils.ProfileUtils.isButtonChecked
+import mobileView.profile.model.*
+import mobileView.profile.utils.ProfileUtils.answersStored
+import mobileView.profile.utils.ProfileUtils.assertExclusiveSelected
+import mobileView.profile.utils.ProfileUtils.bmiCategoryValues
+import mobileView.profile.utils.ProfileUtils.buildAddressText
+import mobileView.profile.utils.ProfileUtils.calculateBMIValues
+import mobileView.profile.utils.ProfileUtils.formatDobToDdMmYyyy
+import mobileView.profile.utils.ProfileUtils.formatDobWithAge
+import mobileView.profile.utils.ProfileUtils.formatFlotTwoDecimal
+import mobileView.profile.utils.ProfileUtils.isButtonChecked
 import utils.json.json
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.ACCOUNT_INFO_VALIDATION
+import utils.report.StepHelper.ANSWER_QUESTION
+import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
+import utils.report.StepHelper.CLICK_ADDRESS_DROPDOWN
+import utils.report.StepHelper.CLICK_SAVE_CHANGES
+import utils.report.StepHelper.EDIT_PROFILE
+import utils.report.StepHelper.EDIT_USER_ADDRESS
+import utils.report.StepHelper.EDIT_HEALTH_METRICS
+import utils.report.StepHelper.SAVE_HEALTH_METRICS
+import utils.report.StepHelper.FETCH_ACCOUNT_INFORMATION
+import utils.report.StepHelper.FETCH_ADDRESS_DATA
+import utils.report.StepHelper.FETCH_PREFERENCE
+import utils.report.StepHelper.FETCH_DATA_FROM_API
+import utils.report.StepHelper.FILL_ADDRESS_FORM_MANDATORY
+import utils.report.StepHelper.REMOVE_USER_ADDRESS
+import utils.report.StepHelper.SAVE_CHANGES
+import utils.report.StepHelper.logApiResponse
+import utils.report.StepHelper.SELECT_COMMUNICATION_OPTION
+import utils.report.StepHelper.SUBMIT_ADDRESS
+import utils.report.StepHelper.YES_DELETE
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -269,6 +290,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun captureAddressData(action: () -> Unit) {
+        StepHelper.step(FETCH_ADDRESS_DATA)
         try {
             val response = page.waitForResponse(
                 { response: Response? ->
@@ -290,6 +312,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             if (responseObj.data.addressList.isNotEmpty()) {
                 addressData = responseObj.data
+                StepHelper.step("$FETCH_DATA_FROM_API ${responseObj.data.addressList.size} addresses found")
+                logApiResponse(TestConfig.APIs.API_ADDRESS, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
@@ -319,6 +343,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             if (responseObj.status == "success" && responseObj.data.isUpdated) {
                 logger.info { "Preference updated successfully to: $selectedOption" }
+                StepHelper.step("Preference updated successfully to: $selectedOption")
+                logApiResponse(TestConfig.APIs.API_PREFERENCE_UPDATE, responseObj)
                 return true
             }
 
@@ -346,6 +372,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun clickAddressDropDown() {
+        StepHelper.step(CLICK_ADDRESS_DROPDOWN)
         saveAddressDropDown.click()
     }
 
@@ -412,6 +439,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun clickAddNewAddress() {
+        StepHelper.step(CLICK_ADD_NEW_ADDRESS)
         addNewAddress.click()
     }
 
@@ -484,6 +512,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         pincode: String,
         country: String
     ) {
+        StepHelper.step("$FILL_ADDRESS_FORM_MANDATORY for: $nickName")
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
         houseNoInput.fill(doorNumber)
@@ -515,6 +544,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         )
 
         captureAddressData {
+            StepHelper.step(SUBMIT_ADDRESS)
             newAddressSubmit.click()
         }
 
@@ -528,6 +558,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun removeUserAddress() {
+        StepHelper.step(REMOVE_USER_ADDRESS)
 
         val addresses = addressData?.addressList
             ?: throw AssertionError("Address list is null from API")
@@ -586,6 +617,7 @@ class ProfilePage(page: Page) : BasePage(page) {
            5️⃣ DELETE API CALL (Intercepted)
            ------------------------------- */
         captureAddressData {
+            StepHelper.step(YES_DELETE)
             dialog.getByRole(
                 AriaRole.BUTTON,
                 Locator.GetByRoleOptions().setName("Yes, delete")
@@ -602,6 +634,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun editUserAddress() {
+        StepHelper.step(EDIT_USER_ADDRESS)
 
         val updateAddressDialog: Locator =
             page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Update Address"))
@@ -665,6 +698,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
         captureAddressData {
+            StepHelper.step(SUBMIT_ADDRESS)
             newAddressSubmit.click()
         }
 
@@ -677,6 +711,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     /**--------Communication Preference------------*/
 
     fun fetchCurrentPreference() {
+        StepHelper.step(FETCH_PREFERENCE)
         try {
             logger.info { "Fetching current preference from API..." }
 
@@ -707,6 +742,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             if (responseObj.status == "success") {
                 currentPreference = responseObj.data.preference.communicationPreference
                 logger.info { "Current preference from API: $currentPreference" }
+                StepHelper.step("Communication preference fetched: $currentPreference")
+                logApiResponse(TestConfig.APIs.API_PREFERENCE, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
@@ -715,6 +752,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
 
     fun selectCommunicationOption() {
+        StepHelper.step(SELECT_COMMUNICATION_OPTION)
 
         // Fetch current preference from API
         fetchCurrentPreference()
@@ -796,6 +834,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /**------------Account Information----------------*/
     fun fetchAccountInformation() {
+        StepHelper.step(FETCH_ACCOUNT_INFORMATION)
         try {
             logger.info { "Fetching current preference from API..." }
 
@@ -827,6 +866,8 @@ class ProfilePage(page: Page) : BasePage(page) {
                 piiData = responseObj.data.piiData
                 setMaleConditions(piiData?.gender == "male")
                 logger.info { "Current account Information from API: $piiData" }
+                StepHelper.step("Account information fetched for: ${piiData?.name}")
+                logApiResponse(TestConfig.APIs.API_ACCOUNT_INFORMATION, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
@@ -835,6 +876,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     //validation
     fun accountInformationValidation() {
+        StepHelper.step(ACCOUNT_INFO_VALIDATION)
         fetchAccountInformation()
         waitForViewProfileLoaded()
 
@@ -898,6 +940,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     //edit
     fun accountInformationEdit() {
+        StepHelper.step(EDIT_PROFILE)
         fetchAccountInformation()
         waitForViewProfileLoaded()
 
@@ -927,6 +970,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         editableInputByLabel("Name").fill(updateName)
 
+        StepHelper.step("$SAVE_CHANGES (New name: $updateName)")
+        StepHelper.step(CLICK_SAVE_CHANGES)
         saveChanges.click()
 
         waitForViewProfileLoaded()
@@ -942,6 +987,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun accountInformationEditClose() {
+        StepHelper.step(EDIT_PROFILE)
         fetchAccountInformation()
         waitForViewProfileLoaded()
 
@@ -1078,7 +1124,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByTestId("health-metrics-edit-button")
 
         healthMetricsEdit.waitFor()
-
+        
+        StepHelper.step(EDIT_HEALTH_METRICS)
         edit.click()
 
         val weight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
@@ -1104,6 +1151,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val saveButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
         assertTrue(saveButton.isEnabled)
+        StepHelper.step("$SAVE_HEALTH_METRICS (Height: $newHeight, Weight: $newWeight)")
         saveButton.click()
 
         edit.waitFor()
@@ -6072,6 +6120,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answerLabel: String,
         nextAction: (() -> Unit)? = null
     ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabel)
         if (!isButtonChecked(option)) {
             option.click()
         } else {
@@ -6088,6 +6137,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answerLabels: Array<String>,
         nextAction: (() -> Unit)? = null
     ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabels.joinToString(", "))
         options.forEach { option ->
             if (!isButtonChecked(option)) {
                 option.click()
@@ -6110,6 +6160,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         answerLabels: Array<String>,
         nextAction: (() -> Unit)? = null
     ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabels.joinToString(", ") + (if (othersValue != null) " (Other: $othersValue)" else ""))
         options.forEach { option ->
             if (!isButtonChecked(option)) {
                 option.click()
@@ -6135,6 +6186,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         question: String,
         nextAction: (() -> Unit)? = null
     ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + value)
         if (locator.inputValue() != value) {
             locator.fill(value)
         }
@@ -6152,6 +6204,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         question: String,
         nextAction: (() -> Unit)
     ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + value)
         if (locator.inputValue() != value) {
             locator.fill(value)
         }

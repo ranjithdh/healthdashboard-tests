@@ -1,5 +1,7 @@
 package onboard.test.page
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -13,6 +15,7 @@ import kotlin.collections.forEach
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_BOOKLABTEST)
 class OrderSummaryPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

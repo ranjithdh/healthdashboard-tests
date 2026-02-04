@@ -4,6 +4,12 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_HERO_BOOK_NOW
+import utils.report.StepHelper.CLICK_LEARN_MORE
+import utils.report.StepHelper.CLICK_READ_OUR_WHY
+import utils.report.StepHelper.CLICK_WHAT_WE_TEST
+import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
 
 class LandingPage(page: Page) : WebSiteBasePage(page) {
@@ -25,6 +31,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     private val readOurWhy = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Read our Why"))
 
     fun waitForPageLoad(): LandingPage {
+        StepHelper.step(WAIT_WEBSITE_PAGE_LOAD + "Landing")
         page.locator("a#join-now-btn-hero").waitFor()
         logger.info { "Landing page loaded" }
         return this
@@ -48,6 +55,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickHeroBookNow() {
+        StepHelper.step(CLICK_HERO_BOOK_NOW)
         logger.info { "Clicking Hero Book Now button" }
         heroSectionBookNow.click()
     }
@@ -89,6 +97,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickWhatWeTestButton(): WhatWeTestPage {
+        StepHelper.step(CLICK_WHAT_WE_TEST)
         whatWeTest.click()
         val whatWeTestPage = WhatWeTestPage(page)
         return whatWeTestPage
@@ -120,6 +129,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickLearnMoreButton(): HowItWorksPage {
+        StepHelper.step(CLICK_LEARN_MORE)
         learnMore.click()
         val howItWorksPage = HowItWorksPage(page)
         return howItWorksPage
@@ -162,6 +172,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickWhatIsIncludedSectionBookNowButton() {
+        StepHelper.step(StepHelper.CLICK_BOOK_NOW_WHAT_INCLUDED)
         whatsIncludedSectionBookNow.click()
     }
 
@@ -263,6 +274,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickWordFromOurFounderSectionReadOurWhyButtonVisible(): OurWhyPage {
+        StepHelper.step(CLICK_READ_OUR_WHY)
         readOurWhy.click()
         val ourWhyPage = OurWhyPage(page)
         ourWhyPage.waitForPageLoad()

@@ -17,12 +17,13 @@ object TestConfig {
         // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-        const val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+
         val SERVICES_URL = "${BASE_URL}services"
 
-        val LOGIN_URL = "${BASE_URL}login"
+
+        val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
-        const val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
@@ -69,6 +70,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
@@ -77,6 +80,7 @@ object TestConfig {
         val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
     }
 
@@ -88,11 +92,11 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
-                ?: false   //TODO default safe for CI is true
+                ?: true   //TODO default safe for CI is true
 
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
-                .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
+                .setSlowMo(SLOW_MO)
         }
     }
 

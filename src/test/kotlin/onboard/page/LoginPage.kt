@@ -5,8 +5,18 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
-import io.qameta.allure.Step
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.CLEAR_MOBILE_NUMBER
+import utils.report.StepHelper.CLICK_CONTINUE_BUTTON
+import utils.report.StepHelper.CLICK_LOGIN_LINK
+import utils.report.StepHelper.CLICK_PRIVACY_POLICY
+import utils.report.StepHelper.CLICK_SIGN_UP_LINK
+import utils.report.StepHelper.CLICK_TERMS_OF_SERVICE
+import utils.report.StepHelper.ENTER_MOBILE_NUMBER
+import utils.report.StepHelper.LOGIN_WITH_MOBILE_AND_CONTINUE
+import utils.report.StepHelper.SELECT_COUNTRY_CODE
+import utils.report.StepHelper.TOGGLE_WHATSAPP_CHECKBOX
 
 private val logger = KotlinLogging.logger {}
 
@@ -16,16 +26,16 @@ class LoginPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.LOGIN_URL
 
 
-    @Step("Enter mobile number: {phoneNumber}")
     fun enterMobileNumber(phoneNumber: String): LoginPage {
+        StepHelper.step(ENTER_MOBILE_NUMBER + phoneNumber)
         logger.info { "enterMobileNumber($phoneNumber)" }
         utils.SignupDataStore.update { mobileNumber = phoneNumber }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).fill(phoneNumber)
         return this
     }
 
-    @Step("Clear Mobile Number")
     fun clearMobileNumber(): LoginPage {
+        StepHelper.step(CLEAR_MOBILE_NUMBER)
         logger.info { "clearMobileNumber()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).clear()
         return this
@@ -36,15 +46,15 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Click Continue button")
     fun clickContinue(): LoginPage {
+        StepHelper.step(CLICK_CONTINUE_BUTTON)
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
     }
 
-    @Step("Select country code: {countryName}")
     fun selectCountryCode(countryName: String) {
+        StepHelper.step(SELECT_COUNTRY_CODE + countryName)
         logger.info { "selectCountryCode($countryName)" }
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
         page.getByPlaceholder("Search country...").click()
@@ -52,8 +62,8 @@ class LoginPage(page: Page) : BasePage(page) {
         page.getByText(countryName).nth(1).click()
     }
 
-    @Step("Login with mobile number and continue to OTP")
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
+        StepHelper.step(LOGIN_WITH_MOBILE_AND_CONTINUE)
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
         page.waitForTimeout(5000.0)
         selectCountryCode(testUser.country)
@@ -73,8 +83,8 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Toggle WhatsApp checkbox")
     fun toggleWhatsAppCheckbox(): LoginPage {
+        StepHelper.step(TOGGLE_WHATSAPP_CHECKBOX)
         logger.info { "toggleWhatsAppCheckbox()" }
         byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).click()
         return this
@@ -122,15 +132,15 @@ class LoginPage(page: Page) : BasePage(page) {
         return byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Terms of Service")).isVisible
     }
 
-    @Step("Click Login link")
     fun clickLogin(): LoginPage {
+        StepHelper.step(CLICK_LOGIN_LINK)
         logger.info { "clickLogin()" }
         byText("Log in").click()
         return this
     }
 
-    @Step("Click Sign Up link")
     fun clickSignUp(): LoginPage {
+        StepHelper.step(CLICK_SIGN_UP_LINK)
         logger.info { "clickSignUp()" }
         byText("Sign up here").click()
         return this
@@ -163,9 +173,8 @@ class LoginPage(page: Page) : BasePage(page) {
     }
 
 
-
-    @Step("Click Privacy Policy and verify popup")
     fun clickPrivacyPolicyAndVerifyPopup(): Boolean {
+        StepHelper.step(CLICK_PRIVACY_POLICY)
         logger.info { "clickPrivacyPolicyAndVerifyPopup()" }
         val popup = page.waitForPopup {
             byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Privacy Policy")).click()
@@ -179,8 +188,8 @@ class LoginPage(page: Page) : BasePage(page) {
         return headingVisible
     }
 
-    @Step("Click Terms of Service and verify popup")
     fun clickTermsOfServiceAndVerifyPopup(): Boolean {
+        StepHelper.step(CLICK_TERMS_OF_SERVICE)
         logger.info { "clickTermsOfServiceAndVerifyPopup()" }
         val popup = page.waitForPopup {
             byRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Terms of Service")).click()

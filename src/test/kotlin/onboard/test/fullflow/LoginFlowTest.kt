@@ -7,11 +7,11 @@ import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
+import utils.report.Modules
 import java.nio.file.Paths
 
 
-@Epic("Login")
-@Feature("End-to-End Login Flow")
+@Epic(Modules.EPIC_LOGIN)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginFlowTest : BaseTest() {
 
@@ -58,6 +58,7 @@ class LoginFlowTest : BaseTest() {
     @Test
     fun `login flow`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
+
         loginPage
             .enterMobileAndContinue()
             .enterOtpAndContinueToMobileHomePage()

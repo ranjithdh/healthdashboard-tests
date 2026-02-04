@@ -14,6 +14,13 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_SCHEDULE_NOW
+import utils.report.StepHelper.FETCH_SERVICE_DATA
+import utils.report.StepHelper.NAVIGATE_TO_SERVICES
+import utils.report.StepHelper.VERIFY_SERVICE_CARD
+import utils.report.StepHelper.VERIFY_STATIC_CONTENT
+import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.SymptomsData
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.text.NumberFormat
@@ -43,6 +50,7 @@ class ServicePage(page: Page) : BasePage(page) {
         monitorTraffic()
     }
     fun navigateToServices() {
+        StepHelper.step(NAVIGATE_TO_SERVICES)
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue()
@@ -60,8 +68,11 @@ class ServicePage(page: Page) : BasePage(page) {
      * Verify static content on the Service Page
      */
     fun verifyStaticContent() {
+        StepHelper.step("$VERIFY_STATIC_CONTENT: Your Health, Guided by Experts heading")
         logger.info { "Verifying static content on Service Page" }
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your Health, Guided by Experts")).click()
+
+        StepHelper.step("$VERIFY_STATIC_CONTENT: expert connection text")
         page.getByText("Connect with experienced").click()
     }
 
@@ -70,6 +81,7 @@ class ServicePage(page: Page) : BasePage(page) {
      * Should be called when the page is loading or about to load the services
      */
     fun fetchServiceDataFromApi(): ServiceResponse? {
+        StepHelper.step(FETCH_SERVICE_DATA)
         if (serviceData != null) {
             logger.info { "Using cached service data" }
             return serviceData
@@ -80,7 +92,7 @@ class ServicePage(page: Page) : BasePage(page) {
             val response = page.waitForResponse(
                 { response: Response? ->
                     response?.url()
-                        ?.contains(TestConfig.Urls.SERVICE_SEARCH_API_URL) == true && (response.status() == 200 || response.status() == 304)
+                        ?.contains(TestConfig.APIs.SERVICE_SEARCH_API_URL) == true && (response.status() == 200 || response.status() == 304)
                 },
                 {
                     // Optional: Assert page URL or similar if needed to ensure trigger
@@ -92,6 +104,8 @@ class ServicePage(page: Page) : BasePage(page) {
                 val responseBody = String(responseBodyBytes)
                 serviceData = json.decodeFromString<ServiceResponse>(responseBody)
                 logger.info { "Service data fetched and parsed successfully" }
+                StepHelper.step("$FETCH_SERVICE_DATA: ${serviceData?.data?.products?.size ?: 0} products found")
+                logApiResponse(TestConfig.APIs.SERVICE_SEARCH_API_URL, serviceData)
                 return serviceData
             }
         } catch (e: Exception) {
@@ -145,6 +159,7 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     private fun verifyServiceCard(product: ServiceProduct) {
+        StepHelper.step(VERIFY_SERVICE_CARD + product.name)
         logger.info { "Verifying product card for: ${product.name}" }
 
         // Image Verification - Check Visibility
@@ -272,6 +287,7 @@ class ServicePage(page: Page) : BasePage(page) {
 
             // Schedule Now Button Logic
             // Handle potentially opening in new tab or same tab
+            StepHelper.step(CLICK_SCHEDULE_NOW)
             val currentUrl = page.url()
             page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
             

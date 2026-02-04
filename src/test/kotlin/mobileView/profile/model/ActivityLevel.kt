@@ -1,4 +1,4 @@
-package profile.model
+package mobileView.profile.model
 
 /**
  * Enum representing activity levels for question 10

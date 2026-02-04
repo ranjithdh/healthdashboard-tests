@@ -1,8 +1,8 @@
-package profile.utils
+package mobileView.profile.utils
 
 import com.microsoft.playwright.Locator
 import model.profile.Address
-import profile.model.QuestionAnswer
+import mobileView.profile.model.QuestionAnswer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period

@@ -4,6 +4,9 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_BIOMARKER
+import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,6 +25,7 @@ class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
     private val bookNow = page.locator("#join-btn-test")
 
     fun waitForPageLoad(): WhatWeTestPage {
+        StepHelper.step("${WAIT_WEBSITE_PAGE_LOAD}: What We Test Page")
         header.waitFor()
         logger.info { "What We Test page loaded" }
         return this
@@ -90,6 +94,7 @@ class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
     fun isBookNowVisible() = bookNow.isVisible
 
     fun clickBookNowButton() {
+        StepHelper.step(StepHelper.CLICK_BOOK_NOW)
         bookNow.click()
     }
 
@@ -119,6 +124,7 @@ class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
 
 
     fun isBiomarkerNameAndDescriptionVisible(name: String, description: String): Boolean {
+        StepHelper.step(CLICK_BIOMARKER + name)
         val biomarkerName = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName(name).setExact(true))
         val biomarkerDescription = page.getByLabel(name, Page.GetByLabelOptions().setExact(true)).getByText(description)
 

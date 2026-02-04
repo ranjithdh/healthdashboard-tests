@@ -2,16 +2,17 @@ package website.test.detail
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
+import utils.report.Modules
 import website.page.detail.AdvancedHeartHealthDetailPage
-import website.page.detail.AutoImmunePanelDetailPage
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_WEBSITE)
 class AdvancedHeatHealthDetailPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

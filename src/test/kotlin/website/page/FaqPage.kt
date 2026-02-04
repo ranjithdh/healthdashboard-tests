@@ -4,6 +4,8 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
 
 class FaqPage(page: Page) : WebSiteBasePage(page) {
@@ -18,6 +20,7 @@ class FaqPage(page: Page) : WebSiteBasePage(page) {
     val faqSection = FaqSection(page)
 
     fun waitForPageLoad(): FaqPage {
+        StepHelper.step(WAIT_WEBSITE_PAGE_LOAD + "FAQ")
         header.waitFor()
         logger.info { "FAQ page loaded" }
         return this
