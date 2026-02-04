@@ -39,7 +39,7 @@ healthdashboard-tests/
 │   │   ├── home/              # Mobile home page & tests
 │   │   └── orders/            # Mobile orders page & tests
 │   ├── model/                 # Data models for API/JSON parsing
-│   ├── profile/               # Profile-related POMs
+│   ├── mobileView.profile/               # Profile-related POMs
 │   ├── webView/                # Web diagnostic tests
 │   └── utils/                 # Utilities (JSON, Logger, DateHelper, etc.)
 ├── build.gradle.kts

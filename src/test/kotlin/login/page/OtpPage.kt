@@ -22,7 +22,7 @@ import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
-import profile.page.ProfilePage
+import mobileView.profile.page.ProfilePage
 import utils.json.json
 import webView.diagnostics.symptoms.page.SymptomsPage
 import utils.logger.logger

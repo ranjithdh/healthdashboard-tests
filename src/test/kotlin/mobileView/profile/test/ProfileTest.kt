@@ -1,4 +1,4 @@
-package profile.test
+package mobileView.profile.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
@@ -216,7 +216,7 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
@@ -234,7 +234,7 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.VEGAN)
 
         profilePage.assertQuestionerValidationsCheck()
@@ -252,7 +252,7 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.EGGETARIAN)
 
         profilePage.assertQuestionerValidationsCheck()
@@ -268,7 +268,7 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
 
         profilePage.assertQuestionerVegInitialCheck(QuestionerMealType.NON_VEGETARIAN)
 
@@ -287,7 +287,7 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
         // Pass HARDLY_EXERCISE to skip Q11-Q13 and go directly to Q14
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.HARDLY_EXERCISE)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.HARDLY_EXERCISE)
 
         profilePage.assertQuestionerVegInitialCheck()
 
@@ -306,8 +306,8 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.NONE))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.NONE))
 
         // Test: Select "None of the above" in Q37
         // Expected: Q37 → Q51 (skip all condition detail questions)
@@ -326,8 +326,8 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.GASTROINTESTINAL))
 
 
         // Test: Select "Gastrointestinal Conditions" only in Q37
@@ -347,10 +347,10 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(
             listOf(
-                profile.model.MedicalCondition.GASTROINTESTINAL, profile.model.MedicalCondition.DERMATOLOGICAL
+                mobileView.profile.model.MedicalCondition.GASTROINTESTINAL, mobileView.profile.model.MedicalCondition.DERMATOLOGICAL
             )
         )
 
@@ -372,8 +372,8 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.DIABETES))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.DIABETES))
 
         // Test: Select "Type 2 - Diabetes" only in Q37
         // Expected: Q37 → Q42 (Diabetes status) → Q51
@@ -392,8 +392,8 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.THYROID))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.THYROID))
 
         // Test: Select "Thyroid-related disorders" only in Q37
         // Expected: Q37 → Q43 (Thyroid details) → Q51
@@ -412,8 +412,8 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.CANCER))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.CANCER))
 
         // Test: Select "Cancer" only in Q37
         // Expected: Q37 → Q49 (Cancer status) → Q50 (Cancer type) → Q51
@@ -432,10 +432,10 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(
             listOf(
-                profile.model.MedicalCondition.CARDIOVASCULAR, profile.model.MedicalCondition.KIDNEY
+                mobileView.profile.model.MedicalCondition.CARDIOVASCULAR, mobileView.profile.model.MedicalCondition.KIDNEY
             )
         )
 
@@ -457,12 +457,12 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(
             listOf(
-                profile.model.MedicalCondition.DIABETES,
-                profile.model.MedicalCondition.THYROID,
-                profile.model.MedicalCondition.CANCER
+                mobileView.profile.model.MedicalCondition.DIABETES,
+                mobileView.profile.model.MedicalCondition.THYROID,
+                mobileView.profile.model.MedicalCondition.CANCER
             )
         )
 
@@ -483,10 +483,10 @@ class ProfileTest : BaseTest() {
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
                 .clickAccountProfile().waitForConfirmation()
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(
             listOf(
-                profile.model.MedicalCondition.RESPIRATORY, profile.model.MedicalCondition.AUTO_IMMUNE
+                mobileView.profile.model.MedicalCondition.RESPIRATORY, mobileView.profile.model.MedicalCondition.AUTO_IMMUNE
             )
         )
 
@@ -508,14 +508,14 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
 
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.setMedicalConditions(
             listOf(
-                profile.model.MedicalCondition.GASTROINTESTINAL,
-                profile.model.MedicalCondition.DERMATOLOGICAL,
-                profile.model.MedicalCondition.DIABETES,
-                profile.model.MedicalCondition.THYROID,
-                profile.model.MedicalCondition.GALL_BLADDER,
+                mobileView.profile.model.MedicalCondition.GASTROINTESTINAL,
+                mobileView.profile.model.MedicalCondition.DERMATOLOGICAL,
+                mobileView.profile.model.MedicalCondition.DIABETES,
+                mobileView.profile.model.MedicalCondition.THYROID,
+                mobileView.profile.model.MedicalCondition.GALL_BLADDER,
             )
         )
 
@@ -556,8 +556,8 @@ class ProfileTest : BaseTest() {
                 .clickAccountProfile().waitForConfirmation()
 
         // Set flag to stop before completion
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.GASTROINTESTINAL))
         profilePage.setShouldClickComplete(false)
 
         // Fill the questionnaire (using Veg flow as example)
@@ -579,8 +579,8 @@ class ProfileTest : BaseTest() {
 
         // Set flag to stop at question 20 and goBack
         profilePage.setStopAtQuestion(20)
-        profilePage.setActivityType(type = profile.model.ActivityLevel.SEDENTARY)
-        profilePage.setMedicalConditions(listOf(profile.model.MedicalCondition.GASTROINTESTINAL))
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.setMedicalConditions(listOf(mobileView.profile.model.MedicalCondition.GASTROINTESTINAL))
         profilePage.setShouldClickComplete(false)
 
         // Fill the questionnaire (using Veg flow as example)

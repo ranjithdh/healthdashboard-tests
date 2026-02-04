@@ -1,4 +1,4 @@
-package profile.page
+package mobileView.profile.page
 
 
 import com.microsoft.playwright.Locator
@@ -11,16 +11,16 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import model.profile.*
-import profile.model.*
-import profile.utils.ProfileUtils.answersStored
-import profile.utils.ProfileUtils.assertExclusiveSelected
-import profile.utils.ProfileUtils.bmiCategoryValues
-import profile.utils.ProfileUtils.buildAddressText
-import profile.utils.ProfileUtils.calculateBMIValues
-import profile.utils.ProfileUtils.formatDobToDdMmYyyy
-import profile.utils.ProfileUtils.formatDobWithAge
-import profile.utils.ProfileUtils.formatFlotTwoDecimal
-import profile.utils.ProfileUtils.isButtonChecked
+import mobileView.profile.model.*
+import mobileView.profile.utils.ProfileUtils.answersStored
+import mobileView.profile.utils.ProfileUtils.assertExclusiveSelected
+import mobileView.profile.utils.ProfileUtils.bmiCategoryValues
+import mobileView.profile.utils.ProfileUtils.buildAddressText
+import mobileView.profile.utils.ProfileUtils.calculateBMIValues
+import mobileView.profile.utils.ProfileUtils.formatDobToDdMmYyyy
+import mobileView.profile.utils.ProfileUtils.formatDobWithAge
+import mobileView.profile.utils.ProfileUtils.formatFlotTwoDecimal
+import mobileView.profile.utils.ProfileUtils.isButtonChecked
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper

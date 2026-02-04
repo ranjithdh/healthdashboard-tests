@@ -14,7 +14,7 @@ import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
 import model.home.HomeData
 import model.home.HomeDataResponse
-import profile.page.ProfilePage
+import mobileView.profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.logger.logger

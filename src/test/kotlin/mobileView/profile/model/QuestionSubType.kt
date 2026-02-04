@@ -1,4 +1,4 @@
-package profile.model
+package mobileView.profile.model
 
 object QuestionSubType {
     /**
