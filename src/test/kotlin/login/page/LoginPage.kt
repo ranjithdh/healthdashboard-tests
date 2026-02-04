@@ -55,7 +55,7 @@ class LoginPage(page: Page) : BasePage(page) {
     @Step("Login with mobile number and continue to OTP")
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
-        page.waitForTimeout(1500.0)
+        page.waitForTimeout(500.0)
         selectCountryCode(testUser.country)
         enterMobileNumber(testUser.mobileNumber)
         clickContinue()
