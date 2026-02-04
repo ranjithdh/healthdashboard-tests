@@ -4,7 +4,7 @@ import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import webView.diagnostics.page.LabTestsPage
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
 

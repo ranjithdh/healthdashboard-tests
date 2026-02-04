@@ -9,7 +9,7 @@ import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import login.page.LoginPage
+import onboard.page.LoginPage
 import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
@@ -47,7 +47,7 @@ class ServicePage(page: Page) : BasePage(page) {
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue()
 
-        val otpPage = login.page.OtpPage(page)
+        val otpPage = onboard.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)
 
         // Direct navigation to Services after login, with a short delay for session stability

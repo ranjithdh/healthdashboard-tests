@@ -2,13 +2,12 @@ package healthdata.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import healthdata.page.HealthDataPage
-import login.page.LoginPage
-import login.page.OtpPage
+import onboard.page.LoginPage
+import onboard.page.OtpPage
 import model.healthdata.Biomarker
 import org.junit.jupiter.api.*
 import utils.BiomarkerCsvParser

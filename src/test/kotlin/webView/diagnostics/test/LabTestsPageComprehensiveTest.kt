@@ -6,7 +6,7 @@ import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import webView.diagnostics.page.LabTestsPage
-import login.page.LoginPage
+import onboard.page.LoginPage
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
 

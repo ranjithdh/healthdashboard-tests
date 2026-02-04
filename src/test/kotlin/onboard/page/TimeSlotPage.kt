@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
@@ -6,7 +6,6 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import model.addontest.AddOnTests
-import model.addontest.OnboardDiagnosticProductList
 import model.slot.SlotData
 import model.slot.SlotList
 import utils.OnboardAddOnTestDataStore

@@ -5,7 +5,7 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import kotlin.test.Test
 

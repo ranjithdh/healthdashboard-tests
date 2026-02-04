@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Page
