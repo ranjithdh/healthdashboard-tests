@@ -3,6 +3,7 @@ package onboard.test.page
 import io.qameta.allure.Epic
 import utils.report.Modules
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*

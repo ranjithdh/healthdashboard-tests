@@ -4,9 +4,10 @@ import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
+import io.qameta.allure.Epic
 import kotlinx.serialization.json.*
-import login.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.report.Modules
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -64,7 +65,7 @@ class LabTestsTest : BaseTest() {
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
         val response = page.waitForResponse({
-            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
+            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
         println("Response Status: ${response.status()}")
@@ -247,7 +248,7 @@ class LabTestsTest : BaseTest() {
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
         val listResponse = page.waitForResponse({
-            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
+            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
 
@@ -489,7 +490,7 @@ class LabTestsTest : BaseTest() {
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
         val listResponse = page.waitForResponse({
-            it.url().contains(other = TestConfig.Urls.LAB_TEST_API_URL) && it.status() == 200 }) {
+            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
             labTestsPage.navigateToDiagnostics()
         }
         val targetCode = "P037"

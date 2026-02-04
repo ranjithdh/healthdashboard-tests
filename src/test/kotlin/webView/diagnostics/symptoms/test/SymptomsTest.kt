@@ -5,8 +5,10 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
+import utils.report.Modules
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

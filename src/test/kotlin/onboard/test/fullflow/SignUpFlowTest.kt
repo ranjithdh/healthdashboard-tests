@@ -14,6 +14,7 @@ import org.junit.jupiter.api.*
 import utils.SignupDataStore
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
+import utils.report.Modules
 import java.nio.file.Paths
 import kotlin.test.assertTrue
 

@@ -5,9 +5,11 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import onboard.page.LoginPage
 import model.profile.QuestionerMealType
 import org.junit.jupiter.api.*
+import utils.report.Modules
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)

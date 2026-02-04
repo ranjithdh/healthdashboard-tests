@@ -14,6 +14,13 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_SCHEDULE_NOW
+import utils.report.StepHelper.FETCH_SERVICE_DATA
+import utils.report.StepHelper.NAVIGATE_TO_SERVICES
+import utils.report.StepHelper.VERIFY_SERVICE_CARD
+import utils.report.StepHelper.VERIFY_STATIC_CONTENT
+import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.SymptomsData
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.text.NumberFormat

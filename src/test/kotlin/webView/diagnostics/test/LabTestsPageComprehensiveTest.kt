@@ -5,10 +5,12 @@ import com.microsoft.playwright.Page  // ← Add this explicit import
 import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import webView.diagnostics.page.LabTestsPage
 import onboard.page.LoginPage
 import mu.KotlinLogging
 import org.junit.jupiter.api.*
+import utils.report.Modules
 
 private val logger = KotlinLogging.logger {}
 

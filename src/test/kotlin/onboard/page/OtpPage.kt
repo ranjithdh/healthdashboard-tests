@@ -16,6 +16,19 @@ import mobileView.profile.page.ProfilePage
 import utils.json.json
 import webView.diagnostics.symptoms.page.SymptomsPage
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_CONTINUE
+import utils.report.StepHelper.CLICK_EDIT_BUTTON
+import utils.report.StepHelper.ENTER_OTP
+import utils.report.StepHelper.ENTER_OTP_ACCOUNT_CREATION
+import utils.report.StepHelper.ENTER_OTP_HEALTH_DATA
+import utils.report.StepHelper.ENTER_OTP_HOME
+import utils.report.StepHelper.ENTER_OTP_INSIGHTS
+import utils.report.StepHelper.ENTER_OTP_LAB_TEST
+import utils.report.StepHelper.ENTER_OTP_MOBILE_HOME
+import utils.report.StepHelper.ENTER_OTP_PROFILE
+import utils.report.StepHelper.TOGGLE_WHATSAPP_CHECKBOX
+import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.home.HomePageWebsite
 
 
