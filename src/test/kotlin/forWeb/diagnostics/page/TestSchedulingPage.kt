@@ -20,7 +20,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun verifySampleCollectionAddressHeading() {
-        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Sample Collection Address"))
+        val heading = page.getByText("Sample Collection Address")
         logger.info { "Verifying Sample Collection Address heading" }
         Assertions.assertTrue(heading.isVisible, "Sample Collection Address heading should be visible")
     }
@@ -32,7 +32,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun clickAddNewAddress() {
         logger.info { "Clicking Add New Address" }
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Add New Address")).click()
+//        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Add New Address")).click()
+        page.getByTestId("diagnostics-booking-add-new-address").click();
     }
 
     fun addAddressAndValidate() {
