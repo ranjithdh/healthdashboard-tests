@@ -88,8 +88,8 @@ class SignUpFlowTest : BaseTest() {
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow()
+
 
 
         checkBloodTestBookedCardStatus(homePage)
@@ -117,8 +117,7 @@ class SignUpFlowTest : BaseTest() {
             .selectSlotsAndContinue()
             .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow()
 
 
         checkBloodTestBookedCardStatus(homePage)
@@ -174,8 +173,7 @@ class SignUpFlowTest : BaseTest() {
         }
 
         val homePage = orderSummaryPage
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow(isAddOn = true)
 
         checkBloodTestBookedCardStatus(homePage)
 

@@ -13,7 +13,7 @@ private val logger = KotlinLogging.logger {}
 
 class PaymentPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     @Step("Complete Payment")
     fun completePayment(): PaymentPage {

@@ -6,9 +6,11 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
+import healthdata.page.HealthDataPage
 import io.qameta.allure.Step
 import webView.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
+import model.healthdata.HealthData
 import model.signup.VerifyOtpResponse
 import profile.page.ProfilePage
 import utils.json.json
@@ -216,18 +218,23 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
     @Step("Enter OTP and continue to Health Data")
-    fun enterOtpAndContinueToHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
-        enterOtp(testUser.otp)
-        // Wait for login to complete (either by URL change or timeout)
-        try {
-            page.waitForURL("**/home", Page.WaitForURLOptions().setTimeout(10000.0))
-        } catch (e: Exception) {
-            // Ignore timeout if it doesn't go to home quickly, just proceed to navigate
-            logger.info { "Wait for home page timed out or skipped, proceeding to Health Data page" }
-        }
+    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
 
-        val healthDataPage = healthdata.page.HealthDataPage(page)
-        healthDataPage.navigate()
+        enterOtp(testUser.otp)
+
+        page.waitForURL {
+            page.url().contains(TestConfig.Urls.BASE_URL)
+        }
+        page.navigate(TestConfig.Urls.HOME_PAGE_URL)
+
+        val homePage = webView.HomePage(page)
+        homePage.waitForHomePageConfirmation()
+
+        val healthData = homePage.getHealthDataResponse()
+
+        homePage.clickHealthTab()
+
+        val healthDataPage = HealthDataPage(page,healthData)
         healthDataPage.waitForPageLoad()
         return healthDataPage
     }

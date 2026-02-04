@@ -13,12 +13,13 @@ import utils.json.json
 import utils.logger.logger
 import io.qameta.allure.Step
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
 class TimeSlotPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     private var slotData = SlotData()
 
@@ -151,8 +152,13 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     @Step("Select Slots and Continue")
     fun selectSlotsAndContinue(): OrderSummaryPage {
         val currentDate = LocalDateTime.now().plusDays(1)
+
+        val dayFormatted = currentDate.format(
+            DateTimeFormatter.ofPattern("dd")
+        )
+
         selectDateView(
-            currentDate.dayOfMonth.toString(),
+            dayFormatted.toString(),
         )
 
         utils.SignupDataStore.update { slotDate = currentDate }
