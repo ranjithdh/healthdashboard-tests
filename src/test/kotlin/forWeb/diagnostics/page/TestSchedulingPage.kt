@@ -103,8 +103,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByTestId("diagnostics-booking-add-new-address").click();
     }
 
-    fun editUserAddress() {
-
+    fun editUserAddress(index: Int) {
         val updateAddressDialog: Locator =
             page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Update Address"))
 
@@ -112,45 +111,15 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             ?: throw AssertionError("Address list is null from API")
 
         require(addresses.isNotEmpty()) { "Address list is empty from API" }
+        require(index < addresses.size) { "Address index $index out of bounds" }
 
-        val addressItem = addresses.first()
+        val addressItem = addresses[index]
         val address = addressItem.address
         val addressId = addressItem.addressId
 
         val title = address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
         val expectedAddressText = buildAddressText(address)
         page.locator(".bg-secondary.flex.flex-1").first().click();
-        /* -------------------------------
-           1️⃣ Locate Address Card
-           ------------------------------- */
-//        val addressCard = page
-//            .locator("div.border")
-//            .filter(
-//                FilterOptions().setHas(
-//                    page.getByRole(
-//                        AriaRole.HEADING,
-//                        Page.GetByRoleOptions().setName(title)
-//                    )
-//                )
-//            )
-//            .first()
-//
-//        addressCard.waitFor()
-
-        /* -------------------------------
-           2️⃣ Validate Address Content
-           ------------------------------- */
-//        addressCard
-//            .locator("p")
-//            .filter(FilterOptions().setHasText(expectedAddressText))
-//            .first()
-//            .waitFor()
-
-        /* -------------------------------
-           3️⃣ Click Edit Button
-           ------------------------------- */
-//        addressCard.getByText("Edit").first().click()
-        updateAddressDialog.waitFor()
 
         // Fill inputs (UI)
         val number = (500..1000).random()

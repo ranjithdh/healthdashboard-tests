@@ -1,6 +1,7 @@
 package mobileView.diagnostics
 
 import com.microsoft.playwright.*
+import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
@@ -513,7 +514,7 @@ class LabTestsTest : BaseTest() {
 
         println("Testing 'Edit Address' functionality...")
         // Edit the first address
-        testSchedulingPage.editUserAddress()
+        testSchedulingPage.editUserAddress(0)
 
 
         // Extract price for the targetCode from listResponse
