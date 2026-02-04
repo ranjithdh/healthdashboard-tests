@@ -1,17 +1,19 @@
-package login.test.signup
+package onboard.test.fullflow
 
-import io.qameta.allure.Epic
-import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
+import utils.report.Modules
+import java.nio.file.Paths
 
 
+@Epic(Modules.EPIC_LOGIN)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Epic(Modules.EPIC_ONBOARDING)
-class SignUpTest : BaseTest() {
+class LoginFlowTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -37,9 +39,15 @@ class SignUpTest : BaseTest() {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
+            .setRecordVideoDir(Paths.get(TestConfig.Artifacts.VIDEO_DIR))
+            .setRecordVideoSize(390, 844)
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+
+        val videoPath = page.video()?.path()
+        println("📹 Video saved to: $videoPath")
+
     }
 
     @AfterEach
@@ -48,25 +56,12 @@ class SignUpTest : BaseTest() {
     }
 
     @Test
-    fun `should verify signup page links and texts`() {
+    fun `login flow`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
-        loginPage.clickSignUp()
-
-        assert(loginPage.isSignUpStatsTextVisible()) { "Stats text should be visible" }
-        assert(loginPage.itAllStartsWith100LabTest()) { "Lab tests text should be visible" }
-        assert(loginPage.alreadyHaveAnAccountLinkVisible()) { "Blood draw text should be visible" }
-        assert(loginPage.isSendOtpOnWhatsAppVisible()) { "Results text should be visible" }
-        assert(loginPage.whatsIncludedSectionContentVisible()) { "Section content should be visible" }
-
-        assert(loginPage.clickPrivacyPolicyAndVerifyPopup()) { "Privacy Policy popup header should be visible" }
-        assert(loginPage.clickTermsOfServiceAndVerifyPopup()) { "Terms of Service popup header should be visible" }
-
-        loginPage.clickLogin()
-        assert(loginPage.isLoginHeaderVisible()) { "Should be back on Login page" }
-
-        loginPage.takeScreenshot("signup-links-verified")
+        loginPage
+            .enterMobileAndContinue()
+            .enterOtpAndContinueToMobileHomePage()
     }
-
-
 }
+

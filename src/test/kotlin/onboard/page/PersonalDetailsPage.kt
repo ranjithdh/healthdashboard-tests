@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 
 class PersonalDetailsPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     private val dateOfBirthLabel = byText("Date of Birth")
     private val genderInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender"))

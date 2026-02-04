@@ -5,7 +5,7 @@ import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import kotlin.test.assertTrue
 

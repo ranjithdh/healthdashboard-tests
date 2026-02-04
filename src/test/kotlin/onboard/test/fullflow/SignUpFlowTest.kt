@@ -1,18 +1,19 @@
-package login.test.fullflow
+package onboard.test.fullflow
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
 import config.BaseTest
 import config.TestConfig
-import io.qameta.allure.Epic
-import login.page.LoginPage
+import onboard.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import utils.SignupDataStore
-import utils.report.Modules
+import io.qameta.allure.Epic
+import io.qameta.allure.Feature
 import java.nio.file.Paths
 import kotlin.test.assertTrue
 
@@ -87,8 +88,8 @@ class SignUpFlowTest : BaseTest() {
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow()
+
 
 
         checkBloodTestBookedCardStatus(homePage)
@@ -116,8 +117,7 @@ class SignUpFlowTest : BaseTest() {
             .selectSlotsAndContinue()
             .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow()
 
 
         checkBloodTestBookedCardStatus(homePage)
@@ -173,8 +173,7 @@ class SignUpFlowTest : BaseTest() {
         }
 
         val homePage = orderSummaryPage
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
+            .automateOrderWorkflow(isAddOn = true)
 
         checkBloodTestBookedCardStatus(homePage)
 

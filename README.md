@@ -32,7 +32,7 @@ healthdashboard-tests/
 │   ├── config/
 │   │   ├── BasePage.kt        # Base page object
 │   │   └── TestConfig.kt      # Configuration & viewports
-│   ├── login/
+│   ├── onboard/
 │   │   ├── page/              # Login-related POMs
 │   │   └── test/              # Login & Signup tests (fullflow, signup, etc.)
 │   ├── mobileView/
@@ -67,8 +67,8 @@ healthdashboard-tests/
 
 ### Specific Test Class
 ```bash
-./gradlew test --tests "login.test.fullflow.SignUpFlowTest"
-./gradlew test --tests "login.test.fullflow.LoginFlowTest"
+./gradlew test --tests "onboard.test.fullflow.SignUpFlowTest"
+./gradlew test --tests "onboard.test.fullflow.LoginFlowTest"
 ```
 
 ### With Browser UI (Non-Headless)
@@ -106,7 +106,7 @@ fun `should complete full signup flow`() {
 ### Mobile-Specific Tests
 ```kotlin
 @Test
-fun `login and check blood test status`() {
+fun `onboard and check blood test status`() {
     val user = TestConfig.TestUsers.NEW_USER
     val loginPage = LoginPage(page).navigate() as LoginPage
     

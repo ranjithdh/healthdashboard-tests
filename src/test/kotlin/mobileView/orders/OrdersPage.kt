@@ -19,7 +19,7 @@ import utils.report.StepHelper.CLICK_ORDER_STATUS
 
 class OrdersPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
 
     private var appointmentDate: String? = null

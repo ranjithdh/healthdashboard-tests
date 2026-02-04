@@ -1,11 +1,11 @@
-package login.test.page
+package onboard.test.page
 
 import io.qameta.allure.Epic
 import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
 
@@ -47,7 +47,7 @@ class PersonalDetailsPageTest : BaseTest() {
         context.close()
     }
 
-    private fun navigateToPersonalDetails(): login.page.PersonalDetailsPage {
+    private fun navigateToPersonalDetails(): onboard.page.PersonalDetailsPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.NEW_USER
 

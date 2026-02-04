@@ -1,12 +1,12 @@
-package login.test.page
+package onboard.test.page
 
 import io.qameta.allure.Epic
 import utils.report.Modules
 import com.microsoft.playwright.*
-import login.page.LoginPage
-import login.page.OrderSummaryPage
 import config.BaseTest
 import config.TestConfig
+import onboard.page.LoginPage
+import onboard.page.OrderSummaryPage
 import org.junit.jupiter.api.*
 import utils.OnboardAddOnTestDataStore
 import utils.SignupDataStore

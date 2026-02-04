@@ -5,7 +5,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import login.page.LoginPage
+import onboard.page.LoginPage
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_FILTER
 import utils.report.StepHelper.NAVIGATE_TO_DIAGNOSTICS
@@ -21,37 +21,42 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun checkStaticTextsAndSegments() {
         StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: Book Lab Tests heading")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests"))
-        
+
         StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: flexible testing options text")
         page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("With flexible testing options"))
-        
+
         StepHelper.step(CLICK_FILTER + "All")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).click()
-        
+
         StepHelper.step(CLICK_FILTER + "Blood")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Blood")).click()
-        
+
         StepHelper.step(CLICK_FILTER + "Gene")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gene")).click()
-        
+
         StepHelper.step(CLICK_FILTER + "Gut")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
     }
 
-    fun navigateToDiagnostics() {
+    fun login() {
         StepHelper.step(NAVIGATE_TO_DIAGNOSTICS)
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue(testUser)
         
-        val otpPage = login.page.OtpPage(page)
+        val otpPage = onboard.page.OtpPage(page)
         otpPage.enterOtp(testUser.otp)
-        
-        // Navigate to Home first
-//        page.navigate(TestConfig.Urls.BASE_URL)
-        
-        // Click Book Now to go to Diagnostics (this triggers the API call needed by the test)
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+    }
+
+    fun goToDiagnosticsUrl() {
+        //  page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+    }
+
+    fun navigateToDiagnostics() {
+        login()
+        goToDiagnosticsUrl()
     }
 
     fun clickViewDetails(): TestDetailPage {
@@ -104,46 +109,95 @@ class LabTestsPage(page: Page) : BasePage(page) {
         if (!page.getByTestId("test-card-view-details-$code").isVisible) throw AssertionError("View details not visible for code: $code")
     }
 
-    fun verifyHowItWorksSection() {
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("How it Works?")).click()
+    fun verifyHowItWorksSection(sampleType: String, code: String, reportGenerationHr: String? = null, firstHighlight: String? = null) {
+        val type = sampleType.lowercase()
+        println("Verifying 'How it Works' section for sample type: $type")
 
-        // Step 01
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("01")).click()
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("At-Home Sample Collection")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("At-Home Sample Collection")).click()
-        page.getByText("Schedule the blood sample").click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("How it Works?")).waitFor()
 
-        // Step 02
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("02")).click()
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Get results in 72 hrs")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Get results in 72 hrs")).click()
-        page.getByText("Your sample is processed at a").click()
+        // Logic based on React implementation provided by the user:
+        // If not blood, there is a "Kit Delivered" step first.
+        val steps = mutableListOf<Map<String, String>>()
 
-        // Step 03
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("03")).click()
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("-on-1 Expert Consultation")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("-on-1 Expert Consultation")).click()
-        page.getByText("See how your antibody levels").click()
+        // Step: Kit Delivered (Non-blood only)
+        when (type) {
+            "saliva" -> steps.add(mapOf("title" to "Get Gene Kit Delivered", "desc" to "Your DNA kit arrives at your doorstep with simple cheek swab instructions."))
+            "stool" -> steps.add(mapOf("title" to "Get Gut Kit Delivered", "desc" to "Your gut test kit arrives at your doorstep with easy sample collection instructions."))
+            "dried_blood_spot" -> steps.add(mapOf("title" to "Get Omega Test Kit Delivered", "desc" to "Your Omega test kit arrives at your doorstep with an easy DBS tool."))
+            "saliva_stress" -> steps.add(mapOf("title" to "Get Cortisol Test Kit Delivered", "desc" to "Your cortisol test kit arrives at your doorstep with an easy saliva collection tube."))
+        }
 
-        // Step 04
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("04")).click()
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Track Progress Overtime")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Track Progress Overtime")).click()
-        page.getByText("Monitor these markers over").click()
+        // Step: Sample Collection
+        val collectionTitle = if (type == "saliva" || type == "blood") "At-Home Sample Collection" else "At-Home Self-Test Kit"
+        val collectionDesc = when (type) {
+            "saliva" -> "Schedule a quick home visit — our technician collects your sample in minutes."
+            "stool" -> "Collect your stool sample and schedule a quick pickup from home."
+            "blood" -> "Schedule the blood sample collection from the comfort of your home."
+            "dried_blood_spot" -> "Do easy DBS test by yourself and schedule a quick pickup from home."
+            "saliva_stress" -> "Collect your saliva sample as per the instructions and schedule a quick pickup from home."
+            else -> "Schedule the ${firstHighlight ?: "blood sample"} collection from the comfort of your home."
+        }
+        steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
+
+        // Step: Results
+        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
+        val resultsDesc = when (type) {
+            "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
+            "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
+            "stool" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            "dried_blood_spot" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            "saliva_stress" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            else -> "Your sample is processed at a certified lab, and your report is ready online in 72 hours."
+        }
+        steps.add(mapOf("title" to resultsTitle, "desc" to resultsDesc))
+
+        // Step: Consultation
+        val consultDesc = when (type) {
+            "saliva" -> "Chat with our experts to understand your results and get personalised guidance."
+            "stool" -> "Discuss your gut health report with our experts and get personalised guidance."
+            "blood" -> "See how your antibody levels connect with your symptoms by talking to our experts."
+            "dried_blood_spot" -> "Discuss your Omega panel report with our experts and get personalised guidance."
+            "saliva_stress" -> "Discuss your stress and cortisol report with our experts and get personalised guidance."
+            else -> "See how your antibody levels connect with your symptoms by talking to our experts."
+        }
+        steps.add(mapOf("title" to "1-on-1 Expert Consultation", "desc" to consultDesc))
+
+        // Step: Track Progress (Blood only)
+        if (type == "blood") {
+            steps.add(mapOf("title" to "Track Progress Overtime", "desc" to "Monitor these markers over time to understand changes and treatment response."))
+        }
+
+        // Now verify each step in UI
+        steps.forEachIndexed { index, step ->
+            val stepNum = String.format("%02d", index + 1)
+            println("Verifying step $stepNum: ${step["title"]}")
+
+            // Verify Number
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum)).scrollIntoViewIfNeeded()
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum)).waitFor()
+
+            // Verify Title
+            page.getByText(step["title"]!!).first().waitFor()
+
+            // Verify Description
+            val desc = step["desc"]!!
+            // Description might be long or slightly truncated in getByText if not exact,
+            // but we'll try exact first or a significant prefix
+            page.getByText(desc.take(40)).waitFor()
+        }
     }
 
     fun verifyCertifiedLabsSection() {
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Certified Labs, Secure Data")).click()
+        println("Verifying 'Certified Labs, Secure Data' section")
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Certified Labs, Secure Data")).scrollIntoViewIfNeeded()
 
-        // Certified Labs
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("NABL and CAP Certified")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("NABL and CAP Certified")).click()
-        page.getByText("Each partner lab we work with").click()
+        // Lab Step
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("NABL and CAP Certified Laboratories")).waitFor()
+        page.getByText("Each partner lab we work with is CAP-accredited and NABL-certified.").waitFor()
 
-        // Privacy
-        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Your privacy matters")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your privacy matters")).click()
-        page.getByText("Your health data is always").click()
+        // Privacy Step
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your privacy matters")).waitFor()
+        page.getByText("Your health data is always protected with strict privacy safeguards.").waitFor()
     }
     fun clickFilter(name: String) {
         StepHelper.step(CLICK_FILTER + name)

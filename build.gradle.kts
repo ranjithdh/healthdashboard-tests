@@ -99,6 +99,22 @@ tasks.register<Test>("loginTests") {
     }
 }
 
+// Custom task to run only webView tests
+tasks.register<Test>("webViewTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("webView.*")
+    }
+}
+
+// Custom task to run only onboard tests
+tasks.register<Test>("onboardTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("onboard.*")
+    }
+}
+
 // Install Playwright browsers
 tasks.register<Exec>("installPlaywright") {
     commandLine("npx", "playwright", "install", "--with-deps")

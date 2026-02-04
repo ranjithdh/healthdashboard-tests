@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Page
@@ -15,7 +15,7 @@ private val logger = KotlinLogging.logger {}
 
 class PaymentPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     fun completePayment(): PaymentPage {
         StepHelper.step(COMPLETE_PAYMENT)

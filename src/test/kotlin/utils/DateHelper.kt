@@ -20,6 +20,12 @@ object DateHelper {
         }
     }
 
+    fun localDateTimeToUtc(localDateTime: LocalDateTime?): String {
+        val formatter = DateTimeFormatter.ofPattern(SERVER_FORMAT)
+        val zonedLocal = (localDateTime ?: LocalDateTime.now()).atZone(ZoneId.systemDefault())
+        return zonedLocal.withZoneSameInstant(ZoneId.of("UTC")).format(formatter)
+    }
+
     fun getTomorrowDate(): String {
         val dateFormatter = DateTimeFormatter.ofPattern("dd")
         return dateFormatter.format(LocalDateTime.now().plusDays(1)) ?: dateFormatter.format(LocalDateTime.now())

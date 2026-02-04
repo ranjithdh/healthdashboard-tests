@@ -1,4 +1,4 @@
-package login.page
+package onboard.page
 
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
@@ -6,7 +6,6 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import model.addontest.AddOnTests
-import model.addontest.OnboardDiagnosticProductList
 import model.slot.SlotData
 import model.slot.SlotList
 import utils.OnboardAddOnTestDataStore
@@ -26,12 +25,13 @@ import utils.report.StepHelper.SELECT_POST_MEAL_SLOT
 import utils.report.StepHelper.SELECT_SLOT
 import utils.report.StepHelper.SELECT_SLOTS_CONTINUE
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
 class TimeSlotPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     private var slotData = SlotData()
 
@@ -164,8 +164,13 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     fun selectSlotsAndContinue(): OrderSummaryPage {
         StepHelper.step(SELECT_SLOTS_CONTINUE)
         val currentDate = LocalDateTime.now().plusDays(1)
+
+        val dayFormatted = currentDate.format(
+            DateTimeFormatter.ofPattern("dd")
+        )
+
         selectDateView(
-            currentDate.dayOfMonth.toString(),
+            dayFormatted.toString(),
         )
 
         utils.SignupDataStore.update { slotDate = currentDate }

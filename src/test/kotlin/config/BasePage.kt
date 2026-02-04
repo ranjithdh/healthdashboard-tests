@@ -101,12 +101,7 @@ abstract class BasePage(protected val page: Page) {
         )
     }
     
-    /**
-     * Wait for URL to match pattern
-     */
-    protected fun waitForUrl(pattern: String, timeout: Long = TestConfig.Timeouts.NAVIGATION_TIMEOUT) {
-        page.waitForURL(pattern, Page.WaitForURLOptions().setTimeout(timeout.toDouble()))
-    }
+
     
     /**
      * Take screenshot of current page state
