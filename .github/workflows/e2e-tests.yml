@@ -36,8 +36,8 @@ jobs:
     name: Mobile Tests
     runs-on: ubuntu-22.04
     if: |
-      github.event_name == 'push' || 
-      github.event_name == 'pull_request' || 
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Mobile'))
 
@@ -79,13 +79,23 @@ jobs:
             build/screenshots/
           retention-days: 30
 
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'Mobile View Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
   # Website-only tests
   test-website:
     name: Website Tests
     runs-on: ubuntu-22.04
     if: |
-      github.event_name == 'push' || 
-      github.event_name == 'pull_request' || 
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Website'))
 
@@ -124,13 +134,23 @@ jobs:
             build/screenshots/
           retention-days: 30
 
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'Website Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
   # WebView-only tests
   test-webview:
     name: WebView Tests
     runs-on: ubuntu-22.04
     if: |
-      github.event_name == 'push' || 
-      github.event_name == 'pull_request' || 
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'WebView'))
 
@@ -169,13 +189,23 @@ jobs:
             build/screenshots/
           retention-days: 30
 
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'WebView Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
   # Onboard-only tests
   test-onboard:
     name: Onboard Tests
     runs-on: ubuntu-22.04
     if: |
-      github.event_name == 'push' || 
-      github.event_name == 'pull_request' || 
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' ||
       github.event_name == 'schedule' ||
       (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Onboard'))
 
@@ -216,4 +246,16 @@ jobs:
             build/allure-report-v3/
             build/screenshots/
           retention-days: 30
+
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'Onboard Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+
+
 
