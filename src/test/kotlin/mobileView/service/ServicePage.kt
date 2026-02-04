@@ -14,6 +14,8 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import webView.diagnostics.symptoms.model.SymptomsData
+import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.regex.Pattern
@@ -35,8 +37,11 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     private var serviceData: ServiceResponse? = null
-
-
+    private var symptomsResponse: SymptomsData? = null
+    var isSymptomsEmpty = false
+    init {
+        monitorTraffic()
+    }
     fun navigateToServices() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -548,5 +553,26 @@ class ServicePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom")).click()
+    }
+    private fun monitorTraffic() {
+        val symptomsList = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
+                logger.info { "API Response: ${response.status()} ${response.url()}" }
+                try {
+                    if (response.status() == 200) {
+                        val responseBody = response.text()
+                        if (!responseBody.isNullOrBlank()) {
+                            val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
+                            symptomsResponse = responseObj.data
+                            isSymptomsEmpty = responseObj.data.symptoms.isEmpty()
+                            logger.info { "isSymptomsEmpty set to: $isSymptomsEmpty" }
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.warn { "Could not read response body: ${e.message}" }
+                }
+            }
+        }
+        page.onResponse(symptomsList)
     }
 }

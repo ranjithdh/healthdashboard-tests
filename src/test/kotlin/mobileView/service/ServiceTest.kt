@@ -90,7 +90,8 @@ class ServiceTest : BaseTest() {
         servicePage.verifyServices(targetProductId)
         val product = servicePage.getProductById(targetProductId)
         val status = product?.item_purchase_status
-        if (!status.equals("paid", ignoreCase = true)) {
+//        if (!status.equals("paid", ignoreCase = true)) {
+        if (servicePage.isSymptomsEmpty) {
             servicePage.verifySymptomReportFeedbackDialog()
 
             servicePage.dialogValidation()
