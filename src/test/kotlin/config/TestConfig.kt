@@ -83,20 +83,21 @@ object TestConfig {
     }
 
 
-       object Browser {
-            const val SLOW_MO: Double = (1 * 1000).toDouble()
-            const val TIMEOUT: Double = 60000.toDouble()
+    object Browser {
+        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val TIMEOUT: Double = 60000.toDouble()
 
-            fun launchOptions(): BrowserType.LaunchOptions {
-                val isHeadless = System.getenv("HEADLESS")?.toBoolean()
-                    ?: System.getProperty("headless")?.toBoolean()
-                    ?: false   //TODO default safe for CI is true
+        fun launchOptions(): BrowserType.LaunchOptions {
+            val isHeadless = System.getenv("HEADLESS")?.toBoolean()
+                ?: System.getProperty("headless")?.toBoolean()
+                ?: true   //TODO default safe for CI is true
 
-                return BrowserType.LaunchOptions()
-                    .setHeadless(isHeadless)
-                    .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
-            }
+            return BrowserType.LaunchOptions()
+                .setHeadless(isHeadless)
+                .setSlowMo(SLOW_MO)
+            //   .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
         }
+    }
 
     object Viewports {
         // Mobile devices
@@ -151,16 +152,16 @@ object TestConfig {
                 )*/
 
         val EXISTING_USER = TestUser(
-              mobileNumber = "7373791414",
-              otp = "678901",
-              country = "India"
-          )
-
-      /*  val EXISTING_USER = TestUser(
-            mobileNumber = "9159439327",
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India"
-        )*/
+        )
+
+        /*  val EXISTING_USER = TestUser(
+              mobileNumber = "9159439327",
+              otp = "678901",
+              country = "India"
+          )*/
     }
 
     object Artifacts {
