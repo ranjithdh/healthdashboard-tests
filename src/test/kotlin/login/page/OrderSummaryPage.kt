@@ -6,15 +6,24 @@ import config.BasePage
 import config.TestConfig
 import mobileView.home.HomePage
 import utils.logger.logger
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.ADD_ALL_ADDON_TESTS
+import utils.report.StepHelper.ADD_FIRST_ADDON
+import utils.report.StepHelper.ADD_SECOND_ADDON
+import utils.report.StepHelper.CLEAR_COUPON_CODE
+import utils.report.StepHelper.CLICK_APPLY_COUPON
+import utils.report.StepHelper.CLICK_CHECKOUT
+import utils.report.StepHelper.ENTER_COUPON_CODE
+import utils.report.StepHelper.REMOVE_ALL_ADDON_TESTS
+import utils.report.StepHelper.REMOVE_COUPON
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.LOGIN_URL
 
-    @Step("Enter Coupon Code: {code}")
     fun enterCouponCode(code: String): OrderSummaryPage {
+        StepHelper.step(ENTER_COUPON_CODE + code)
         logger.info { "enterCouponCode($code)" }
         if (!isCouponInputVisible()) {
             byText("Have a referral/ coupon code").click()
@@ -23,8 +32,8 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Click Apply Coupon")
     fun clickApplyCoupon(): OrderSummaryPage {
+        StepHelper.step(CLICK_APPLY_COUPON)
         logger.info { "clickApplyCoupon()" }
         val button = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Apply"))
         if (button.isVisible) {
@@ -35,15 +44,15 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Clear Coupon Code")
     fun clearCouponCode(): OrderSummaryPage {
+        StepHelper.step(CLEAR_COUPON_CODE)
         logger.info { "clearCouponCode()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter code")).clear()
         return this
     }
 
-    @Step("Click Checkout")
     fun clickCheckout(): HomePage {
+        StepHelper.step(CLICK_CHECKOUT)
         logger.info { "clickCheckout()" }
         page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
 
@@ -93,8 +102,8 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             .isVisible
     }
 
-    @Step("Remove Coupon")
     fun removeCoupon(): OrderSummaryPage {
+        StepHelper.step(REMOVE_COUPON)
         logger.info { "removeCoupon()" }
         byRole(AriaRole.IMG).nth(3).click()
         return this
@@ -126,29 +135,29 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     private val totalAmount = page.getByText("Total₹9,999", Page.GetByTextOptions().setExact(true))
 
 
-    @Step("Add All Add-on Tests")
     fun addAllTheAddOnTests() {
+        StepHelper.step(ADD_ALL_ADDON_TESTS)
         firstTest?.click()
         secondTest?.click()
         thirdTest?.click()
         fourthTest?.click()
     }
 
-    @Step("Remove All Add-on Tests")
     fun removeAllTheAddOnTests() {
+        StepHelper.step(REMOVE_ALL_ADDON_TESTS)
         removeFirstTest?.click()
         removeSecondTest?.click()
         removeThirdTest?.click()
         removeFourthTest?.click()
     }
 
-    @Step("Add First Add-on")
     fun addFirstAddOn() {
+        StepHelper.step(ADD_FIRST_ADDON)
         firstTest.click()
     }
 
-    @Step("Add Second Add-on")
     fun addSecondAddOn() {
+        StepHelper.step(ADD_SECOND_ADDON)
         secondTest.click()
     }
 

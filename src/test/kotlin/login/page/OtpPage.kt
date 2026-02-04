@@ -6,7 +6,19 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_CONTINUE
+import utils.report.StepHelper.CLICK_EDIT_BUTTON
+import utils.report.StepHelper.ENTER_OTP
+import utils.report.StepHelper.ENTER_OTP_ACCOUNT_CREATION
+import utils.report.StepHelper.ENTER_OTP_HEALTH_DATA
+import utils.report.StepHelper.ENTER_OTP_HOME
+import utils.report.StepHelper.ENTER_OTP_INSIGHTS
+import utils.report.StepHelper.ENTER_OTP_LAB_TEST
+import utils.report.StepHelper.ENTER_OTP_MOBILE_HOME
+import utils.report.StepHelper.ENTER_OTP_PROFILE
+import utils.report.StepHelper.TOGGLE_WHATSAPP_CHECKBOX
+import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.page.LabTestsPage
 import mobileView.home.HomePage
 import model.signup.VerifyOtpResponse
@@ -66,15 +78,15 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Enter OTP: {otp}")
     fun enterOtp(otp: String): OtpPage {
+        StepHelper.step(ENTER_OTP + otp)
         logger.info { "enterOtp($otp)" }
         byRole(AriaRole.TEXTBOX).fill(otp)
         return this
     }
 
-    @Step("Click Continue button")
     fun clickContinue(): OtpPage {
+        StepHelper.step(CLICK_CONTINUE)
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
@@ -82,8 +94,8 @@ class OtpPage(page: Page) : BasePage(page) {
 
 
 
-    @Step("Enter OTP and continue to account creation")
     fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
+        StepHelper.step(ENTER_OTP_ACCOUNT_CREATION)
         enterOtp(testUser.otp)
 
         val basicDetailsPage = BasicDetailsPage(page)
@@ -92,8 +104,8 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Enter OTP and continue to mobile home page")
     fun enterOtpAndContinueToMobileHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
+        StepHelper.step(ENTER_OTP_MOBILE_HOME)
         enterOtp(testUser.otp)
 
         val homePage = HomePage(page)
@@ -102,8 +114,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    @Step("Enter OTP and continue to profile")
     fun enterOtpAndContinueToProfile(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): ProfilePage {
+        StepHelper.step(ENTER_OTP_PROFILE)
         enterOtp(testUser.otp)
         val profilePage = ProfilePage(page)
 
@@ -113,8 +125,8 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Enter OTP and continue to home page")
     fun enterOtpAndContinueToHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
+        StepHelper.step(ENTER_OTP_HOME)
         enterOtp(testUser.otp)
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -122,15 +134,15 @@ class OtpPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    @Step("Click Edit button")
     fun clickEdit(): LoginPage {
+        StepHelper.step(CLICK_EDIT_BUTTON)
         logger.info { "clickEdit()" }
         byText("Edit").click()
         return LoginPage(page)
     }
 
-    @Step("Wait for confirm screen")
     fun waitForConfirmScreen(): OtpPage {
+        StepHelper.step(WAIT_CONFIRM_SCREEN)
         logger.info { "waitForConfirmScreen()" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Confirm your number")).waitFor()
         return this
@@ -168,15 +180,15 @@ class OtpPage(page: Page) : BasePage(page) {
         return byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).isChecked
     }
 
-    @Step("Toggle WhatsApp Checkbox")
     fun toggleWhatsAppCheckbox(): OtpPage {
+        StepHelper.step(TOGGLE_WHATSAPP_CHECKBOX)
         logger.info { "toggleWhatsAppCheckbox()" }
         byRole(AriaRole.CHECKBOX, Page.GetByRoleOptions().setName("Send OTP on WhatsApp")).click()
         return this
     }
 
-    @Step("Enter OTP and continue to Lab Test page (Web)")
     fun enterOtpAndContinueToLabTestForWeb(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): LabTestsPage {
+        StepHelper.step(ENTER_OTP_LAB_TEST)
         enterOtp(testUser.otp)
 //        clickContinue()
 
@@ -215,8 +227,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return page.getByText("Incorrect OTP").isVisible
     }
 
-    @Step("Enter OTP and continue to Health Data")
     fun enterOtpAndContinueToHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
+        StepHelper.step(ENTER_OTP_HEALTH_DATA)
         enterOtp(testUser.otp)
         // Wait for login to complete (either by URL change or timeout)
         try {
@@ -232,8 +244,8 @@ class OtpPage(page: Page) : BasePage(page) {
         return healthDataPage
     }
 
-    @Step("Enter OTP and continue to Insights (Web)")
     fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
+        StepHelper.step(ENTER_OTP_INSIGHTS)
         enterOtp(otp)
 
         val homePage = HomePageWebsite(page)

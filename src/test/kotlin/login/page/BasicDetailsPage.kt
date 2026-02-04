@@ -5,7 +5,12 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_CONTINUE
+import utils.report.StepHelper.ENTER_EMAIL
+import utils.report.StepHelper.ENTER_FIRST_NAME
+import utils.report.StepHelper.FILL_BASIC_DETAILS
+import utils.report.StepHelper.FILL_BASIC_DETAILS_CONTINUE
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -19,16 +24,16 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     private val emailInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email"))
 
 
-    @Step("Enter First Name: {firstName}")
     fun enterFirstName(firstName: String): BasicDetailsPage {
+        StepHelper.step(ENTER_FIRST_NAME + firstName)
         logger.info { "enterFirstName($firstName)" }
         firstNameInput.fill(firstName)
         return this
     }
 
 
-    @Step("Enter Email: {email}")
     fun enterEmail(email: String): BasicDetailsPage {
+        StepHelper.step(ENTER_EMAIL + email)
         logger.info { "enterEmail($email)" }
         emailInput.fill(email)
         return this
@@ -47,8 +52,8 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Fill Basic Details")
     fun fillDetails(firstName: String,email: String): BasicDetailsPage {
+        StepHelper.step(FILL_BASIC_DETAILS)
         logger.info { "fillDetails($firstName, $email)" }
         utils.SignupDataStore.update {
             this.firstName = firstName
@@ -60,15 +65,15 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Click Continue")
     fun clickContinue(): BasicDetailsPage {
+        StepHelper.step(CLICK_CONTINUE)
         logger.info { "clickContinue()" }
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
     }
 
-    @Step("Fill Basic Details and Continue")
     fun fillBasicDetails(): PersonalDetailsPage {
+        StepHelper.step(FILL_BASIC_DETAILS_CONTINUE)
         val testUser: TestUser = TestConfig.TestUsers.NEW_USER
         
         logger.info { "fillBasicDetails()" }
