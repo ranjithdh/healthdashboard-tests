@@ -4,6 +4,7 @@ import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import config.BaseTest
 import config.TestConfig
 import org.junit.jupiter.api.*
 import website.page.detail.AdvancedHeartHealthDetailPage
@@ -13,12 +14,11 @@ import website.page.detail.WomenFertilityDetailPage
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BloodHealthDetailPageTest {
+class BloodHealthDetailPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

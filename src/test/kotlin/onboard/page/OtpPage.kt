@@ -14,9 +14,9 @@ import model.healthdata.HealthData
 import model.signup.VerifyOtpResponse
 import profile.page.ProfilePage
 import utils.json.json
-import symptoms.page.SymptomsPage
+import webView.diagnostics.symptoms.page.SymptomsPage
 import utils.logger.logger
-
+import webView.diagnostics.home.HomePageWebsite
 
 
 class OtpPage(page: Page) : BasePage(page) {
@@ -242,6 +242,9 @@ class OtpPage(page: Page) : BasePage(page) {
     @Step("Enter OTP and continue to Insights (Web)")
     fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
         enterOtp(otp)
+
+        val homePage = HomePageWebsite(page)
+        homePage.waitFoWebPageHomePageConfirmation()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
         val symptomsPage = SymptomsPage(page)

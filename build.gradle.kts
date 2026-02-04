@@ -31,7 +31,7 @@ dependencies {
 
     // JSON parsing for test data
     testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-    
+
     // Allure
     testImplementation("io.qameta.allure:allure-junit5:2.29.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
@@ -50,7 +50,7 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    
+
     // Attach AspectJ Agent for Allure steps and attachments
     jvmArgs("-javaagent:${agent.singleFile}")
 
@@ -87,7 +87,6 @@ tasks.register<Test>("appTests") {
         includeTestsMatching("login.*")
         includeTestsMatching("healthdata.*")
         includeTestsMatching("profile.*")
-        includeTestsMatching("symptoms.*")
         includeTestsMatching("webView.*")
     }
 }
@@ -97,6 +96,22 @@ tasks.register<Test>("loginTests") {
     useJUnitPlatform()
     filter {
         includeTestsMatching("login.*")
+    }
+}
+
+// Custom task to run only webView tests
+tasks.register<Test>("webViewTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("webView.*")
+    }
+}
+
+// Custom task to run only onboard tests
+tasks.register<Test>("onboardTests") {
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching("onboard.*")
     }
 }
 
@@ -120,9 +135,9 @@ allure {
 tasks.register<Exec>("allure3Report") {
     group = "verification"
     description = "Generates Allure Report v3"
-    
+
     val env = project.findProperty("environment") ?: "Local"
-    
+
     doFirst {
         val resultsDir = file("build/allure-results")
         if (!resultsDir.exists()) {
@@ -130,15 +145,24 @@ tasks.register<Exec>("allure3Report") {
         }
         val envFile = resultsDir.resolve("environment.properties")
         envFile.writeText("Environment=$env")
-        
+
         // Clean up old report
         val reportDir = file("build/allure-report-v3")
         if (reportDir.exists()) {
             reportDir.deleteRecursively()
         }
     }
-    
-    commandLine("npx", "allure", "generate", "--config", "allurerc.mjs", "build/allure-results", "-o", "build/allure-report-v3")
+
+    commandLine(
+        "npx",
+        "allure",
+        "generate",
+        "--config",
+        "allurerc.mjs",
+        "build/allure-results",
+        "-o",
+        "build/allure-report-v3"
+    )
 }
 
 tasks.register<Exec>("allure3Serve") {

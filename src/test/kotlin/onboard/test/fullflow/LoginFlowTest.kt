@@ -1,6 +1,7 @@
 package onboard.test.fullflow
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
@@ -12,12 +13,11 @@ import java.nio.file.Paths
 @Epic("Login")
 @Feature("End-to-End Login Flow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginFlowTest {
+class LoginFlowTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

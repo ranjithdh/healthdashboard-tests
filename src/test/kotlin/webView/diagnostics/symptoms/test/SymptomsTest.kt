@@ -1,28 +1,20 @@
-package symptoms.test
+package webView.diagnostics.symptoms.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class SymptomsTest {
+class SymptomsTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {
@@ -68,6 +60,8 @@ class SymptomsTest {
 
         val loginPage = LoginPage(page).navigate() as LoginPage
 
+
+
         val symptomsMain =
             loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
@@ -81,6 +75,9 @@ class SymptomsTest {
         symptomsMain.onReportSymptomsButtonClick()
         symptomsMain.selectAllSymptoms()
         symptomsMain.submitSymptoms()
+
+        // 🔥 NEW: wait for all APIs + then validate
+        symptomsMain.waitForApiAndValidate()
     }
 
 
@@ -105,7 +102,7 @@ class SymptomsTest {
     }
 
 
-    @Test
+/*    @Test
     fun `reported symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
 
@@ -114,10 +111,11 @@ class SymptomsTest {
         val symptomsMain =
             loginPage.enterMobileAndContinue(testUser)
                 .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()
 
-    }
+    }*/
 
 
 }

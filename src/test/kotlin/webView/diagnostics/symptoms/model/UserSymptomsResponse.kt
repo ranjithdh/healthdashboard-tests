@@ -1,4 +1,4 @@
-package symptoms.model
+package webView.diagnostics.symptoms.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -32,7 +32,7 @@ data class Symptom(
     val lastReported: String? = null,
 
     @SerialName("personalized_generated_description")
-    val personalizedGeneratedDescription: PersonalizedGeneratedDescription? = null,
+    var personalizedGeneratedDescription: PersonalizedGeneratedDescription? = null,
 
     val biomarkers: List<Biomarker> = emptyList(),
 
@@ -44,10 +44,10 @@ data class Symptom(
 @Serializable
 data class PersonalizedGeneratedDescription(
     @SerialName("what_it_means_to_you")
-    val whatItMeansToYou: List<String> = emptyList(),
+    var whatItMeansToYou: List<String> = emptyList(),
 
     @SerialName("causing_factors_explanation")
-    val causingFactorsExplanation: List<CausingFactorExplanation> = emptyList()
+    var causingFactorsExplanation: List<CausingFactorExplanation> = emptyList()
 )
 
 
@@ -86,5 +86,51 @@ data class Biomarker(
 
     val tag: String? = null
 )
+
+
+@Serializable
+data class UserSymptomDetailResponse(
+    val status: String,
+    val message: String,
+    val data: SymptomDetailData
+)
+
+@Serializable
+data class SymptomDetailData(
+    val id: String,
+
+    @SerialName("user_id")
+    val userId: String,
+
+    @SerialName("symptom_id")
+    val symptomId: String,
+
+    @SerialName("reported_at")
+    val reportedAt: String,
+
+    @SerialName("is_latest")
+    val isLatest: Boolean,
+
+    val description: SymptomDescription,
+
+    @SerialName("data_hash")
+    val dataHash: String,
+
+    @SerialName("created_at")
+    val createdAt: String,
+
+    @SerialName("updated_at")
+    val updatedAt: String
+)
+
+@Serializable
+data class SymptomDescription(
+    @SerialName("what_it_means_to_you")
+    val whatItMeansToYou: List<String>,
+
+    @SerialName("causing_factors_explanation")
+    val causingFactorsExplanation: List<CausingFactorExplanation>
+)
+
 
 

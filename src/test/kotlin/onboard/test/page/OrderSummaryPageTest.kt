@@ -1,6 +1,9 @@
 package onboard.test.page
 
 import com.microsoft.playwright.*
+import onboard.page.LoginPage
+import onboard.page.OrderSummaryPage
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import onboard.page.OrderSummaryPage
@@ -12,12 +15,11 @@ import kotlin.collections.forEach
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class OrderSummaryPageTest {
+class OrderSummaryPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

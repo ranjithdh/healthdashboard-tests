@@ -18,6 +18,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import io.qameta.allure.Step
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
@@ -243,12 +244,12 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
 
         val payload = buildJsonObject {
             put("is_user_present", false)
-            
+
             if (isAddOn) {
                 val productIds = mutableListOf<Int>()
                 val thyrocareProductIds = mutableListOf<String>()
                 val orderIds = mutableListOf<String>()
-                
+
                 productIds.add(103)
                 thyrocareProductIds.add("DH_LONGEVITY_PANEL")
                 orderIds.add("VL192030")
@@ -308,7 +309,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             put("first_name", signupData.firstName ?: "John")
             put("last_name", signupData.lastName ?: "Doe")
             put("gender", (signupData.gender ?: "male").lowercase())
-            
+
             val dobDate = ZonedDateTime.of(
                 signupData.year?.toInt() ?: 1990,
                 signupData.month?.toInt() ?: 1,
@@ -321,7 +322,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             put("weight", signupData.weight?.toIntOrNull() ?: 70)
             put("ref_source", "automation")
             put("is_created_by_admin", true)
-            
+
             putJsonObject("communication_address") {
                 put("address_line_1", signupData.address ?: "123 Main Street")
                 put("address_line_2", "Apt 4B")

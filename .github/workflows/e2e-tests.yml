@@ -2,7 +2,7 @@ name: E2E Tests - Playwright + Kotlin
 
 on:
   push:
-    branches: [website_test]
+    branches: [main]
 #  pull_request:
 #    types: [opened, synchronize, reopened]
 #    branches: [main]
@@ -19,7 +19,8 @@ on:
           - All
           - Mobile
           - Website
-          - App
+          - WebView
+          - Onboard
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,107 +32,62 @@ env:
 
 jobs:
   # Mobile-only tests
-  # test-mobile:
-  #   name: Mobile Tests
-  #   runs-on: ubuntu-22.04
-  #   if: |
-  #     github.event_name == 'push' || 
-  #     github.event_name == 'pull_request' || 
-  #     github.event_name == 'schedule' ||
-  #     (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Mobile'))
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Set up JDK 17
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: '17'
-  #         distribution: 'temurin'
-  #         cache: 'gradle'
-  #
-  #     - name: Install Playwright browsers
-  #       run: npx playwright@1.49.0 install --with-deps chromium webkit
-  #
-  #     - name: Install Playwright dependencies
-  #       run: npx playwright@1.49.0 install-deps
-  #
-  #     - name: Run mobile tests
-  #       run: ./gradlew mobileTests
-  #       env:
-  #         TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-  #         TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
-  #
-  #     - name: Generate Allure report
-  #       if: always()
-  #       run: ./gradlew allure3Report -Penvironment=Mobile
-  #
-  #     - name: Upload results
-  #       uses: actions/upload-artifact@v4
-  #       if: always()
-  #       with:
-  #         name: mobile-test-results
-  #         path: |
-  #           build/reports/tests/
-  #           build/allure-report-v3/
-  #           build/screenshots/
-  #         retention-days: 30
-
-  # Website-only tests
-  # test-website:
-  #   name: Website Tests
-  #   runs-on: ubuntu-22.04
-  #   if: |
-  #     github.event_name == 'push' || 
-  #     github.event_name == 'pull_request' || 
-  #     github.event_name == 'schedule' ||
-  #     (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Website'))
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Set up JDK 17
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: '17'
-  #         distribution: 'temurin'
-  #         cache: 'gradle'
-  #
-  #     - name: Install Playwright browsers
-  #       run: npx playwright@1.49.0 install --with-deps chromium
-  #
-  #     - name: Install Playwright dependencies
-  #       run: npx playwright@1.49.0 install-deps
-  #
-  #     - name: Run website tests
-  #       run: ./gradlew websiteTests
-  #
-  #     - name: Generate Allure report
-  #       if: always()
-  #       run: ./gradlew allure3Report -Penvironment=Website
-  #
-  #     - name: Upload results
-  #       uses: actions/upload-artifact@v4
-  #       if: always()
-  #       with:
-  #         name: website-test-results
-  #         path: |
-  #           build/reports/tests/
-  #           build/allure-report-v3/
-  #           build/screenshots/
-  #         retention-days: 30
-
-  # Login-only tests
-  test-login:
-    name: Login Tests
+  test-mobile:
+    name: Mobile Tests
     runs-on: ubuntu-22.04
     if: |
       github.event_name == 'push' || 
       github.event_name == 'pull_request' || 
       github.event_name == 'schedule' ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'App'))
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Mobile'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Install Playwright browsers
+        run: npx playwright@1.49.0 install --with-deps chromium webkit
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
+
+      - name: Run mobile tests
+        run: ./gradlew mobileTests
+        env:
+          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
+          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
+
+      - name: Generate Allure report
+        if: always()
+        run: ./gradlew allure3Report -Penvironment=Mobile
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-test-results
+          path: |
+            build/reports/tests/
+            build/allure-report-v3/
+            build/screenshots/
+          retention-days: 30
+
+  # Website-only tests
+  test-website:
+    name: Website Tests
+    runs-on: ubuntu-22.04
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Website'))
 
     steps:
       - name: Checkout code
@@ -150,110 +106,114 @@ jobs:
       - name: Install Playwright dependencies
         run: npx playwright@1.49.0 install-deps
 
-      - name: Run login tests
-        run: ./gradlew loginTests
-        env:
-          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
+      - name: Run website tests
+        run: ./gradlew websiteTests
 
       - name: Generate Allure report
         if: always()
-        run: ./gradlew allure3Report -Penvironment=Login
+        run: ./gradlew allure3Report -Penvironment=Website
 
       - name: Upload results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: login-test-results
+          name: website-test-results
           path: |
             build/reports/tests/
             build/allure-report-v3/
             build/screenshots/
           retention-days: 30
 
-  # App-only tests (Login, Profile, etc.)
-  # test-app:
-  #   name: App Tests
-  #   runs-on: ubuntu-22.04
-  #   if: |
-  #     github.event_name == 'push' || 
-  #     github.event_name == 'pull_request' || 
-  #     github.event_name == 'schedule' ||
-  #     (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'App'))
-  #
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Set up JDK 17
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         java-version: '17'
-  #         distribution: 'temurin'
-  #         cache: 'gradle'
-  #
-  #     - name: Install Playwright browsers
-  #       run: npx playwright@1.49.0 install --with-deps chromium firefox
-  #
-  #     - name: Install Playwright dependencies
-  #       run: npx playwright@1.49.0 install-deps
-  #
-  #     - name: Run app tests
-  #       run: ./gradlew appTests
-  #       env:
-  #         TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-  #         TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
-  #
-  #     - name: Generate Allure report
-  #       if: always()
-  #       run: ./gradlew allure3Report -Penvironment=App
-  #
-  #     - name: Upload results
-  #       uses: actions/upload-artifact@v4
-  #       if: always()
-  #       with:
-  #         name: app-test-results
-  #         path: |
-  #           build/reports/tests/
-  #           build/allure-report-v3/
-  #           build/screenshots/
-  #         retention-days: 30
+  # WebView-only tests
+  test-webview:
+    name: WebView Tests
+    runs-on: ubuntu-22.04
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'WebView'))
 
-#  # Cross-browser tests
-#  test-cross-browser:
-#    name: Cross-Browser Tests
-#    runs-on: ubuntu-22.04
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        browser: [chromium, firefox, webkit]
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: '17'
-#          distribution: 'temurin'
-#          cache: 'gradle'
-#
-#      - name: Install Playwright browser (${{ matrix.browser }})
-#        run: npx playwright@1.44.0 install --with-deps ${{ matrix.browser }}
-#
-#      - name: Run tests on ${{ matrix.browser }}
-#        run: ./gradlew test -Dbrowser=${{ matrix.browser }}
-#        env:
-#          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-#          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
-#
-#      - name: Upload results
-#        uses: actions/upload-artifact@v4
-#        if: always()
-#        with:
-#          name: ${{ matrix.browser }}-test-results
-#          path: |
-#            build/reports/tests/
-#            build/screenshots/
-#          retention-days: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Install Playwright browsers
+        run: npx playwright@1.49.0 install --with-deps chromium
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
+
+      - name: Run WebView tests
+        run: ./gradlew webViewTests
+
+      - name: Generate Allure report
+        if: always()
+        run: ./gradlew allure3Report -Penvironment=WebView
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: webview-test-results
+          path: |
+            build/reports/tests/
+            build/allure-report-v3/
+            build/screenshots/
+          retention-days: 30
+
+  # Onboard-only tests
+  test-onboard:
+    name: Onboard Tests
+    runs-on: ubuntu-22.04
+    if: |
+      github.event_name == 'push' || 
+      github.event_name == 'pull_request' || 
+      github.event_name == 'schedule' ||
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Onboard'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Install Playwright browsers
+        run: npx playwright@1.49.0 install --with-deps chromium
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
+
+      - name: Run onboard tests
+        run: ./gradlew onboardTests
+        env:
+          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
+          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
+
+      - name: Generate Allure report
+        if: always()
+        run: ./gradlew allure3Report -Penvironment=Onboard
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: onboard-test-results
+          path: |
+            build/reports/tests/
+            build/allure-report-v3/
+            build/screenshots/
+          retention-days: 30
+

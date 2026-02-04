@@ -1,18 +1,18 @@
 package onboard.test.page
 
 import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BasicDetailsPageTest {
+class BasicDetailsPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

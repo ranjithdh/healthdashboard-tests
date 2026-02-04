@@ -2,13 +2,15 @@ package healthdata.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
 import com.microsoft.playwright.options.AriaRole
+import config.BaseTest
 import config.TestConfig
 import healthdata.page.HealthDataPage
+import onboard.page.LoginPage
+import onboard.page.OtpPage
 import model.healthdata.Biomarker
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
@@ -22,12 +24,11 @@ import java.nio.file.Paths
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class HealthDataPageTest {
+class HealthDataPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
     private lateinit var healthDataPage: HealthDataPage
 
     private val csvPath = "/Users/apple/Downloads/Deep-Holistics-Biomarkers-export.csv"

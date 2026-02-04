@@ -2,10 +2,10 @@ package onboard.test.fullflow
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import mobileView.home.checkBloodTestBookedCardStatus
@@ -19,12 +19,11 @@ import kotlin.test.assertTrue
 @Epic("Login")
 @Feature("Sign Up Flow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SignUpFlowTest {
+class SignUpFlowTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

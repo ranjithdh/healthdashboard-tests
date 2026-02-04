@@ -1,9 +1,7 @@
 package onboard.test.page
 
-import com.microsoft.playwright.Browser
-import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
-import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.*
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import onboard.page.TimeSlotPage
@@ -12,12 +10,11 @@ import utils.logger.logger
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class TimeSlotPageTest {
+class TimeSlotPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

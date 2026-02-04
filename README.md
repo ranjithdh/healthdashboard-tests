@@ -106,7 +106,7 @@ fun `should complete full signup flow`() {
 ### Mobile-Specific Tests
 ```kotlin
 @Test
-fun `login and check blood test status`() {
+fun `onboard and check blood test status`() {
     val user = TestConfig.TestUsers.NEW_USER
     val loginPage = LoginPage(page).navigate() as LoginPage
     

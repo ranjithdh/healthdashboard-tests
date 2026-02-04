@@ -231,15 +231,83 @@ class TestDetailPage(page: Page) : BasePage(page) {
     }
 
     /**
-     * Verify complete "How it Works?" section (wrapper for all steps)
+     * Verify "How it Works?" section dynamically based on sample type
      */
-    fun verifyHowItWorksSection(): TestDetailPage {
-        logger.info { "Verifying complete How it Works section" }
-        verifyHowItWorksHeading()
-        verifyStep01()
-        verifyStep02()
-        verifyStep03()
-        verifyStep04()
+    fun verifyHowItWorksSection(sampleType: String, code: String, reportGenerationHr: String? = null, firstHighlight: String? = null): TestDetailPage {
+        val type = sampleType.lowercase()
+        logger.info { "Verifying 'How it Works' section for sample type: $type" }
+
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("How it Works?")).waitFor()
+
+        // Logic based on React implementation provided by the user:
+        val steps = mutableListOf<Map<String, String>>()
+
+        // Step: Kit Delivered (Non-blood only)
+        when (type) {
+            "saliva" -> steps.add(mapOf("title" to "Get Gene Kit Delivered", "desc" to "Your DNA kit arrives at your doorstep with simple cheek swab instructions."))
+            "stool" -> steps.add(mapOf("title" to "Get Gut Kit Delivered", "desc" to "Your gut test kit arrives at your doorstep with easy sample collection instructions."))
+            "dried_blood_spot" -> steps.add(mapOf("title" to "Get Omega Test Kit Delivered", "desc" to "Your Omega test kit arrives at your doorstep with an easy DBS tool."))
+            "saliva_stress" -> steps.add(mapOf("title" to "Get Cortisol Test Kit Delivered", "desc" to "Your cortisol test kit arrives at your doorstep with an easy saliva collection tube."))
+        }
+
+        // Step: Sample Collection
+        val collectionTitle = if (type == "saliva" || type == "blood") "At-Home Sample Collection" else "At-Home Self-Test Kit"
+        val collectionDesc = when (type) {
+            "saliva" -> "Schedule a quick home visit — our technician collects your sample in minutes."
+            "stool" -> "Collect your stool sample and schedule a quick pickup from home."
+            "blood" -> "Schedule the blood sample collection from the comfort of your home."
+            "dried_blood_spot" -> "Do easy DBS test by yourself and schedule a quick pickup from home."
+            "saliva_stress" -> "Collect your saliva sample as per the instructions and schedule a quick pickup from home."
+            else -> "Schedule the ${firstHighlight ?: "blood sample"} collection from the comfort of your home."
+        }
+        steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
+
+        // Step: Results
+        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
+        val resultsDesc = when (type) {
+            "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
+            "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
+            "stool" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            "dried_blood_spot" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            "saliva_stress" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+            else -> "Your sample is processed at a certified lab, and your report is ready online in 72 hours."
+        }
+        steps.add(mapOf("title" to resultsTitle, "desc" to resultsDesc))
+
+        // Step: Consultation
+        val consultDesc = when (type) {
+            "saliva" -> "Chat with our experts to understand your results and get personalised guidance."
+            "stool" -> "Discuss your gut health report with our experts and get personalised guidance."
+            "blood" -> "See how your antibody levels connect with your symptoms by talking to our experts."
+            "dried_blood_spot" -> "Discuss your Omega panel report with our experts and get personalised guidance."
+            "saliva_stress" -> "Discuss your stress and cortisol report with our experts and get personalised guidance."
+            else -> "See how your antibody levels connect with your symptoms by talking to our experts."
+        }
+        steps.add(mapOf("title" to "1-on-1 Expert Consultation", "desc" to consultDesc))
+
+        // Step: Track Progress (Blood only)
+        if (type == "blood") {
+            steps.add(mapOf("title" to "Track Progress Overtime", "desc" to "Monitor these markers over time to understand changes and treatment response."))
+        }
+
+        // Now verify each step in UI
+        steps.forEachIndexed { index, step ->
+            val stepNum = String.format("%02d", index + 1)
+            val title = step["title"]!!
+            val desc = step["desc"]!!
+            logger.info { "Verifying step $stepNum: $title" }
+            
+            // Verify Number
+            val numHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum))
+            numHeading.scrollIntoViewIfNeeded()
+            numHeading.waitFor()
+            
+            // Verify Title - using getByText with exact=false for maximum flexibility with casing/hrs vs Hours
+            page.getByText(title).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))
+            
+            // Verify Description (partial match for flexibility)
+            page.getByText(desc.take(40)).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))
+        }
         return this
     }
 

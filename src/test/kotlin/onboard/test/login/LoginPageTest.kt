@@ -2,10 +2,10 @@ package onboard.test.login
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
@@ -17,12 +17,11 @@ import java.nio.file.Paths
 @Epic("Login")
 @Feature("Login Page UI")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LoginPageTest {
+class LoginPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {

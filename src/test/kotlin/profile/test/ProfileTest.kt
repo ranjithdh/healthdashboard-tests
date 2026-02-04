@@ -2,8 +2,8 @@ package profile.test
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
+import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
 import model.profile.QuestionerMealType
@@ -11,11 +11,10 @@ import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-class ProfileTest {
+class ProfileTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var page: Page
 
     @BeforeAll
     fun setup() {
@@ -37,11 +36,11 @@ class ProfileTest {
                 .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
-       // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
+        // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
 
-     /*   context = browser.newContext(contextOptions)
-        page = context.newPage()*/
+        /*   context = browser.newContext(contextOptions)
+           page = context.newPage()*/
     }
 
     @AfterEach
