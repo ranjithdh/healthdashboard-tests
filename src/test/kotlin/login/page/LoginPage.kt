@@ -7,6 +7,8 @@ import config.TestConfig
 import config.TestUser
 import io.qameta.allure.Step
 import mu.KotlinLogging
+import utils.report.StepHelper
+import utils.report.StepHelper.CLEAR_MOBILE_NUMBER
 
 private val logger = KotlinLogging.logger {}
 
@@ -24,8 +26,8 @@ class LoginPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Clear Mobile Number")
     fun clearMobileNumber(): LoginPage {
+        StepHelper.step(CLEAR_MOBILE_NUMBER)
         logger.info { "clearMobileNumber()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).clear()
         return this
@@ -161,7 +163,6 @@ class LoginPage(page: Page) : BasePage(page) {
                 page.getByText("Expert-led personalised action plan").isVisible &&
                 page.getByText("One secure place for all your health results").isVisible
     }
-
 
 
     @Step("Click Privacy Policy and verify popup")
