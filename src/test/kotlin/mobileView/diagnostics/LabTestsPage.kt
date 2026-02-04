@@ -19,11 +19,22 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
 
     fun checkStaticTextsAndSegments() {
+        StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: Book Lab Tests heading")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests"))
+        
+        StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: flexible testing options text")
         page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("With flexible testing options"))
+        
+        StepHelper.step(CLICK_FILTER + "All")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).click()
+        
+        StepHelper.step(CLICK_FILTER + "Blood")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Blood")).click()
+        
+        StepHelper.step(CLICK_FILTER + "Gene")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gene")).click()
+        
+        StepHelper.step(CLICK_FILTER + "Gut")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
     }
 

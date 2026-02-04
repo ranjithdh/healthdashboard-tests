@@ -28,14 +28,19 @@ import utils.report.StepHelper.ACCOUNT_INFO_VALIDATION
 import utils.report.StepHelper.ANSWER_QUESTION
 import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
 import utils.report.StepHelper.CLICK_ADDRESS_DROPDOWN
+import utils.report.StepHelper.CLICK_SAVE_CHANGES
 import utils.report.StepHelper.EDIT_PROFILE
 import utils.report.StepHelper.EDIT_USER_ADDRESS
+import utils.report.StepHelper.EDIT_HEALTH_METRICS
+import utils.report.StepHelper.SAVE_HEALTH_METRICS
 import utils.report.StepHelper.FETCH_ACCOUNT_INFORMATION
 import utils.report.StepHelper.FETCH_ADDRESS_DATA
 import utils.report.StepHelper.FETCH_PREFERENCE
+import utils.report.StepHelper.FETCH_DATA_FROM_API
 import utils.report.StepHelper.FILL_ADDRESS_FORM_MANDATORY
 import utils.report.StepHelper.REMOVE_USER_ADDRESS
 import utils.report.StepHelper.SAVE_CHANGES
+import utils.report.StepHelper.logApiResponse
 import utils.report.StepHelper.SELECT_COMMUNICATION_OPTION
 import utils.report.StepHelper.SUBMIT_ADDRESS
 import utils.report.StepHelper.YES_DELETE
@@ -307,6 +312,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             if (responseObj.data.addressList.isNotEmpty()) {
                 addressData = responseObj.data
+                StepHelper.step("$FETCH_DATA_FROM_API ${responseObj.data.addressList.size} addresses found")
+                logApiResponse(TestConfig.APIs.API_ADDRESS, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
@@ -336,6 +343,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
             if (responseObj.status == "success" && responseObj.data.isUpdated) {
                 logger.info { "Preference updated successfully to: $selectedOption" }
+                StepHelper.step("Preference updated successfully to: $selectedOption")
+                logApiResponse(TestConfig.APIs.API_PREFERENCE_UPDATE, responseObj)
                 return true
             }
 
@@ -503,7 +512,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         pincode: String,
         country: String
     ) {
-        StepHelper.step(FILL_ADDRESS_FORM_MANDATORY)
+        StepHelper.step("$FILL_ADDRESS_FORM_MANDATORY for: $nickName")
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
         houseNoInput.fill(doorNumber)
@@ -733,6 +742,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             if (responseObj.status == "success") {
                 currentPreference = responseObj.data.preference.communicationPreference
                 logger.info { "Current preference from API: $currentPreference" }
+                StepHelper.step("Communication preference fetched: $currentPreference")
+                logApiResponse(TestConfig.APIs.API_PREFERENCE, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
@@ -855,6 +866,8 @@ class ProfilePage(page: Page) : BasePage(page) {
                 piiData = responseObj.data.piiData
                 setMaleConditions(piiData?.gender == "male")
                 logger.info { "Current account Information from API: $piiData" }
+                StepHelper.step("Account information fetched for: ${piiData?.name}")
+                logApiResponse(TestConfig.APIs.API_ACCOUNT_INFORMATION, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
@@ -957,7 +970,8 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         editableInputByLabel("Name").fill(updateName)
 
-        StepHelper.step(SAVE_CHANGES)
+        StepHelper.step("$SAVE_CHANGES (New name: $updateName)")
+        StepHelper.step(CLICK_SAVE_CHANGES)
         saveChanges.click()
 
         waitForViewProfileLoaded()
@@ -1110,7 +1124,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByTestId("health-metrics-edit-button")
 
         healthMetricsEdit.waitFor()
-
+        
+        StepHelper.step(EDIT_HEALTH_METRICS)
         edit.click()
 
         val weight = formatFlotTwoDecimal(piiData?.weight ?: 0f)
@@ -1136,6 +1151,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val saveButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Save Changes"))
         assertTrue(saveButton.isEnabled)
+        StepHelper.step("$SAVE_HEALTH_METRICS (Height: $newHeight, Weight: $newWeight)")
         saveButton.click()
 
         edit.waitFor()

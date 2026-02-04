@@ -22,6 +22,8 @@ import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_PROFILE_ICON
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
+import utils.report.StepHelper.FETCH_HOME_DATA
+import utils.report.StepHelper.logApiResponse
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -67,7 +69,7 @@ class HomePage(page: Page) : BasePage(page) {
         val response = page.waitForResponse(
             { response: Response? ->
                 response?.url()
-                    ?.contains("https://api.stg.dh.deepholistics.com/v4/human-token/market-place/home") == true && response.status() == 200
+                    ?.contains(TestConfig.APIs.API_HOME) == true && response.status() == 200
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
@@ -87,6 +89,8 @@ class HomePage(page: Page) : BasePage(page) {
 
             if (responseObj.data != null) {
                 homeData = responseObj.data
+                StepHelper.step(FETCH_HOME_DATA)
+                logApiResponse(TestConfig.APIs.API_HOME, responseObj)
                 val diagnostic = homeData?.diagnostics?.firstOrNull { it.blood_test_appointment_date != null }
                 appointmentDate = diagnostic?.blood_test_appointment_date
             }

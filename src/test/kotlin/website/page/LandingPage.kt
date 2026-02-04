@@ -7,6 +7,7 @@ import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_HERO_BOOK_NOW
 import utils.report.StepHelper.CLICK_LEARN_MORE
+import utils.report.StepHelper.CLICK_READ_OUR_WHY
 import utils.report.StepHelper.CLICK_WHAT_WE_TEST
 import utils.report.StepHelper.WAIT_WEBSITE_PAGE_LOAD
 
@@ -171,6 +172,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickWhatIsIncludedSectionBookNowButton() {
+        StepHelper.step(StepHelper.CLICK_BOOK_NOW_WHAT_INCLUDED)
         whatsIncludedSectionBookNow.click()
     }
 
@@ -272,6 +274,7 @@ class LandingPage(page: Page) : WebSiteBasePage(page) {
     }
 
     fun clickWordFromOurFounderSectionReadOurWhyButtonVisible(): OurWhyPage {
+        StepHelper.step(CLICK_READ_OUR_WHY)
         readOurWhy.click()
         val ourWhyPage = OurWhyPage(page)
         ourWhyPage.waitForPageLoad()

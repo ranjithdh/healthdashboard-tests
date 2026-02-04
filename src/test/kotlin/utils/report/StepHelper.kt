@@ -4,8 +4,13 @@ import io.qameta.allure.Allure
 
 object StepHelper {
 
-    fun step(name: String) {
-        Allure.step(name)
+    fun step(name: Any?) {
+        Allure.step(name.toString())
+    }
+
+    fun logApiResponse(url: String, response: Any?) {
+        step("API Response from: $url")
+        step(response)
     }
 
     // Generic
@@ -13,6 +18,20 @@ object StepHelper {
     const val TAKE_SCREENSHOT = "Take screenshot: "
     const val CLICK_CONTINUE = "Click Continue"
     const val CLICK_EDIT_BUTTON = "Click Edit button"
+    const val CLICK_SAVE_CHANGES = "Click Save Changes"
+    const val CLICK_CANCEL = "Click Cancel"
+    const val CLICK_CLOSE = "Click Close"
+    const val FETCH_DATA_FROM_API = "Fetch data from API: "
+    const val CLICK_STATIC_ELEMENT = "Click static element: "
+    const val VERIFY_STATIC_CONTENT = "Verify static content"
+    const val VERIFY_SECTION = "Verify section: "
+    const val VERIFY_STEP = "Verify Step: "
+    const val VERIFY_PRIVACY_INFO = "Verify privacy information"
+    const val VERIFY_LABS_INFO = "Verify labs information"
+    const val CLICK_SEARCH_TEXTBOX = "Click search textbox"
+    const val CLICK_BOOK_LAB_TESTS_HEADING = "Click Book Lab Tests heading"
+    const val CLICK_GET_TESTED_HEADING = "Click Get tested from the comfort heading"
+    const val CLICK_FLEXIBLE_TESTING_PARA = "Click paragraph with flexible testing options"
 
     // LoginPage
     const val ENTER_MOBILE_NUMBER = "Enter mobile number: "
@@ -112,10 +131,13 @@ object StepHelper {
     const val ACCOUNT_INFO_VALIDATION = "Account information validation"
     const val EDIT_PROFILE = "Edit profile"
     const val SAVE_CHANGES = "Save changes"
+    const val EDIT_HEALTH_METRICS = "Edit Health Metrics"
+    const val SAVE_HEALTH_METRICS = "Save Health Metrics"
 
     // mobileView - HomePage
     const val WAIT_MOBILE_HOME_CONFIRMATION = "Wait for Mobile Home Page confirmation"
     const val CLICK_PROFILE_ICON = "Click Profile icon"
+    const val FETCH_HOME_DATA = "Fetch Home data from API"
 
     // mobileView - LabTestsPage
     const val NAVIGATE_TO_DIAGNOSTICS = "Navigate to Diagnostics"
@@ -150,6 +172,9 @@ object StepHelper {
     const val CLICK_HERO_BOOK_NOW = "Click Hero Book Now"
     const val CLICK_LEARN_MORE = "Click Learn More"
     const val CLICK_WHAT_WE_TEST = "Click What We Test"
+    const val CLICK_READ_OUR_WHY = "Click Read Our Why"
+    const val CLICK_BOOK_NOW = "Click Book Now"
+    const val CLICK_BOOK_NOW_WHAT_INCLUDED = "Click Book Now (What's included section)"
 
     // website - HeaderSection
     const val NAVIGATE_TO_PAGE = "Navigate to page: "

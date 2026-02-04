@@ -11,12 +11,15 @@ import model.profile.PiiUserResponse
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_CANCEL
 import utils.report.StepHelper.EXPAND_SYMPTOMS_SECTION
 import utils.report.StepHelper.OPEN_REPORT_SYMPTOMS_DIALOG
 import utils.report.StepHelper.RESET_SYMPTOMS
 import utils.report.StepHelper.SELECT_SYMPTOM
 import utils.report.StepHelper.SUBMIT_SYMPTOMS
 import utils.report.StepHelper.WAIT_SYMPTOMS_PAGE_LOAD
+import utils.report.StepHelper.FETCH_DATA_FROM_API
+import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.PersonalizedGeneratedDescription
 import webView.diagnostics.symptoms.model.Symptom
 import webView.diagnostics.symptoms.model.SymptomsData
@@ -71,6 +74,8 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
             if (responseObj.status == "success") {
                 setMaleConditions(responseObj.data.piiData.gender == "male")
+                StepHelper.step("Account information fetched: Gender is ${responseObj.data.piiData.gender}")
+                logApiResponse(TestConfig.APIs.API_ACCOUNT_INFORMATION, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
@@ -130,6 +135,8 @@ class SymptomsPage(page: Page) : BasePage(page) {
                         if (pendingDescriptionIds.isEmpty()) {
                             readyForValidation = true
                         }
+                        StepHelper.step("$FETCH_DATA_FROM_API ${symptomsResponse?.symptoms?.size ?: 0} symptoms")
+                        logApiResponse(TestConfig.APIs.API_SYMPTOMS_LIST, responseObj)
                     }
                 }
 
@@ -168,6 +175,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
                     if (receivedDescriptionIds.containsAll(pendingDescriptionIds)) {
                         logger.info { "All description APIs received" }
                         readyForValidation = true
+                        StepHelper.step("All symptom descriptions received")
                     }
                 }
 
@@ -368,11 +376,13 @@ class SymptomsPage(page: Page) : BasePage(page) {
             val selectedSymptoms = randomSubList(symptoms, 1, 3)
             selectionSymptoms[section] = selectedSymptoms
             clickSymptoms(selectedSymptoms)
+            StepHelper.step("${SELECT_SYMPTOM} $section: ${selectedSymptoms.joinToString()}")
             symptomsSelectedCount(selectionSymptoms)
         }
     }
 
     fun cancelButtonClick() {
+        StepHelper.step(CLICK_CANCEL)
         val cancelButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
         cancelButton.click()
     }
@@ -412,6 +422,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
     }
 
     fun cancelConfirmationDialog() {
+        StepHelper.step(CLICK_CANCEL + " (Confirmation Dialog)")
         val cancelBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Cancel"))
         cancelBtn.waitFor()
         cancelBtn.click()
@@ -419,6 +430,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     fun continueConfirmationDialog() {
+        StepHelper.step("${StepHelper.CLICK_CONTINUE} (Confirmation Dialog)")
         val continueBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
         continueBtn.waitFor()
         continueBtn.click()

@@ -79,6 +79,7 @@ object TestConfig {
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
     }
 
 

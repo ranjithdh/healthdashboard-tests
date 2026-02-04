@@ -25,7 +25,7 @@ class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
     private val bookNow = page.locator("#join-btn-test")
 
     fun waitForPageLoad(): WhatWeTestPage {
-        StepHelper.step(WAIT_WEBSITE_PAGE_LOAD + "What We Test")
+        StepHelper.step("${WAIT_WEBSITE_PAGE_LOAD}: What We Test Page")
         header.waitFor()
         logger.info { "What We Test page loaded" }
         return this
@@ -94,7 +94,7 @@ class WhatWeTestPage(page: Page) : WebSiteBasePage(page) {
     fun isBookNowVisible() = bookNow.isVisible
 
     fun clickBookNowButton() {
-        StepHelper.step(StepHelper.CLICK_HERO_BOOK_NOW)
+        StepHelper.step(StepHelper.CLICK_BOOK_NOW)
         bookNow.click()
     }
 

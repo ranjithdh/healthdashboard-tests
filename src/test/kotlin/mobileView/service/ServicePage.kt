@@ -12,13 +12,15 @@ import login.page.LoginPage
 import model.ServiceResponse
 import model.ServiceProduct
 import mu.KotlinLogging
+import utils.report.StepHelper
 import java.text.NumberFormat
 import java.util.Locale
-import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_SCHEDULE_NOW
 import utils.report.StepHelper.FETCH_SERVICE_DATA
 import utils.report.StepHelper.NAVIGATE_TO_SERVICES
 import utils.report.StepHelper.VERIFY_SERVICE_CARD
-import utils.report.StepHelper.CLICK_SCHEDULE_NOW
+import utils.report.StepHelper.VERIFY_STATIC_CONTENT
+import utils.report.StepHelper.logApiResponse
 
 private val logger = KotlinLogging.logger {}
 
@@ -57,8 +59,11 @@ class ServicePage(page: Page) : BasePage(page) {
      * Verify static content on the Service Page
      */
     fun verifyStaticContent() {
+        StepHelper.step("$VERIFY_STATIC_CONTENT: Your Health, Guided by Experts heading")
         logger.info { "Verifying static content on Service Page" }
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your Health, Guided by Experts")).click()
+        
+        StepHelper.step("$VERIFY_STATIC_CONTENT: expert connection text")
         page.getByText("Connect with experienced").click()
     }
 
@@ -90,6 +95,8 @@ class ServicePage(page: Page) : BasePage(page) {
                 val responseBody = String(responseBodyBytes)
                 serviceData = json.decodeFromString<ServiceResponse>(responseBody)
                 logger.info { "Service data fetched and parsed successfully" }
+                StepHelper.step("$FETCH_SERVICE_DATA: ${serviceData?.data?.products?.size ?: 0} products found")
+                logApiResponse(TestConfig.APIs.SERVICE_SEARCH_API_URL, serviceData)
                 return serviceData
             }
         } catch (e: Exception) {

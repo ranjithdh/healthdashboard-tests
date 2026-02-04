@@ -15,9 +15,15 @@ import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_FILTER
+import utils.report.StepHelper.CLICK_BOOK_LAB_TESTS_HEADING
+import utils.report.StepHelper.CLICK_FLEXIBLE_TESTING_PARA
+import utils.report.StepHelper.CLICK_GET_TESTED_HEADING
+import utils.report.StepHelper.CLICK_SEARCH_TEXTBOX
 import utils.report.StepHelper.CLICK_TEST_PANEL_ELEMENT
+import utils.report.StepHelper.FETCH_DATA_FROM_API
 import utils.report.StepHelper.SEARCH_LAB_TESTS
 import utils.report.StepHelper.WAIT_LAB_TESTS_PAGE_LOAD
+import utils.report.StepHelper.logApiResponse
 
 private val logger = KotlinLogging.logger {}
 
@@ -114,6 +120,8 @@ class LabTestsPage(page: Page) : BasePage(page) {
                 val responseBody = String(responseBodyBytes)
                 val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
                 labTestData = responseObj
+                StepHelper.step("$FETCH_DATA_FROM_API ${responseObj.data?.diagnostic_product_list} packages")
+                logApiResponse(TestConfig.APIs.LAB_TEST_API_URL, responseObj)
                 return responseObj
             } catch (e: Exception) {
                 logger.error { "Failed to parse API response: ${e.message}" }
@@ -182,6 +190,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Book Lab Tests" heading
      */
     fun clickBookLabTestsHeading(): LabTestsPage {
+        StepHelper.step(CLICK_BOOK_LAB_TESTS_HEADING)
         logger.info { "Clicking 'Book Lab Tests' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests")).click()
         return this
@@ -191,6 +200,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on search textbox
      */
     fun clickSearchTextBox(): LabTestsPage {
+        StepHelper.step(CLICK_SEARCH_TEXTBOX)
         logger.info { "Clicking search textbox" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in lab tests")).click()
         return this
@@ -211,6 +221,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on "Get tested from the comfort" heading
      */
     fun clickGetTestedHeading(): LabTestsPage {
+        StepHelper.step(CLICK_GET_TESTED_HEADING)
         logger.info { "Clicking 'Get tested from the comfort' heading" }
         byRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Get tested from the comfort")).click()
         return this
@@ -220,6 +231,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
      * Click on paragraph with "With flexible testing options" text
      */
     fun clickFlexibleTestingOptionsParagraph(): LabTestsPage {
+        StepHelper.step(CLICK_FLEXIBLE_TESTING_PARA)
         logger.info { "Clicking paragraph with 'With flexible testing options'" }
         byRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("With flexible testing options")).click()
         return this
