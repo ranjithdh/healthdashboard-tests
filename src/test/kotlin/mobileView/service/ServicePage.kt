@@ -103,6 +103,14 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     /**
+     * Get a specific product by ID from the cached or fetched data
+     */
+    fun getProductById(productId: String): ServiceProduct? {
+        val data = serviceData ?: fetchServiceDataFromApi()
+        return data?.data?.products?.find { it.product_id == productId }
+    }
+
+    /**
      * Verify services displayed on the page against the API data
      */
     fun verifyServices(targetProductId: String? = null) {
@@ -532,6 +540,7 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     fun verifySymptomReportFeedbackDialog() {
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
         logger.info { "Verifying Symptom Report Feedback/Acknowledge Dialog" }
         page.getByRole(AriaRole.DIALOG)
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))

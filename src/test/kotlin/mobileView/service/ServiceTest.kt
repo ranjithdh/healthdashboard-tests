@@ -86,18 +86,16 @@ class ServiceTest : BaseTest() {
         }
         
         // Verify specific consultant flow (e.g. Nutritionist Consultation)
-        val targetProductId =  "72055641-39fc-423b-9a57-b07cda66727f"//"72055641-39fc-423b-9a57-b07cda66727f" //"898c67b7-bf72-4a37-8f3d-6a3dbc981edb"
+        val targetProductId = "72055641-39fc-423b-9a57-b07cda66727f"
         servicePage.verifyServices(targetProductId)
-
-        val status = product.item_purchase_status
+        val product = servicePage.getProductById(targetProductId)
+        val status = product?.item_purchase_status
         if (!status.equals("paid", ignoreCase = true)) {
             servicePage.verifySymptomReportFeedbackDialog()
 
             servicePage.dialogValidation()
             servicePage.reportOptionsValidations()
             servicePage.cancelButtonClick()
-
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
 
             servicePage.onReportSymptomsButtonClick()
             servicePage.selectAllSymptoms()
