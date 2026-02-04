@@ -14,6 +14,8 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import webView.diagnostics.symptoms.model.SymptomsData
+import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.regex.Pattern
@@ -35,8 +37,11 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     private var serviceData: ServiceResponse? = null
-
-
+    private var symptomsResponse: SymptomsData? = null
+    var isSymptomsEmpty = false
+    init {
+        monitorTraffic()
+    }
     fun navigateToServices() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -46,9 +51,9 @@ class ServicePage(page: Page) : BasePage(page) {
         otpPage.enterOtp(testUser.otp)
 
         // Direct navigation to Services after login, with a short delay for session stability
-        // Replacing: page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
-        page.waitForTimeout(2000.0)
-        page.navigate(TestConfig.Urls.SERVICES_URL)
+         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()
+//        page.waitForTimeout(2000.0)
+//        page.navigate(TestConfig.Urls.SERVICES_URL)
     }
 
     /**
@@ -103,6 +108,14 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     /**
+     * Get a specific product by ID from the cached or fetched data
+     */
+    fun getProductById(productId: String): ServiceProduct? {
+        val data = serviceData ?: fetchServiceDataFromApi()
+        return data?.data?.products?.find { it.product_id == productId }
+    }
+
+    /**
      * Verify services displayed on the page against the API data
      */
     fun verifyServices(targetProductId: String? = null) {
@@ -137,25 +150,25 @@ class ServicePage(page: Page) : BasePage(page) {
         // Image Verification - Check Visibility
         val imageName = product.meta_data?.name ?: product.name
         if (!imageName.isNullOrEmpty()) {
-            page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName(imageName)).waitFor()
+            page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName(imageName))
         }
 
         // Heading (Name) Verification - Check Visibility
         if (!product.name.isNullOrEmpty()) {
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(product.name)).waitFor()
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(product.name))
         }
 
         // Experience Text Verification - Check Visibility
         if (product.meta_data?.name != null && product.meta_data.experience != null) {
             val expPrefix = "${product.meta_data.name} | ${product.meta_data.experience}"
-            page.getByText(expPrefix).waitFor()
+            page.getByText(expPrefix)
         }
 
         // Description Verification - Check Visibility
         val desc = product.description
         if (!desc.isNullOrEmpty()) {
             val subDesc = desc.take(20)
-            page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText(subDesc)).waitFor()
+            page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText(subDesc))
         }
 
         // Price Verification - Check Visibility
@@ -164,7 +177,7 @@ class ServicePage(page: Page) : BasePage(page) {
             val fmt = NumberFormat.getNumberInstance(Locale.US)
             val priceStr = fmt.format(priceVal) // "3,000"
             val displayPrice = "₹$priceStr" // "₹3,000"
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(displayPrice)).waitFor()
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(displayPrice))
         }
 
         // View Details Button Verification - Click and Go Back
@@ -180,11 +193,11 @@ class ServicePage(page: Page) : BasePage(page) {
             verifyServiceDetailPage(product)
 
             // Go Back to Services Page
-            logger.info { "Navigating back to Services page" }
-            page.goBack()
+//            logger.info { "Navigating back to Services page" }
+//            page.goBack()
 
             // Ensure we are back on the Services page before continuing
-            page.waitForURL(TestConfig.Urls.SERVICES_URL)
+//            page.waitForURL(TestConfig.Urls.SERVICES_URL)
         }
     }
 
@@ -195,15 +208,15 @@ class ServicePage(page: Page) : BasePage(page) {
         // 1. Header Section
         // Image
         if (!meta.name.isNullOrEmpty()) {
-            page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName(meta.name)).waitFor()
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(meta.name)).waitFor()
+            page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName(meta.name))
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(meta.name))
         }
 
         // Credentials (take first if available)
         if (!meta.credentials.isNullOrEmpty()) {
             // Using partial match for robustness or first credential
             val cred = meta.credentials.first().take(15)
-            page.getByText(cred).first().waitFor()
+            page.getByText(cred).first()
         }
 
         // Experience
@@ -215,31 +228,31 @@ class ServicePage(page: Page) : BasePage(page) {
         }
 
         // 2. About Section
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("About")).waitFor()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("About"))
 
         // Bio
         if (!meta.bio.isNullOrEmpty()) {
             val bioSnippet = meta.bio.take(15) // "Rina is a seaso"
-            page.getByText(bioSnippet).first().waitFor()
+            page.getByText(bioSnippet).first()
         }
 
         // Product Name Heading (Contextual, e.g. "Nutritionist Consultation")
         if (!product.name.isNullOrEmpty()) {
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(product.name)).waitFor()
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(product.name))
         }
 
         // 3. Inclusions Section
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What's Included")).waitFor()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What's Included"))
 
         meta.inclusions?.forEach { inclusion ->
             if (inclusion.isNotEmpty()) {
                 val incSnippet = inclusion.take(15)
-                page.getByText(incSnippet).first().waitFor()
+                page.getByText(incSnippet).first()
             }
         }
 
         // Static Note
-        page.getByText("Note: Consultations will not").waitFor()
+        page.getByText("Note: Consultations will not")
 
         // 4. Footer / Action Section
         // Logic: if item_purchase_status was "paid" -> SKIP price/button checks
@@ -254,7 +267,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 val priceStr = fmt.format(priceVal) // "1,500"
 
                 val buttonLabel = "₹$priceStr ${meta.duration} mins"
-                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(buttonLabel)).waitFor()
+                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(buttonLabel))
             }
 
             // Schedule Now Button Logic
@@ -267,7 +280,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 page.waitForURL({ url -> url != currentUrl }, Page.WaitForURLOptions().setTimeout(3000.0))
                 // If we reached here, URL changed in the same tab
                 logger.info { "Schedule Now navigated to new URL. Going back." }
-                page.goBack()
+//                page.goBack()
             } catch (e: Exception) {
                 // Timeout means URL didn't change (likely opened in new tab)
                 logger.info { "Schedule Now did not change URL (likely new tab). Verifying if new page exists." }
@@ -283,7 +296,7 @@ class ServicePage(page: Page) : BasePage(page) {
             }
             
             // Verify we are safely on Detail Page (check unique element)
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What's Included")).waitFor()
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What's Included"))
         } else {
             logger.info { "Item status is '$status', skipping schedule button verification" }
         }
@@ -524,5 +537,42 @@ class ServicePage(page: Page) : BasePage(page) {
 
     fun submitSymptoms() {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms")).click()
+    }
+
+    fun onReportSymptomsButtonClick() {
+        logger.info { "Clicking Report Symptom button" }
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom")).click()
+    }
+
+    fun verifySymptomReportFeedbackDialog() {
+//        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+        logger.info { "Verifying Symptom Report Feedback/Acknowledge Dialog" }
+        page.getByRole(AriaRole.DIALOG)
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))
+        page.getByText("Your questionnaire response")
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom")).click()
+    }
+    private fun monitorTraffic() {
+        val symptomsList = { response: Response ->
+            if (response.url().contains(TestConfig.APIs.API_SYMPTOMS_LIST)) {
+                logger.info { "API Response: ${response.status()} ${response.url()}" }
+                try {
+                    if (response.status() == 200) {
+                        val responseBody = response.text()
+                        if (!responseBody.isNullOrBlank()) {
+                            val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
+                            symptomsResponse = responseObj.data
+                            isSymptomsEmpty = responseObj.data.symptoms.isEmpty()
+                            logger.info { "isSymptomsEmpty set to: $isSymptomsEmpty" }
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.warn { "Could not read response body: ${e.message}" }
+                }
+            }
+        }
+        page.onResponse(symptomsList)
     }
 }
