@@ -155,18 +155,25 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
-        // Basic verification logic
-        val subtotalText = "₹$expectedSubtotal" // Simplified formatting logic
-        // Verify subtotal visibility if possible, or generic check
-        
-        // This is a placeholder validation
-        Assertions.assertTrue(page.isVisible("text=Price Details"), "Price Details section should be visible")
+        page.getByText("PRICE DETAILS").click()
+        page.getByTestId("diagnostics-sidebar-subtotal-label").click()
+        page.getByTestId("diagnostics-sidebar-subtotal-value").click()
+        page.getByTestId("diagnostics-sidebar-discount-label").click()
+        page.getByTestId("diagnostics-sidebar-discount-value").click()
+        page.getByTestId("diagnostics-sidebar-grand-total-label").click()
+        page.getByTestId("diagnostics-sidebar-grand-total-value").click()
     }
 
     fun verifyFooterActions() {
         logger.info { "Verifying footer actions" }
         val proceedBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Proceed"))
         Assertions.assertTrue(proceedBtn.isVisible, "Proceed button should be visible")
+
+        val page2 = page.waitForPopup {
+            page.getByText("Got any questions? Contact").click()
+        }
+        Assertions.assertNotNull(page2, "Popup page should be opened")
+        page2.close()
     }
 
     fun clickProceed() {
