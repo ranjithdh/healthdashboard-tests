@@ -772,12 +772,14 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         try {
             val apiContext = page.context().request()
+            val timeZone = java.util.TimeZone.getDefault().id
+
             val url = TestConfig.APIs.API_PREFERENCE
 
             val headers = mapOf(
                 "access_token" to TestConfig.ACCESS_TOKEN,
                 "client_id" to TestConfig.CLIENT_ID,
-                "user_timezone" to "Asia/Calcutta"
+                "user_timezone" to timeZone
             )
 
             val requestOptions = RequestOptions.create()
