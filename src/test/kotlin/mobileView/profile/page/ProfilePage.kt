@@ -280,14 +280,13 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.onResponse(updateProfileResponse)
         page.onRequest(preferenceProfileRequest)
         page.onResponse(preferenceProfileResponse)
-        /* TODO need to check
         try {
          } finally {
              page.offRequest(updateProfileRequest)
              page.offResponse(updateProfileResponse)
              page.offRequest(preferenceProfileRequest)
              page.offResponse(preferenceProfileResponse)
-         }*/
+         }
     }
 
 
