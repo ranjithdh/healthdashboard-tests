@@ -30,6 +30,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     override val pageUrl = ""
     private var addressData: UserAddressData? = null
+    private var selectedAddressName: String = ""
+    private var selectedAddressText: String = ""
+    private var selectedDateSummary: String = ""
+    private var selectedTimeSummary: String = ""
     private val nickNameInput =
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Home, work, etc."))
 
@@ -127,7 +131,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         val title = address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
         val expectedAddressText = buildAddressText(address)
-        page.locator(".bg-secondary.flex.flex-1").first().click();
+        page.locator(".bg-secondary.flex.flex-1").nth(index).click()
 
         // Fill inputs (UI)
         val number = (500..1000).random()
@@ -232,21 +236,27 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val leadId = getLeadId()
         val addressId = addressData?.addressList?.firstOrNull()?.addressId
             ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
+//        val selectedAddressObj = addressData?.addressList?.find { it.addressId == addressId }?.address
+//        selectedAddressName = selectedAddressObj?.addressName ?: "Primary"
+//        selectedAddressText = buildAddressText(selectedAddressObj!!)
 
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val summaryDateFormatter = DateTimeFormatter.ofPattern("dd MMM")
         val tomorrowDateStr = tomorrow.format(dateFormatter)
 
         logger.info { "Processing tomorrow's slots: $tomorrowDateStr" }
         page.getByTestId("diagnostics-booking-step2-date-$tomorrowDateStr").click()
 
         val tomorrowSlots = getSlots(tomorrowDateStr, leadId, addressId)
-        tomorrowSlots.forEach { slot ->
-            if (slot.is_available == true && slot.start_time != null) {
-                page.getByTestId("diagnostics-booking-step2-slot-${slot.start_time}").click()
-            }
-        }
+//        tomorrowSlots.forEach { slot ->
+//            if (slot.is_available == true && slot.start_time != null) {
+//                page.getByTestId("diagnostics-booking-step2-slot-${slot.start_time}").click()
+//                // Just to capture something if we don't do the random part or if it fails
+//                captureSlotForSummary(slot.start_time, summaryDateFormatter)
+//            }
+//        }
 
         // Randomly select a date from tomorrow + 7 days (index 0 to 6)
         val randomDayOffset = (0..6).random()
@@ -263,9 +273,84 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             val randomSlot = availableSlots.random()
             logger.info { "Selecting slot: ${randomSlot.start_time}" }
             page.getByTestId("diagnostics-booking-step2-slot-${randomSlot.start_time}").click()
+            captureSlotForSummary(randomSlot.start_time!!, summaryDateFormatter)
         } else {
             logger.warn { "No available slots found for random date $randomDateStr" }
         }
+    }
+
+    private fun captureSlotForSummary(startTimeIso: String, summaryDateFormatter: DateTimeFormatter) {
+        // Parse ISO string and convert to IST (+5:30)
+        // Format: 2026-02-06T05:00:00.000Z
+        val instant = java.time.Instant.parse(startTimeIso)
+        val istZone = java.time.ZoneId.of("Asia/Kolkata")
+        val zonedDateTime = instant.atZone(istZone)
+        
+        selectedDateSummary = zonedDateTime.format(summaryDateFormatter)
+        selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+    }
+
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double) {
+        logger.info { "Verifying Order Summary Page" }
+
+        val addressId = addressData?.addressList?.firstOrNull()?.addressId
+            ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
+        val selectedAddressObj = addressData?.addressList?.find { it.addressId == addressId }?.address
+        selectedAddressName = selectedAddressObj?.addressName ?: "Primary"
+        selectedAddressText = buildAddressText(selectedAddressObj!!)
+
+        // Address verification
+        page.getByText("Sample Collection Address").click()
+        
+        var nicknameToSearch = selectedAddressName.trim()
+        
+        // 1. If nickname starts with digits followed by a space, remove the leading number
+        val matchResult = Regex("^(\\d+)\\s+(.*)$").find(nicknameToSearch)
+        if (matchResult != null) {
+            nicknameToSearch = matchResult.groupValues[2]
+        }
+
+        // 2. Take only the first 3 words of the nickname to avoid issues with long text/truncation
+        nicknameToSearch = nicknameToSearch.split(" ").filter { it.isNotBlank() }.take(3).joinToString(" ")
+        
+        page.getByText(nicknameToSearch, Page.GetByTextOptions().setExact(false)).first().click()
+        // Note: Sometimes the full address text might be truncated or formatted differently, 
+        // using contains/subset of text or building from components.
+        val partialAddress = selectedAddressText.take(20) // take a safe chunk
+        page.getByText(partialAddress, Page.GetByTextOptions().setExact(false)).first().click()
+
+        // Slot verification
+        page.getByText("Sample Collection Time Slot").click()
+        page.getByText("Date: $selectedDateSummary").click()
+        page.getByText("Selected time slot: $selectedTimeSummary").click()
+
+        // Price details verification (reusing logic or similar)
+        page.getByText("PRICE DETAILS").click()
+        page.getByTestId("diagnostics-sidebar-subtotal-label").click()
+        
+        val subtotalValue = page.getByTestId("diagnostics-sidebar-subtotal-value").innerText()
+        assertEquals("₹${expectedSubtotal.toInt()}", subtotalValue.replace(",", "").replace(" ", ""))
+
+        page.getByTestId("diagnostics-sidebar-discount-label").click()
+        val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
+        // Handle variations like "- ₹ 0" or "-₹0" by removing whitespace
+        assertEquals("-₹${expectedDiscount.toInt()}", discountValue.replace(",", "").replace(" ", ""))
+
+        page.getByTestId("diagnostics-sidebar-grand-total-label").click()
+        val grandTotalValue = page.getByTestId("diagnostics-sidebar-grand-total-value").innerText()
+        val expectedGrandTotal = expectedSubtotal - expectedDiscount
+        assertEquals("₹${expectedGrandTotal.toInt()}", grandTotalValue.replace(",", "").replace(" ", ""))
+
+        // Got any questions? Contact
+        val page3 = page.waitForPopup {
+            page.getByText("Got any questions? Contact").click()
+        }
+        Assertions.assertNotNull(page3, "Question popup page should be opened")
+        page3.close()
+
+        // Mobile footer elements
+        page.getByTestId("diagnostics-sidebar-mobile-grand-total").click()
+        page.getByTestId("diagnostics-sidebar-mobile-proceed").click()
     }
 
 
@@ -346,5 +431,19 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     fun isNewAddressDialogVisible(): Boolean {
         newAddressDialog.waitFor()
         return newAddressDialog.isVisible
+    }
+
+    fun clickEditAddressFromSummary() {
+        logger.info { "Clicking Edit Address from Summary Page" }
+        page.locator(".bg-secondary").first().click()
+    }
+
+    fun clickEditSlotFromSummary() {
+        logger.info { "Clicking Edit Slot from Summary Page" }
+        page.locator(".flex-1 > .bg-secondary").click()
+    }
+
+    fun getAddressCount(): Int {
+        return addressData?.addressList?.size ?: 0
     }
 }

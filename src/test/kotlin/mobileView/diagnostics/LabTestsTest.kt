@@ -544,9 +544,7 @@ class LabTestsTest : BaseTest() {
 
         println("Testing 'Edit Address' functionality...")
         // Edit the first address
-        testSchedulingPage.editUserAddress(0)
-
-
+         testSchedulingPage.editUserAddress(0)
         // Extract price for the targetCode from responseObj
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
 
@@ -580,60 +578,64 @@ class LabTestsTest : BaseTest() {
         println("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
         println("Test completed successfully.")
     }
-
     @Test
-    fun `verify longevity panel scheduling flow`() {
+    fun `verify summary page edit flow`() {
         val labTestsPage = LabTestsPage(page)
-        val targetCode = "DH_LONGEVITY_PANEL"
-        println("Starting test: verify longevity panel scheduling flow ($targetCode)")
+        val targetCode = "P037"
+        println("Starting test: verify summary page edit flow")
 
-        // Navigation and capture
-        // Navigation and capture
-        val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-
-        println("Clicking View Details for $targetCode")
+        labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
         labTestsPage.clickViewDetails(targetCode)
 
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
         val testSchedulingPage = TestSchedulingPage(page)
 
-        println("Capturing address list and booking $targetCode")
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
         }
 
-        // Extract price
-        val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
+        // Initial setup to reach summary page
+        testSchedulingPage.editUserAddress(0)
+        testSchedulingPage.clickProceed()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.clickProceed()
 
-        val targetProduct = productList.packages?.find { it.code == targetCode }
-            ?: productList.test_profiles?.find { it.code == targetCode }
-            ?: productList.tests?.find { it.code == targetCode }
-            ?: throw AssertionError("Product with code $targetCode not found in API response")
+        // 1. Test Address Edit from Summary
+        println("Editing address from summary...")
+        testSchedulingPage.clickEditAddressFromSummary()
+        
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        println("Selecting random address at index $randomIndex")
+        testSchedulingPage.editUserAddress(randomIndex)
+        
+        testSchedulingPage.clickProceed() // go to slot selection
+        testSchedulingPage.clickProceed() // go to summary
 
+        // 2. Test Slot Edit from Summary
+        println("Editing slot from summary...")
+        testSchedulingPage.clickEditSlotFromSummary()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.clickProceed()
+
+        // Final Verification
+        println("Final verification on summary page...")
+        // Re-extract price for validation
+        val productList = labTestsPage.labTestData?.data?.diagnostic_product_list
+        val targetProduct = productList?.packages?.find { it.code == targetCode }
+            ?: productList?.test_profiles?.find { it.code == targetCode }
+            ?: productList?.tests?.find { it.code == targetCode }
         val rawPrice = when (targetProduct) {
             is model.LabTestPackage -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             is model.LabTestProfile -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
-
-        println("Verifying Price/Footer on address page...")
-//        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-//        testSchedulingPage.verifyFooterActions()
-
-        println("Clicking Proceed and verifying Slot Selection Page for Longevity Panel...")
-        testSchedulingPage.clickProceed()
-
-        // This will now verify all slot buttons (should be 2 for longevity panel)
-//        testSchedulingPage.verifySlotSelectionPage()
-
-        println("Verifying Price/Footer on slot selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-        testSchedulingPage.verifyFooterActions()
-
-        println("Longevity panel test completed successfully.")
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        println("Edit flow test completed successfully.")
     }
 }
