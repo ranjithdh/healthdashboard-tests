@@ -12,12 +12,19 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
+import model.healthdata.HealthData
 import model.home.HomeData
 import model.home.HomeDataResponse
-import profile.page.ProfilePage
+import mobileView.profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
+import utils.report.StepHelper.CLICK_PROFILE_ICON
+import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
+import utils.report.StepHelper.FETCH_HOME_DATA
+import utils.report.StepHelper.logApiResponse
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -27,6 +34,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
+
 
     @OptIn(ExperimentalSerializationApi::class)
     val json = Json {
@@ -38,6 +46,7 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun waitForMobileHomePageConfirmation(): HomePage {
+        StepHelper.step(WAIT_MOBILE_HOME_CONFIRMATION)
         logger.info("Waiting for mobileView.home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
         return this
@@ -62,7 +71,7 @@ class HomePage(page: Page) : BasePage(page) {
         val response = page.waitForResponse(
             { response: Response? ->
                 response?.url()
-                    ?.contains("https://api.stg.dh.deepholistics.com/v4/human-token/market-place/home") == true && response.status() == 200
+                    ?.contains(TestConfig.APIs.API_HOME) == true && response.status() == 200
             },
             {
                 page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
@@ -82,6 +91,8 @@ class HomePage(page: Page) : BasePage(page) {
 
             if (responseObj.data != null) {
                 homeData = responseObj.data
+                StepHelper.step(FETCH_HOME_DATA)
+                logApiResponse(TestConfig.APIs.API_HOME, responseObj)
                 val diagnostic = homeData?.diagnostics?.firstOrNull { it.blood_test_appointment_date != null }
                 appointmentDate = diagnostic?.blood_test_appointment_date
             }
@@ -156,6 +167,7 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun clickProfile(): OrdersPage {
+        StepHelper.step(CLICK_PROFILE_ICON)
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         val orderPage = OrdersPage(page)
         return orderPage
@@ -163,6 +175,7 @@ class HomePage(page: Page) : BasePage(page) {
 
 
     fun clickAccountProfile(): ProfilePage {
+        StepHelper.step(CLICK_ACCOUNT_PROFILE)
         val profilePage = ProfilePage(page)
         profilePage.captureAddressData {
             profileImage.click()
@@ -170,6 +183,7 @@ class HomePage(page: Page) : BasePage(page) {
         profilePage.waitForConfirmation()
         return profilePage
     }
+
 
 
 

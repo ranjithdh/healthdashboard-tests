@@ -1,10 +1,12 @@
 package onboard.test.page
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
-import onboard.page.LoginPage
-import onboard.page.OrderSummaryPage
 import config.BaseTest
 import config.TestConfig
+import onboard.page.LoginPage
+import onboard.page.OrderSummaryPage
 import org.junit.jupiter.api.*
 import utils.OnboardAddOnTestDataStore
 import utils.SignupDataStore
@@ -13,6 +15,7 @@ import kotlin.collections.forEach
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_BOOKLABTEST)
 class OrderSummaryPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

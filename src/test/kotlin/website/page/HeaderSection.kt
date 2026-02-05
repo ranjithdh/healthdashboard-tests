@@ -3,6 +3,8 @@ package website.page
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
+import utils.report.StepHelper
+import utils.report.StepHelper.NAVIGATE_TO_PAGE
 
 
 class HeaderSection(val page: Page) {
@@ -27,6 +29,7 @@ class HeaderSection(val page: Page) {
 
 
     fun navigateToHowItWorksPage(): HowItWorksPage {
+        StepHelper.step(NAVIGATE_TO_PAGE + "How It Works")
         val locator = howItWorksPage
         locator.click()
         val howItWorksPage = HowItWorksPage(page)
@@ -35,6 +38,7 @@ class HeaderSection(val page: Page) {
     }
 
     fun navigateToWhatWeTestPage(): WhatWeTestPage {
+        StepHelper.step(NAVIGATE_TO_PAGE + "What We Test")
         val locator = whatWeTestPage
         locator.click()
         val whatWeTestPage = WhatWeTestPage(page)
@@ -43,6 +47,7 @@ class HeaderSection(val page: Page) {
     }
 
     fun navigateToOurWhyPage(): OurWhyPage {
+        StepHelper.step(NAVIGATE_TO_PAGE + "Our Why")
         val locator = ourWhyPage
         locator.click()
         val ourWhyPage = OurWhyPage(page)
@@ -51,6 +56,7 @@ class HeaderSection(val page: Page) {
     }
 
     fun navigateToFaq(): FaqPage {
+        StepHelper.step(NAVIGATE_TO_PAGE + "FAQs")
         val locator = faqPage
         locator.click()
         val faqPage = FaqPage(page)
@@ -59,6 +65,7 @@ class HeaderSection(val page: Page) {
     }
 
     fun navigateToLanding(): LandingPage {
+        StepHelper.step(NAVIGATE_TO_PAGE + "Home")
         val locator = landingPage
         locator.click()
         val landingPage = LandingPage(page)

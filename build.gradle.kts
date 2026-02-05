@@ -86,7 +86,7 @@ tasks.register<Test>("appTests") {
     filter {
         includeTestsMatching("login.*")
         includeTestsMatching("healthdata.*")
-        includeTestsMatching("profile.*")
+        includeTestsMatching("mobileView.profile.*")
         includeTestsMatching("webView.*")
     }
 }

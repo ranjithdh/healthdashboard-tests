@@ -1,5 +1,7 @@
 package website.test
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.*
 import website.page.LandingPage
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_WEBSITE)
 class HeaderAndFooterTest : BaseTest() {
 
     private lateinit var playwright: Playwright

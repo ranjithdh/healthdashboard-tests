@@ -4,6 +4,7 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.TestConfig
 import utils.logger.logger
+import utils.report.StepHelper
 import website.page.WebSiteBasePage
 
 
@@ -16,8 +17,9 @@ class GeneDetailPage(page: Page) : WebSiteBasePage(page) {
     val certifiedLabsSection = CertifiedLabsSection(page)
 
     fun waitForPageLoad(): GeneDetailPage {
+        StepHelper.step(StepHelper.WAIT_WEBSITE_PAGE_LOAD + "Advanced Genetic Analysis")
         header.waitFor()
-        logger.info { "GutMicrobiomeDetailPage loaded" }
+        logger.info { "Advanced Genetic Analysis loaded" }
         return this
     }
 

@@ -1,5 +1,7 @@
 package onboard.test.page
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -7,27 +9,21 @@ import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_ONBOARDING)
 class AddressPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var addressPage: onboard.page.AddressPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
         val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
@@ -37,14 +33,17 @@ class AddressPageTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+        addressPage = performInitialNavigation()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
     }
 
-    private fun navigateToAddressPage(): onboard.page.AddressPage {
+    private fun performInitialNavigation(): onboard.page.AddressPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.NEW_USER
         return loginPage
@@ -55,8 +54,9 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(1)
     fun `should display all form fields`() {
-        val addressPage = navigateToAddressPage()
+        addressPage.waitForConfirmation()
 
         assert(addressPage.isFlatHouseNoOrBuildingVisible()) { "Flat/House No/Building field should be visible" }
         assert(addressPage.isAddressVisible()) { "Address field should be visible" }
@@ -68,48 +68,48 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(2)
     fun `should enter flat house no or building correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.enterFlatHouseNoOrBuilding("Flat 101")
         addressPage.takeScreenshot("flat-house-entered")
     }
 
     @Test
+    @Order(3)
     fun `should enter address correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.enterAddress("123, Test Street, Test Area")
         addressPage.takeScreenshot("address-entered")
     }
 
     @Test
+    @Order(4)
     fun `should enter city correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.enterCity("Chennai")
         addressPage.takeScreenshot("city-entered")
     }
 
     @Test
+    @Order(5)
     fun `should select state correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.selectState("Tamil Nadu")
         addressPage.takeScreenshot("state-selected")
     }
 
     @Test
+    @Order(6)
     fun `should enter pin code correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.enterPinCode("600001")
         addressPage.takeScreenshot("pincode-entered")
     }
 
     @Test
+    @Order(7)
     fun `should fill all address details correctly`() {
-        val addressPage = navigateToAddressPage()
 
         addressPage.fillAddress(
             flatHouseNoOrBuilding = "Flat 101",
@@ -122,8 +122,8 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(8)
     fun `should have Continue disabled with empty address`() {
-        val addressPage = navigateToAddressPage()
         addressPage.fillAddress("Flat 101", "123, Test Street", "Chennai", "Tamil Nadu", "600001")
         assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
 
@@ -133,8 +133,8 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(9)
     fun `should have Continue disabled with empty city`() {
-        val addressPage = navigateToAddressPage()
         addressPage.fillAddress("Flat 101", "123, Test Street", "Chennai", "Tamil Nadu", "600001")
         assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
 
@@ -144,8 +144,8 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(10)
     fun `should have Continue disabled with empty pincode`() {
-        val addressPage = navigateToAddressPage()
         addressPage.fillAddress("Flat 101", "123, Test Street", "Chennai", "Tamil Nadu", "600001")
         assert(addressPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
 
@@ -155,8 +155,8 @@ class AddressPageTest : BaseTest() {
     }
 
     @Test
+    @Order(11)
     fun `should navigate to time slot page on valid submission`() {
-        val addressPage = navigateToAddressPage()
 
         val timeSlotPage = addressPage.fillAddressDetails(TestConfig.TestUsers.NEW_USER)
 

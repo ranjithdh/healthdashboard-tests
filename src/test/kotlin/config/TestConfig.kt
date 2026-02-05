@@ -17,13 +17,13 @@ object TestConfig {
         // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
 
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+
         val SERVICES_URL = "${BASE_URL}services"
 
 
         val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
-        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
 
@@ -33,32 +33,34 @@ object TestConfig {
         val PROFILE_URL = "${BASE_URL}profile"
 
 
-        val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
-        val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
-        val WHAT_WE_TEST: String = "${WEBSITE_BASE_URL}what-we-test"
-        val OUR_WHY: String = "${WEBSITE_BASE_URL}our-why"
-        val FAQ: String = "${WEBSITE_BASE_URL}faq"
-        val ALL_TEST: String = "${WEBSITE_BASE_URL}all-tests"
-        val ALLERGY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/allergies"
-        val GUT_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gut"
-        val STRESS_CORTISOL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/stress-and-cortisol"
-        val GENE_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gene"
-        val OMEGA_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/omega-profile"
-        val TOXIC_METALS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/toxic-metals"
-        val THYROID_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/thyroid-health"
-        val WOMEN_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-health"
-        val ESSENTIAL_AND_NUTRIENTS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/essential-nutrients"
-        val ADVANCED_THYROID_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/advanced-thyroid"
-        val LIVER_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/liver-health"
-        val AUTO_IMMUNE_PANEL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/autoimmune"
-        val HEART_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/heart-health"
-        val WOMEN_FERTILITY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-fertility"
-        val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
+        const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
+        const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
+        const val WHAT_WE_TEST: String = "${WEBSITE_BASE_URL}what-we-test"
+        const val OUR_WHY: String = "${WEBSITE_BASE_URL}our-why"
+        const val FAQ: String = "${WEBSITE_BASE_URL}faq"
+        const val ALL_TEST: String = "${WEBSITE_BASE_URL}all-tests"
+        const val ALLERGY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/allergies"
+        const val GUT_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gut"
+        const val STRESS_CORTISOL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/stress-and-cortisol"
+        const val GENE_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/gene"
+        const val OMEGA_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/omega-profile"
+        const val TOXIC_METALS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/toxic-metals"
+        const val THYROID_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/thyroid-health"
+        const val WOMEN_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-health"
+        const val ESSENTIAL_AND_NUTRIENTS_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/essential-nutrients"
+        const val ADVANCED_THYROID_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/advanced-thyroid"
+        const val LIVER_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/liver-health"
+        const val AUTO_IMMUNE_PANEL_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/autoimmune"
+        const val HEART_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/heart-health"
+        const val WOMEN_FERTILITY_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/womens-fertility"
+        const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
-        val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
+
+         val TRACK_RESULT = "${BASE_URL}order/"
     }
 
     object APIs {
@@ -68,6 +70,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
+        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
+        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
@@ -75,54 +79,45 @@ object TestConfig {
         val API_PREFERENCE_UPDATE = "$BASE_URL/v4/human-token/preference"
         val API_ACCOUNT_INFORMATION = "$BASE_URL/v4/human-token/pii-data"
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
-        val API_SLOTS_AVAILABILITY = "$BASE_URL/v3/diagnostics/slots-availability"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
+        val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
+        val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
     }
 
 
-       object Browser {
-            const val SLOW_MO: Double = (1 * 1000).toDouble()
-            const val TIMEOUT: Double = 60000.toDouble()
+    object Browser {
+        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val TIMEOUT: Double = 60000.toDouble()
 
-            fun launchOptions(): BrowserType.LaunchOptions {
-                val isHeadless = System.getenv("HEADLESS")?.toBoolean()
-                    ?: System.getProperty("headless")?.toBoolean()
-                    ?: false   //TODO default safe for CI is true
+        fun launchOptions(): BrowserType.LaunchOptions {
+            val isHeadless = System.getenv("HEADLESS")?.toBoolean()
+                ?: System.getProperty("headless")?.toBoolean()
+                ?: true   //TODO default safe for CI is true
 
-                return BrowserType.LaunchOptions()
-                    .setHeadless(isHeadless)
-                    .setSlowMo(if (isHeadless) 0.0 else SLOW_MO)
-            }
+            return BrowserType.LaunchOptions()
+                .setHeadless(isHeadless)
+                .setSlowMo(SLOW_MO)
         }
+    }
 
     object Viewports {
         // Mobile devices
         val MOBILE_PORTRAIT = Viewport(390, 844, "iPhone 13", true)
         val MOBILE_LANDSCAPE = Viewport(844, 390, "iPhone 13 Landscape", true)
-        val MOBILE_SMALL = Viewport(320, 568, "iPhone SE", true)
         val ANDROID = Viewport(412, 915, "Pixel 5", true)
 
         // Tablets
         val TABLET_PORTRAIT = Viewport(768, 1024, "iPad", true)
-        val TABLET_LANDSCAPE = Viewport(1024, 768, "iPad Landscape", true)
-        val TABLET_PRO = Viewport(1024, 1366, "iPad Pro", true)
 
         // Desktop
         val DESKTOP_HD = Viewport(1280, 720, "Desktop HD", false)
         val DESKTOP_FHD = Viewport(1920, 1080, "Desktop Full HD", false)
-        val DESKTOP_4K = Viewport(3840, 2160, "Desktop 4K", false)
-        val LAPTOP = Viewport(1366, 768, "Laptop", false)
 
-        // All viewports for comprehensive testing
-        val ALL_MOBILE = listOf(MOBILE_PORTRAIT, MOBILE_LANDSCAPE, ANDROID)
-        val ALL_TABLET = listOf(TABLET_PORTRAIT, TABLET_LANDSCAPE)
-        val ALL_DESKTOP = listOf(DESKTOP_HD, DESKTOP_FHD, LAPTOP)
-        val ALL = ALL_MOBILE + ALL_TABLET + ALL_DESKTOP
     }
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583618",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583654",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -146,18 +141,11 @@ object TestConfig {
                     otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
                     country = "India"
                 )*/
-
         val EXISTING_USER = TestUser(
-              mobileNumber = "7373791414",
-              otp = "678901",
-              country = "India"
-          )
-
-      /*  val EXISTING_USER = TestUser(
             mobileNumber = "9159439327",
             otp = "678901",
             country = "India"
-        )*/
+        )
     }
 
     object Artifacts {

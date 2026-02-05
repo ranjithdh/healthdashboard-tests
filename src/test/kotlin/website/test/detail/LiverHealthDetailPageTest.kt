@@ -2,26 +2,17 @@ package website.test.detail
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
-import website.page.AddOnTestPage
-import website.page.LandingPage
-import website.page.OurWhyPage
-import website.page.detail.AdvancedThyroidDetailPage
-import website.page.detail.AllergyDetailPage
-import website.page.detail.EssentialAndNutrientsDetailPage
-import website.page.detail.GeneDetailPage
-import website.page.detail.GutMicrobiomeDetailPage
+import utils.report.Modules
 import website.page.detail.LiverHealthDetailPage
-import website.page.detail.ToxicMetalsDetailPage
-import website.page.detail.WomenHealthDetailPage
-import kotlin.test.assertTrue
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_WEBSITE)
 class LiverHealthDetailPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

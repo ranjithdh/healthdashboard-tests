@@ -5,7 +5,15 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 import config.TestUser
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_CONTINUE
+import utils.report.StepHelper.ENTER_ADDRESS
+import utils.report.StepHelper.ENTER_CITY
+import utils.report.StepHelper.ENTER_FLAT_HOUSE_NO
+import utils.report.StepHelper.ENTER_PIN_CODE
+import utils.report.StepHelper.FILL_ADDRESS_DETAILS_CONTINUE
+import utils.report.StepHelper.FILL_ADDRESS_FORM
+import utils.report.StepHelper.SELECT_STATE
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -13,7 +21,7 @@ private val logger = KotlinLogging.logger {}
 
 class AddressPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
     private val addressInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your address"))
     private val cityInput = byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("City"))
@@ -23,8 +31,8 @@ class AddressPage(page: Page) : BasePage(page) {
 
     private val flatHouseNoOrBuildingInput = page.getByText("Flat, House no., Building,")
 
-    @Step("Enter Flat/House No: {value}")
     fun enterFlatHouseNoOrBuilding(value: String): AddressPage {
+        StepHelper.step(ENTER_FLAT_HOUSE_NO + value)
         logger.info { "enterFlatHouseNoOrBuilding($value)" }
         flatHouseNoOrBuildingInput.fill(value)
         return this
@@ -36,8 +44,8 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Enter Address: {address}")
     fun enterAddress(address: String): AddressPage {
+        StepHelper.step(ENTER_ADDRESS + address)
         logger.info { "enterAddress($address)" }
         addressInput.fill(address)
         return this
@@ -49,8 +57,8 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Enter City: {city}")
     fun enterCity(city: String): AddressPage {
+        StepHelper.step(ENTER_CITY + city)
         logger.info { "enterCity($city)" }
         cityInput.fill(city)
         return this
@@ -62,15 +70,15 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Select State: {state}")
     fun selectState(state: String): AddressPage {
+        StepHelper.step(SELECT_STATE + state)
         logger.info { "selectState($state)" }
         stateInput.fill(state)
         return this
     }
 
-    @Step("Enter Pin Code: {pinCode}")
     fun enterPinCode(pinCode: String): AddressPage {
+        StepHelper.step(ENTER_PIN_CODE + pinCode)
         logger.info { "enterPinCode($pinCode)" }
         pinCodeInput.fill(pinCode)
         return this
@@ -82,7 +90,6 @@ class AddressPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Fill Address Form")
     fun fillAddress(
         flatHouseNoOrBuilding: String,
         address: String,
@@ -90,6 +97,7 @@ class AddressPage(page: Page) : BasePage(page) {
         state: String,
         pinCode: String
     ): AddressPage {
+        StepHelper.step(FILL_ADDRESS_FORM)
         logger.info { "fillAddress($flatHouseNoOrBuilding, $address, $city, $state, $pinCode)" }
         utils.SignupDataStore.update {
             this.flatHouseNoOrBuilding = flatHouseNoOrBuilding
@@ -107,15 +115,15 @@ class AddressPage(page: Page) : BasePage(page) {
     }
 
 
-    @Step("Click Continue")
     fun clickContinue(): AddressPage {
+        StepHelper.step(CLICK_CONTINUE)
         logger.info { "clickContinue()" }
         continueButton.click()
         return this
     }
 
-    @Step("Fill Address Details and Continue")
     fun fillAddressDetails(testUser: TestUser = TestConfig.TestUsers.NEW_USER): TimeSlotPage {
+        StepHelper.step(FILL_ADDRESS_DETAILS_CONTINUE)
         logger.info { "fillAddressDetails()" }
         fillAddress(
             testUser.flatHouseNo,

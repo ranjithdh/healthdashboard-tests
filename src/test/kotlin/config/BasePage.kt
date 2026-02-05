@@ -5,7 +5,9 @@ import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.WaitForSelectorState
 import io.qameta.allure.Allure
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.NAVIGATE_TO
+import utils.report.StepHelper.TAKE_SCREENSHOT
 import mu.KotlinLogging
 import java.nio.file.Paths
 
@@ -21,9 +23,9 @@ abstract class BasePage(protected val page: Page) {
     /**
      * Navigate to this page
      */
-    @Step("Navigate to {pageUrl}")
     open fun navigate(): BasePage {
         val fullUrl = pageUrl
+        StepHelper.step(NAVIGATE_TO + pageUrl)
         logger.info { "Navigating to: $fullUrl" }
         page.navigate(fullUrl)
         return this
@@ -99,18 +101,13 @@ abstract class BasePage(protected val page: Page) {
         )
     }
     
-    /**
-     * Wait for URL to match pattern
-     */
-    protected fun waitForUrl(pattern: String, timeout: Long = TestConfig.Timeouts.NAVIGATION_TIMEOUT) {
-        page.waitForURL(pattern, Page.WaitForURLOptions().setTimeout(timeout.toDouble()))
-    }
+
     
     /**
      * Take screenshot of current page state
      */
-    @Step("Take screenshot: {name}")
     fun takeScreenshot(name: String): String {
+        StepHelper.step(TAKE_SCREENSHOT + name)
         val path = "${TestConfig.Artifacts.SCREENSHOT_DIR}/${name}_${System.currentTimeMillis()}.png"
         page.screenshot(Page.ScreenshotOptions()
             .setPath(Paths.get(path))

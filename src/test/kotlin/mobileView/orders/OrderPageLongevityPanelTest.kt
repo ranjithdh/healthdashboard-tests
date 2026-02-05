@@ -1,5 +1,7 @@
 package mobileView.orders
 
+import io.qameta.allure.Epic
+import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
@@ -9,6 +11,7 @@ import utils.SignupDataStore
 import utils.logger.logger
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_ORDERS)
 class OrderPageLongevityPanelTest : BaseTest() {
 
     private lateinit var playwright: Playwright

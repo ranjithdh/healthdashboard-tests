@@ -5,19 +5,14 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import config.TestConfig
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
-import website.page.AddOnTestPage
-import website.page.LandingPage
-import website.page.OurWhyPage
-import website.page.detail.AllergyDetailPage
-import website.page.detail.GeneDetailPage
-import website.page.detail.GutMicrobiomeDetailPage
-import website.page.detail.ToxicMetalsDetailPage
+import utils.report.Modules
 import website.page.detail.WomenHealthDetailPage
-import kotlin.test.assertTrue
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Epic(Modules.EPIC_WEBSITE)
 class WomenHealthDetailPageTest {
 
     private lateinit var playwright: Playwright

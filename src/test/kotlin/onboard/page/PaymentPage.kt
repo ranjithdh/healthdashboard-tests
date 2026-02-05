@@ -6,17 +6,19 @@ import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import mobileView.home.HomePage
 import mu.KotlinLogging
-import io.qameta.allure.Step
+import utils.report.StepHelper
+import utils.report.StepHelper.COMPLETE_PAYMENT
+import utils.report.StepHelper.MANUAL_NAVIGATE_HOME
 
 private val logger = KotlinLogging.logger {}
 
 
 class PaymentPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "/login"
+    override val pageUrl = "/onboard"
 
-    @Step("Complete Payment")
     fun completePayment(): PaymentPage {
+        StepHelper.step(COMPLETE_PAYMENT)
         logger.info { "completePayment()" }
 
         page.waitForSelector("iframe")
@@ -36,8 +38,8 @@ class PaymentPage(page: Page) : BasePage(page) {
         return this
     }
 
-    @Step("Manually Navigate to Home")
     fun manuallyNavigateToHome(): HomePage {
+        StepHelper.step(MANUAL_NAVIGATE_HOME)
         logger.info { "manuallyNavigateToHome()" }
         page.navigate("https://app.stg.deepholistics.com/home")
         return HomePage(page)
