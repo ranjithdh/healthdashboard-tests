@@ -94,7 +94,8 @@ data class LabTestContent(
     val how: List<String>? = null,
     val biomarkers_description: String? = null,
     val biomarkers_tested: Map<String, List<String>>? = null,
-    val fasting_info: String? = null
+    val fasting_info: String? = null,
+    val when_to_take: String? = null
 )
 
 @Serializable

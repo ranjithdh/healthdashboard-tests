@@ -2,44 +2,35 @@ package mobileView.diagnostics
 
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import model.LabTestResponse
+import mu.KotlinLogging
 import onboard.page.LoginPage
-import utils.report.StepHelper
-import utils.report.StepHelper.CLICK_FILTER
-import utils.report.StepHelper.NAVIGATE_TO_DIAGNOSTICS
-import utils.report.StepHelper.VIEW_TEST_DETAILS
+import utils.json.json
+
+private val logger = KotlinLogging.logger {}
 
 class LabTestsPage(page: Page) : BasePage(page) {
 
     override val pageUrl = ""
+     var labTestData: LabTestResponse? = null
 
 
 
 
     fun checkStaticTextsAndSegments() {
-        StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: Book Lab Tests heading")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests"))
-
-        StepHelper.step("${StepHelper.VERIFY_STATIC_CONTENT}: flexible testing options text")
         page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("With flexible testing options"))
-
-        StepHelper.step(CLICK_FILTER + "All")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).click()
-
-        StepHelper.step(CLICK_FILTER + "Blood")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Blood")).click()
-
-        StepHelper.step(CLICK_FILTER + "Gene")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gene")).click()
-
-        StepHelper.step(CLICK_FILTER + "Gut")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
     }
 
     fun login() {
-        StepHelper.step(NAVIGATE_TO_DIAGNOSTICS)
         val testUser = TestConfig.TestUsers.EXISTING_USER
         val loginPage = LoginPage(page).navigate() as LoginPage
         loginPage.enterMobileAndContinue(testUser)
@@ -49,9 +40,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun goToDiagnosticsUrl() {
-        //  page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-        page.waitForTimeout(2000.0)
-        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+//        page.waitForTimeout(2000.0)
+//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
@@ -59,14 +50,49 @@ class LabTestsPage(page: Page) : BasePage(page) {
         goToDiagnosticsUrl()
     }
 
+
+    init {
+        getLabTestsResponse()
+    }
+
+    fun getLabTestsResponse() {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()
+                    ?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true && response.status() == 200
+            },
+            {
+                navigateToDiagnostics()
+            }
+        )
+
+        val responseBody = response.text()
+        if (responseBody.isNullOrBlank()) {
+            logger.info { "getLabTestsResponse API response body is empty" }
+//            return null
+        }
+
+        try {
+            val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
+
+            if (responseObj.data != null) {
+                labTestData = responseObj
+//                return labTestData
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response..${e.message}" }
+//            return null
+        }
+
+//        return null
+    }
+
     fun clickViewDetails(): TestDetailPage {
-        StepHelper.step(VIEW_TEST_DETAILS + "first test card")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).first().click()
         return TestDetailPage(page)
     }
 
     fun clickViewDetails(code: String): TestDetailPage {
-        StepHelper.step(VIEW_TEST_DETAILS + code)
         val button = page.getByTestId("test-card-view-details-$code")
         button.scrollIntoViewIfNeeded()
         button.click()
@@ -171,17 +197,17 @@ class LabTestsPage(page: Page) : BasePage(page) {
         steps.forEachIndexed { index, step ->
             val stepNum = String.format("%02d", index + 1)
             println("Verifying step $stepNum: ${step["title"]}")
-
+            
             // Verify Number
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum)).scrollIntoViewIfNeeded()
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(stepNum)).waitFor()
-
+            
             // Verify Title
             page.getByText(step["title"]!!).first().waitFor()
-
+            
             // Verify Description
             val desc = step["desc"]!!
-            // Description might be long or slightly truncated in getByText if not exact,
+            // Description might be long or slightly truncated in getByText if not exact, 
             // but we'll try exact first or a significant prefix
             page.getByText(desc.take(40)).waitFor()
         }
@@ -190,17 +216,16 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun verifyCertifiedLabsSection() {
         println("Verifying 'Certified Labs, Secure Data' section")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Certified Labs, Secure Data")).scrollIntoViewIfNeeded()
-
+        
         // Lab Step
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("NABL and CAP Certified Laboratories")).waitFor()
         page.getByText("Each partner lab we work with is CAP-accredited and NABL-certified.").waitFor()
-
+        
         // Privacy Step
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Your privacy matters")).waitFor()
         page.getByText("Your health data is always protected with strict privacy safeguards.").waitFor()
     }
     fun clickFilter(name: String) {
-        StepHelper.step(CLICK_FILTER + name)
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName(name)).click()
     }
 

@@ -1,17 +1,16 @@
 package mobileView.diagnostics
 
 import com.microsoft.playwright.*
+import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
-import io.qameta.allure.Epic
 import kotlinx.serialization.json.*
+import model.LabTestResponse
 import org.junit.jupiter.api.*
-import utils.report.Modules
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Epic(Modules.EPIC_BOOKLABTEST)
 class LabTestsTest : BaseTest() {
 
     private lateinit var playwright: Playwright
@@ -51,7 +50,7 @@ class LabTestsTest : BaseTest() {
     @Test
     fun `verify lab tests page static texts and segments`() {
         val labTestsPage = LabTestsPage(page)
-        labTestsPage.navigateToDiagnostics()
+//        labTestsPage.navigateToDiagnostics()
         labTestsPage.checkStaticTextsAndSegments()
     }
 
@@ -64,53 +63,42 @@ class LabTestsTest : BaseTest() {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val response = page.waitForResponse({
-            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
-            labTestsPage.navigateToDiagnostics()
-        }
-        println("Response Status: ${response.status()}")
-        if (response.status() == 304) {
-            throw AssertionError("API returned 304 Not Modified. Playwright cannot read body of 304 responses. Header 'Cache-Control: no-cache' should have prevented this.")
-        }
+        val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
         // Parse response and verify cards
         println("Parsing API response...")
-        val json = kotlinx.serialization.json.Json.parseToJsonElement(response.text()).jsonObject
-        val data = json["data"]?.jsonObject
-        val productList = data?.get("diagnostic_product_list")?.jsonObject
+        val productList = responseObj.data?.diagnostic_product_list
+            ?: throw AssertionError("diagnostic_product_list not found in API response")
         data class TestCardData(val code: String, val name: String, val sampleType: String, val rawSampleType: String, val price: String)
         val testCards = mutableListOf<TestCardData>()
 
-        fun extractData(jsonArray: JsonArray?) {
-            jsonArray?.forEach { element ->
-                val obj = element.jsonObject
-                val code = obj["code"]?.jsonPrimitive?.content ?: return@forEach
-                val name = obj["name"]?.jsonPrimitive?.content ?: ""
-                val rawSampleType = obj["sample_type"]?.jsonPrimitive?.content ?: ""
+        fun addTestCard(code: String?, name: String?, rawSampleType: String?, priceStr: String?) {
+            if (code == null) return
+            val safeName = name ?: ""
+            val safeRawSampleType = rawSampleType ?: ""
 
-                // Sample type logic as per user requirement
-                val sampleType = when {
-                    code.startsWith("CORTISOL") -> "At-Home Test Kit"
-                    code.startsWith("OMEGA") -> "At-Home Test Kit"
-                    rawSampleType.lowercase() == "saliva" -> "At-Home Test Kit"
-                    rawSampleType.lowercase() == "stool" -> "At-Home Test Kit"
-                    else -> "Blood test"
-                }
-
-                // Price extraction and formatting
-                val rawPrice = obj["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
-                val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
-                numberFormat.maximumFractionDigits = 0
-                val formattedPrice = "₹ " + numberFormat.format(rawPrice)
-
-                testCards.add(TestCardData(code, name, sampleType, rawSampleType, formattedPrice))
+            // Sample type logic as per user requirement
+            val sampleType = when {
+                code.startsWith("CORTISOL") -> "At-Home Test Kit"
+                code.startsWith("OMEGA") -> "At-Home Test Kit"
+                safeRawSampleType.lowercase() == "saliva" -> "At-Home Test Kit"
+                safeRawSampleType.lowercase() == "stool" -> "At-Home Test Kit"
+                else -> "Blood test"
             }
+
+            // Price extraction and formatting
+            val rawPrice = priceStr?.toDoubleOrNull() ?: 0.0
+            val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
+            numberFormat.maximumFractionDigits = 0
+            val formattedPrice = "₹ " + numberFormat.format(rawPrice)
+
+            testCards.add(TestCardData(code, safeName, sampleType, safeRawSampleType, formattedPrice))
         }
 
         // Extract data from all sections
-        extractData(productList?.get("packages")?.jsonArray)
-        extractData(productList?.get("test_profiles")?.jsonArray)
-        extractData(productList?.get("tests")?.jsonArray)
+        productList.packages?.forEach { addTestCard(it.code, it.name, it.sample_type, it.product?.price) }
+        productList.test_profiles?.forEach { addTestCard(it.code, it.name, it.sample_type, it.product?.price) }
+        productList.tests?.forEach { addTestCard(it.code, it.name, it.sample_type, it.product?.price) }
 
         println("Found ${testCards.size} cards total.")
 
@@ -247,46 +235,40 @@ class LabTestsTest : BaseTest() {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val listResponse = page.waitForResponse({
-            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
-            labTestsPage.navigateToDiagnostics()
-        }
+        val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
         val targetCode = "GENE10001" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
-        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
-        val listData = listJson["data"]?.jsonObject
-        val productList = listData?.get("diagnostic_product_list")?.jsonObject
-        // Helper to search in multiple arrays
-        fun findItem(section: String): JsonObject? {
-            return productList?.get(section)?.jsonArray?.map { it.jsonObject }?.firstOrNull {
-                it["code"]?.jsonPrimitive?.content == targetCode
+        val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
+        
+        val targetPackage = productList.packages?.find { it.code == targetCode }
+            ?: productList.test_profiles?.find { it.code == targetCode }
+            ?: productList.tests?.find { it.code == targetCode }
+            ?: throw AssertionError("Item with code $targetCode not found in API response")
+
+        val content = targetPackage.let { 
+            when (it) {
+                is model.LabTestPackage -> it.content
+                is model.LabTestProfile -> it.content
+                is model.LabTestItem -> it.content
+                else -> null
             }
-        }
-
-        val targetPackage = findItem("packages")
-            ?: findItem("test_profiles")
-            ?: findItem("tests")
-            ?: throw AssertionError("Item with code $targetCode not found in API response (packages, test_profiles, tests)")
-
-        val content = targetPackage["content"]?.jsonObject ?: throw AssertionError("Content not found for $targetCode")
+        } ?: throw AssertionError("Content not found for $targetCode")
 
         // Extract descriptions
-        val whatMeasuredDesc = content["what_measured_description"]?.jsonPrimitive?.content ?: ""
-        val whatToExpectDesc = content["what_to_expect_description"]?.jsonPrimitive?.content ?: ""
+        val whatMeasuredDesc = content.what_measured_description ?: ""
+        val whatToExpectDesc = content.what_to_expect_description ?: ""
 
-        // 'who' is an array in the JSON, we take the first element
-        val whoArray = content["who"]?.jsonArray
-        val whoDesc = whoArray?.firstOrNull()?.jsonPrimitive?.content ?: ""
+        // 'who' is a list in the model
+        val whoDesc = content.who?.firstOrNull() ?: ""
 
         println("Expected What's Measured: $whatMeasuredDesc")
         println("Expected Who: $whoDesc")
         println("Expected What to Expect: $whatToExpectDesc")
 
         // Logic to determine expected highlights based on React frontend logic
-        val highlightsJson = content["highlights"]?.jsonArray
-        val rawHighlights = highlightsJson?.map { it.jsonPrimitive.content } ?: emptyList()
+        val rawHighlights = content.highlights ?: emptyList()
         val expectedHighlights = mutableListOf<String>()
 
         // 1. highlights[0]
@@ -296,8 +278,18 @@ class LabTestsTest : BaseTest() {
 
         // 2. Prep/Fasting block (Only if !hasHighlight5)
         if (!hasHighlight5) {
-            val code = targetPackage["code"]?.jsonPrimitive?.content
-            val vendorProductId = targetPackage["product"]?.jsonObject?.get("vendor_product_id")?.jsonPrimitive?.content
+            val code = when (targetPackage) {
+                is model.LabTestPackage -> targetPackage.code
+                is model.LabTestProfile -> targetPackage.code
+                is model.LabTestItem -> targetPackage.code
+                else -> null
+            }
+            val vendorProductId = when (targetPackage) {
+                is model.LabTestPackage -> targetPackage.product?.vendor_product_id
+                is model.LabTestProfile -> targetPackage.product?.vendor_product_id
+                is model.LabTestItem -> targetPackage.product?.vendor_product_id
+                else -> null
+            }
 
             if (code == "DH_LONGEVITY_PANEL" || vendorProductId == "DH_LONGEVITY_PANEL" ||
                 code == "DH_METABOLIC_PANEL" || vendorProductId == "DH_METABOLIC_PANEL") {
@@ -310,14 +302,24 @@ class LabTestsTest : BaseTest() {
                 }
 
             } else {
-                val sampleType = targetPackage["sample_type"]?.jsonPrimitive?.content?.lowercase()
-                val preparation = content["preparation"]?.jsonPrimitive?.content
-                val isFastingRequired = targetPackage["is_fasting_required"]?.jsonPrimitive?.boolean == true
+                val sampleType = when (targetPackage) {
+                    is model.LabTestPackage -> targetPackage.sample_type
+                    is model.LabTestProfile -> targetPackage.sample_type
+                    is model.LabTestItem -> targetPackage.sample_type
+                    else -> null
+                }?.lowercase()
+                val preparation = content.preparation
+                val isFastingRequired = when (targetPackage) {
+                    is model.LabTestPackage -> targetPackage.is_fasting_required
+                    is model.LabTestProfile -> targetPackage.is_fasting_required
+                    is model.LabTestItem -> targetPackage.is_fasting_required
+                    else -> null
+                } == true
 
                 if (sampleType == "stool" || sampleType == "saliva") {
                     expectedHighlights.add(preparation ?: "No preparation required")
                 } else if (isFastingRequired) {
-                    val fastingInfo = content["fasting_info"]?.jsonPrimitive?.content
+                    val fastingInfo = content.fasting_info
                     val cleanedFastingInfo = fastingInfo?.replace(Regex("fasting\\s*", RegexOption.IGNORE_CASE), "")?.trim() ?: "required"
                     expectedHighlights.add("Fasting $cleanedFastingInfo")
                 } else {
@@ -327,7 +329,7 @@ class LabTestsTest : BaseTest() {
         }
 
         // 3. when_to_take
-        val whenToTake = content["when_to_take"]?.jsonPrimitive?.content
+        val whenToTake = content.when_to_take
         if (!whenToTake.isNullOrBlank()) {
             expectedHighlights.add(whenToTake)
         }
@@ -400,9 +402,21 @@ class LabTestsTest : BaseTest() {
             "saliva_stress" to "Your sample is analysed in a certified lab, and results are shared on your dashboard."
         )
 
-        val sampleType = targetPackage["sample_type"]?.jsonPrimitive?.content?.lowercase() ?: ""
-        val reportGenHr = targetPackage["report_generation_hr"]?.jsonPrimitive?.content ?: "72 hours"
-        val highlightsList = content["highlights"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+        val sampleType = when (targetPackage) {
+            is model.LabTestPackage -> targetPackage.sample_type
+            is model.LabTestProfile -> targetPackage.sample_type
+            is model.LabTestItem -> targetPackage.sample_type
+            else -> ""
+        }?.lowercase() ?: ""
+
+        val reportGenHr = when (targetPackage) {
+            is model.LabTestPackage -> targetPackage.report_generation_hr
+            is model.LabTestProfile -> targetPackage.report_generation_hr
+            is model.LabTestItem -> targetPackage.report_generation_hr
+            else -> "72 hours"
+        } ?: "72 hours"
+
+        val highlightsList = content.highlights ?: emptyList()
 
         val baseSteps = mutableListOf<Map<String, String>>()
 
@@ -458,7 +472,12 @@ class LabTestsTest : BaseTest() {
 //        testDetailPage.verifyCertifiedLabsSection()
 
         // Extract and format price
-        val rawPrice = targetPackage["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+        val rawPrice = when (targetPackage) {
+            is model.LabTestPackage -> targetPackage.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestProfile -> targetPackage.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestItem -> targetPackage.product?.price?.toDoubleOrNull() ?: 0.0
+            else -> 0.0
+        }
         val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
         numberFormat.maximumFractionDigits = 0
         val formattedPrice = "₹" + numberFormat.format(rawPrice)
@@ -471,10 +490,20 @@ class LabTestsTest : BaseTest() {
         println("Test completed successfully.")
 
         println("Verifying How It Works section...")
-        val sampleTypes = targetPackage["sample_type"]?.jsonPrimitive?.content ?: ""
-        val reportGenerationHr = targetPackage["report_generation_hr"]?.jsonPrimitive?.content
+        val finalSampleType = when (targetPackage) {
+            is model.LabTestPackage -> targetPackage.sample_type
+            is model.LabTestProfile -> targetPackage.sample_type
+            is model.LabTestItem -> targetPackage.sample_type
+            else -> ""
+        } ?: ""
+        val finalReportGenHr = when (targetPackage) {
+            is model.LabTestPackage -> targetPackage.report_generation_hr
+            is model.LabTestProfile -> targetPackage.report_generation_hr
+            is model.LabTestItem -> targetPackage.report_generation_hr
+            else -> null
+        }
         val firstHighlight = if (rawHighlights.isNotEmpty()) rawHighlights[0] else null
-        testDetailPage.verifyHowItWorksSection(sampleTypes, targetCode, reportGenerationHr, firstHighlight)
+        testDetailPage.verifyHowItWorksSection(finalSampleType, targetCode, finalReportGenHr, firstHighlight)
 
         println("Verifying Certified Labs section...")
         testDetailPage.verifyCertifiedLabsSection()
@@ -489,51 +518,49 @@ class LabTestsTest : BaseTest() {
 
         // Capture the API response during navigation
         println("Navigating to diagnostics page and capturing API response...")
-        val listResponse = page.waitForResponse({
-            it.url().contains(other = TestConfig.APIs.LAB_TEST_API_URL) && it.status() == 200 }) {
-            labTestsPage.navigateToDiagnostics()
-        }
+        val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
         val targetCode = "P037"
 
         println("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
 
-//        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
+        val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
         val testSchedulingPage = TestSchedulingPage(page)
         println("Capturing address list and verifying scheduling page...")
-//        testSchedulingPage.captureAddressData {
-//            testDetailPage.clickBookNow(targetCode)
-//        }
 
-//        testSchedulingPage.verifySampleCollectionAddressHeading()
-
-//        println("Verifying addresses from API...")
-//        testSchedulingPage.assertAddressesFromApi()
-
-//        println("Testing 'Add New Address' functionality...")
-//        testSchedulingPage.clickAddNewAddress()
-//        testSchedulingPage.addAddressAndValidate()
-
-//        println("Testing 'Edit Address' functionality...")
-        // Edit the first address (at index 0)
-//        testSchedulingPage.editUserAddress(0)
-
-        // Extract price for the targetCode from listResponse
-        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
-        val listData = listJson["data"]?.jsonObject
-        val productList = listData?.get("diagnostic_product_list")?.jsonObject
-
-        val productTypes = listOf("packages", "test_profiles", "tests")
-        val allProducts = productTypes.flatMap { type ->
-            productList?.get(type)?.jsonArray?.map { it.jsonObject } ?: emptyList()
+        testSchedulingPage.captureAddressData {
+            testDetailPage.clickBookNow(targetCode)
         }
 
-        val targetProduct = allProducts.firstOrNull {
-            it["code"]?.jsonPrimitive?.content == targetCode
-        } ?: throw AssertionError("Product with code $targetCode not found in any of $productTypes in API response")
+        testSchedulingPage.verifySampleCollectionAddressHeading()
+        println("Testing 'Add New Address' functionality...")
+        testSchedulingPage.clickAddNewAddress()
+        assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
+        testSchedulingPage.assertAddressFormFieldsVisible()
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.addAddressAndValidate()
+        assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
-        val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
+        println("Testing 'Edit Address' functionality...")
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        println("Selecting random address at index $randomIndex")
+        testSchedulingPage.editUserAddress(randomIndex)
+        // Extract price for the targetCode from responseObj
+        val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
+
+        val targetProduct = productList.packages?.find { it.code == targetCode }
+            ?: productList.test_profiles?.find { it.code == targetCode }
+            ?: productList.tests?.find { it.code == targetCode }
+            ?: throw AssertionError("Product with code $targetCode not found in API response")
+
+        val rawPrice = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestProfile -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            else -> 0.0
+        }
 
         println("Verifying price details on address selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
@@ -545,70 +572,72 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.clickProceed()
 
         println("Verifying Slot Selection Page items...")
-        testSchedulingPage.verifySlotSelectionPage()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
 
         println("Verifying Price Details on Slot Selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
         println("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
+        testSchedulingPage.clickProceed()
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
         println("Test completed successfully.")
     }
-
     @Test
-    fun `verify longevity panel scheduling flow`() {
+    fun `verify summary page edit flow`() {
         val labTestsPage = LabTestsPage(page)
-        val targetCode = "DH_LONGEVITY_PANEL"
-        println("Starting test: verify longevity panel scheduling flow ($targetCode)")
+        val targetCode = "P037"
+        println("Starting test: verify summary page edit flow")
 
-        // Navigation and capture
-        val listResponse = page.waitForResponse({ it.url().contains("human-token/lab-test") && it.status() == 200 }) {
-            labTestsPage.navigateToDiagnostics()
-        }
-
-        println("Clicking View Details for $targetCode")
+        labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
         labTestsPage.clickViewDetails(targetCode)
 
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
         val testSchedulingPage = TestSchedulingPage(page)
 
-        println("Capturing address list and booking $targetCode")
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
         }
 
-        // Verify address page
-//        testSchedulingPage.verifySampleCollectionAddressHeading()
-//        testSchedulingPage.assertAddressesFromApi()
-
-        // Extract price
-        val listJson = kotlinx.serialization.json.Json.parseToJsonElement(listResponse.text()).jsonObject
-        val listData = listJson["data"]?.jsonObject
-        val productList = listData?.get("diagnostic_product_list")?.jsonObject
-        // Helper to search in multiple arrays
-        val targetProduct = listOf("packages", "test_profiles", "tests").mapNotNull { section ->
-            productList?.get(section)?.jsonArray?.map { it.jsonObject }?.firstOrNull {
-                it["code"]?.jsonPrimitive?.content == targetCode
-            }
-        }.firstOrNull() ?: throw AssertionError("Product with code $targetCode not found in API response (packages, test_profiles, tests)")
-
-        val rawPrice = targetProduct["product"]?.jsonObject?.get("price")?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
-
-        println("Verifying Price/Footer on address page...")
-//        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-//        testSchedulingPage.verifyFooterActions()
-
-        println("Clicking Proceed and verifying Slot Selection Page for Longevity Panel...")
+        // Initial setup to reach summary page
+        testSchedulingPage.clickProceed()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
         testSchedulingPage.clickProceed()
 
-        // This will now verify all slot buttons (should be 2 for longevity panel)
-//        testSchedulingPage.verifySlotSelectionPage()
+        // 1. Test Address Edit from Summary
+        println("Editing address from summary...")
+        testSchedulingPage.clickEditAddressFromSummary()
+        
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        println("Selecting random address at index $randomIndex")
+        testSchedulingPage.editUserAddress(randomIndex)
+        
+        testSchedulingPage.clickProceed() // go to slot selection
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.clickProceed() // go to summary
 
-        println("Verifying Price/Footer on slot selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-        testSchedulingPage.verifyFooterActions()
+        // 2. Test Slot Edit from Summary
+        println("Editing slot from summary...")
+        testSchedulingPage.clickEditSlotFromSummary()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.clickProceed()
 
-        println("Longevity panel test completed successfully.")
+        // Final Verification
+        println("Final verification on summary page...")
+        // Re-extract price for validation
+        val productList = labTestsPage.labTestData?.data?.diagnostic_product_list
+        val targetProduct = productList?.packages?.find { it.code == targetCode }
+            ?: productList?.test_profiles?.find { it.code == targetCode }
+            ?: productList?.tests?.find { it.code == targetCode }
+        val rawPrice = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestProfile -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
+            else -> 0.0
+        }
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        println("Edit flow test completed successfully.")
     }
 }
