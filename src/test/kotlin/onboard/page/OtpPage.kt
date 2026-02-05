@@ -16,6 +16,7 @@ import mobileView.profile.page.ProfilePage
 import model.signup.GetOtpRequest
 import model.signup.OtpResponse
 import model.signup.VerifyOtpResponse
+import utils.LogFullApiCall
 import utils.LogFullApiCall.logFullApiCall
 import utils.Normalize.refactorCountryCode
 import utils.json.json
@@ -31,6 +32,7 @@ import utils.report.StepHelper.ENTER_OTP_INSIGHTS
 import utils.report.StepHelper.ENTER_OTP_LAB_TEST
 import utils.report.StepHelper.ENTER_OTP_MOBILE_HOME
 import utils.report.StepHelper.ENTER_OTP_PROFILE
+import utils.report.StepHelper.NAVIGATE_TO
 import utils.report.StepHelper.TOGGLE_WHATSAPP_CHECKBOX
 import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.home.HomePageWebsite
@@ -93,6 +95,7 @@ class OtpPage(page: Page) : BasePage(page) {
             val responseBody = response.text()
             val responseObj = json.decodeFromString<OtpResponse>(responseBody)
             fetchedOtp = responseObj.data.otp
+            logFullApiCall("POST", TestConfig.APIs.GET_OTP, emptyMap(), requestJson, response)
         } catch (e: Exception) {
             logger.error { "Failed to call OTP API: ${e.message}" }
         }
@@ -122,6 +125,7 @@ class OtpPage(page: Page) : BasePage(page) {
                         } else {
                             val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
                             TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
+                            logFullApiCall(response)
                         }
                     }
                     logger.info { "OTP Page--> API Response Body: ${response.text()}" }
@@ -268,6 +272,7 @@ class OtpPage(page: Page) : BasePage(page) {
         }
 
         // Navigate to diagnostics (API call happens during this navigation)
+        StepHelper.step("$NAVIGATE_TO: https://app.stg.deepholistics.com/diagnostics")
         page.navigate("https://app.stg.deepholistics.com/diagnostics")
 
         // Remove listener
@@ -296,6 +301,7 @@ class OtpPage(page: Page) : BasePage(page) {
         page.waitForURL {
             page.url().contains(TestConfig.Urls.BASE_URL)
         }
+        StepHelper.step("$NAVIGATE_TO: ${TestConfig.Urls.HOME_PAGE_URL}")
         page.navigate(TestConfig.Urls.HOME_PAGE_URL)
 
         val homePage = webView.HomePage(page)
@@ -321,6 +327,7 @@ class OtpPage(page: Page) : BasePage(page) {
         val symptomsPage = SymptomsPage(page)
 
         // Navigate to diagnostics (API call happens during this navigation)
+        StepHelper.step("$NAVIGATE_TO: ${TestConfig.Urls.SYMPTOMS_PAGE_URL}")
         page.navigate(TestConfig.Urls.SYMPTOMS_PAGE_URL)
 
         symptomsPage.waitForSymptomsPageConfirmation()

@@ -11,6 +11,31 @@ object LogFullApiCall {
         requestBody: String?,
         response: com.microsoft.playwright.APIResponse
     ) {
+        logApiData(method, url, requestHeaders, requestBody, response.status(), response.headers(), { response.text() })
+    }
+
+    fun logFullApiCall(response: com.microsoft.playwright.Response) {
+        val request = response.request()
+        logApiData(
+            request.method(),
+            request.url(),
+            request.headers(),
+            request.postData(),
+            response.status(),
+            response.headers(),
+            { response.text() }
+        )
+    }
+
+    private fun logApiData(
+        method: String,
+        url: String,
+        requestHeaders: Map<String, String>,
+        requestBody: String?,
+        status: Int,
+        responseHeaders: Map<String, String>,
+        responseBodyProvider: () -> String?
+    ) {
         // -------- REQUEST --------
         logger.error { "➡️ API REQUEST METHOD: $method" }
         StepHelper.step("➡️ API REQUEST METHOD: $method")
@@ -27,14 +52,14 @@ object LogFullApiCall {
         }
 
         // -------- RESPONSE --------
-        logger.error { "⬅️ API RESPONSE STATUS: ${response.status()}" }
-        StepHelper.step("⬅️ API RESPONSE STATUS: ${response.status()}")
+        logger.error { "⬅️ API RESPONSE STATUS: $status" }
+        StepHelper.step("⬅️ API RESPONSE STATUS: $status")
 
-        logger.error { "⬅️ API RESPONSE HEADERS: ${response.headers()}" }
-        StepHelper.step("⬅️ API RESPONSE HEADERS: ${response.headers()}")
+        logger.error { "⬅️ API RESPONSE HEADERS: $responseHeaders" }
+        StepHelper.step("⬅️ API RESPONSE HEADERS: $responseHeaders")
 
         try {
-            val responseBody = response.text()
+            val responseBody = responseBodyProvider()
             logger.error { "⬅️ API RESPONSE BODY: $responseBody" }
             StepHelper.step("⬅️ API RESPONSE BODY: $responseBody")
         } catch (e: Exception) {
