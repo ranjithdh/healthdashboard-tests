@@ -32,7 +32,7 @@ object TestConfig {
         val SERVICES_URL = "${BASE_URL}services"
 
 
-        val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
+        val LOGIN_URL = "${BASE_URL}login?utm_source=testing_internal"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
@@ -67,8 +67,8 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
-        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
         val TRACK_RESULT = "${BASE_URL}order/"
@@ -104,7 +104,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
-                ?: true   //TODO default safe for CI is true
+                ?: false   //TODO default safe for CI is true
 
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
@@ -154,10 +154,10 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "8870208411",
+            mobileNumber = "4573999784",
             otp = "678901",
-            country = "India",
-            countryCode = "+91"
+            country = "Finland",
+            countryCode = "+358"
         )
 
     }

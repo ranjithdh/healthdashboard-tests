@@ -3,18 +3,22 @@ package onboard.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import config.TestConfig.SECRET_KEY
+import config.TestConfig.TestUsers.EXISTING_USER
 import config.TestUser
 import healthdata.page.HealthDataPage
-import io.qameta.allure.Step
-import webView.diagnostics.page.LabTestsPage
+import kotlinx.serialization.encodeToString
 import mobileView.home.HomePage
-import model.healthdata.HealthData
-import model.signup.VerifyOtpResponse
 import mobileView.profile.page.ProfilePage
+import model.signup.GetOtpRequest
+import model.signup.OtpResponse
+import model.signup.VerifyOtpResponse
+import utils.LogFullApiCall.logFullApiCall
+import utils.Normalize.refactorCountryCode
 import utils.json.json
-import webView.diagnostics.symptoms.page.SymptomsPage
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_CONTINUE
@@ -30,15 +34,70 @@ import utils.report.StepHelper.ENTER_OTP_PROFILE
 import utils.report.StepHelper.TOGGLE_WHATSAPP_CHECKBOX
 import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.home.HomePageWebsite
+import webView.diagnostics.page.LabTestsPage
+import webView.diagnostics.symptoms.page.SymptomsPage
 
 
 class OtpPage(page: Page) : BasePage(page) {
 
     override val pageUrl = "/login"
 
+    private var fetchedOtp: String? = null
+
     init {
         monitorTraffic()
     }
+
+    fun requestOtp() {
+        try {
+            val apiContext = page.context().request()
+            val url = TestConfig.APIs.GET_OTP
+
+            val headers = mapOf(
+                "client_id" to TestConfig.CLIENT_ID,
+                "Content-Type" to "application/json"
+            )
+
+            val requestObj = GetOtpRequest(
+                mobile = EXISTING_USER.mobileNumber,
+                country_code = refactorCountryCode(EXISTING_USER.countryCode),
+                secret_key = SECRET_KEY,
+                service = "DH_VERIFICATION"
+            )
+
+            val requestJson = json.encodeToString(requestObj)
+
+
+            val requestOptions = RequestOptions.create()
+            requestOptions.setData(requestJson)
+            headers.forEach { (k, v) -> requestOptions.setHeader(k, v) }
+
+            val response = apiContext.post(
+                url,
+                requestOptions
+            )
+
+            logFullApiCall(
+                method = "POST",
+                url = url,
+                requestHeaders = headers,
+                requestBody = requestJson,
+                response = response
+            )
+
+            if (response.status() != 200) {
+                logger.error { "OTP API returned status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            val responseObj = json.decodeFromString<OtpResponse>(responseBody)
+            fetchedOtp = responseObj.data.otp
+        } catch (e: Exception) {
+            logger.error { "Failed to call OTP API: ${e.message}" }
+        }
+    }
+
 
     private fun monitorTraffic() {
         val updateProfileRequest = { request: com.microsoft.playwright.Request ->
@@ -83,8 +142,9 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtp(otp: String): OtpPage {
         StepHelper.step(ENTER_OTP + otp)
+        requestOtp()
         logger.info { "enterOtp($otp)" }
-        byRole(AriaRole.TEXTBOX).fill(otp)
+        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
         return this
     }
 
@@ -94,7 +154,6 @@ class OtpPage(page: Page) : BasePage(page) {
         byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
         return this
     }
-
 
 
     fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
@@ -246,7 +305,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
         homePage.clickHealthTab()
 
-        val healthDataPage = HealthDataPage(page,healthData)
+        val healthDataPage = HealthDataPage(page, healthData)
         healthDataPage.waitForPageLoad()
         return healthDataPage
     }
