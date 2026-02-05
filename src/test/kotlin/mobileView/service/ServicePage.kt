@@ -427,6 +427,7 @@ class ServicePage(page: Page) : BasePage(page) {
     fun fetchAccountInformation() {
         try {
             logger.info { "Fetching current preference from API..." }
+            val timeZone = java.util.TimeZone.getDefault().id
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -434,7 +435,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", "Asia/Calcutta")
+                    .setHeader("user_timezone", timeZone)
             )
 
             if (response.status() != 200) {

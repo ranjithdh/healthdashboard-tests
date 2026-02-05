@@ -904,6 +904,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         try {
             StepHelper.step("Fetching account information from API...")
+            val timeZone = java.util.TimeZone.getDefault().id
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -911,7 +912,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", "Asia/Calcutta")
+                    .setHeader("user_timezone", timeZone)
             )
 
             StepHelper.step("[DEBUG] API Status: ${response.status()}")
