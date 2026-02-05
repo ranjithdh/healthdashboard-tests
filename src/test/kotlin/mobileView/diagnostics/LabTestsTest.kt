@@ -572,13 +572,14 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.clickProceed()
 
         println("Verifying Slot Selection Page items...")
-        testSchedulingPage.verifySlotSelectionPage()
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
 
         println("Verifying Price Details on Slot Selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
         println("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
+        testSchedulingPage.clickProceed()
 
         println("Test completed successfully.")
     }

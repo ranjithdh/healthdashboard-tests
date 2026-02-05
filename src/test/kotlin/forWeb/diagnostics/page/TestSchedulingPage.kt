@@ -14,7 +14,15 @@ import org.junit.jupiter.api.Assertions
 import profile.utils.ProfileUtils.buildAddressText
 import utils.json.json
 import utils.logger.logger
+import model.slot.SlotList
+import model.profile.PiiUserResponse
+import com.microsoft.playwright.options.RequestOptions
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.assertEquals
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -166,12 +174,91 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Proceed")).click()
     }
 
-    fun verifySlotSelectionPage() {
+    private fun getLeadId(): String {
+        val url = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val response = page.request().get(
+            url,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Calcutta")
+        )
+        if (response.status() != 200) {
+            throw RuntimeException("Failed to fetch PII data: ${response.status()} ${response.text()}")
+        }
+        val piiResponse = json.decodeFromString<PiiUserResponse>(response.text())
+        return piiResponse.data.piiData.leadId
+    }
+
+    private fun getSlots(date: String, leadId: String, addressId: String): List<model.slot.Slot> {
+        val url = TestConfig.APIs.API_SLOTS_AVAILABILITY + "?platform=web"
+        val payload = buildJsonObject {
+            put("address_id", addressId)
+            put("date", date)
+            put("lead_id", leadId)
+//            put("user_timezone", "Asia/Kolkata")
+        }.toString()
+
+        val response = page.request().post(
+            url,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("Content-Type", "application/json")
+                .setHeader("user_timezone", "Asia/Kolkata")
+                .setData(payload)
+        )
+
+        if (response.status() != 200) {
+            logger.error { "Slot API failed: ${response.text()}" }
+            return emptyList()
+        }
+
+        val slotList = json.decodeFromString<SlotList>(response.text())
+        return slotList.data?.slots ?: emptyList()
+    }
+
+    fun verifySlotSelectionPage(code: String) {
         logger.info { "Verifying Slot Selection Page" }
-        // Verify we are on the slot selection page, e.g. check for "Select a Date" or "Schedule" heading
-        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Schedule your Blood Test").setLevel(1))
-        // If heading differs, might need adjustment
-        Assertions.assertTrue(heading.isVisible || page.getByText("Select Date").isVisible, "Slot selection page should be visible")
+        page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
+
+        val leadId = getLeadId()
+        val addressId = addressData?.addressList?.firstOrNull()?.addressId
+            ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
+
+        val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val tomorrowDateStr = tomorrow.format(dateFormatter)
+
+        logger.info { "Processing tomorrow's slots: $tomorrowDateStr" }
+        page.getByTestId("diagnostics-booking-step2-date-$tomorrowDateStr").click()
+
+        val tomorrowSlots = getSlots(tomorrowDateStr, leadId, addressId)
+        tomorrowSlots.forEach { slot ->
+            if (slot.is_available == true && slot.start_time != null) {
+                page.getByTestId("diagnostics-booking-step2-slot-${slot.start_time}").click()
+            }
+        }
+
+        // Randomly select a date from tomorrow + 7 days (index 0 to 6)
+        val randomDayOffset = (0..6).random()
+        val randomDate = tomorrow.plusDays(randomDayOffset.toLong())
+        val randomDateStr = randomDate.format(dateFormatter)
+
+        logger.info { "Selecting random date: $randomDateStr" }
+        page.getByTestId("diagnostics-booking-step2-date-$randomDateStr").click()
+
+        val randomDateSlots = getSlots(randomDateStr, leadId, addressId)
+        val availableSlots = randomDateSlots.filter { it.is_available == true && it.start_time != null }
+
+        if (availableSlots.isNotEmpty()) {
+            val randomSlot = availableSlots.random()
+            logger.info { "Selecting slot: ${randomSlot.start_time}" }
+            page.getByTestId("diagnostics-booking-step2-slot-${randomSlot.start_time}").click()
+        } else {
+            logger.warn { "No available slots found for random date $randomDateStr" }
+        }
     }
 
 
