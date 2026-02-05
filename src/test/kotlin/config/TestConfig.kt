@@ -117,7 +117,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583654",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998304",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -132,7 +132,7 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Poland"
+            country = "Finland"
         )
 
 
@@ -142,10 +142,11 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "9159439327",
+            mobileNumber = "8870208411",
             otp = "678901",
             country = "India"
         )
+
     }
 
     object Artifacts {

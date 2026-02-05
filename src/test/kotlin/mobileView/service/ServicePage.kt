@@ -14,6 +14,7 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import utils.Normalize.refactorTimeZone
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_SCHEDULE_NOW
 import utils.report.StepHelper.FETCH_SERVICE_DATA
@@ -427,6 +428,7 @@ class ServicePage(page: Page) : BasePage(page) {
     fun fetchAccountInformation() {
         try {
             logger.info { "Fetching current preference from API..." }
+            val timeZone = java.util.TimeZone.getDefault().id
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -434,7 +436,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", "Asia/Calcutta")
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
             if (response.status() != 200) {

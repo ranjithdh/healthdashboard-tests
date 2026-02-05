@@ -21,6 +21,7 @@ import mobileView.profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import mobileView.profile.utils.ProfileUtils.formatDobWithAge
 import mobileView.profile.utils.ProfileUtils.formatFlotTwoDecimal
 import mobileView.profile.utils.ProfileUtils.isButtonChecked
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -280,12 +281,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.onRequest(preferenceProfileRequest)
         page.onResponse(preferenceProfileResponse)
         try {
-        } finally {
-            page.offRequest(updateProfileRequest)
-            page.offResponse(updateProfileResponse)
-            page.offRequest(preferenceProfileRequest)
-            page.offResponse(preferenceProfileResponse)
-        }
+         } finally {
+             page.offRequest(updateProfileRequest)
+             page.offResponse(updateProfileResponse)
+             page.offRequest(preferenceProfileRequest)
+             page.offResponse(preferenceProfileResponse)
+         }
     }
 
 
@@ -710,10 +711,16 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     /**--------Communication Preference------------*/
 
-    fun fetchCurrentPreference() {
+    /*fun fetchCurrentPreference() {
         StepHelper.step(FETCH_PREFERENCE)
+
+        // Debug Information
+        StepHelper.step("[DEBUG] Starting fetchCurrentPreference")
+        StepHelper.step("[DEBUG] ACCESS_TOKEN present: ${TestConfig.ACCESS_TOKEN.isNotBlank()}")
+        StepHelper.step("[DEBUG] URL: ${TestConfig.APIs.API_PREFERENCE}")
+
         try {
-            logger.info { "Fetching current preference from API..." }
+            StepHelper.step("Fetching current preference from API...")
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -724,18 +731,22 @@ class ProfilePage(page: Page) : BasePage(page) {
                     .setHeader("user_timezone", "Asia/Calcutta")
             )
 
+            StepHelper.step("[DEBUG] API Status: ${response.status()}")
+
             if (response.status() != 200) {
-                logger.error { "API returned status: ${response.status()}" }
+                logger.error { "API returned error status: ${response.status()}" }
+                StepHelper.step("FAIL: API returned status ${response.status()}")
                 return
             }
 
             val responseBody = response.text()
             if (responseBody.isNullOrBlank()) {
                 logger.error { "API response body is empty" }
+                StepHelper.step("FAIL: API response body empty")
                 return
             }
 
-            logger.info { "API response...${responseBody}" }
+            StepHelper.step("API response received: ${responseBody.take(100)}...")
 
             val responseObj = json.decodeFromString<UserPreferenceResponse>(responseBody)
 
@@ -747,8 +758,57 @@ class ProfilePage(page: Page) : BasePage(page) {
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch current preference: ${e.message}" }
+            StepHelper.step("EXCEPTION in fetchCurrentPreference: ${e.message}")
+        }
+    }*/
+
+    fun fetchCurrentPreference() {
+        StepHelper.step(FETCH_PREFERENCE)
+
+        StepHelper.step("[DEBUG] Starting fetchCurrentPreference")
+        StepHelper.step("[DEBUG] ACCESS_TOKEN present: ${TestConfig.ACCESS_TOKEN}")
+        StepHelper.step("[DEBUG] URL: ${TestConfig.APIs.API_PREFERENCE}")
+
+        try {
+            val apiContext = page.context().request()
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val url = TestConfig.APIs.API_PREFERENCE
+
+            val headers = mapOf(
+                "access_token" to TestConfig.ACCESS_TOKEN,
+                "client_id" to TestConfig.CLIENT_ID,
+                "user_timezone" to refactorTimeZone(timeZone)
+            )
+
+            val requestOptions = RequestOptions.create()
+            headers.forEach { (k, v) -> requestOptions.setHeader(k, v) }
+
+            val response = apiContext.get(url, requestOptions)
+
+            logFullApiCall(
+                method = "GET",
+                url = url,
+                requestHeaders = headers,
+                requestBody = null,
+                response = response
+            )
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            val responseObj = json.decodeFromString<UserPreferenceResponse>(responseBody)
+            currentPreference = responseObj.data.preference.communicationPreference
+
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch current preference: ${e.message}" }
         }
     }
+
+
 
 
     fun selectCommunicationOption() {
@@ -835,8 +895,15 @@ class ProfilePage(page: Page) : BasePage(page) {
     /**------------Account Information----------------*/
     fun fetchAccountInformation() {
         StepHelper.step(FETCH_ACCOUNT_INFORMATION)
+
+        // Debug Information
+        StepHelper.step("[DEBUG] Starting fetchAccountInformation")
+        StepHelper.step("[DEBUG] ACCESS_TOKEN present: ${TestConfig.ACCESS_TOKEN.isNotBlank()}")
+        StepHelper.step("[DEBUG] URL: ${TestConfig.APIs.API_ACCOUNT_INFORMATION}")
+
         try {
-            logger.info { "Fetching current preference from API..." }
+            StepHelper.step("Fetching account information from API...")
+            val timeZone = java.util.TimeZone.getDefault().id
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -844,33 +911,38 @@ class ProfilePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", "Asia/Calcutta")
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
+            StepHelper.step("[DEBUG] API Status: ${response.status()}")
+
             if (response.status() != 200) {
-                logger.error { "API returned status: ${response.status()}" }
+                logger.error { "API returned error status: ${response.status()}" }
+                StepHelper.step("FAIL: API returned status ${response.status()}")
                 return
             }
 
             val responseBody = response.text()
             if (responseBody.isNullOrBlank()) {
                 logger.error { "API response body is empty" }
+                StepHelper.step("FAIL: API response body empty")
                 return
             }
 
-            logger.info { "API response...${responseBody}" }
+            StepHelper.step("API response received: ${responseBody.take(100)}...")
 
             val responseObj = json.decodeFromString<PiiUserResponse>(responseBody)
 
             if (responseObj.status == "success") {
                 piiData = responseObj.data.piiData
                 setMaleConditions(piiData?.gender == "male")
-                logger.info { "Current account Information from API: $piiData" }
+                logger.info { "Account information successfully fetched: $piiData" }
                 StepHelper.step("Account information fetched for: ${piiData?.name}")
                 logApiResponse(TestConfig.APIs.API_ACCOUNT_INFORMATION, responseObj)
             }
         } catch (e: Exception) {
-            logger.error { "Failed to fetch current preference: ${e.message}" }
+            logger.error { "Failed to fetch account information: ${e.message}" }
+            StepHelper.step("EXCEPTION in fetchAccountInformation: ${e.message}")
         }
     }
 
@@ -1124,7 +1196,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             page.getByTestId("health-metrics-edit-button")
 
         healthMetricsEdit.waitFor()
-        
+
         StepHelper.step(EDIT_HEALTH_METRICS)
         edit.click()
 
@@ -4414,7 +4486,8 @@ class ProfilePage(page: Page) : BasePage(page) {
             .filter(FilterOptions().setHasText("What is your waist"))
 
         // Helper text
-        val subTitle =page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
+        val subTitle =
+            page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("Value in inches (20-54)"))
 
 
         val faittyIndex =
@@ -4425,7 +4498,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
 
-        (listOf(title, subTitle,faittyIndex, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
+        (listOf(title, subTitle, faittyIndex, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
@@ -6211,6 +6284,49 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(subType, question, value)
         nextAction()
     }
+
+
+    fun logFullApiCall(
+        method: String,
+        url: String,
+        requestHeaders: Map<String, String>,
+        requestBody: String?,
+        response: com.microsoft.playwright.APIResponse
+    ) {
+        // -------- REQUEST --------
+        logger.error { "➡️ API REQUEST METHOD: $method" }
+        StepHelper.step("➡️ API REQUEST METHOD: $method")
+
+        logger.error { "➡️ API REQUEST URL: $url" }
+        StepHelper.step("➡️ API REQUEST URL: $url")
+
+        logger.error { "➡️ API REQUEST HEADERS: $requestHeaders" }
+        StepHelper.step("➡️ API REQUEST HEADERS: $requestHeaders")
+
+        if (!requestBody.isNullOrBlank()) {
+            logger.error { "➡️ API REQUEST BODY: $requestBody" }
+            StepHelper.step("➡️ API REQUEST BODY: $requestBody")
+        }
+
+        // -------- RESPONSE --------
+        logger.error { "⬅️ API RESPONSE STATUS: ${response.status()}" }
+        StepHelper.step("⬅️ API RESPONSE STATUS: ${response.status()}")
+
+        logger.error { "⬅️ API RESPONSE HEADERS: ${response.headers()}" }
+        StepHelper.step("⬅️ API RESPONSE HEADERS: ${response.headers()}")
+
+        try {
+            val responseBody = response.text()
+            logger.error { "⬅️ API RESPONSE BODY: $responseBody" }
+            StepHelper.step("⬅️ API RESPONSE BODY: $responseBody")
+        } catch (e: Exception) {
+            logger.error { "⬅️ API RESPONSE BODY: <cannot read> ${e.message}" }
+            StepHelper.step("⬅️ API RESPONSE BODY: <cannot read> ${e.message}")
+        }
+    }
+
+
+
 
 }
 

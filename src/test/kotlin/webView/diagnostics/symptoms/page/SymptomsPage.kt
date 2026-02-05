@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import model.profile.PiiUserResponse
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -47,6 +48,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
     fun fetchAccountInformation() {
         try {
             logger.info { "Fetching current preference from API..." }
+            val timeZone = java.util.TimeZone.getDefault().id
 
             val apiContext = page.context().request()
             val response = apiContext.get(
@@ -54,7 +56,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", "Asia/Calcutta")
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
             if (response.status() != 200) {
