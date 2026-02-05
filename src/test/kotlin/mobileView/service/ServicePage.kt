@@ -14,6 +14,7 @@ import model.ServiceResponse
 import model.ServiceProduct
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import utils.Normalize.refactorTimeZone
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_SCHEDULE_NOW
 import utils.report.StepHelper.FETCH_SERVICE_DATA
@@ -435,7 +436,7 @@ class ServicePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", timeZone)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
             if (response.status() != 200) {

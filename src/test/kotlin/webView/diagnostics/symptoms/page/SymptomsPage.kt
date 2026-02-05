@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import model.profile.PiiUserResponse
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -55,7 +56,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", timeZone)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
             if (response.status() != 200) {

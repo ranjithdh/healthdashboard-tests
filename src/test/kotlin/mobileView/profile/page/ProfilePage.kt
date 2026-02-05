@@ -1,7 +1,6 @@
 package mobileView.profile.page
 
 
-import com.microsoft.playwright.APIResponse
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
@@ -22,6 +21,7 @@ import mobileView.profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import mobileView.profile.utils.ProfileUtils.formatDobWithAge
 import mobileView.profile.utils.ProfileUtils.formatFlotTwoDecimal
 import mobileView.profile.utils.ProfileUtils.isButtonChecked
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -779,7 +779,7 @@ class ProfilePage(page: Page) : BasePage(page) {
             val headers = mapOf(
                 "access_token" to TestConfig.ACCESS_TOKEN,
                 "client_id" to TestConfig.CLIENT_ID,
-                "user_timezone" to timeZone
+                "user_timezone" to refactorTimeZone(timeZone)
             )
 
             val requestOptions = RequestOptions.create()
@@ -912,7 +912,7 @@ class ProfilePage(page: Page) : BasePage(page) {
                 RequestOptions.create()
                     .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                     .setHeader("client_id", TestConfig.CLIENT_ID)
-                    .setHeader("user_timezone", timeZone)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
             )
 
             StepHelper.step("[DEBUG] API Status: ${response.status()}")
