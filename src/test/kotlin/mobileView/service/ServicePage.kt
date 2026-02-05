@@ -16,11 +16,20 @@ import model.profile.PiiUserResponse
 import mu.KotlinLogging
 import utils.Normalize.refactorTimeZone
 import utils.report.StepHelper
+import utils.report.StepHelper.VERIFY_SYMPTOMS_COUNT
+import utils.report.StepHelper.CLICK_SYMPTOM_MOBILE
+import utils.report.StepHelper.SELECT_ALL_SYMPTOMS
+import utils.report.StepHelper.SUBMIT_SYMPTOMS_MOBILE
+import utils.report.StepHelper.VERIFY_SYMPTOMS_FEEDBACK
+import utils.report.StepHelper.REPORT_SYMPTOMS_CLICK
+import utils.report.StepHelper.VERIFY_SYMPTOMS_DIALOG
+import utils.report.StepHelper.EXPAND_SYMPTOMS_SECTION
 import utils.report.StepHelper.CLICK_SCHEDULE_NOW
 import utils.report.StepHelper.FETCH_SERVICE_DATA
 import utils.report.StepHelper.NAVIGATE_TO_SERVICES
 import utils.report.StepHelper.VERIFY_SERVICE_CARD
 import utils.report.StepHelper.VERIFY_STATIC_CONTENT
+import utils.LogFullApiCall
 import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.SymptomsData
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
@@ -479,6 +488,7 @@ class ServicePage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON).filter(Locator.FilterOptions().setHasText(Pattern.compile("^$")))
         val submitSymptoms = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms"))
         val components = listOf(title, subTitle, symptomsCount, closeButton, submitSymptoms, cancel)
+        StepHelper.step(VERIFY_SYMPTOMS_DIALOG)
         components.forEach { it.waitFor() }
     }
 
@@ -500,10 +510,12 @@ class ServicePage(page: Page) : BasePage(page) {
             )
             .first() // pick the first matching element
         heading.scrollIntoViewIfNeeded()
+        StepHelper.step("$EXPAND_SYMPTOMS_SECTION $section")
         heading.waitFor()
     }
 
     fun selectSymptom(symptomName: String) {
+        StepHelper.step("$CLICK_SYMPTOM_MOBILE $symptomName")
         page.getByRole(
             AriaRole.BUTTON, Page.GetByRoleOptions().setName(symptomName)
         ).waitFor()
@@ -515,6 +527,7 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
     fun selectAllSymptoms() {
+        StepHelper.step(SELECT_ALL_SYMPTOMS)
         fetchAccountInformation()
         symptoms.forEach { (section, symptoms) ->
             val selectedSymptoms = randomSubList(symptoms, 1, 3)
@@ -537,6 +550,7 @@ class ServicePage(page: Page) : BasePage(page) {
             )
 
             button.scrollIntoViewIfNeeded()
+            StepHelper.step("$CLICK_SYMPTOM_MOBILE $name")
             button.click()
         }
     }
@@ -548,22 +562,26 @@ class ServicePage(page: Page) : BasePage(page) {
         selectionSymptoms.forEach { (string, symptomsList) ->
             count = count.plus(symptomsList.size)
         }
+        StepHelper.step(VERIFY_SYMPTOMS_COUNT)
         assertEquals("$count symptoms selected", symptomsCount.innerText())
     }
 
 
 
     fun submitSymptoms() {
+        StepHelper.step(SUBMIT_SYMPTOMS_MOBILE)
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms")).click()
     }
 
     fun onReportSymptomsButtonClick() {
+        StepHelper.step(REPORT_SYMPTOMS_CLICK)
         logger.info { "Clicking Report Symptom button" }
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom")).click()
     }
 
     fun verifySymptomReportFeedbackDialog() {
 //        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+        StepHelper.step(VERIFY_SYMPTOMS_FEEDBACK)
         logger.info { "Verifying Symptom Report Feedback/Acknowledge Dialog" }
         page.getByRole(AriaRole.DIALOG)
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))
@@ -583,6 +601,7 @@ class ServicePage(page: Page) : BasePage(page) {
                             val responseObj = json.decodeFromString<UserSymptomsResponse>(responseBody)
                             symptomsResponse = responseObj.data
                             isSymptomsEmpty = responseObj.data.symptoms.isEmpty()
+                            LogFullApiCall.logFullApiCall(response)
                             logger.info { "isSymptomsEmpty set to: $isSymptomsEmpty" }
                         }
                     }
