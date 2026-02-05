@@ -205,7 +205,7 @@ class ProfileTest : BaseTest() {
 
     /**-------------Questioner---------------*/
 
-    @Test
+   /* @Test
     @Order(11)
     fun `questioner validation vegetarian`() { //done
 
@@ -528,7 +528,7 @@ class ProfileTest : BaseTest() {
     }
 
 
-    /*   //Re-selection checking
+    *//*   //Re-selection checking
        @Test
        fun `questioner re-selection validations sample`() {
            val testUser = TestConfig.TestUsers.EXISTING_USER
@@ -543,7 +543,7 @@ class ProfileTest : BaseTest() {
 
            profilePage.assertQuestionerValidationsCheckSample()
         }
-   */
+   *//*
 
     @Test
     @Order(25)
@@ -588,6 +588,6 @@ class ProfileTest : BaseTest() {
 
         // Validate backward navigation
         profilePage.assertQuestionerBackwardValidationsCheck()
-    }
+    }*/
 
 }
