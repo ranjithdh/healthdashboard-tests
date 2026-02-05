@@ -601,7 +601,6 @@ class LabTestsTest : BaseTest() {
         }
 
         // Initial setup to reach summary page
-        testSchedulingPage.editUserAddress(0)
         testSchedulingPage.clickProceed()
         testSchedulingPage.verifySlotSelectionPage(code = targetCode)
         testSchedulingPage.clickProceed()
@@ -616,6 +615,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.editUserAddress(randomIndex)
         
         testSchedulingPage.clickProceed() // go to slot selection
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
         testSchedulingPage.clickProceed() // go to summary
 
         // 2. Test Slot Edit from Summary
