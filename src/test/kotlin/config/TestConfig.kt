@@ -6,7 +6,18 @@ import com.microsoft.playwright.BrowserType
 object TestConfig {
     val isStaging: Boolean = true
     var ACCESS_TOKEN = ""
-    const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+
+    const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+    const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
+
+    const val STG_SECRET_KEY = "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA"
+    const val PROD_SECRET_KEY = "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA"//TODO need get prod secret key
+
+    val CLIENT_ID = if (isStaging) STG_CLIENT_ID else PROD_CLIENT_ID
+
+    val SECRET_KEY = if (isStaging) STG_SECRET_KEY else PROD_SECRET_KEY
+
+    const val STATIC_OTP = "678901"
 
     object Urls {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
@@ -60,7 +71,7 @@ object TestConfig {
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
-         val TRACK_RESULT = "${BASE_URL}order/"
+        val TRACK_RESULT = "${BASE_URL}order/"
     }
 
     object APIs {
@@ -82,6 +93,7 @@ object TestConfig {
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
+        val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
     }
 
 
@@ -144,7 +156,8 @@ object TestConfig {
         val EXISTING_USER = TestUser(
             mobileNumber = "8870208411",
             otp = "678901",
-            country = "India"
+            country = "India",
+            countryCode = "+91"
         )
 
     }
@@ -192,5 +205,6 @@ data class TestUser(
     val city: String = "Delhi",
     val state: String = "Delhi",
     val pinCode: String = "110001",
-    val country: String = "India"
+    val country: String = "India",
+    val countryCode: String = "+91",
 )
