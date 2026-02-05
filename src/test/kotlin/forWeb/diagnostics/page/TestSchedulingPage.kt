@@ -11,7 +11,6 @@ import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
-import profile.utils.ProfileUtils.buildAddressText
 import utils.json.json
 import utils.logger.logger
 import model.slot.SlotList
@@ -21,6 +20,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.buildJsonObject
+import mobileView.profile.utils.ProfileUtils.buildAddressText
 import kotlin.test.assertEquals
 
 
