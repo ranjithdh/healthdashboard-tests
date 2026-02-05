@@ -543,8 +543,10 @@ class LabTestsTest : BaseTest() {
         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         println("Testing 'Edit Address' functionality...")
-        // Edit the first address
-         testSchedulingPage.editUserAddress(0)
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        println("Selecting random address at index $randomIndex")
+        testSchedulingPage.editUserAddress(randomIndex)
         // Extract price for the targetCode from responseObj
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
 

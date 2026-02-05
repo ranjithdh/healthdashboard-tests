@@ -30,6 +30,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     override val pageUrl = ""
     private var addressData: UserAddressData? = null
+    private var selectedAddressIndex: Int = 0
     private var selectedAddressName: String = ""
     private var selectedAddressText: String = ""
     private var selectedDateSummary: String = ""
@@ -134,8 +135,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.locator(".bg-secondary.flex.flex-1").nth(index).click()
 
         // Fill inputs (UI)
-        val number = (500..1000).random()
-        val updatedNickName = (address.addressName ?: "").plus(" Updated $number")
+        val updatedNickName = address.addressName?.takeIf { it.isNotBlank() } ?: "Home"
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
@@ -150,6 +150,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         captureAddressData {
             newAddressSubmit.click()
         }
+        
+        this.selectedAddressIndex = index
 
         val updatedList = addressData?.addressList ?: throw AssertionError("Address list not updated")
         val updatedAddress = updatedList.find { it.addressId == addressId }
@@ -234,8 +236,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
 
         val leadId = getLeadId()
-        val addressId = addressData?.addressList?.firstOrNull()?.addressId
+        val addressItem = addressData?.addressList?.getOrNull(selectedAddressIndex)
+            ?: addressData?.addressList?.firstOrNull()
             ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
+        val addressId = addressItem.addressId
 //        val selectedAddressObj = addressData?.addressList?.find { it.addressId == addressId }?.address
 //        selectedAddressName = selectedAddressObj?.addressName ?: "Primary"
 //        selectedAddressText = buildAddressText(selectedAddressObj!!)
@@ -293,11 +297,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double) {
         logger.info { "Verifying Order Summary Page" }
 
-        val addressId = addressData?.addressList?.firstOrNull()?.addressId
+        val addressItem = addressData?.addressList?.getOrNull(selectedAddressIndex)
+            ?: addressData?.addressList?.firstOrNull()
             ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
-        val selectedAddressObj = addressData?.addressList?.find { it.addressId == addressId }?.address
-        selectedAddressName = selectedAddressObj?.addressName ?: "Primary"
-        selectedAddressText = buildAddressText(selectedAddressObj!!)
+        val addressId = addressItem.addressId
+        val selectedAddressObj = addressItem.address
+        selectedAddressName = selectedAddressObj.addressName ?: "Primary"
+        selectedAddressText = buildAddressText(selectedAddressObj)
 
         // Address verification
         page.getByText("Sample Collection Address").click()
