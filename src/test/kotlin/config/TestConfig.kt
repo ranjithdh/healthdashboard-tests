@@ -105,7 +105,7 @@ object TestConfig {
         fun launchOptions(): BrowserType.LaunchOptions {
             val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
-                ?: false   //TODO default safe for CI is true
+                ?: true   //TODO default safe for CI is true
 
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
@@ -130,7 +130,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998304",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998303",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -145,7 +145,8 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Finland"
+            country = "Finland",
+            countryCode = "+358"
         )
 
 
@@ -155,10 +156,10 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "4573999784",
+            mobileNumber = "7373791414",
             otp = "678901",
-            country = "Finland",
-            countryCode = "+358"
+            country = "India",
+            countryCode = "+91"
         )
 
     }
