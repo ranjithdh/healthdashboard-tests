@@ -9,6 +9,12 @@ import config.TestConfig
 import model.healthdata.HealthData
 import utils.json.json
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.CLICK_TRACK_RESULT
+import utils.report.StepHelper.DOWNLOAD_REPORT
+import utils.report.StepHelper.FETCH_HEALTH_DATA
+import utils.report.StepHelper.VERIFY_BIOMARKER_DATA
+import utils.LogFullApiCall
 import java.util.regex.Pattern
 
 
@@ -17,6 +23,7 @@ class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(pa
     override val pageUrl = TestConfig.Urls.HEALTH_DATA_URL
 
     fun waitForPageLoad() {
+        StepHelper.step("${StepHelper.NAVIGATE_TO} ${TestConfig.Urls.HEALTH_DATA_URL}")
         logger.info { "Waiting for Health Data page to load" }
         page.waitForURL(TestConfig.Urls.HEALTH_DATA_URL)
     }
@@ -27,8 +34,10 @@ class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(pa
         val tabSelector = "button:has-text('$systemName')"
 
         if (!isVisible(tabSelector)) {
+            StepHelper.step("Clicking system tab: $systemName")
             byText(systemName).first().click()
         } else {
+            StepHelper.step("Clicking system tab: $systemName")
             element(tabSelector).first().click()
         }
 
@@ -87,11 +96,13 @@ class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(pa
         if (!statusMatches) logger.error { "Status mismatch for $name. Expected: $expectedStatus, Found in: $rowText" }
         if (!rangeMatches) logger.error { "Range mismatch for $name. Expected: $expectedRange, Found in: $rowText" }
 
+        StepHelper.step("$VERIFY_BIOMARKER_DATA $name")
         return valueMatches && statusMatches && rangeMatches
     }
 
 
     fun downloadReport(): Download {
+        StepHelper.step(DOWNLOAD_REPORT)
         logger.info { "Downloading biomarker report" }
         val download = page.waitForDownload {
             byTestId("download-report-button").click()
@@ -111,6 +122,7 @@ class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(pa
     }
 
     fun clickTrackResult() {
+        StepHelper.step(CLICK_TRACK_RESULT)
         trackResult.click()
     }
 
@@ -134,6 +146,8 @@ class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(pa
             val responseObj = json.decodeFromString<HealthData>(responseBody)
 
             if (responseObj.data != null) {
+                StepHelper.step(FETCH_HEALTH_DATA)
+                LogFullApiCall.logFullApiCall(response)
                 return responseObj
             }
         } catch (e: Exception) {

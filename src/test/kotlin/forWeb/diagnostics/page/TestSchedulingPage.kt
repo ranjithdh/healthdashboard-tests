@@ -1,6 +1,7 @@
 package forWeb.diagnostics.page
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -21,6 +22,18 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.buildJsonObject
 import mobileView.profile.utils.ProfileUtils.buildAddressText
 
+import utils.LogFullApiCall.logFullApiCall
+import utils.report.StepHelper
+import utils.report.StepHelper.ADD_ADDRESS
+import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
+import utils.report.StepHelper.CLICK_PROCEED
+import utils.report.StepHelper.EDIT_ADDRESS_SUMMARY
+import utils.report.StepHelper.EDIT_SLOT_SUMMARY
+import utils.report.StepHelper.FETCH_SLOTS
+import utils.report.StepHelper.VERIFY_ORDER_SUMMARY_PAGE
+import utils.report.StepHelper.VERIFY_PRICE_DETAILS
+import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
+import utils.report.StepHelper.VERIFY_SLOT_SELECTION_PAGE
 import kotlin.test.assertEquals
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonArray
@@ -107,6 +120,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
             if (responseObj.data.addressList.isNotEmpty()) {
                 addressData = responseObj.data
+                logFullApiCall(response)
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response or API call failed..${e.message}" }
@@ -115,6 +129,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
 
     fun verifySampleCollectionAddressHeading() {
+        StepHelper.step(VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING)
         val heading = page.getByText("Sample Collection Address")
         logger.info { "Verifying Sample Collection Address heading" }
         Assertions.assertTrue(heading.isVisible, "Sample Collection Address heading should be visible")
@@ -126,6 +141,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun clickAddNewAddress() {
+        StepHelper.step(CLICK_ADD_NEW_ADDRESS)
         logger.info { "Clicking Add New Address" }
 //        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Add New Address")).click()
         page.getByTestId("diagnostics-booking-add-new-address").click();
@@ -175,6 +191,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
+        StepHelper.step(VERIFY_PRICE_DETAILS)
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
         page.getByText("PRICE DETAILS").click()
         page.getByTestId("diagnostics-sidebar-subtotal-label").click()
@@ -198,6 +215,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun clickProceed() {
+        StepHelper.step(CLICK_PROCEED)
         logger.info { "Clicking Proceed" }
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Proceed")).click()
     }
@@ -276,12 +294,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val tomorrowDateStr = tomorrow.format(dateFormatter)
 
         logger.info { "Processing tomorrow's slots: $tomorrowDateStr" }
+        StepHelper.step("$FETCH_SLOTS $tomorrowDateStr")
         page.getByTestId("diagnostics-booking-step2-date-$tomorrowDateStr").click()
-        
+
         // We need to ensure getSlots uses the productId. It uses the class property `product_id`.
         // Since we set this.product_id = productId above, the next call will use it.
         val tomorrowSlots = getSlots(tomorrowDateStr, leadId, addressId)
-        
+
         tomorrowSlots.forEach { slot ->
             if (slot.is_available == true && slot.start_time != null) {
                 // Ensure the slot is clickable before clicking
@@ -299,6 +318,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val randomDateStr = randomDate.format(dateFormatter)
 
         logger.info { "Selecting random date: $randomDateStr" }
+        StepHelper.step("$FETCH_SLOTS $randomDateStr")
         page.getByTestId("diagnostics-booking-step2-date-$randomDateStr").click()
 
         val randomDateSlots = getSlots(randomDateStr, leadId, addressId)
@@ -326,6 +346,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double) {
+        StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
         val addressItem = addressData?.addressList?.getOrNull(selectedAddressIndex)
@@ -458,6 +479,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         )
 
         captureAddressData {
+            StepHelper.step(ADD_ADDRESS)
             newAddressSubmit.click()
         }
 
@@ -475,11 +497,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun clickEditAddressFromSummary() {
+        StepHelper.step(EDIT_ADDRESS_SUMMARY)
         logger.info { "Clicking Edit Address from Summary Page" }
         page.locator(".bg-secondary").first().click()
     }
 
     fun clickEditSlotFromSummary() {
+        StepHelper.step(EDIT_SLOT_SUMMARY)
         logger.info { "Clicking Edit Slot from Summary Page" }
         page.locator(".flex-1 > .bg-secondary").click()
     }
@@ -542,7 +566,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              logger.warn { "Order details not pre-captured. Attempting to fetch now..." }
              callBloodDataReports()
         }
-        
+
         val orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
         val productId = capturedProductId
         val thyrocareProductId = capturedThyrocareProductId

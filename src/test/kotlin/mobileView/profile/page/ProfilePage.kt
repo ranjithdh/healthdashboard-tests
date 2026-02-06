@@ -10,7 +10,6 @@ import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
-import model.profile.*
 import mobileView.profile.model.*
 import mobileView.profile.utils.ProfileUtils.answersStored
 import mobileView.profile.utils.ProfileUtils.assertExclusiveSelected
@@ -21,30 +20,32 @@ import mobileView.profile.utils.ProfileUtils.formatDobToDdMmYyyy
 import mobileView.profile.utils.ProfileUtils.formatDobWithAge
 import mobileView.profile.utils.ProfileUtils.formatFlotTwoDecimal
 import mobileView.profile.utils.ProfileUtils.isButtonChecked
+import model.profile.*
+import utils.LogFullApiCall.logFullApiCall
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.ACCOUNT_INFO_VALIDATION
 import utils.report.StepHelper.ANSWER_QUESTION
-import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
 import utils.report.StepHelper.CLICK_ADDRESS_DROPDOWN
+import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
 import utils.report.StepHelper.CLICK_SAVE_CHANGES
+import utils.report.StepHelper.EDIT_HEALTH_METRICS
 import utils.report.StepHelper.EDIT_PROFILE
 import utils.report.StepHelper.EDIT_USER_ADDRESS
-import utils.report.StepHelper.EDIT_HEALTH_METRICS
-import utils.report.StepHelper.SAVE_HEALTH_METRICS
 import utils.report.StepHelper.FETCH_ACCOUNT_INFORMATION
 import utils.report.StepHelper.FETCH_ADDRESS_DATA
-import utils.report.StepHelper.FETCH_PREFERENCE
 import utils.report.StepHelper.FETCH_DATA_FROM_API
+import utils.report.StepHelper.FETCH_PREFERENCE
 import utils.report.StepHelper.FILL_ADDRESS_FORM_MANDATORY
 import utils.report.StepHelper.REMOVE_USER_ADDRESS
 import utils.report.StepHelper.SAVE_CHANGES
-import utils.report.StepHelper.logApiResponse
+import utils.report.StepHelper.SAVE_HEALTH_METRICS
 import utils.report.StepHelper.SELECT_COMMUNICATION_OPTION
 import utils.report.StepHelper.SUBMIT_ADDRESS
 import utils.report.StepHelper.YES_DELETE
+import utils.report.StepHelper.logApiResponse
 import java.util.regex.Pattern
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -6284,49 +6285,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(subType, question, value)
         nextAction()
     }
-
-
-    fun logFullApiCall(
-        method: String,
-        url: String,
-        requestHeaders: Map<String, String>,
-        requestBody: String?,
-        response: com.microsoft.playwright.APIResponse
-    ) {
-        // -------- REQUEST --------
-        logger.error { "➡️ API REQUEST METHOD: $method" }
-        StepHelper.step("➡️ API REQUEST METHOD: $method")
-
-        logger.error { "➡️ API REQUEST URL: $url" }
-        StepHelper.step("➡️ API REQUEST URL: $url")
-
-        logger.error { "➡️ API REQUEST HEADERS: $requestHeaders" }
-        StepHelper.step("➡️ API REQUEST HEADERS: $requestHeaders")
-
-        if (!requestBody.isNullOrBlank()) {
-            logger.error { "➡️ API REQUEST BODY: $requestBody" }
-            StepHelper.step("➡️ API REQUEST BODY: $requestBody")
-        }
-
-        // -------- RESPONSE --------
-        logger.error { "⬅️ API RESPONSE STATUS: ${response.status()}" }
-        StepHelper.step("⬅️ API RESPONSE STATUS: ${response.status()}")
-
-        logger.error { "⬅️ API RESPONSE HEADERS: ${response.headers()}" }
-        StepHelper.step("⬅️ API RESPONSE HEADERS: ${response.headers()}")
-
-        try {
-            val responseBody = response.text()
-            logger.error { "⬅️ API RESPONSE BODY: $responseBody" }
-            StepHelper.step("⬅️ API RESPONSE BODY: $responseBody")
-        } catch (e: Exception) {
-            logger.error { "⬅️ API RESPONSE BODY: <cannot read> ${e.message}" }
-            StepHelper.step("⬅️ API RESPONSE BODY: <cannot read> ${e.message}")
-        }
-    }
-
-
-
 
 }
 
