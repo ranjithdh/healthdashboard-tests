@@ -169,7 +169,7 @@ class OtpPageTest : BaseTest() {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val otpPage = loginPage.enterMobileAndContinue(testUser)
 
-        otpPage.enterOtp("123456")
+        otpPage.enterOtp("123456", testUser.mobileNumber, testUser.countryCode)
         otpPage.clickContinue()
 
         assert(otpPage.isIncorrectOtpMessageVisible()) { "Error message 'Incorrect OTP' should be visible" }

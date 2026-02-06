@@ -39,7 +39,7 @@ class ProfileTest : BaseTest() {
                 .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
-        // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
 
         /*   context = browser.newContext(contextOptions)
