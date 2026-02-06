@@ -155,7 +155,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
         streetAddressInput.fill(address.addressLine1)
-        addressLine2Input.fill(address.addressLine2 ?: "")
+        addressLine2Input.fill(address.addressLine2 ?: "2nd Street")
         cityInput.fill(address.city)
         stateInput.fill(address.state)
         pincodeInput.fill(address.pincode)
@@ -421,11 +421,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         city: String,
         state: String,
         pincode: String,
-        country: String
+        country: String,
+        addressLine2: String = "2nd Street"
     ) {
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
         houseNoInput.fill(doorNumber)
+        addressLine2Input.fill(addressLine2)
         cityInput.fill(city)
         stateInput.fill(state)
         pincodeInput.fill(pincode)
@@ -442,6 +444,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val state = "Tamil Nadu"
         val pincode = "636004"
         val country = "India"
+        val addressLine2 = "Near Park"
 
         fillMandatoryAddressFields(
             nickName,
@@ -450,7 +453,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             city,
             state,
             pincode,
-            country
+            country,
+            addressLine2
         )
 
         captureAddressData {
