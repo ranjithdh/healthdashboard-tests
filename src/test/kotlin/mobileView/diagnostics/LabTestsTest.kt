@@ -616,9 +616,9 @@ class LabTestsTest : BaseTest() {
             ?: throw AssertionError("Product with code $targetCode not found in API response")
 
         val productId = when (targetProduct) {
-            is model.LabTestPackage -> targetProduct.id
-            is model.LabTestProfile -> targetProduct.id
-            is model.LabTestItem -> targetProduct.id
+            is model.LabTestPackage -> targetProduct.product?.product_id
+            is model.LabTestProfile -> targetProduct.product?.product_id
+            is model.LabTestItem -> targetProduct.product?.product_id
             else -> throw RuntimeException("Unknown product type")
         }
 
