@@ -1,13 +1,14 @@
 package mobileView.diagnostics
 
-import com.microsoft.playwright.*
-import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
-import kotlinx.serialization.json.*
-import model.LabTestResponse
 import org.junit.jupiter.api.*
+import utils.logger.logger
+import utils.report.StepHelper
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -58,15 +59,18 @@ class LabTestsTest : BaseTest() {
     @Test
     fun `verify lab tests cards using API response`() {
 
-        println("Starting test: verify lab tests cards using API response")
+        logger.info { "Starting test: verify lab tests cards using API response" }
+        StepHelper.step("Starting test: verify lab tests cards using API response")
         val labTestsPage = LabTestsPage(page)
 
         // Capture the API response during navigation
-        println("Navigating to diagnostics page and capturing API response...")
+        logger.info { "Navigating to diagnostics page and capturing API response..." }
+        StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
         // Parse response and verify cards
-        println("Parsing API response...")
+        logger.info { "Parsing API response..." }
+        StepHelper.step("Parsing API response...")
         val productList = responseObj.data?.diagnostic_product_list
             ?: throw AssertionError("diagnostic_product_list not found in API response")
         data class TestCardData(val code: String, val name: String, val sampleType: String, val rawSampleType: String, val price: String)
@@ -100,10 +104,12 @@ class LabTestsTest : BaseTest() {
         productList.test_profiles?.forEach { addTestCard(it.code, it.name, it.sample_type, it.product?.price) }
         productList.tests?.forEach { addTestCard(it.code, it.name, it.sample_type, it.product?.price) }
 
-        println("Found ${testCards.size} cards total.")
+        logger.info { "Found ${testCards.size} cards total." }
+        StepHelper.step("Found ${testCards.size} cards total.")
 
         // initial check - All should be visible
-        println("Verifying initial state (All visible)...")
+        logger.info { "Verifying initial state (All visible)..." }
+        StepHelper.step("Verifying initial state (All visible)...")
         testCards.forEach { card ->
             labTestsPage.verifyTestCard(card.code, card.name, card.sampleType, card.price)
         }
@@ -126,7 +132,8 @@ class LabTestsTest : BaseTest() {
         activeFilters.add("All") // Initially All is selected
 
         fun verifyVisibility() {
-            println("Verifying visibility for filters: $activeFilters")
+            logger.info { "Verifying visibility for filters: $activeFilters" }
+            StepHelper.step("Verifying visibility for filters: $activeFilters")
             testCards.forEach { card ->
                 val category = getCategory(card.rawSampleType)
 
@@ -140,18 +147,21 @@ class LabTestsTest : BaseTest() {
 
                 // Assert
                 if (isVisible != shouldBeVisible) {
-                    println("Mismatch: Card '${card.name}' ($category) [raw: ${card.rawSampleType}] - Expected: $shouldBeVisible, Actual: $isVisible")
+                    logger.info { "Mismatch: Card '${card.name}' ($category) [raw: ${card.rawSampleType}] - Expected: $shouldBeVisible, Actual: $isVisible" }
+                    StepHelper.step("Mismatch: Card '${card.name}' ($category) [raw: ${card.rawSampleType}] - Expected: $shouldBeVisible, Actual: $isVisible")
                 }
                 assert(isVisible == shouldBeVisible) {
                     "Visibility mismatch for card '${card.name}' ($category) [raw: ${card.rawSampleType}]. Active Filters: $activeFilters. Expected Visible: $shouldBeVisible, Actual: $isVisible"
                 }
             }
-            println("Verified visibility successfully.")
+            logger.info { "Verified visibility successfully." }
+            StepHelper.step("Verified visibility successfully.")
         }
 
         // Helper to simulate clicking a filter
         fun toggleFilter(filterName: String) {
-            println(">> Clicking filter: $filterName")
+            logger.info { ">> Clicking filter: $filterName" }
+            StepHelper.step(">> Clicking filter: $filterName")
             labTestsPage.clickFilter(filterName)
 
             if (filterName == "All") {
@@ -210,31 +220,38 @@ class LabTestsTest : BaseTest() {
         toggleFilter("Blood")
         verifyVisibility()
 
-        println("Filter permutation test completed successfully.")
+        logger.info { "Filter permutation test completed successfully." }
+        StepHelper.step("Filter permutation test completed successfully.")
     }
     @Test
     fun `verify inside card static section`() {
         val labTestsPage = LabTestsPage(page)
         labTestsPage.navigateToDiagnostics()
-        println("Clicking View Details...")
+        logger.info { "Clicking View Details..." }
+        StepHelper.step("Clicking View Details...")
         val testDetailPage = labTestsPage.clickViewDetails(code = "PROJ1056379")
 
-        println("Verifying How It Works section...")
+        logger.info { "Verifying How It Works section..." }
+        StepHelper.step("Verifying How It Works section...")
         testDetailPage.verifyHowItWorksSection()
 
-        println("Verifying Certified Labs section...")
+        logger.info { "Verifying Certified Labs section..." }
+        StepHelper.step("Verifying Certified Labs section...")
         testDetailPage.verifyCertifiedLabsSection()
 
-        println("Test completed successfully.")
+        logger.info { "Test completed successfully." }
+        StepHelper.step("Test completed successfully.")
     }
 
     @Test
     fun `verify detail page components`() {
         val labTestsPage = LabTestsPage(page)
-        println("Starting test: verify detail page components")
+        logger.info { "Starting test: verify detail page components" }
+        StepHelper.step("Starting test: verify detail page components")
 
         // Capture the API response during navigation
-        println("Navigating to diagnostics page and capturing API response...")
+        logger.info { "Navigating to diagnostics page and capturing API response..." }
+        StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
         val targetCode = "GENE10001" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
@@ -263,9 +280,12 @@ class LabTestsTest : BaseTest() {
         // 'who' is a list in the model
         val whoDesc = content.who?.firstOrNull() ?: ""
 
-        println("Expected What's Measured: $whatMeasuredDesc")
-        println("Expected Who: $whoDesc")
-        println("Expected What to Expect: $whatToExpectDesc")
+        logger.info { "Expected What's Measured: $whatMeasuredDesc" }
+        StepHelper.step("Expected What's Measured: $whatMeasuredDesc")
+        logger.info { "Expected Who: $whoDesc" }
+        StepHelper.step("Expected Who: $whoDesc")
+        logger.info { "Expected What to Expect: $whatToExpectDesc" }
+        StepHelper.step("Expected What to Expect: $whatToExpectDesc")
 
         // Logic to determine expected highlights based on React frontend logic
         val rawHighlights = content.highlights ?: emptyList()
@@ -346,9 +366,10 @@ class LabTestsTest : BaseTest() {
         // 7. highlights[4]
         if (rawHighlights.size > 4) expectedHighlights.add(rawHighlights[4])
 
-        println("Calculated Expected Highlights (Frontend Logic): $expectedHighlights")
+        logger.info { "Calculated Expected Highlights (Frontend Logic): $expectedHighlights" }
+        StepHelper.step("Calculated Expected Highlights (Frontend Logic): $expectedHighlights")
 
-        println("Clicking View Details for code $targetCode")
+        logger.info { "Clicking View Details for code $targetCode" }
         // Click View Details for the specific panel
         labTestsPage.clickViewDetails(targetCode)
 
@@ -358,7 +379,8 @@ class LabTestsTest : BaseTest() {
         testDetailPage.verifyTestHeaderInfo(targetCode)
         testDetailPage.verifyHighlights(expectedHighlights)
         // Verify "How it Works?" section
-        println("Verifying How it Works section...")
+        logger.info { "Verifying How it Works section..." }
+        StepHelper.step("Verifying How it Works section...")
         val howItWorksBySampleType = mapOf(
             "saliva" to mapOf(
                 "title" to "Get Gene Kit Delivered",
@@ -482,14 +504,17 @@ class LabTestsTest : BaseTest() {
         numberFormat.maximumFractionDigits = 0
         val formattedPrice = "₹" + numberFormat.format(rawPrice)
 
-        println("Expected Price: $formattedPrice")
+        logger.info { "Expected Price: $formattedPrice" }
+        StepHelper.step("Expected Price: $formattedPrice")
 
         // Verify Price and Booking Button
         testDetailPage.verifyPriceAndBookingButton(targetCode, formattedPrice)
 
-        println("Test completed successfully.")
+        logger.info { "Test completed successfully." }
+        StepHelper.step("Test completed successfully.")
 
-        println("Verifying How It Works section...")
+        logger.info { "Verifying How It Works section..." }
+        StepHelper.step("Verifying How It Works section...")
         val finalSampleType = when (targetPackage) {
             is model.LabTestPackage -> targetPackage.sample_type
             is model.LabTestProfile -> targetPackage.sample_type
@@ -498,43 +523,49 @@ class LabTestsTest : BaseTest() {
         } ?: ""
         val finalReportGenHr = when (targetPackage) {
             is model.LabTestPackage -> targetPackage.report_generation_hr
-            is model.LabTestProfile -> targetPackage.report_generation_hr
+                    is model.LabTestProfile -> targetPackage.report_generation_hr
             is model.LabTestItem -> targetPackage.report_generation_hr
             else -> null
         }
         val firstHighlight = if (rawHighlights.isNotEmpty()) rawHighlights[0] else null
         testDetailPage.verifyHowItWorksSection(finalSampleType, targetCode, finalReportGenHr, firstHighlight)
 
-        println("Verifying Certified Labs section...")
+        logger.info { "Verifying Certified Labs section..." }
+        StepHelper.step("Verifying Certified Labs section...")
         testDetailPage.verifyCertifiedLabsSection()
 
-        println("Test completed successfully.")
+        logger.info { "Test completed successfully." }
+        StepHelper.step("Test completed successfully.")
     }
 
     @Test
     fun `verify test scheduling`() {
         val labTestsPage = LabTestsPage(page)
-        println("Starting test: verify test scheduling")
+        logger.info { "Starting test: verify test scheduling" }
+        StepHelper.step("Starting test: verify test scheduling")
 
         // Capture the API response during navigation
-        println("Navigating to diagnostics page and capturing API response...")
+        StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
         val targetCode = "P037"
 
-        println("Clicking View Details for code $targetCode")
+        logger.info { "Clicking View Details for code $targetCode" }
+        StepHelper.step("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
 
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
         val testSchedulingPage = TestSchedulingPage(page)
-        println("Capturing address list and verifying scheduling page...")
+        logger.info { "Capturing address list and verifying scheduling page..." }
+        StepHelper.step("Capturing address list and verifying scheduling page...")
 
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
         }
 
         testSchedulingPage.verifySampleCollectionAddressHeading()
-        println("Testing 'Add New Address' functionality...")
+        logger.info { "Testing 'Add New Address' functionality..." }
+        StepHelper.step("Testing 'Add New Address' functionality...")
         testSchedulingPage.clickAddNewAddress()
         assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         testSchedulingPage.assertAddressFormFieldsVisible()
@@ -542,10 +573,12 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.addAddressAndValidate()
         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
-        println("Testing 'Edit Address' functionality...")
+        logger.info { "Testing 'Edit Address' functionality..." }
+        StepHelper.step("Testing 'Edit Address' functionality...")
         val addressCount = testSchedulingPage.getAddressCount()
         val randomIndex = (0 until addressCount).random()
-        println("Selecting random address at index $randomIndex")
+        logger.info { "Selecting random address at index $randomIndex" }
+        StepHelper.step("Selecting random address at index $randomIndex")
         testSchedulingPage.editUserAddress(randomIndex)
         // Extract price for the targetCode from responseObj
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -562,33 +595,41 @@ class LabTestsTest : BaseTest() {
             else -> 0.0
         }
 
-        println("Verifying price details on address selection page...")
+        logger.info { "Verifying price details on address selection page..." }
+        StepHelper.step("Verifying price details on address selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
-        println("Verifying footer actions on address selection page...")
+        logger.info { "Verifying footer actions on address selection page..." }
+        StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
 
-        println("Clicking Proceed and navigating to Slot Selection page...")
+        logger.info { "Clicking Proceed and navigating to Slot Selection page..." }
+        StepHelper.step("Clicking Proceed and navigating to Slot Selection page...")
         testSchedulingPage.clickProceed()
 
-        println("Verifying Slot Selection Page items...")
+        logger.info { "Verifying Slot Selection Page items..." }
+        StepHelper.step("Verifying Slot Selection Page items...")
         testSchedulingPage.verifySlotSelectionPage(code = targetCode)
 
-        println("Verifying Price Details on Slot Selection page...")
+        logger.info { "Verifying Price Details on Slot Selection page..." }
+        StepHelper.step("Verifying Price Details on Slot Selection page...")
         testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
-        println("Verifying Footer Actions on Slot Selection page...")
+        logger.info { "Verifying Footer Actions on Slot Selection page..." }
+        StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
 
-        println("Test completed successfully.")
+        logger.info { "Test completed successfully." }
+        StepHelper.step("Test completed successfully.")
     }
     @Test
     fun `verify summary page edit flow`() {
         val labTestsPage = LabTestsPage(page)
         val targetCode = "P037"
-        println("Starting test: verify summary page edit flow")
+        logger.info { "Starting test: verify summary page edit flow" }
+        StepHelper.step("Starting test: verify summary page edit flow")
 
         labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
         labTestsPage.clickViewDetails(targetCode)
@@ -606,12 +647,13 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.clickProceed()
 
         // 1. Test Address Edit from Summary
-        println("Editing address from summary...")
+        logger.info { "Editing address from summary..." }
         testSchedulingPage.clickEditAddressFromSummary()
         
         val addressCount = testSchedulingPage.getAddressCount()
         val randomIndex = (0 until addressCount).random()
-        println("Selecting random address at index $randomIndex")
+        logger.info { "Selecting random address at index $randomIndex" }
+        StepHelper.step("Selecting random address at index $randomIndex")
         testSchedulingPage.editUserAddress(randomIndex)
         
         testSchedulingPage.clickProceed() // go to slot selection
@@ -619,13 +661,14 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.clickProceed() // go to summary
 
         // 2. Test Slot Edit from Summary
-        println("Editing slot from summary...")
+        logger.info { "Editing slot from summary..." }
         testSchedulingPage.clickEditSlotFromSummary()
         testSchedulingPage.verifySlotSelectionPage(code = targetCode)
         testSchedulingPage.clickProceed()
 
         // Final Verification
-        println("Final verification on summary page...")
+        logger.info { "Final verification on summary page..." }
+        StepHelper.step("Final verification on summary page...")
         // Re-extract price for validation
         val productList = labTestsPage.labTestData?.data?.diagnostic_product_list
         val targetProduct = productList?.packages?.find { it.code == targetCode }
@@ -638,6 +681,7 @@ class LabTestsTest : BaseTest() {
             else -> 0.0
         }
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-        println("Edit flow test completed successfully.")
+        logger.info { "Edit flow test completed successfully." }
+        StepHelper.step("Edit flow test completed successfully.")
     }
 }

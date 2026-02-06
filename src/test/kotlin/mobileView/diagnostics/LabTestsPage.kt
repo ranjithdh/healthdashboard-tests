@@ -10,6 +10,12 @@ import model.LabTestResponse
 import mu.KotlinLogging
 import onboard.page.LoginPage
 import utils.json.json
+import utils.report.StepHelper
+import utils.report.StepHelper.NAVIGATE_TO_DIAGNOSTICS_URL
+import utils.report.StepHelper.VERIFY_CERTIFIED_LABS
+import utils.report.StepHelper.VERIFY_HOW_IT_WORKS
+import utils.report.StepHelper.VERIFY_STATIC_CONTENT
+import utils.LogFullApiCall
 
 private val logger = KotlinLogging.logger {}
 
@@ -22,11 +28,17 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
 
     fun checkStaticTextsAndSegments() {
+        StepHelper.step("$VERIFY_STATIC_CONTENT: Book Lab Tests heading")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book Lab Tests"))
+        StepHelper.step("$VERIFY_STATIC_CONTENT: flexible testing options text")
         page.getByRole(AriaRole.PARAGRAPH).filter(Locator.FilterOptions().setHasText("With flexible testing options"))
+        StepHelper.step("Click Filter: All")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).click()
+        StepHelper.step("Click Filter: Blood")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Blood")).click()
+        StepHelper.step("Click Filter: Gene")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gene")).click()
+        StepHelper.step("Click Filter: Gut")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
     }
 
@@ -40,6 +52,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun goToDiagnosticsUrl() {
+        StepHelper.step(NAVIGATE_TO_DIAGNOSTICS_URL)
           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
 //        page.waitForTimeout(2000.0)
 //        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
@@ -77,6 +90,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
             if (responseObj.data != null) {
                 labTestData = responseObj
+                LogFullApiCall.logFullApiCall(response)
 //                return labTestData
             }
         } catch (e: Exception) {
@@ -88,11 +102,13 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun clickViewDetails(): TestDetailPage {
+        StepHelper.step("${StepHelper.CLICK_VIEW_DETAILS}: First item")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View Details")).first().click()
         return TestDetailPage(page)
     }
 
     fun clickViewDetails(code: String): TestDetailPage {
+        StepHelper.step("${StepHelper.CLICK_VIEW_DETAILS}: for code $code")
         val button = page.getByTestId("test-card-view-details-$code")
         button.scrollIntoViewIfNeeded()
         button.click()
@@ -109,6 +125,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
         if (!page.getByTestId("test-card-description-$code").isVisible) throw AssertionError("Description not visible for code: $code")
         if (!page.getByTestId("test-card-price-$code").isVisible) throw AssertionError("Price not visible for code: $code")
         if (!page.getByTestId("test-card-view-details-$code").isVisible) throw AssertionError("View details not visible for code: $code")
+        StepHelper.step("${StepHelper.VERIFY_SERVICE_CARD} $code")
     }
 
     fun verifyTestCard(code: String, name: String, sampleType: String, price: String) {
@@ -138,6 +155,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun verifyHowItWorksSection(sampleType: String, code: String, reportGenerationHr: String? = null, firstHighlight: String? = null) {
         val type = sampleType.lowercase()
         println("Verifying 'How it Works' section for sample type: $type")
+        StepHelper.step(VERIFY_HOW_IT_WORKS)
 
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("How it Works?")).waitFor()
 
@@ -214,6 +232,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun verifyCertifiedLabsSection() {
+        StepHelper.step(VERIFY_CERTIFIED_LABS)
         println("Verifying 'Certified Labs, Secure Data' section")
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Certified Labs, Secure Data")).scrollIntoViewIfNeeded()
         
@@ -226,6 +245,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
         page.getByText("Your health data is always protected with strict privacy safeguards.").waitFor()
     }
     fun clickFilter(name: String) {
+        StepHelper.step("Click Filter: $name")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName(name)).click()
     }
 

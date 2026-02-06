@@ -10,4 +10,9 @@ object Normalize {
             timeZone
         }
     }
+
+    fun refactorCountryCode(countryCode: String): String {
+        return countryCode.replace("+", "")
+    }
+
 }

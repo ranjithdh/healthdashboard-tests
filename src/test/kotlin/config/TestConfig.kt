@@ -6,7 +6,18 @@ import com.microsoft.playwright.BrowserType
 object TestConfig {
     val isStaging: Boolean = true
     var ACCESS_TOKEN = ""
-    const val CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+
+    const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
+    const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
+
+    const val STG_SECRET_KEY = "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA"
+    const val PROD_SECRET_KEY = "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA"//TODO need get prod secret key
+
+    val CLIENT_ID = if (isStaging) STG_CLIENT_ID else PROD_CLIENT_ID
+
+    val SECRET_KEY = if (isStaging) STG_SECRET_KEY else PROD_SECRET_KEY
+
+    const val STATIC_OTP = "678901"
 
     object Urls {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
@@ -21,7 +32,7 @@ object TestConfig {
         val SERVICES_URL = "${BASE_URL}services"
 
 
-        val LOGIN_URL = "${BASE_URL}login?utm_source=direct"
+        val LOGIN_URL = "${BASE_URL}login?utm_source=testing_internal"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
@@ -56,11 +67,11 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=direct&via=website"
-        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=direct&via=website"
+        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
-         val TRACK_RESULT = "${BASE_URL}order/"
+        val TRACK_RESULT = "${BASE_URL}order/"
     }
 
     object APIs {
@@ -71,8 +82,8 @@ object TestConfig {
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
         val API_SLOTS_AVAILABILITY = "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
-        val SERVICE_SEARCH_API_URL = "https://api.stg.dh.deepholistics.com/v4/human-token/market-place/products"
-        val LAB_TEST_API_URL: String = "https://api.stg.dh.deepholistics.com/v4/human-token/lab-test"
+        val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
+        val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
         val API_UPDATE_PROFILE = "$BASE_URL/v4/human-token/lead/update-profile"
         val API_TONE_PREFERENCE = "$BASE_URL/v4/human-token/preference"
@@ -83,6 +94,7 @@ object TestConfig {
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
+        val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
     }
 
 
@@ -116,9 +128,10 @@ object TestConfig {
 
     }
 
+
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998304",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998301",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -133,7 +146,8 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Finland"
+            country = "Finland",
+            countryCode = "+358"
         )
 
 
@@ -143,9 +157,10 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "8870208411",
+            mobileNumber = "7373791414",
             otp = "678901",
-            country = "India"
+            country = "India",
+            countryCode = "+91"
         )
 
     }
@@ -193,5 +208,6 @@ data class TestUser(
     val city: String = "Delhi",
     val state: String = "Delhi",
     val pinCode: String = "110001",
-    val country: String = "India"
+    val country: String = "India",
+    val countryCode: String = "+91",
 )

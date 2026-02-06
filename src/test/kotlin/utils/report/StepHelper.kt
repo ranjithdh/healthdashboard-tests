@@ -107,6 +107,10 @@ object StepHelper {
     // PaymentPage
     const val COMPLETE_PAYMENT = "Complete Payment"
     const val MANUAL_NAVIGATE_HOME = "Manually Navigate to Home"
+    const val DOWNLOAD_REPORT = "Download biomarker report"
+    const val CLICK_TRACK_RESULT = "Click Track test status"
+    const val FETCH_HEALTH_DATA = "Fetch Health data from API"
+    const val VERIFY_BIOMARKER_DATA = "Verify biomarker data: "
 
     // ProfilePage - Questionnaire
     const val ANSWER_QUESTION = "Answer question: "
@@ -120,6 +124,14 @@ object StepHelper {
     const val EDIT_USER_ADDRESS = "Edit user address"
     const val SUBMIT_ADDRESS = "Submit address"
     const val YES_DELETE = "Yes delete"
+    const val VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING = "Verify Sample Collection Address heading"
+    const val CLICK_PROCEED = "Click Proceed"
+    const val FETCH_SLOTS = "Fetch slots for date: "
+    const val VERIFY_SLOT_SELECTION_PAGE = "Verify Slot Selection Page"
+    const val VERIFY_ORDER_SUMMARY_PAGE = "Verify Order Summary Page"
+    const val ADD_ADDRESS = "Add address and validate"
+    const val EDIT_ADDRESS_SUMMARY = "Click Edit Address from Summary Page"
+    const val EDIT_SLOT_SUMMARY = "Click Edit Slot from Summary Page"
     const val CLICK_ACCOUNT_PROFILE = "Click Account Profile"
 
     // ProfilePage - Preference
@@ -143,6 +155,9 @@ object StepHelper {
     const val NAVIGATE_TO_DIAGNOSTICS = "Navigate to Diagnostics"
     const val VIEW_TEST_DETAILS = "View test details: "
     const val CLICK_FILTER = "Click filter: "
+    const val CLICK_VIEW_DETAILS = "Click View Details"
+    const val VERIFY_CERTIFIED_LABS = "Verify Certified Labs"
+    const val VERIFY_HOW_IT_WORKS = "Verify How It Works"
 
     // mobileView - OrdersPage
     const val CLICK_ORDERS_TAB = "Click Orders tab"
@@ -153,6 +168,13 @@ object StepHelper {
     const val FETCH_SERVICE_DATA = "Fetch service data"
     const val VERIFY_SERVICE_CARD = "Verify service card: "
     const val CLICK_SCHEDULE_NOW = "Click Schedule Now"
+    const val VERIFY_SYMPTOMS_DIALOG = "Verify Report Symptoms dialog"
+    const val REPORT_SYMPTOMS_CLICK = "Click Report Symptom button"
+    const val VERIFY_SYMPTOMS_FEEDBACK = "Verify Symptom Report Feedback dialog"
+    const val SUBMIT_SYMPTOMS_MOBILE = "Submit symptoms (Mobile)"
+    const val SELECT_ALL_SYMPTOMS = "Select all symptoms"
+    const val CLICK_SYMPTOM_MOBILE = "Click symptom: "
+    const val VERIFY_SYMPTOMS_COUNT = "Verify symptoms selected count"
 
     // webView - LabTestsPage
     const val WAIT_LAB_TESTS_PAGE_LOAD = "Wait for Lab Tests page load"
@@ -185,4 +207,6 @@ object StepHelper {
     // website - FaqSection
     const val CLICK_FAQ_TAB = "Click FAQ tab: "
     const val VIEW_FAQ_QUESTION = "View FAQ question: "
+    const val NAVIGATE_TO_DIAGNOSTICS_URL = "Navigate to Diagnostics URL"
+    const val VERIFY_PRICE_DETAILS = "Verify Price Details"
 }
