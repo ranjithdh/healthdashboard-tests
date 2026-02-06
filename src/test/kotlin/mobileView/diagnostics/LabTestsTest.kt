@@ -3,6 +3,7 @@ package mobileView.diagnostics
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Playwright
+import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
@@ -561,6 +562,8 @@ class LabTestsTest : BaseTest() {
 
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
+            // Fetch order details immediately after Book Now triggering order creation
+            testSchedulingPage.callBloodDataReports()
         }
 
         testSchedulingPage.verifySampleCollectionAddressHeading()
@@ -609,7 +612,14 @@ class LabTestsTest : BaseTest() {
 
         logger.info { "Verifying Slot Selection Page items..." }
         StepHelper.step("Verifying Slot Selection Page items...")
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        // Assuming 'id' is available in the common interface or checking the specific types
+        val productId = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.product?.product_id
+            is model.LabTestProfile -> targetProduct.product?.product_id
+            is model.LabTestItem -> targetProduct.product?.product_id
+            else -> throw RuntimeException("Unknown product type")
+        }
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
 
         logger.info { "Verifying Price Details on Slot Selection page..." }
         StepHelper.step("Verifying Price Details on Slot Selection page...")
@@ -620,6 +630,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
@@ -642,8 +653,22 @@ class LabTestsTest : BaseTest() {
         }
 
         // Initial setup to reach summary page
+        val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
+        val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
+        val targetProduct = productList.packages?.find { it.code == targetCode }
+            ?: productList.test_profiles?.find { it.code == targetCode }
+            ?: productList.tests?.find { it.code == targetCode }
+            ?: throw AssertionError("Product with code $targetCode not found in API response")
+
+        val productId = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.product?.product_id
+            is model.LabTestProfile -> targetProduct.product?.product_id
+            is model.LabTestItem -> targetProduct.product?.product_id
+            else -> throw RuntimeException("Unknown product type")
+        }
+
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
         testSchedulingPage.clickProceed()
 
         // 1. Test Address Edit from Summary
@@ -657,23 +682,20 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.editUserAddress(randomIndex)
         
         testSchedulingPage.clickProceed() // go to slot selection
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
         testSchedulingPage.clickProceed() // go to summary
 
         // 2. Test Slot Edit from Summary
         logger.info { "Editing slot from summary..." }
         testSchedulingPage.clickEditSlotFromSummary()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode)
+        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
         testSchedulingPage.clickProceed()
 
         // Final Verification
         logger.info { "Final verification on summary page..." }
         StepHelper.step("Final verification on summary page...")
         // Re-extract price for validation
-        val productList = labTestsPage.labTestData?.data?.diagnostic_product_list
-        val targetProduct = productList?.packages?.find { it.code == targetCode }
-            ?: productList?.test_profiles?.find { it.code == targetCode }
-            ?: productList?.tests?.find { it.code == targetCode }
+        // We already extracted targetProduct and productId earlier in this test
         val rawPrice = when (targetProduct) {
             is model.LabTestPackage -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             is model.LabTestProfile -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0

@@ -1,6 +1,7 @@
 package forWeb.diagnostics.page
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.buildJsonObject
 import mobileView.profile.utils.ProfileUtils.buildAddressText
+
 import utils.LogFullApiCall.logFullApiCall
 import utils.report.StepHelper
 import utils.report.StepHelper.ADD_ADDRESS
@@ -33,6 +35,11 @@ import utils.report.StepHelper.VERIFY_PRICE_DETAILS
 import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
 import utils.report.StepHelper.VERIFY_SLOT_SELECTION_PAGE
 import kotlin.test.assertEquals
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.int
+//import kotlinx.serialization.json.content
 
 
 private val logger = KotlinLogging.logger {}
@@ -46,6 +53,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     private var selectedAddressText: String = ""
     private var selectedDateSummary: String = ""
     private var selectedTimeSummary: String = ""
+    private var product_id: String? = null
+
+    // Properties to store order details from callBloodDataReports
+    private var capturedOrderNo: String? = null
+    private var capturedProductId: Int? = null
+    private var capturedThyrocareProductId: String? = null
+    private var capturedAppointmentDate: String? = null
+    private var capturedCreatedAt: String? = null
+    private var capturedPaymentDate: String? = null
+
     private val nickNameInput =
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Home, work, etc."))
 
@@ -78,7 +95,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     val newAddressDialog: Locator =
 //        page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Add a new Address"))
-    page.getByTestId("diagnostics-booking-add-new-address")
+        page.getByTestId("diagnostics-booking-add-new-address")
 
     fun captureAddressData(action: () -> Unit) {
         logger.info { "Capturing address data..." }
@@ -154,7 +171,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
         streetAddressInput.fill(address.addressLine1)
-        addressLine2Input.fill(address.addressLine2 ?: "")
+        addressLine2Input.fill(address.addressLine2 ?: "2nd Street")
         cityInput.fill(address.city)
         stateInput.fill(address.state)
         pincodeInput.fill(address.pincode)
@@ -165,7 +182,6 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             newAddressSubmit.click()
         }
 
-        StepHelper.step("${StepHelper.EDIT_USER_ADDRESS} at index $index")
         this.selectedAddressIndex = index
 
         val updatedList = addressData?.addressList ?: throw AssertionError("Address list not updated")
@@ -221,13 +237,17 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     private fun getSlots(date: String, leadId: String, addressId: String): List<model.slot.Slot> {
-        val url = TestConfig.APIs.API_SLOTS_AVAILABILITY + "?platform=web"
+        // Fix URL: TestConfig.APIs.API_SLOTS_AVAILABILITY already contains ?platform=web
+        val url = TestConfig.APIs.API_SLOTS_AVAILABILITY
         val payload = buildJsonObject {
             put("address_id", addressId)
             put("date", date)
             put("lead_id", leadId)
+            put("product_id", product_id)
 //            put("user_timezone", "Asia/Kolkata")
         }.toString()
+
+        logger.info { "Fetching slots for date: $date with payload: $payload" }
 
         val response = page.request().post(
             url,
@@ -240,17 +260,24 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         )
 
         if (response.status() != 200) {
-            logger.error { "Slot API failed: ${response.text()}" }
+            logger.error { "Slot API failed: ${response.status()} ${response.text()}" }
             return emptyList()
         }
 
-        val slotList = json.decodeFromString<SlotList>(response.text())
-        return slotList.data?.slots ?: emptyList()
+        val responseText = response.text()
+        logger.info { "Slot API Response ($date): $responseText" }
+
+        return try {
+            val slotList = json.decodeFromString<SlotList>(responseText)
+            slotList.data?.slots ?: emptyList()
+        } catch (e: Exception) {
+            logger.error { "Failed to parse slot list: ${e.message}" }
+            emptyList()
+        }
     }
 
-    fun verifySlotSelectionPage(code: String) {
-        StepHelper.step(VERIFY_SLOT_SELECTION_PAGE)
-        logger.info { "Verifying Slot Selection Page" }
+    fun verifySlotSelectionPage(code: String, productId: String?) {
+        logger.info { "Verifying Slot Selection Page with product ID: $productId" }
         page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
 
         val leadId = getLeadId()
@@ -258,10 +285,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             ?: addressData?.addressList?.firstOrNull()
             ?: throw IllegalStateException("Address data not found. Ensure address is selected/captured before slot selection.")
         val addressId = addressItem.addressId
-//        val selectedAddressObj = addressData?.addressList?.find { it.addressId == addressId }?.address
-//        selectedAddressName = selectedAddressObj?.addressName ?: "Primary"
-//        selectedAddressText = buildAddressText(selectedAddressObj!!)
-
+        // Populate the class property for context if needed, though we use the param in getSlots call currently (actually we need to update getSlots too or set the property)
+        this.product_id = productId
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -272,14 +297,20 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         StepHelper.step("$FETCH_SLOTS $tomorrowDateStr")
         page.getByTestId("diagnostics-booking-step2-date-$tomorrowDateStr").click()
 
+        // We need to ensure getSlots uses the productId. It uses the class property `product_id`.
+        // Since we set this.product_id = productId above, the next call will use it.
         val tomorrowSlots = getSlots(tomorrowDateStr, leadId, addressId)
-//        tomorrowSlots.forEach { slot ->
-//            if (slot.is_available == true && slot.start_time != null) {
-//                page.getByTestId("diagnostics-booking-step2-slot-${slot.start_time}").click()
-//                // Just to capture something if we don't do the random part or if it fails
-//                captureSlotForSummary(slot.start_time, summaryDateFormatter)
-//            }
-//        }
+
+        tomorrowSlots.forEach { slot ->
+            if (slot.is_available == true && slot.start_time != null) {
+                // Ensure the slot is clickable before clicking
+                 val slotLocator = page.getByTestId("diagnostics-booking-step2-slot-${slot.start_time}")
+                 if(slotLocator.isVisible) {
+                     slotLocator.click()
+                     captureSlotForSummary(slot.start_time, summaryDateFormatter)
+                 }
+            }
+        }
 
         // Randomly select a date from tomorrow + 7 days (index 0 to 6)
         val randomDayOffset = (0..6).random()
@@ -411,11 +442,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         city: String,
         state: String,
         pincode: String,
-        country: String
+        country: String,
+        addressLine2: String = "2nd Street"
     ) {
         nickNameInput.fill(nickName)
         streetAddressInput.fill(street)
         houseNoInput.fill(doorNumber)
+        addressLine2Input.fill(addressLine2)
         cityInput.fill(city)
         stateInput.fill(state)
         pincodeInput.fill(pincode)
@@ -432,6 +465,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val state = "Tamil Nadu"
         val pincode = "636004"
         val country = "India"
+        val addressLine2 = "Near Park"
 
         fillMandatoryAddressFields(
             nickName,
@@ -440,7 +474,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             city,
             state,
             pincode,
-            country
+            country,
+            addressLine2
         )
 
         captureAddressData {
@@ -475,5 +510,121 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun getAddressCount(): Int {
         return addressData?.addressList?.size ?: 0
+    }
+
+    fun callBloodDataReports() {
+        logger.info { "Fetching Blood Data Reports (triggered by Book Now)..." }
+
+        // Wait briefly for backend to process order creation if triggered immediately after click
+        page.waitForTimeout(3000.0)
+
+        val bloodReportsUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/blood-data-reports"
+        val response = page.request().get(
+            bloodReportsUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+
+        if (response.status() != 200) {
+            throw RuntimeException("Failed to fetch blood reports: ${response.status()} ${response.text()}")
+        }
+
+        val responseJson = json.decodeFromString<kotlinx.serialization.json.JsonObject>(response.text())
+        val reports = responseJson["data"]?.jsonObject?.get("reports")?.jsonArray
+
+        if (reports.isNullOrEmpty()) {
+            throw RuntimeException("No reports found.")
+        }
+
+        // Get the most recent report
+        val latestReport = reports[0].jsonObject
+
+        val diOrder = latestReport["di_order"]?.jsonObject
+        val order = latestReport["order"]?.jsonObject
+
+        if (diOrder == null || order == null) {
+            throw RuntimeException("Order details missing in report")
+        }
+
+        capturedOrderNo = diOrder["order_id"]?.jsonPrimitive?.content
+        capturedProductId = diOrder["meta_data"]?.jsonObject?.get("product_id")?.jsonPrimitive?.int
+        capturedThyrocareProductId = diOrder["product_id"]?.jsonPrimitive?.content
+        capturedAppointmentDate = diOrder["appointment_date"]?.jsonPrimitive?.content
+        capturedCreatedAt = diOrder["created_at"]?.jsonPrimitive?.content
+        capturedPaymentDate = order["created_at"]?.jsonPrimitive?.content
+
+        logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, ProductId=$capturedProductId" }
+    }
+
+    fun callAutomateOrderWorkflow(isKit: Boolean = false) {
+        logger.info { "Calling Automate Order Workflow API..." }
+
+        if (capturedOrderNo == null) {
+             // Fallback: try to fetch if not already captured, or throw error depending on strictness
+             logger.warn { "Order details not pre-captured. Attempting to fetch now..." }
+             callBloodDataReports()
+        }
+
+        val orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
+        val productId = capturedProductId
+        val thyrocareProductId = capturedThyrocareProductId
+        val appointmentDate = capturedAppointmentDate
+        val createdAt = capturedCreatedAt
+        val paymentDate = capturedPaymentDate
+
+        // Get User Mobile/Country from PII
+        val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val piiResponse = page.request().get(
+            piiUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+        )
+        val piiObj = json.decodeFromString<kotlinx.serialization.json.JsonObject>(piiResponse.text())
+        val piiData = piiObj["data"]?.jsonObject?.get("piiData")?.jsonObject
+        val mobile = piiData?.get("mobile")?.jsonPrimitive?.content ?: ""
+        val countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content ?: "91"
+
+        val paymentId = "pay_dummy_auto"
+
+        val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
+
+        val payload = buildJsonObject {
+            put("appointment_date", appointmentDate)
+            put("country_code", countryCode)
+            put("created_at", createdAt)
+            put("is_combine_order", false)
+            put("is_free_user", false)
+            put("is_kit", isKit)
+            put("is_restrict_whatsapp", buildJsonObject {})
+            put("is_user_present", true)
+            put("mobile", mobile)
+            put("order_id", orderNo)
+            put("payment_amount_inr", "0.00")
+            put("payment_date", paymentDate)
+            put("payment_fee", "0.00")
+            put("payment_id", paymentId)
+            put("product_id", productId)
+            put("status", "YET_TO_ASSIGN")
+            put("thyrocare_product_id", thyrocareProductId)
+        }
+
+        logger.info { "Automating workflow for Order: $orderNo Payload: $payload" }
+
+        val postRes = page.request().post(
+            automateUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("Content-Type", "application/json")
+                .setData(payload.toString())
+        )
+
+        logger.info { "Automate Workflow Response: ${postRes.status()} ${postRes.text()}" }
+        if (postRes.status() != 200 && postRes.status() != 201) {
+            logger.error { "Automate workflow API failed" }
+        }
     }
 }
