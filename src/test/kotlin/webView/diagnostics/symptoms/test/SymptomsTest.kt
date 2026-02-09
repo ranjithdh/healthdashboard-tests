@@ -9,7 +9,6 @@ import io.qameta.allure.Epic
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.report.Modules
-import webView.diagnostics.symptoms.page.SymptomsPage
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -19,12 +18,28 @@ class SymptomsTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var symptomsMain: SymptomsPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
+    }
+
+    @AfterAll
+    fun teardown() {
+        browser.close()
+        playwright.close()
+    }
+
+    @BeforeEach
+    fun createContext() {
+        /*  val viewport = TestConfig.Viewports.ANDROID
+          val contextOptions =
+              Browser.NewContextOptions().setViewportSize(viewport.width, viewport.height).setHasTouch(viewport.hasTouch)
+                  .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
+
+          context = browser.newContext(contextOptions)
+          page = context.newPage()*/
 
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(1366, 768)   // Desktop resolution
@@ -33,34 +48,26 @@ class SymptomsTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
-
-        symptomsMain = performInitialNavigation()
     }
 
-    @AfterAll
-    fun tearDown() {
+    @AfterEach
+    fun closeContext() {
         context.close()
-        browser.close()
-        playwright.close()
-    }
-
-    private fun performInitialNavigation(): SymptomsPage {
-        val testUser = TestConfig.TestUsers.EXISTING_USER
-
-        val loginPage = LoginPage(page).navigate() as LoginPage
-
-
-        val symptomsMain =
-            loginPage.enterMobileAndContinue(testUser)
-                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
-        return symptomsMain
     }
 
 
     @Test
     @Order(1)
     fun `report symptoms with validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
 
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
 
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsButtonClick()
@@ -98,20 +105,20 @@ class SymptomsTest : BaseTest() {
     }
 
 
-    /*    @Test
-        fun `reported symptoms with validation`() {
-            val testUser = TestConfig.TestUsers.EXISTING_USER
+/*    @Test
+    fun `reported symptoms with validation`() {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
 
-            val loginPage = LoginPage(page).navigate() as LoginPage
+        val loginPage = LoginPage(page).navigate() as LoginPage
 
-            val symptomsMain =
-                loginPage.enterMobileAndContinue(testUser)
-                    .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
 
-            symptomsMain.headerValidation()
-            symptomsMain.onReportSymptomsValidation()
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsValidation()
 
-        }*/
+    }*/
 
 
 }
