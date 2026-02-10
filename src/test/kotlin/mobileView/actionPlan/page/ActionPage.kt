@@ -146,5 +146,24 @@ class ActionPage(page: Page) : BasePage(page) {
 
     }
 
+    fun nutritionCard() {
+        val foodSectionLocators = listOf<Locator?>(
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Eat")),
+            page.getByText("You can have these foods regularly in significant quantities."),
+
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Limit")),
+            page.getByText("You can have these foods 1–2"),
+
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Avoid")),
+            page.getByText("These can be consumed")
+        )
+
+        foodSectionLocators.forEach { locator -> locator?.waitFor() }
+    }
+
+    fun whatToEat() {
+
+    }
+
 
 }

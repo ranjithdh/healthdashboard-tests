@@ -56,6 +56,8 @@ class ActionTest : BaseTest() {
     @Test
     fun nutritionTest() {
         actionPage.dailyCaloriesIntakeCard()
+        actionPage.nutritionCard()
+        actionPage.whatToEat()
 
     }
 
