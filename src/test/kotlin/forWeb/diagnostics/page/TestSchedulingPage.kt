@@ -518,9 +518,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // Wait briefly for backend to process order creation if triggered immediately after click
         page.waitForTimeout(3000.0)
 
-        val bloodReportsUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/blood-data-reports"
         val response = page.request().get(
-            bloodReportsUrl,
+            TestConfig.APIs.BLOOD_DATA_REPORTS,
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
@@ -558,7 +557,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, ProductId=$capturedProductId" }
     }
 
-    fun callAutomateOrderWorkflow(isKit: Boolean = false) {
+    fun callAutomateOrderWorkflow(isKit: Boolean = true) {
         logger.info { "Calling Automate Order Workflow API..." }
 
         if (capturedOrderNo == null) {
@@ -584,11 +583,19 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         )
         val piiObj = json.decodeFromString<kotlinx.serialization.json.JsonObject>(piiResponse.text())
         val piiData = piiObj["data"]?.jsonObject?.get("piiData")?.jsonObject
-        val mobile = piiData?.get("mobile")?.jsonPrimitive?.content ?: ""
-        val countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content ?: "91"
+        
+        var mobile = piiData?.get("mobile")?.jsonPrimitive?.content
+        if (mobile.isNullOrBlank()) {
+            mobile = TestConfig.TestUsers.EXISTING_USER.mobileNumber
+        }
+        
+        var countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content
+        if (countryCode.isNullOrBlank()) {
+             countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
+        }
 
-        val paymentId = "pay_dummy_auto"
-
+        val paymentId = "order_RJURFxbJ6TYlyC"
+// this RJURFxbJ6TYlyB will be dynamic
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
         val payload = buildJsonObject {
