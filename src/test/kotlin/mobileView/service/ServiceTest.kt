@@ -14,15 +14,21 @@ import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.report.Modules
 
+/**
+ * Service tests using the "Single Login" pattern.
+ * Performs login once during suite setup and reuses the session.
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_CONSULTATIONS)
-class ServiceTest : BaseTest() {
+@DisplayName("Service Tests - Single Login Pattern")
+class ServiceSingleLoginTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
     private lateinit var servicePage: ServicePage
-    private var response: Response?=null
+    private var response: Response? = null
 
     @BeforeAll
     fun setup() {
@@ -35,14 +41,11 @@ class ServiceTest : BaseTest() {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
-//            .setExtraHTTPHeaders(mapOf("Cache-Control" to "no-cache", "Pragma" to "no-cache"))
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
         servicePage = performInitialNavigation()
     }
-
-
 
     @AfterAll
     fun tearDown() {
@@ -54,55 +57,44 @@ class ServiceTest : BaseTest() {
     private fun performInitialNavigation(): ServicePage {
         val servicePage = ServicePage(page)
 
-        // Navigate to Services page using the robust helper
-        servicePage.navigateToServices()
-
+        // FIX: The trigger (navigateToServices) must be INSIDE the waitForResponse block to prevent timeout
         response = page.waitForResponse({
             it.url().contains(TestConfig.APIs.SERVICE_SEARCH_API_URL) && it.status() == 200
         }) {
-            // navigateToServices() includes login and the "Book Now" click which triggers the API
-            //servicePage.navigateToServices()
+            servicePage.navigateToServices()
         }
-
 
         return servicePage
     }
 
     @Test
+    @Order(1)
     fun `verify service page static texts`() {
-        // Verify static content
         servicePage.verifyStaticContent()
     }
 
     @Test
+    @Order(2)
     fun `verify service cards using API response`() {
-        //val servicePage = ServicePage(page)
-
-        println("Starting test: verify service cards using API response")
-
-        println("Capturing API response and navigating to Services page...")
+        println("Starting test: verify service cards using API response (Single Login)")
 
         println("Response Status: ${response?.status()}")
         if (response?.status() == 304) {
-            throw AssertionError("API returned 304 Not Modified. Playwright cannot read body of 304 responses. Header 'Cache-Control: no-cache' should have prevented this.")
+            throw AssertionError("API returned 304 Not Modified. Playwright cannot read body of 304 responses.")
         }
 
         val responseBody = response?.text()
         if (responseBody?.isNotEmpty() == true) {
-            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true;  }
+            val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true; }
             val serviceResponse = json.decodeFromString<model.ServiceResponse>(responseBody)
             servicePage.setServiceData(serviceResponse)
         }
 
-        // Verify specific consultant flow (e.g. Nutritionist Consultation)
         val targetProductId = "72055641-39fc-423b-9a57-b07cda66727f"
         servicePage.verifyServices(targetProductId)
-        val product = servicePage.getProductById(targetProductId)
-        val status = product?.item_purchase_status
-//        if (!status.equals("paid", ignoreCase = true)) {
+        
         if (servicePage.isSymptomsEmpty) {
             servicePage.verifySymptomReportFeedbackDialog()
-
             servicePage.dialogValidation()
             servicePage.reportOptionsValidations()
             servicePage.cancelButtonClick()
@@ -111,8 +103,7 @@ class ServiceTest : BaseTest() {
             servicePage.selectAllSymptoms()
             servicePage.submitSymptoms()
         }
-        // Final verification for the feedback/acknowledgement dialog
-        println("Test completed successfully.")
+        println("Single Login test completed successfully.")
     }
 
 
