@@ -210,4 +210,7 @@ object StepHelper {
     const val VIEW_FAQ_QUESTION = "View FAQ question: "
     const val NAVIGATE_TO_DIAGNOSTICS_URL = "Navigate to Diagnostics URL"
     const val VERIFY_PRICE_DETAILS = "Verify Price Details"
+
+    //Action Plan
+    const val FETCH_RECOMMENDATION_DATA = "Fetch Recommendation data"
 }

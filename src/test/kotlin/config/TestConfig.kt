@@ -67,7 +67,8 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val SIGNUP_VIA_WEBSITE =
+            "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
@@ -84,7 +85,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_SLOTS_AVAILABILITY = "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
+        val API_SLOTS_AVAILABILITY =
+            "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
         val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
         val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
@@ -98,6 +100,7 @@ object TestConfig {
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
+        val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
     }
 
 

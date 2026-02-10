@@ -14,7 +14,7 @@ import utils.report.Modules
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_ACTION_PLAN)
-class ActionTest: BaseTest() {
+class ActionTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
@@ -54,7 +54,8 @@ class ActionTest: BaseTest() {
     }
 
     @Test
-    fun nutritionTest(){
+    fun nutritionTest() {
+        actionPage.dailyCaloriesIntakeCard()
 
     }
 
