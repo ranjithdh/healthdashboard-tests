@@ -78,6 +78,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
                 navigateToDiagnostics()
             }
         )
+        
+        // Fetch blood reports as per requirement
+        fetchBloodReports()
 
         val responseBody = response.text()
         if (responseBody.isNullOrBlank()) {
@@ -99,6 +102,23 @@ class LabTestsPage(page: Page) : BasePage(page) {
         }
 
 //        return null
+    }
+
+    private fun fetchBloodReports() {
+        logger.info { "Fetching Blood Data Reports..." }
+        val response = page.request().get(
+            TestConfig.APIs.BLOOD_DATA_REPORTS,
+            com.microsoft.playwright.options.RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+        if (response.status() == 200) {
+            logger.info { "Successfully fetched blood reports alongside lab tests." }
+            LogFullApiCall.logFullApiCall(response)
+        } else {
+            logger.warn { "Failed to fetch blood reports: ${response.status()}" }
+        }
     }
 
     fun clickViewDetails(): TestDetailPage {
