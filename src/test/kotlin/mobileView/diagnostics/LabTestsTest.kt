@@ -567,20 +567,20 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifySampleCollectionAddressHeading()
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
-//        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.clickAddNewAddress()
         assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
-//        testSchedulingPage.assertAddressFormFieldsVisible()
-//        testSchedulingPage.clickAddNewAddress()
-//        testSchedulingPage.addAddressAndValidate()
+        testSchedulingPage.assertAddressFormFieldsVisible()
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.addAddressAndValidate()
         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         logger.info { "Testing 'Edit Address' functionality..." }
         StepHelper.step("Testing 'Edit Address' functionality...")
-//        val addressCount = testSchedulingPage.getAddressCount()
-//        val randomIndex = (0 until addressCount).random()
-//        logger.info { "Selecting random address at index $randomIndex" }
-//        StepHelper.step("Selecting random address at index $randomIndex")
-//        testSchedulingPage.editUserAddress(randomIndex)
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        logger.info { "Selecting random address at index $randomIndex" }
+        StepHelper.step("Selecting random address at index $randomIndex")
+        testSchedulingPage.editUserAddress(randomIndex)
         // Extract price for the targetCode from responseObj
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
 
