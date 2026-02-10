@@ -13,6 +13,7 @@ object Modules {
     const val EPIC_PROFILE = "Profile $MOBILE"
     const val EPIC_HOME = "Home $MOBILE"
     const val EPIC_ORDERS = "Orders $MOBILE"
+    const val EPIC_ACTION_PLAN = "Action Plan $MOBILE"
 
     const val EPIC_SYMPTOMS = "Symptoms $DESKTOP"
     const val EPIC_WEBSITE = "Website $DESKTOP"

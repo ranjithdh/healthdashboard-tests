@@ -72,6 +72,9 @@ object TestConfig {
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
         val TRACK_RESULT = "${BASE_URL}order/"
+        val RECOMMENDATIONS_URL = "${BASE_URL}recommendations"
+
+
     }
 
     object APIs {

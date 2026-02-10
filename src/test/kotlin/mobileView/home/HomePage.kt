@@ -11,19 +11,20 @@ import kotlinx.serialization.json.Json
 import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
+import mobileView.actionPlan.page.ActionPage
 import mobileView.orders.OrdersPage
-import model.healthdata.HealthData
+import mobileView.profile.page.ProfilePage
 import model.home.HomeData
 import model.home.HomeDataResponse
-import mobileView.profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
+import utils.report.StepHelper.CLICK_ACTION_PLAN
 import utils.report.StepHelper.CLICK_PROFILE_ICON
-import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.FETCH_HOME_DATA
+import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
 
 class HomePage(page: Page) : BasePage(page) {
@@ -31,6 +32,7 @@ class HomePage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.HOME_PAGE_URL
 
     val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
+    val actionButtonPlan = page.getByText("Action Plan")
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
@@ -184,7 +186,12 @@ class HomePage(page: Page) : BasePage(page) {
         return profilePage
     }
 
-
+    fun clickActionPlan(): ActionPage {
+        StepHelper.step(CLICK_ACTION_PLAN)
+        actionButtonPlan.click()
+        val actionPlan = ActionPage(page)
+        return actionPlan
+    }
 
 
 }
