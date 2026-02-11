@@ -4,14 +4,12 @@ import utils.logger.logger
 import utils.report.StepHelper
 
 object LogFullApiCall {
-    fun logFullApiCall(
-        method: String,
-        url: String,
-        requestHeaders: Map<String, String>,
-        requestBody: String?,
-        response: com.microsoft.playwright.APIResponse
-    ) {
+    fun logFullApiCall(method: String, url: String, requestHeaders: Map<String, String>, requestBody: String?, response: com.microsoft.playwright.APIResponse) {
         logApiData(method, url, requestHeaders, requestBody, response.status(), response.headers(), { response.text() })
+    }
+
+    fun logFullApiCall(response: com.microsoft.playwright.APIResponse) {
+        logApiData("UNKNOWN", response.url(), emptyMap(), null, response.status(), response.headers(), { response.text() })
     }
 
     fun logFullApiCall(response: com.microsoft.playwright.Response) {
