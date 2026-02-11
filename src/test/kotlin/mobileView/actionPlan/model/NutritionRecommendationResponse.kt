@@ -22,7 +22,7 @@ data class RecommendationData(
     val nutrient_profile: NutrientProfile? = null,
     val recommendation_pdf_url: String? = null,
     val weight: String? = null,
-    val bmr: Int? = null
+    val bmr: Float? = null
 )
 
 @Serializable

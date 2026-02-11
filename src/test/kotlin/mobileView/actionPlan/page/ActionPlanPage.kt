@@ -6,13 +6,19 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
+import mobileView.actionPlan.model.FoodRecommendation
+import mobileView.actionPlan.model.NutritionFoodType
 import mobileView.actionPlan.model.NutritionRecommendationResponse
 import mobileView.actionPlan.model.RecommendationData
+import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
+import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -31,7 +37,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var recommendationData: RecommendationData? = null
 
     init {
-        monitorTraffic()
+        //  monitorTraffic()
     }
 
     private fun monitorTraffic() {
@@ -106,11 +112,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val apiFatPercentage = ninetyPercent(apiFat?.toDouble() ?: 0.0)
         val apiFiberPercentage = ninetyPercent(apiFiber?.toDouble() ?: 0.0)
 
-        val caloriesValues="$apiCaloriesPercentage-$apiCalories Cals"
-        val carbohydrateValues="$apiCarbohydratePercentage-$apiCarbohydrate".plus("g")
-        val proteinValues="$apiProteinPercentage-$apiProtein".plus("g")
-        val fatValues="$apiFatPercentage-$apiFat".plus("g")
-        val fiberValues="$apiFiberPercentage-$apiFiber".plus("g")
+        val caloriesValues = "$apiCaloriesPercentage-$apiCalories Cals"
+        val carbohydrateValues = "$apiCarbohydratePercentage-$apiCarbohydrate".plus("g")
+        val proteinValues = "$apiProteinPercentage-$apiProtein".plus("g")
+        val fatValues = "$apiFatPercentage-$apiFat".plus("g")
+        val fiberValues = "$apiFiberPercentage-$apiFiber".plus("g")
 
         logger.info("API Daily Calories : ${caloriesValues}")
         logger.info("API Carbohydrate   : ${carbohydrateValues}")
@@ -118,11 +124,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         logger.info("API Fat            : ${fatValues}")
         logger.info("API Fiber          : ${fiberValues}")
 
-        assertEquals(caloriesValues,uiDailyCalories)
-        assertEquals(carbohydrateValues,uiCarbohydrate)
-        assertEquals(proteinValues,uiProtein)
-        assertEquals(fatValues,uiFat)
-        assertEquals(fiberValues,uiFiber)
+        assertEquals(caloriesValues, uiDailyCalories)
+        assertEquals(carbohydrateValues, uiCarbohydrate)
+        assertEquals(proteinValues, uiProtein)
+        assertEquals(fatValues, uiFat)
+        assertEquals(fiberValues, uiFiber)
     }
 
 
@@ -146,8 +152,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     }
 
-    fun nutritionCard() {
+    fun nutritionMainCard() {
         val foodSectionLocators = listOf<Locator?>(
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition")),
+
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Eat")),
             page.getByText("You can have these foods regularly in significant quantities."),
 
@@ -162,7 +170,104 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun whatToEat() {
+        logger.info { "Clicking Food Eat section" }
+        foodEatClick()
 
+        val foodRecommendations = recommendationData?.food_recommendations
+        logger.info { "Total food recommendations from API: ${foodRecommendations?.size}" }
+
+        val eatList =
+            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.EAT.type, ignoreCase = true) }
+                ?.groupBy { it.food?.category }
+
+        val limitList =
+            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.LIMIT.type, ignoreCase = true) }
+                ?.groupBy { it.food?.category }
+
+        val avoidList =
+            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.AVOID.type, ignoreCase = true) }
+                ?.groupBy { it.food?.category }
+
+        logger.info { "Eat categories: ${eatList?.keys}" }
+        logger.info { "Limit categories: ${limitList?.keys}" }
+        logger.info { "Avoid categories: ${avoidList?.keys}" }
+
+        val dialog = page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Nutrition"))
+        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
+        val eatTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Eat"))
+        val limitTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Limit"))
+        val avoidTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Avoid"))
+
+        val titleAvoid = page.getByTestId("food-suggestion-section-avoid").getByTestId("food-suggestion-title")
+        val titleLimit = page.getByTestId("food-suggestion-section-limit").getByTestId("food-suggestion-title")
+        val titleEat = page.getByTestId("food-suggestion-section-eat").getByTestId("food-suggestion-title")
+
+        val foodSectionLocators =
+            listOf<Locator?>(dialog, searchBox, eatTab, limitTab, avoidTab, titleAvoid, titleLimit, titleEat)
+
+        logger.info { "Waiting for Nutrition dialog UI elements" }
+        foodSectionLocators.forEach { locator ->
+            locator?.waitFor()
+        }
+
+        logger.info { "Starting food validation for EAT tab" }
+        foodValidation(type = NutritionFoodType.EAT.type, eatList)
+    }
+
+    private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
+        val parentId = when (type) {
+            NutritionFoodType.EAT.type -> "food-suggestion-section-eat"
+            NutritionFoodType.LIMIT.type -> "food-suggestion-section-limit"
+            else -> "food-suggestion-section-avoid"
+        }
+
+        logger.info { "Validating food section: $type (parentId=$parentId)" }
+
+        categoryValidation(parentId, type, foodList)
+
+        logger.info { "Food validation completed for type: $type" }
+    }
+
+    private fun categoryValidation(parentId: String, type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
+        foodList?.forEach { (category, _) ->
+            logger.info { "Validating category: $category" }
+            val isCategoryExist = findSubCategoryExist(category)
+
+            val categoryElement = page.getByTestId(parentId).getByTestId("food-category-title-${category}")
+            var subCategoryElement: Locator? = null
+
+            val elements = if (isCategoryExist) {
+                subCategoryElement = page.getByTestId(parentId).getByTestId("food-category-subtext-${category}")
+                listOf<Locator?>(categoryElement, subCategoryElement)
+            } else {
+                listOf<Locator?>(categoryElement)
+            }
+
+            elements.forEach {
+                it?.scrollIntoViewIfNeeded()
+                it?.waitFor()
+            }
+
+            val categoryUi = categoryElement.innerText()
+
+            logger.info { "UI Category = '$categoryUi', Expected = '$category'" }
+
+            assertEquals(category, categoryUi)
+
+            if (isCategoryExist) {
+                val subCategoryExpected = getCategorySubtext(type, category)
+                val subCategoryUi = subCategoryElement?.innerText()
+                logger.info { "UI SubCategory = '$subCategoryUi', Expected = '$subCategoryExpected'" }
+                assertEquals(subCategoryExpected, subCategoryUi)
+            }
+        }
+    }
+
+
+    private fun foodEatClick() {
+        val foodToEat = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Eat"))
+        foodToEat.waitFor()
+        foodToEat.click()
     }
 
 
