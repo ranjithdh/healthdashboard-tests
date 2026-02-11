@@ -48,7 +48,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
         loginPage.enterMobileAndContinue(testUser)
         
         val otpPage = onboard.page.OtpPage(page)
-        otpPage.enterOtp(testUser.otp)
+        otpPage.enterOtp(testUser.otp,testUser.mobileNumber,testUser.countryCode)
     }
 
     fun goToDiagnosticsUrl() {

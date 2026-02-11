@@ -66,7 +66,7 @@ class ServicePage(page: Page) : BasePage(page) {
         loginPage.enterMobileAndContinue()
 
         val otpPage = onboard.page.OtpPage(page)
-        otpPage.enterOtp(testUser.otp)
+        otpPage.enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 
         // Direct navigation to Services after login, with a short delay for session stability
          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).nth(1).click()

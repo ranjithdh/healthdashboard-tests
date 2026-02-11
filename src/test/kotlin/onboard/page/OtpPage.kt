@@ -16,7 +16,6 @@ import mobileView.profile.page.ProfilePage
 import model.signup.GetOtpRequest
 import model.signup.OtpResponse
 import model.signup.VerifyOtpResponse
-import utils.LogFullApiCall
 import utils.LogFullApiCall.logFullApiCall
 import utils.Normalize.refactorCountryCode
 import utils.json.json
@@ -45,6 +44,8 @@ class OtpPage(page: Page) : BasePage(page) {
     override val pageUrl = "/login"
 
     private var fetchedOtp: String? = null
+    private var mobileNumber: String? = null
+    private var countryCode: String? = null
 
     init {
         monitorTraffic()
@@ -52,50 +53,52 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun requestOtp() {
         try {
-            val apiContext = page.context().request()
-            val url = TestConfig.APIs.GET_OTP
+            if (!mobileNumber.isNullOrBlank() && !countryCode.isNullOrBlank()) {
+                val apiContext = page.context().request()
+                val url = TestConfig.APIs.GET_OTP
 
-            val headers = mapOf(
-                "client_id" to TestConfig.CLIENT_ID,
-                "Content-Type" to "application/json"
-            )
+                val headers = mapOf(
+                    "client_id" to TestConfig.CLIENT_ID,
+                    "Content-Type" to "application/json"
+                )
 
-            val requestObj = GetOtpRequest(
-                mobile = EXISTING_USER.mobileNumber,
-                country_code = refactorCountryCode(EXISTING_USER.countryCode),
-                secret_key = SECRET_KEY,
-                service = "DH_VERIFICATION"
-            )
+                val requestObj = GetOtpRequest(
+                    mobile = mobileNumber!!,
+                    country_code = refactorCountryCode(countryCode!!),
+                    secret_key = SECRET_KEY,
+                    service = "DH_VERIFICATION"
+                )
 
-            val requestJson = json.encodeToString(requestObj)
+                val requestJson = json.encodeToString(requestObj)
 
 
-            val requestOptions = RequestOptions.create()
-            requestOptions.setData(requestJson)
-            headers.forEach { (k, v) -> requestOptions.setHeader(k, v) }
+                val requestOptions = RequestOptions.create()
+                requestOptions.setData(requestJson)
+                headers.forEach { (k, v) -> requestOptions.setHeader(k, v) }
 
-            val response = apiContext.post(
-                url,
-                requestOptions
-            )
+                val response = apiContext.post(
+                    url,
+                    requestOptions
+                )
 
-            logFullApiCall(
-                method = "POST",
-                url = url,
-                requestHeaders = headers,
-                requestBody = requestJson,
-                response = response
-            )
+                logFullApiCall(
+                    method = "POST",
+                    url = url,
+                    requestHeaders = headers,
+                    requestBody = requestJson,
+                    response = response
+                )
 
-            if (response.status() != 200) {
-                logger.error { "OTP API returned status: ${response.status()}" }
-                return
+                if (response.status() != 200) {
+                    logger.error { "OTP API returned status: ${response.status()}" }
+                    return
+                }
+
+                val responseBody = response.text()
+                val responseObj = json.decodeFromString<OtpResponse>(responseBody)
+                fetchedOtp = responseObj.data.otp
+                logFullApiCall("POST", TestConfig.APIs.GET_OTP, emptyMap(), requestJson, response)
             }
-
-            val responseBody = response.text()
-            val responseObj = json.decodeFromString<OtpResponse>(responseBody)
-            fetchedOtp = responseObj.data.otp
-            logFullApiCall("POST", TestConfig.APIs.GET_OTP, emptyMap(), requestJson, response)
         } catch (e: Exception) {
             logger.error { "Failed to call OTP API: ${e.message}" }
         }
@@ -144,8 +147,10 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    fun enterOtp(otp: String): OtpPage {
+    fun enterOtp(otp: String, mobileNumber: String, countryCode: String): OtpPage {
         StepHelper.step(ENTER_OTP + otp)
+        this.mobileNumber = mobileNumber
+        this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
         byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
@@ -162,7 +167,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToAccountCreation(testUser: TestUser = TestConfig.TestUsers.NEW_USER): BasicDetailsPage {
         StepHelper.step(ENTER_OTP_ACCOUNT_CREATION)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 
         val basicDetailsPage = BasicDetailsPage(page)
         basicDetailsPage.waitForConfirmation()
@@ -172,7 +177,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToMobileHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
         StepHelper.step(ENTER_OTP_MOBILE_HOME)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
@@ -182,7 +187,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToProfile(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): ProfilePage {
         StepHelper.step(ENTER_OTP_PROFILE)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
         val profilePage = ProfilePage(page)
 
         profilePage.waitForConfirmation()
@@ -193,7 +198,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
         StepHelper.step(ENTER_OTP_HOME)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
 
@@ -255,7 +260,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToLabTestForWeb(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): LabTestsPage {
         StepHelper.step(ENTER_OTP_LAB_TEST)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 //        clickContinue()
 
         // Create LabTestsPage instance BEFORE navigation to set up response listener
@@ -296,7 +301,7 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
         StepHelper.step(ENTER_OTP_HEALTH_DATA)
-        enterOtp(testUser.otp)
+        enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 
         page.waitForURL {
             page.url().contains(TestConfig.Urls.BASE_URL)
@@ -316,9 +321,12 @@ class OtpPage(page: Page) : BasePage(page) {
         return healthDataPage
     }
 
-    fun enterOtpAndContinueToInsightsForWeb(otp: String): SymptomsPage {
+    fun enterOtpAndContinueToInsightsForWeb(
+        otp: String,
+        testUser: TestUser = TestConfig.TestUsers.EXISTING_USER
+    ): SymptomsPage {
         StepHelper.step(ENTER_OTP_INSIGHTS)
-        enterOtp(otp)
+        enterOtp(otp, testUser.mobileNumber, testUser.countryCode)
 
         val homePage = HomePageWebsite(page)
         homePage.waitFoWebPageHomePageConfirmation()
