@@ -586,7 +586,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         
         var mobile = piiData?.get("mobile")?.jsonPrimitive?.content
         if (mobile.isNullOrBlank()) {
+            mobile = utils.SignupDataStore.get().mobileNumber
+            logger.info { "Mobile from PII is empty, using SignupDataStore: $mobile" }
+        }
+        if (mobile.isNullOrBlank()) {
             mobile = TestConfig.TestUsers.EXISTING_USER.mobileNumber
+            logger.info { "Mobile from SignupDataStore is empty, using TestConfig: $mobile" }
         }
         
         var countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content
