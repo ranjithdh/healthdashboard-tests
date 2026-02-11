@@ -6,6 +6,8 @@ import com.microsoft.playwright.BrowserType
 object TestConfig {
     val isStaging: Boolean = true
     var ACCESS_TOKEN = ""
+    var USER_ID = ""
+    var USER_NAME = ""
 
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
@@ -96,6 +98,7 @@ object TestConfig {
         val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
+        val API_USERS = "$BASE_URL/v4/human-token/users"
     }
 
 
@@ -159,7 +162,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "9952538864",
+            mobileNumber = "7092424997",
             otp = "678901",
             country = "India",
             countryCode = "+91"
