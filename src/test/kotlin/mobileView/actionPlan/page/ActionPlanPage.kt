@@ -212,6 +212,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         logger.info { "Starting food validation for EAT tab" }
         foodValidation(type = NutritionFoodType.EAT.type, eatList)
+        foodValidation(type = NutritionFoodType.LIMIT.type, limitList)
+        foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
     }
 
     private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
@@ -224,9 +226,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         logger.info { "Validating food section: $type (parentId=$parentId)" }
 
         categoryValidation(parentId, type, foodList)
+        foodNameValidation(type, foodList)
 
         logger.info { "Food validation completed for type: $type" }
     }
+
 
     private fun categoryValidation(parentId: String, type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
         foodList?.forEach { (category, _) ->
@@ -262,6 +266,46 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
         }
     }
+
+    private fun foodNameValidation(
+        type: String,
+        foodList: Map<String?, List<FoodRecommendation>>?
+    ) {
+        logger.info { "Starting food name validation for type: $type" }
+
+        foodList?.forEach { (category, recommendation) ->
+            logger.info { "Validating food names under category: $category (count=${recommendation.size})" }
+
+            recommendation.forEach { foodRecommendation ->
+                val food = foodRecommendation.food
+                val foodId = food?.food_id
+
+                logger.info { "Validating food item: id=$foodId" }
+
+                val foodElement = page.getByTestId("food-name-${foodId}")
+                val foodIcon = page.getByTestId("food-config-icon-${foodId}")
+                val foodImage = page.getByTestId("food-icon-${foodId}")
+
+                foodElement.scrollIntoViewIfNeeded()
+
+                listOf(foodElement, foodIcon, foodImage).forEach {
+                    it.waitFor()
+                }
+
+                val foodNameUi = foodElement.innerText()
+                val foodNameExpected = food?.name
+
+                logger.info {
+                    "Food UI name = '$foodNameUi', Expected = '$foodNameExpected'"
+                }
+
+                assertEquals(foodNameExpected, foodNameUi)
+            }
+        }
+
+        logger.info { "Food name validation completed for type: $type" }
+    }
+
 
 
     private fun foodEatClick() {
