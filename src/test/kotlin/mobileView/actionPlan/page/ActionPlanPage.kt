@@ -35,6 +35,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private var recommendationData: RecommendationData? = null
+    private var optimal = "Optimal"
+    private var normal = "Normal"
+    private var question = "question"
 
     init {
         //  monitorTraffic()
@@ -228,7 +231,87 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         categoryValidation(parentId, type, foodList)
         foodNameValidation(type, foodList)
 
+        if (type == NutritionFoodType.LIMIT.type || type == NutritionFoodType.AVOID.type) {
+            foodToolTipsValidation(type, foodList)
+        }
+
         logger.info { "Food validation completed for type: $type" }
+    }
+
+    private fun foodToolTipsValidation(
+        type: String,
+        foodList: Map<String?, List<FoodRecommendation>>?
+    ) {
+        logger.info { "Started food tool tips validation: $type" }
+        foodList?.forEach { (category, recommendation) ->
+            logger.info { "Validating food tool tips under category: $category (count=${recommendation.size})" }
+            recommendation.forEach { foodRecommendation ->
+                val food = foodRecommendation.food
+                val impactBiomarkers = foodRecommendation.impact_biomarkers
+                val hasBiomarker =
+                    impactBiomarkers?.any { !it.inference.equals(optimal) && !it.inference.equals(normal) }
+
+                if (hasBiomarker == true) {
+                    val foodId = food?.food_id
+                    logger.info { "Validating food item: id=$foodId" }
+
+                    val foodElement = page.getByTestId("food-name-${foodId}")
+                    foodElement.hover()
+
+                    // optional: small delay so tooltip renders
+                    page.waitForTimeout(300.0)
+                    val toolTips = page.getByTestId("food-tooltip-${foodId}")
+
+                    toolTips.scrollIntoViewIfNeeded()
+                    toolTips.waitFor()
+
+                    impactBiomarkers.forEachIndexed({ index, impactBiomarker ->
+                        if (impactBiomarker.category == question) {
+                            val impactBiomarkerElement = page.getByTestId("food-tooltip-reason-$foodId-$index").first()
+                            val formattedReason = formatQuestionReason(
+                                impactBiomarker.inference,
+                                impactBiomarker.name,
+                            )
+                            if (!formattedReason.isNullOrBlank()) {
+                                val context = if (type == NutritionFoodType.LIMIT.type) {
+                                    "Limit this because"
+                                } else {
+                                    "Avoid this because"
+                                }
+                                val impactBiomarkerExpected = context.plus(" $formattedReason")
+
+                                logger.info {
+                                    "Food UI toolTips = '${impactBiomarkerElement.innerText()}', Expected = '$impactBiomarkerExpected'"
+                                }
+
+                                assertEquals(impactBiomarkerExpected, impactBiomarkerElement.innerText())
+                            }
+                        } else {
+                            val impactBiomarkerElement =
+                                page.getByTestId("food-tooltip-biomarker-$foodId-$index").first()
+                            if (!impactBiomarker.inference.equals(optimal) && !impactBiomarker.inference.equals(normal)) {
+                                val biomarkerName = impactBiomarker.name
+                                val biomarkerInference = impactBiomarker.inference
+                                val context = if (type == NutritionFoodType.LIMIT.type) {
+                                    "Limit this because your"
+                                } else {
+                                    "Avoid this because your"
+                                }
+
+                                val impactBiomarkerExpected = context.plus(" $biomarkerName is $biomarkerInference")
+
+                                logger.info {
+                                    "Food UI toolTips = '${impactBiomarkerElement.innerText()}', Expected = '$impactBiomarkerExpected'"
+                                }
+
+                                assertEquals(impactBiomarkerExpected, impactBiomarkerElement.innerText())
+                            }
+                        }
+                    })
+                }
+            }
+        }
+        logger.info { "Completed food tool tips validation: $type" }
     }
 
 
@@ -282,6 +365,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 logger.info { "Validating food item: id=$foodId" }
 
+                //TODO need to check icons
                 val foodElement = page.getByTestId("food-name-${foodId}")
                 val foodIcon = page.getByTestId("food-config-icon-${foodId}")
                 val foodImage = page.getByTestId("food-icon-${foodId}")
@@ -307,11 +391,42 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-
     private fun foodEatClick() {
         val foodToEat = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Food to Eat"))
         foodToEat.waitFor()
         foodToEat.click()
+    }
+
+    fun formatQuestionReason(
+        inference: String?,
+        name: String?
+    ): String? {
+
+        if (name.isNullOrBlank() || name.trim().equals("none", ignoreCase = true)) {
+            return null
+        }
+
+        val question = inference?.trim().orEmpty()
+        val answer = name.trim()
+
+        return when {
+            question.uppercase().contains("INTOLERANCES") -> {
+                "you are intolerant to $answer"
+            }
+
+            question.uppercase().contains("FOOD ALLERGIES") ||
+                    question.uppercase().contains("ALLERGIES") -> {
+                "you are allergic to $answer"
+            }
+
+            question.uppercase().contains("SKIN CONDITIONS") -> {
+                "you currently have, or have had, $answer in the past"
+            }
+
+            else -> {
+                "you have $answer"
+            }
+        }
     }
 
 
