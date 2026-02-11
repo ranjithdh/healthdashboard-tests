@@ -99,6 +99,7 @@ object TestConfig {
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
         val API_USERS = "$BASE_URL/v4/human-token/users"
+        val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
     }
 
 

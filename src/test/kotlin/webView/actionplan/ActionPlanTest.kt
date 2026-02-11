@@ -12,6 +12,8 @@ import model.UsersResponse
 import com.microsoft.playwright.options.RequestOptions
 import utils.logger.logger
 import utils.report.StepHelper
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.buildJsonObject
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -133,6 +135,28 @@ class ActionPlanTest : BaseTest() {
         assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
         assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
         
+        // 4. Call user-data API on the replit app
+        StepHelper.step("Calling user-data API on replit app and verifying response")
+        
+        val requestBody = buildJsonObject {
+            put("userId", targetUserId)
+            put("accessToken", TestConfig.ACCESS_TOKEN)
+        }.toString()
+
+        val userDataResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+        
+        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
+        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
+        
+        val userData = userDataResponse.text()
+        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
+        logger.info { "User data API successfully verified." }
+
         logger.info { "ActionPlan flow completed and verified successfully." }
     }
 }
