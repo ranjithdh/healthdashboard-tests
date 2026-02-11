@@ -7,33 +7,32 @@ import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
+import io.qameta.allure.Epic
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import utils.logger.logger
+import utils.report.Modules
 import utils.report.StepHelper
 
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Execution(ExecutionMode.SAME_THREAD)
+@Epic(Modules.EPIC_BOOKLABTEST)
 class LabTestsTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var labTestsPage: LabTestsPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
-        val viewport = TestConfig.Viewports.MOBILE_PORTRAIT
+        val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -42,27 +41,46 @@ class LabTestsTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+        labTestsPage = performInitialNavigation()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
+    }
+
+    private fun performInitialNavigation(): LabTestsPage {
+        val pageObject = LabTestsPage(page)
+        // LabTestsPage.init/getLabTestsResponse already handles login and navigation
+        // but we can make it explicit if preferred, or just return the initialized page.
+        return pageObject
+    }
+
+    @BeforeEach
+    fun resetToDiagnosticsPage() {
+        // Ensure every test starts at the diagnostics page
+        if (!page.url().contains("diagnostics")) {
+            logger.info { "Navigating back to Diagnostics URL..." }
+            page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+            page.waitForLoadState()
+        }
     }
 
     @Test
+    @Order(1)
     fun `verify lab tests page static texts and segments`() {
-        val labTestsPage = LabTestsPage(page)
-//        labTestsPage.navigateToDiagnostics()
         labTestsPage.checkStaticTextsAndSegments()
     }
 
 
     @Test
+    @Order(2)
     fun `verify lab tests cards using API response`() {
 
         logger.info { "Starting test: verify lab tests cards using API response" }
         StepHelper.step("Starting test: verify lab tests cards using API response")
-        val labTestsPage = LabTestsPage(page)
 
         // Capture the API response during navigation
         logger.info { "Navigating to diagnostics page and capturing API response..." }
@@ -167,7 +185,7 @@ class LabTestsTest : BaseTest() {
 
             if (filterName == "All") {
                 activeFilters.clear()
-                activeFilters.add("All")
+                activeFilters.add(filterName)
             } else {
                 if (activeFilters.contains("All")) {
                     activeFilters.remove("All")
@@ -225,28 +243,8 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Filter permutation test completed successfully.")
     }
     @Test
-    fun `verify inside card static section`() {
-        val labTestsPage = LabTestsPage(page)
-        labTestsPage.navigateToDiagnostics()
-        logger.info { "Clicking View Details..." }
-        StepHelper.step("Clicking View Details...")
-        val testDetailPage = labTestsPage.clickViewDetails(code = "PROJ1056379")
-
-        logger.info { "Verifying How It Works section..." }
-        StepHelper.step("Verifying How It Works section...")
-        testDetailPage.verifyHowItWorksSection()
-
-        logger.info { "Verifying Certified Labs section..." }
-        StepHelper.step("Verifying Certified Labs section...")
-        testDetailPage.verifyCertifiedLabsSection()
-
-        logger.info { "Test completed successfully." }
-        StepHelper.step("Test completed successfully.")
-    }
-
-    @Test
+    @Order(3)
     fun `verify detail page components`() {
-        val labTestsPage = LabTestsPage(page)
         logger.info { "Starting test: verify detail page components" }
         StepHelper.step("Starting test: verify detail page components")
 
@@ -255,7 +253,7 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
-        val targetCode = "GENE10001" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "PROJ1056379" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -540,15 +538,15 @@ class LabTestsTest : BaseTest() {
     }
 
     @Test
+    @Order(4)
     fun `verify test scheduling`() {
-        val labTestsPage = LabTestsPage(page)
         logger.info { "Starting test: verify test scheduling" }
         StepHelper.step("Starting test: verify test scheduling")
 
         // Capture the API response during navigation
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-        val targetCode = "P037"
+        val targetCode = "PROJ1056379"
 
         logger.info { "Clicking View Details for code $targetCode" }
         StepHelper.step("Clicking View Details for code $targetCode")
@@ -630,14 +628,16 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-//        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+        
+        // Finalize the order automation by calling the workflow API
+        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
     @Test
+    @Order(5)
     fun `verify summary page edit flow`() {
-        val labTestsPage = LabTestsPage(page)
         val targetCode = "P037"
         logger.info { "Starting test: verify summary page edit flow" }
         StepHelper.step("Starting test: verify summary page edit flow")

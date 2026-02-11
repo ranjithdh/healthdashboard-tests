@@ -93,6 +93,7 @@ object TestConfig {
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
+        val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
     }
@@ -110,6 +111,7 @@ object TestConfig {
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)
+                .setArgs(listOf("--start-maximized", "--no-sandbox"))
         }
     }
 
@@ -157,7 +159,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "7373791414",
+            mobileNumber = "9952538864",
             otp = "678901",
             country = "India",
             countryCode = "+91"
