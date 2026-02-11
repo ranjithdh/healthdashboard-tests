@@ -6,7 +6,7 @@ import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import io.qameta.allure.Epic
-import mobileView.actionPlan.page.ActionPage
+import mobileView.actionPlan.page.ActionPlanPage
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.report.Modules
@@ -14,11 +14,11 @@ import utils.report.Modules
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_ACTION_PLAN)
-class ActionTest : BaseTest() {
+class ActionPlanTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
-    private lateinit var actionPage: ActionPage
+    private lateinit var actionPlanPage: ActionPlanPage
 
     @BeforeAll
     fun setup() {
@@ -35,7 +35,7 @@ class ActionTest : BaseTest() {
         context = browser.newContext(contextOptions)
         // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
-        actionPage = performInitialNavigation()
+        actionPlanPage = performInitialNavigation()
     }
 
     @AfterAll
@@ -45,7 +45,7 @@ class ActionTest : BaseTest() {
         playwright.close()
     }
 
-    private fun performInitialNavigation(): ActionPage {
+    private fun performInitialNavigation(): ActionPlanPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val actionPage =
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
@@ -55,9 +55,9 @@ class ActionTest : BaseTest() {
 
     @Test
     fun nutritionTest() {
-        actionPage.dailyCaloriesIntakeCard()
-        actionPage.nutritionCard()
-        actionPage.whatToEat()
+        actionPlanPage.dailyCaloriesIntakeCard()
+        actionPlanPage.nutritionCard()
+        actionPlanPage.whatToEat()
 
     }
 

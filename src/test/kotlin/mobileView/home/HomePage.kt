@@ -11,7 +11,7 @@ import kotlinx.serialization.json.Json
 import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
-import mobileView.actionPlan.page.ActionPage
+import mobileView.actionPlan.page.ActionPlanPage
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
 import model.home.HomeData
@@ -186,10 +186,10 @@ class HomePage(page: Page) : BasePage(page) {
         return profilePage
     }
 
-    fun clickActionPlan(): ActionPage {
+    fun clickActionPlan(): ActionPlanPage {
         StepHelper.step(CLICK_ACTION_PLAN)
         actionButtonPlan.click()
-        val actionPlan = ActionPage(page)
+        val actionPlan = ActionPlanPage(page)
         return actionPlan
     }
 

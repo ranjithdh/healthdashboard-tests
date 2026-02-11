@@ -8,21 +8,21 @@ import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.model.NutritionRecommendationResponse
 import mobileView.actionPlan.model.RecommendationData
-import mobileView.actionPlan.utils.ActionUtils.ninetyPercent
+import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
 import kotlin.test.assertEquals
 
-class ActionPage(page: Page) : BasePage(page) {
+class ActionPlanPage(page: Page) : BasePage(page) {
 
     override val pageUrl = TestConfig.Urls.RECOMMENDATIONS_URL
 
     private val actionPlanTitle: Locator =
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action Plan"))
 
-    fun waitForConfirmation(): ActionPage {
+    fun waitForConfirmation(): ActionPlanPage {
         page.waitForURL(TestConfig.Urls.RECOMMENDATIONS_URL)
         actionPlanTitle.waitFor()
         return this
