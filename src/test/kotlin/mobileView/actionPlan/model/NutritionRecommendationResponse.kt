@@ -115,7 +115,11 @@ data class Recommendation(
     val recommendation_assessments: List<String>? = null,
     val test_img_url: String? = null,
     val personalized_recommendations: List<String>? = null,
-    val metric_recommendations: List<MetricRecommendation>? = null
+    val metric_recommendations: List<MetricRecommendation>? = null,
+    val is_admin_created: Boolean? = null,
+    val approval_status: String? = null,
+    val descriptive_meta: DescriptiveMeta? = null,
+    val detailed_description: String? = null
 )
 
 @Serializable
@@ -181,6 +185,16 @@ data class UserRecommendationAction(
     val id: String? = null
 )
 
+@Serializable
+data class DescriptiveMeta(
+    val description: String? = null,
+    val why_it_works: String? = null,
+    val why_important: String? = null,
+    val what_to_expect: String? = null,
+    val how_to_practice: String? = null,
+    val why_supports_longevity: String? = null,
+    val potential_biomarker_impact: String? = null
+)
 
 
 

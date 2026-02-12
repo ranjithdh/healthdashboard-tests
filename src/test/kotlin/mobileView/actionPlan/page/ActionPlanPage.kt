@@ -6,14 +6,12 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import mobileView.actionPlan.model.FoodRecommendation
-import mobileView.actionPlan.model.NutritionFoodType
-import mobileView.actionPlan.model.NutritionRecommendationResponse
-import mobileView.actionPlan.model.Recommendation
-import mobileView.actionPlan.model.RecommendationData
+import mobileView.actionPlan.model.*
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
+import mobileView.actionPlan.utils.ActionPlanUtils.removeWhitespace
+import mobileView.actionPlan.utils.ActionPlanUtils.splitByNewLine
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -556,10 +554,233 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
             validatingMainCards(activityList)
+
+            validatingActivitySidePanel(activityList)
         } else {
             logger.warn("No activity recommendations found")
         }
     }
+
+    private fun validatingActivitySidePanel(activityList: List<Recommendation>) {
+        logger.info { "Starting activity side panel validation for ${activityList.size} activities" }
+
+        activityList.forEach { activity ->
+            logger.info { "Opening activity panel for activityId=${activity.id}" }
+
+            val descriptiveMeta = activity.descriptive_meta
+            val descriptionExpected = descriptiveMeta?.description
+
+            val title = page.getByTestId("exercise-title-${activity.id}")
+            title.click()
+
+            val dialog = page.getByRole(AriaRole.DIALOG)
+            dialog.waitFor()
+
+            logger.info { "Activity dialog opened for activityId=${activity.id}" }
+
+            activityHeaderSection(activity)
+
+            val description = page.getByTestId("exercise-description")
+            description.waitFor()
+
+            logger.info { "Validating description for actual=${removeWhitespace(descriptionExpected)}" }
+            logger.info { "Validating description for actual=${removeWhitespace(description.innerText())}" }
+            assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
+
+            potentialBiomarker(activity)
+
+            val viewMore = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View More"))
+            viewMore.waitFor()
+            viewMore.click()
+
+            logger.info { "Clicked View More for activityId=${activity.id}" }
+
+            whyItWorks(activity)
+            intoPractice(activity)
+            whatToExpect(activity)
+
+            val closePanel = page.getByTestId("exercise-panel-close")
+            closePanel.waitFor()
+            closePanel.click()
+
+            logger.info { "Closed activity panel for activityId=${activity.id}" }
+        }
+
+        logger.info { "Completed activity side panel validation" }
+    }
+
+
+    private fun potentialBiomarker(activity: Recommendation) {
+        logger.info { "Validating Potential Biomarker section for activityId=${activity.id}" }
+
+        val down = "down"
+        val metricRecommendations = activity.metric_recommendations
+
+        val header = page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("Potential biomarker impact")
+        )
+        header.waitFor()
+        header.click()
+
+        metricRecommendations?.forEachIndexed { index, recommendations ->
+            val metric = recommendations.metric
+
+            val biomarkerNameExpected = metric?.metric
+            val trendArrow = metric?.trend_arrow
+
+            logger.info {
+                "Validating biomarker index=$index, name=$biomarkerNameExpected, trend=$trendArrow"
+            }
+
+            val arrowUi = if (trendArrow == down) {
+                page.getByTestId("exercise-impact-down-$index")
+            } else {
+                page.getByTestId("exercise-impact-up-$index")
+            }
+
+            arrowUi.waitFor()
+
+            val biomarkerUi = page.getByTestId("exercise-impact-$index")
+            biomarkerUi.waitFor()
+
+            assertEquals(biomarkerNameExpected, biomarkerUi.innerText())
+        }
+
+        logger.info { "Potential Biomarker section validated for activityId=${activity.id}" }
+    }
+
+
+    private fun whyItWorks(activity: Recommendation) {
+        logger.info { "Validating Why It Works section for activityId=${activity.id}" }
+
+        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Why it works"))
+        heading.waitFor()
+        heading.click()
+
+        val descriptiveMeta = activity.descriptive_meta
+        val whyItWorks = descriptiveMeta?.why_it_works
+        val workList = splitByNewLine(whyItWorks)
+
+        if (workList.isNotEmpty()) {
+            workList.forEachIndexed { index, work ->
+                logger.info { "Validating Why It Works item index=$index, value=$work" }
+
+                val whyItWorkElement = page.getByTestId("exercise-why-it-works-$index")
+                whyItWorkElement.waitFor()
+
+                assertEquals(work, whyItWorkElement.innerText())
+            }
+        } else {
+            logger.warn { "Why It Works list is empty for activityId=${activity.id}" }
+        }
+    }
+
+
+    private fun intoPractice(activity: Recommendation) {
+        logger.info { "Validating How To Practice section for activityId=${activity.id}" }
+
+        val heading = page.getByRole(
+            AriaRole.HEADING,
+            Page.GetByRoleOptions().setName("How to put it into practice")
+        )
+        heading.waitFor()
+        heading.click()
+
+        val descriptiveMeta = activity.descriptive_meta
+        val howToPractice = descriptiveMeta?.how_to_practice
+        val practiceList = splitByNewLine(howToPractice)
+
+        if (practiceList.isNotEmpty()) {
+            practiceList.forEachIndexed { index, practice ->
+                logger.info { "Validating Practice item index=$index, value=$practice" }
+
+                val practiceElement = page.getByTestId("exercise-how-to-practice-$index")
+                practiceElement.waitFor()
+
+                assertEquals(practice, practiceElement.innerText())
+            }
+        } else {
+            logger.warn { "Practice list is empty for activityId=${activity.id}" }
+        }
+    }
+
+
+    private fun whatToExpect(activity: Recommendation) {
+        logger.info { "Validating What To Expect section for activityId=${activity.id}" }
+
+        val descriptiveMeta = activity.descriptive_meta
+        val whatToExpect = descriptiveMeta?.what_to_expect
+
+        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What to expect"))
+        heading.waitFor()
+        heading.click()
+
+
+        val subHeadingElement = page.getByTestId("exercise-what-to-expect")
+        subHeadingElement.waitFor()
+
+        logger.info { "What To Expect actual=${removeWhitespace(subHeadingElement.innerText())}" }
+        logger.info { "What To Expect expected=${removeWhitespace(whatToExpect)}" }
+
+        assertEquals(removeWhitespace(whatToExpect), removeWhitespace(subHeadingElement.innerText()))
+
+        logger.info { "What To Expect section validated for activityId=${activity.id}" }
+    }
+
+
+    private fun activityHeaderSection(activity: Recommendation) {
+        val exercise = "Exercise"
+
+        logger.info { "🔹 Validating Activity Header Section for activity: ${activity.name}" }
+
+        val heading = page.getByTestId("exercise-panel-heading")
+        val nameElement = page.getByTestId("exercise-detail-name")
+        val displayElement = page.getByTestId("exercise-detail-display-name")
+        val imageElement = page.getByTestId("exercise-detail-image")
+
+        listOf(heading, nameElement, displayElement, imageElement).forEach {
+            it.waitFor()
+            logger.info { "✅ Element visible: ${it}" }
+        }
+
+        val headingText = heading.innerText()
+        logger.info { "Heading text: $headingText" }
+        assertEquals(exercise, headingText)
+
+        val nameText = nameElement.innerText()
+        logger.info { "Name text: $nameText, Expected: ${activity.name}" }
+        assertEquals(activity.name?.uppercase(), nameText)
+
+        val displayText = displayElement.innerText()
+        logger.info { "Display name text: $displayText, Expected: ${activity.display_name}" }
+        assertEquals(activity.display_name, displayText)
+
+        val variantDescription = activity.variant_description
+        logger.info { "Variant description from API: $variantDescription" }
+
+        val bagList = variantDescription
+            ?.split(",")
+            ?.map { it.trim() }
+            ?: emptyList()
+
+        logger.info { "Parsed variant list: $bagList" }
+
+        if (variantDescription?.isBlank() == false && bagList.isNotEmpty()) {
+            bagList.forEachIndexed { index, expectedVariant ->
+                val uiVariant = page.getByTestId("exercise-variant-value-$index")
+                uiVariant.waitFor()
+
+                val uiText = uiVariant.innerText()
+                logger.info { "Variant[$index] UI: $uiText, Expected: $expectedVariant" }
+
+                assertEquals(expectedVariant, uiText)
+            }
+        } else {
+            logger.info { "ℹ️ No variant description available, skipping variant validation" }
+        }
+    }
+
 
     private fun validatingMainCards(activityList: List<Recommendation>) {
         logger.info("Validating ${activityList.size} activity main cards")
@@ -593,7 +814,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             logger.info("Bag list: $bagList")
 
-            if (variantDescription?.isBlank()==false && bagList.isNotEmpty()) {
+            if (variantDescription?.isBlank() == false && bagList.isNotEmpty()) {
                 bagList.forEach { bag ->
                     logger.info("Validating bag text: $bag")
                     page.getByText(bag).waitFor()

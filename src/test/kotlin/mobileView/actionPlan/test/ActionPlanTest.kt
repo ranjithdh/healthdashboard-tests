@@ -68,7 +68,6 @@ class ActionPlanTest : BaseTest() {
     fun activityTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.activityMainCards()
-
     }
 
 }

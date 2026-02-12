@@ -100,5 +100,19 @@ object ActionPlanUtils {
         return nutritionCategorySubtext[category]!=null
     }
 
+    fun splitByNewLine(text: String?): List<String> {
+        return text
+            ?.split("\n")
+            ?.map { it.trim() }
+            ?.filter { it.isNotEmpty() }?:emptyList()
+    }
+
+
+    fun removeWhitespace(text: String?): String {
+        return text?.replace("\\s+".toRegex(), " ")?:""
+    }
+
+
+
 
 }
