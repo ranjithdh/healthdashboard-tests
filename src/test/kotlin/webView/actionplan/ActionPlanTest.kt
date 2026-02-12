@@ -157,6 +157,12 @@ class ActionPlanTest : BaseTest() {
         assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
         logger.info { "User data API successfully verified." }
 
-        logger.info { "ActionPlan flow completed and verified successfully." }
+        // 5. Verify UI Sections on the PDF Tool / Action Plan Generator
+        StepHelper.step("Verifying UI sections on Action Plan generator")
+
+        page1.getByTestId("button-toggle-category-nutrition").click();
+
+        page1.getByTestId("button-vitamin-selector").click();
+
     }
 }
