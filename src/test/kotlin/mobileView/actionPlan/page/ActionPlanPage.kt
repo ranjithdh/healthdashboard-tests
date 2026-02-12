@@ -121,11 +121,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val fatValues = "$apiFatPercentage-$apiFat".plus("g")
         val fiberValues = "$apiFiberPercentage-$apiFiber".plus("g")
 
-        logger.info("API Daily Calories : ${caloriesValues}")
-        logger.info("API Carbohydrate   : ${carbohydrateValues}")
-        logger.info("API Protein        : ${proteinValues}")
-        logger.info("API Fat            : ${fatValues}")
-        logger.info("API Fiber          : ${fiberValues}")
+        logger.info("API Daily Calories : $caloriesValues")
+        logger.info("API Carbohydrate   : $carbohydrateValues")
+        logger.info("API Protein        : $proteinValues")
+        logger.info("API Fat            : $fatValues")
+        logger.info("API Fiber          : $fiberValues")
 
         assertEquals(caloriesValues, uiDailyCalories)
         assertEquals(carbohydrateValues, uiCarbohydrate)
@@ -214,9 +214,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
 
         logger.info { "Starting food validation for EAT tab" }
-        foodValidation(type = NutritionFoodType.EAT.type, eatList)
-        foodValidation(type = NutritionFoodType.LIMIT.type, limitList)
-        foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
+        if (eatList?.isNotEmpty() == true) {
+            foodValidation(type = NutritionFoodType.EAT.type, eatList)
+        }
+        if (limitList?.isNotEmpty() == true) {
+            foodValidation(type = NutritionFoodType.LIMIT.type, limitList)
+        }
+        if (avoidList?.isNotEmpty() == true) {
+            foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
+        }
     }
 
     private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
@@ -428,6 +434,99 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
         }
     }
+
+    fun searchValidation() {
+        logger.info { "Starting search validation" }
+
+        foodEatClick()
+
+        val searchBox =
+            page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
+
+        // First search with junk value to validate empty state
+        searchBox.fill("abcd123")
+
+        val titleAvoid = page.getByTestId("food-suggestion-section-avoid")
+            .getByTestId("food-suggestion-title")
+        val titleLimit = page.getByTestId("food-suggestion-section-limit")
+            .getByTestId("food-suggestion-title")
+        val titleEat = page.getByTestId("food-suggestion-section-eat")
+            .getByTestId("food-suggestion-title")
+
+        val emptyEat = page.getByText("No foods found in Eat")
+        val emptyLimit = page.getByText("No foods found in Limit")
+        val emptyAvoid = page.getByText("No foods found in Avoid")
+
+        val foodSectionLocators = listOf(
+            searchBox,
+            emptyEat,
+            emptyLimit,
+            emptyAvoid,
+            titleAvoid,
+            titleLimit,
+            titleEat
+        )
+
+        foodSectionLocators.forEach {
+            it.waitFor()
+        }
+
+        logger.info { "Empty state validated successfully" }
+
+        val foodRecommendations = recommendationData?.food_recommendations
+        if (foodRecommendations.isNullOrEmpty()) {
+            logger.warn { "No food recommendations available" }
+            return
+        }
+
+        validateSearchForType(foodRecommendations, NutritionFoodType.EAT.type, searchBox)
+        validateSearchForType(foodRecommendations, NutritionFoodType.LIMIT.type, searchBox)
+        validateSearchForType(foodRecommendations, NutritionFoodType.AVOID.type, searchBox)
+
+        logger.info { "Search validation completed" }
+    }
+
+    private fun validateSearchForType(
+        foodRecommendations: List<FoodRecommendation>,
+        type: String,
+        searchBox: Locator
+    ) {
+        val filteredList =
+            foodRecommendations
+                .filter { it.suggestion.equals(type, ignoreCase = true) }
+                .groupBy { it.food?.category }
+
+        if (filteredList.isEmpty()) {
+            logger.warn { "No food items found for type=$type" }
+            return
+        }
+
+        val singleItem = filteredList.entries.firstOrNull()
+        if (singleItem == null || singleItem.value.isEmpty()) {
+            logger.warn { "No valid category/item found for type=$type" }
+            return
+        }
+
+        val singleValue = singleItem.value.firstOrNull()
+        if (singleValue?.food?.name.isNullOrBlank()) {
+            logger.warn { "Food name is null/blank for type=$type" }
+            return
+        }
+
+        logger.info {
+            "Validating search for type=$type, category=${singleItem.key}, food=${singleValue?.food?.name}"
+        }
+
+        searchBox.fill(singleValue?.food?.name)
+
+        val tempMap = mapOf(singleItem.key to listOf(singleValue!!))
+
+        foodValidation(type = type, foodList = tempMap)
+
+        logger.info { "Search validation passed for type=$type" }
+    }
+
+
 
 
 }

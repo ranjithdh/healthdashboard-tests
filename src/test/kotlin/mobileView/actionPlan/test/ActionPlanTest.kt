@@ -59,6 +59,7 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.dailyCaloriesIntakeCard()
         actionPlanPage.nutritionMainCard()
         actionPlanPage.whatToEat()
+        actionPlanPage.searchValidation()
     }
 
 }
