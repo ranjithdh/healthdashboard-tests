@@ -67,6 +67,7 @@ class ActionPlanTest : BaseTest() {
     @Order(2)
     fun activityTest() {
         actionPlanPage.captureRecommendationData()
+        actionPlanPage.activityMainCards()
 
     }
 

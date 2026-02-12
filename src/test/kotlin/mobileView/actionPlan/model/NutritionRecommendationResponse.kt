@@ -97,7 +97,7 @@ data class Recommendation(
     val meta: Map<String, String>? = null,
     val created_at: String? = null,
     val updated_at: String? = null,
-    val actions: List<String>? = null,
+    val actions: List<Action>? = null,
     val variant_description: String? = null,
     val description_note: String? = null,
     val supplement_meta: Map<String, String>? = null,
@@ -151,6 +151,36 @@ data class Metric(
     val inference: Double? = null,
     val trend_arrow: String? = null
 )
+@Serializable
+data class Action(
+    val id: String? = null,
+    val type: String? = null,
+    val product_id: String? = null,
+    val event_config: EventConfig? = null,
+    val test_id: String? = null,
+    val recommendation_id: String? = null,
+    val is_generic: Boolean? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val user_recommendation_actions: List<UserRecommendationAction>? = null
+)
+
+@Serializable
+data class EventConfig(
+    val type: String? = null,
+    val hours: String? = null,
+    val nav_code: String? = null,
+    val sub_type: String? = null,
+    val frequency: String? = null,
+    val scheduled_time: String? = null,
+    val days_of_the_week: List<Int>? = null
+)
+
+@Serializable
+data class UserRecommendationAction(
+    val id: String? = null
+)
+
 
 
 

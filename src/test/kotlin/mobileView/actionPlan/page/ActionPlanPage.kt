@@ -9,6 +9,7 @@ import config.TestConfig
 import mobileView.actionPlan.model.FoodRecommendation
 import mobileView.actionPlan.model.NutritionFoodType
 import mobileView.actionPlan.model.NutritionRecommendationResponse
+import mobileView.actionPlan.model.Recommendation
 import mobileView.actionPlan.model.RecommendationData
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
@@ -17,8 +18,6 @@ import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -38,6 +37,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var optimal = "Optimal"
     private var normal = "Normal"
     private var question = "question"
+    private var activity = "activity"
 
     init {
         //  monitorTraffic()
@@ -78,6 +78,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
         }
     }
+
+    /**-----------------Nutrition-----------------------*/
 
     fun dailyCaloriesIntakeCard() {
         val nutritionProfile = recommendationData?.nutrient_profile
@@ -536,6 +538,70 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         foodValidation(type = type, foodList = tempMap)
 
         logger.info { "Search validation passed for type=$type" }
+    }
+
+
+    /**-----------------Activity-----------------------*/
+
+    fun activityMainCards() {
+        logger.info("Fetching activity recommendations from data")
+
+        val activityList = recommendationData?.recommendations?.filter { it.category == activity }
+
+        logger.info("Filtered activity list size: ${activityList?.size ?: 0}")
+
+        if (activityList?.isNotEmpty() == true) {
+            logger.info("Activity list is not empty, waiting for Exercise heading")
+
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
+
+            validatingMainCards(activityList)
+        } else {
+            logger.warn("No activity recommendations found")
+        }
+    }
+
+    private fun validatingMainCards(activityList: List<Recommendation>) {
+        logger.info("Validating ${activityList.size} activity main cards")
+
+        activityList.forEach { activity ->
+
+            logger.info("Validating card for activity id=${activity.id}, name=${activity.display_name}")
+
+            val title = page.getByTestId("exercise-title-${activity.id}")
+            val image = page.getByTestId("exercise-image-${activity.id}")
+
+            listOf(title, image).forEach {
+                it.waitFor()
+                logger.info("Element visible: ${it}")
+            }
+
+            val expectedName = activity.display_name
+            val uiName = title.innerText()
+
+            logger.info("Expected name: $expectedName | UI name: $uiName")
+
+            assertEquals(expectedName, uiName)
+
+            val variantDescription = activity.variant_description
+            logger.info("Variant description: $variantDescription")
+
+            val bagList = variantDescription
+                ?.split(",")
+                ?.map { it.trim() }
+                ?: emptyList()
+
+            logger.info("Bag list: $bagList")
+
+            if (variantDescription?.isBlank()==false && bagList.isNotEmpty()) {
+                bagList.forEach { bag ->
+                    logger.info("Validating bag text: $bag")
+                    page.getByText(bag).waitFor()
+                }
+            } else {
+                logger.info("No bags to validate for activity id=${activity.id}")
+            }
+        }
     }
 
 
