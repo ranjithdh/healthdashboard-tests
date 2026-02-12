@@ -17,7 +17,7 @@ data class RecommendationData(
     val last_recommendation_updated_at: String? = null,
     val is_personalized: Boolean? = null,
     val nutrition_plan_status: String? = null,
-    val recommendations: List<String>? = null,
+    val recommendations: List<Recommendation>? = null,
     val food_recommendations: List<FoodRecommendation>? = null,
     val nutrient_profile: NutrientProfile? = null,
     val recommendation_pdf_url: String? = null,
@@ -54,25 +54,7 @@ data class Food(
     val updated_at: String? = null
 )
 
-@Serializable
-data class Metric(
-    val id: String? = null,
-    val metric_id: String? = null,
-    val reference_metric_id: String? = null,
-    val metric: String? = null,
-    val reference_metric: String? = null,
-    val display_name: String? = null,
-    val short_name: String? = null,
-    val unit: String? = null,
-    val description: String? = null,
-    val range_type: String? = null,
-    val category: String? = null,
-    val sub_category: String? = null,
-    val group_name: String? = null,
-    val sub_group_name: String? = null,
-    val created_at: String? = null,
-    val updated_at: String? = null
-)
+
 
 @Serializable
 data class InferenceBucket(
@@ -99,6 +81,76 @@ data class NutrientProfile(
     val fiber: String? = null
 )
 
+
+
+@Serializable
+data class Recommendation(
+    val id: String? = null,
+    val category: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+    val difficulty: String? = null,
+    val is_generic: Boolean? = null,
+    val recommendation_id: String? = null,
+    val display_name: String? = null,
+    val img_url: String? = null,
+    val meta: Map<String, String>? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val actions: List<String>? = null,
+    val variant_description: String? = null,
+    val description_note: String? = null,
+    val supplement_meta: Map<String, String>? = null,
+    val variant_meta: Map<String, String>? = null,
+    val is_trusted: Boolean? = null,
+    val product_group: String? = null,
+    val supplement_intraday_frequency: String? = null,
+    val supplement_weekday_frequency: String? = null,
+    val supplement_duration: String? = null,
+    val test_type: String? = null,
+    val variant_id: String? = null,
+    val test_id: String? = null,
+    val test_to_be_taken_at: String? = null,
+    val test_taken_at: String? = null,
+    val recommendation_assessments: List<String>? = null,
+    val test_img_url: String? = null,
+    val personalized_recommendations: List<String>? = null,
+    val metric_recommendations: List<MetricRecommendation>? = null
+)
+
+@Serializable
+data class MetricRecommendation(
+    val id: String? = null,
+    val metric_id: String? = null,
+    val inference_bucket_id: String? = null,
+    val recommendation_id: String? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val metric: Metric? = null,
+    val inference_bucket: InferenceBucket? = null
+)
+@Serializable
+data class Metric(
+    val id: String? = null,
+    val metric_id: String? = null,
+    val reference_metric_id: String? = null,
+    val metric: String? = null,
+    val reference_metric: String? = null,
+    val display_name: String? = null,
+    val short_name: String? = null,
+    val unit: String? = null,
+    val description: String? = null,
+    val range_type: String? = null,
+    val category: String? = null,
+    val sub_category: String? = null,
+    val group_name: String? = null,
+    val sub_group_name: String? = null,
+    val created_at: String? = null,
+    val updated_at: String? = null,
+    val value: Double? = null,
+    val inference: Double? = null,
+    val trend_arrow: String? = null
+)
 
 
 

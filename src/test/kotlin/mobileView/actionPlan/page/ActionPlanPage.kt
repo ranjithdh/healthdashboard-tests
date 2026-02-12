@@ -48,38 +48,43 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun captureRecommendationData() {
-        StepHelper.step(FETCH_RECOMMENDATION_DATA)
-        try {
-            val response = page.waitForResponse(
-                { response: Response? ->
-                    response?.url()?.contains(TestConfig.APIs.API_RECOMMENDATION) == true &&
-                            response.request().method() == "GET"
-                }, {
+        if (recommendationData === null) {
+            StepHelper.step(FETCH_RECOMMENDATION_DATA)
+            try {
+                val response = page.waitForResponse(
+                    { response: Response? ->
+                        response?.url()?.contains(TestConfig.APIs.API_RECOMMENDATION) == true &&
+                                response.request().method() == "GET"
+                    }, {
 
+                    }
+                )
+
+                val responseBody = response.text()
+                if (responseBody.isNullOrBlank()) {
+                    logger.info { "API response body is empty" }
+                    return
                 }
-            )
 
-            val responseBody = response.text()
-            if (responseBody.isNullOrBlank()) {
-                logger.info { "API response body is empty" }
-                return
+                //logger.info { "API response...${responseBody}" }
+
+                val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
+
+                if (responseObj.data != null) {
+                    recommendationData = responseObj.data
+                }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response or API call failed..${e.message}" }
             }
-
-            //logger.info { "API response...${responseBody}" }
-
-            val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
-
-            if (responseObj.data != null) {
-                recommendationData = responseObj.data
-            }
-        } catch (e: Exception) {
-            logger.error { "Failed to parse API response or API call failed..${e.message}" }
         }
     }
 
     fun dailyCaloriesIntakeCard() {
-        dailyCaloriesFieldCheck()
-        dailyCaloriesValidation()
+        val nutritionProfile = recommendationData?.nutrient_profile
+        nutritionProfile?.let {
+            dailyCaloriesFieldCheck()
+            dailyCaloriesValidation()
+        }
     }
 
     private fun dailyCaloriesValidation() {
@@ -174,54 +179,59 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     fun whatToEat() {
         logger.info { "Clicking Food Eat section" }
-        foodEatClick()
-
         val foodRecommendations = recommendationData?.food_recommendations
-        logger.info { "Total food recommendations from API: ${foodRecommendations?.size}" }
 
-        val eatList =
-            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.EAT.type, ignoreCase = true) }
-                ?.groupBy { it.food?.category }
+        foodRecommendations?.let {
+            nutritionMainCard()
+            foodEatClick()
 
-        val limitList =
-            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.LIMIT.type, ignoreCase = true) }
-                ?.groupBy { it.food?.category }
 
-        val avoidList =
-            foodRecommendations?.filter { it.suggestion.equals(NutritionFoodType.AVOID.type, ignoreCase = true) }
-                ?.groupBy { it.food?.category }
+            logger.info { "Total food recommendations from API: ${foodRecommendations.size}" }
 
-        logger.info { "Eat categories: ${eatList?.keys}" }
-        logger.info { "Limit categories: ${limitList?.keys}" }
-        logger.info { "Avoid categories: ${avoidList?.keys}" }
+            val eatList =
+                foodRecommendations.filter { it.suggestion.equals(NutritionFoodType.EAT.type, ignoreCase = true) }
+                    .groupBy { it.food?.category }
 
-        val dialog = page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Nutrition"))
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
-        val eatTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Eat"))
-        val limitTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Limit"))
-        val avoidTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Avoid"))
+            val limitList =
+                foodRecommendations.filter { it.suggestion.equals(NutritionFoodType.LIMIT.type, ignoreCase = true) }
+                    .groupBy { it.food?.category }
 
-        val titleAvoid = page.getByTestId("food-suggestion-section-avoid").getByTestId("food-suggestion-title")
-        val titleLimit = page.getByTestId("food-suggestion-section-limit").getByTestId("food-suggestion-title")
-        val titleEat = page.getByTestId("food-suggestion-section-eat").getByTestId("food-suggestion-title")
+            val avoidList =
+                foodRecommendations.filter { it.suggestion.equals(NutritionFoodType.AVOID.type, ignoreCase = true) }
+                    .groupBy { it.food?.category }
 
-        val foodSectionLocators =
-            listOf<Locator?>(dialog, searchBox, eatTab, limitTab, avoidTab, titleAvoid, titleLimit, titleEat)
+            logger.info { "Eat categories: ${eatList.keys}" }
+            logger.info { "Limit categories: ${limitList.keys}" }
+            logger.info { "Avoid categories: ${avoidList.keys}" }
 
-        logger.info { "Waiting for Nutrition dialog UI elements" }
-        foodSectionLocators.forEach { locator ->
-            locator?.waitFor()
-        }
+            val dialog = page.getByRole(AriaRole.DIALOG, Page.GetByRoleOptions().setName("Nutrition"))
+            val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
+            val eatTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Eat"))
+            val limitTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Limit"))
+            val avoidTab = page.getByRole(AriaRole.TAB, Page.GetByRoleOptions().setName("Avoid"))
 
-        logger.info { "Starting food validation for EAT tab" }
-        if (eatList?.isNotEmpty() == true) {
-            foodValidation(type = NutritionFoodType.EAT.type, eatList)
-        }
-        if (limitList?.isNotEmpty() == true) {
-            foodValidation(type = NutritionFoodType.LIMIT.type, limitList)
-        }
-        if (avoidList?.isNotEmpty() == true) {
-            foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
+            val titleAvoid = page.getByTestId("food-suggestion-section-avoid").getByTestId("food-suggestion-title")
+            val titleLimit = page.getByTestId("food-suggestion-section-limit").getByTestId("food-suggestion-title")
+            val titleEat = page.getByTestId("food-suggestion-section-eat").getByTestId("food-suggestion-title")
+
+            val foodSectionLocators =
+                listOf<Locator?>(dialog, searchBox, eatTab, limitTab, avoidTab, titleAvoid, titleLimit, titleEat)
+
+            logger.info { "Waiting for Nutrition dialog UI elements" }
+            foodSectionLocators.forEach { locator ->
+                locator?.waitFor()
+            }
+
+            logger.info { "Starting food validation for EAT tab" }
+            if (eatList.isNotEmpty()) {
+                foodValidation(type = NutritionFoodType.EAT.type, eatList)
+            }
+            if (limitList.isNotEmpty()) {
+                foodValidation(type = NutritionFoodType.LIMIT.type, limitList)
+            }
+            if (avoidList.isNotEmpty()) {
+                foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
+            }
         }
     }
 
@@ -436,54 +446,56 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun searchValidation() {
-        logger.info { "Starting search validation" }
-
-        foodEatClick()
-
-        val searchBox =
-            page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
-
-        // First search with junk value to validate empty state
-        searchBox.fill("abcd123")
-
-        val titleAvoid = page.getByTestId("food-suggestion-section-avoid")
-            .getByTestId("food-suggestion-title")
-        val titleLimit = page.getByTestId("food-suggestion-section-limit")
-            .getByTestId("food-suggestion-title")
-        val titleEat = page.getByTestId("food-suggestion-section-eat")
-            .getByTestId("food-suggestion-title")
-
-        val emptyEat = page.getByText("No foods found in Eat")
-        val emptyLimit = page.getByText("No foods found in Limit")
-        val emptyAvoid = page.getByText("No foods found in Avoid")
-
-        val foodSectionLocators = listOf(
-            searchBox,
-            emptyEat,
-            emptyLimit,
-            emptyAvoid,
-            titleAvoid,
-            titleLimit,
-            titleEat
-        )
-
-        foodSectionLocators.forEach {
-            it.waitFor()
-        }
-
-        logger.info { "Empty state validated successfully" }
-
         val foodRecommendations = recommendationData?.food_recommendations
-        if (foodRecommendations.isNullOrEmpty()) {
-            logger.warn { "No food recommendations available" }
-            return
+
+        foodRecommendations?.let {
+
+            logger.info { "Starting search validation" }
+
+            val searchBox =
+                page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search food item"))
+
+            // First search with junk value to validate empty state
+            searchBox.fill("abcd123")
+
+            val titleAvoid = page.getByTestId("food-suggestion-section-avoid")
+                .getByTestId("food-suggestion-title")
+            val titleLimit = page.getByTestId("food-suggestion-section-limit")
+                .getByTestId("food-suggestion-title")
+            val titleEat = page.getByTestId("food-suggestion-section-eat")
+                .getByTestId("food-suggestion-title")
+
+            val emptyEat = page.getByText("No foods found in Eat")
+            val emptyLimit = page.getByText("No foods found in Limit")
+            val emptyAvoid = page.getByText("No foods found in Avoid")
+
+            val foodSectionLocators = listOf(
+                searchBox,
+                emptyEat,
+                emptyLimit,
+                emptyAvoid,
+                titleAvoid,
+                titleLimit,
+                titleEat
+            )
+
+            foodSectionLocators.forEach {
+                it.waitFor()
+            }
+
+            logger.info { "Empty state validated successfully" }
+
+            if (foodRecommendations.isEmpty()) {
+                logger.warn { "No food recommendations available" }
+                return
+            }
+
+            validateSearchForType(foodRecommendations, NutritionFoodType.EAT.type, searchBox)
+            validateSearchForType(foodRecommendations, NutritionFoodType.LIMIT.type, searchBox)
+            validateSearchForType(foodRecommendations, NutritionFoodType.AVOID.type, searchBox)
+
+            logger.info { "Search validation completed" }
         }
-
-        validateSearchForType(foodRecommendations, NutritionFoodType.EAT.type, searchBox)
-        validateSearchForType(foodRecommendations, NutritionFoodType.LIMIT.type, searchBox)
-        validateSearchForType(foodRecommendations, NutritionFoodType.AVOID.type, searchBox)
-
-        logger.info { "Search validation completed" }
     }
 
     private fun validateSearchForType(
@@ -525,8 +537,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         logger.info { "Search validation passed for type=$type" }
     }
-
-
 
 
 }

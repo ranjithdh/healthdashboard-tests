@@ -54,12 +54,20 @@ class ActionPlanTest : BaseTest() {
     }
 
     @Test
+    @Order(1)
     fun nutritionTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.dailyCaloriesIntakeCard()
-        actionPlanPage.nutritionMainCard()
         actionPlanPage.whatToEat()
         actionPlanPage.searchValidation()
+    }
+
+
+    @Test
+    @Order(2)
+    fun activityTest() {
+        actionPlanPage.captureRecommendationData()
+
     }
 
 }
