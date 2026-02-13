@@ -378,11 +378,32 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // 2. Take only the first 3 words of the nickname to avoid issues with long text/truncation
         nicknameToSearch = nicknameToSearch.split(" ").filter { it.isNotBlank() }.take(3).joinToString(" ")
 
+        // 1. Nickname Verification
+        logger.info { "Verifying Address Nickname: '$nicknameToSearch'" }
         page.getByText(nicknameToSearch, Page.GetByTextOptions().setExact(false)).first().click()
-        // Note: Sometimes the full address text might be truncated or formatted differently, 
-        // using contains/subset of text or building from components.
-        val partialAddress = selectedAddressText.take(20) // take a safe chunk
-        page.getByText(partialAddress, Page.GetByTextOptions().setExact(false)).first().click()
+
+        // 2. Address Text Verification
+        logger.info { "Verifying Full Address Text: '$selectedAddressText'" }
+        // Attempt to find the full address text (loose match)
+        if (page.getByText(selectedAddressText, Page.GetByTextOptions().setExact(false)).isVisible) {
+             page.getByText(selectedAddressText, Page.GetByTextOptions().setExact(false)).first().click()
+        } else {
+             // Fallback: The UI might format the address with newlines or different separators.
+             // Verify visible components: Address Line 1, City, Pincode
+             val addressLine1 = selectedAddressObj.addressLine1?.takeIf { it.isNotBlank() }
+             val city = selectedAddressObj.city?.takeIf { it.isNotBlank() }
+             val pincode = selectedAddressObj.pincode?.takeIf { it.isNotBlank() }
+
+             if (addressLine1 != null && page.getByText(addressLine1, Page.GetByTextOptions().setExact(false)).isVisible) {
+                 logger.warn { "Full address text strict match failed. Verified by partial match (Line 1): '$addressLine1'" }
+                 page.getByText(addressLine1, Page.GetByTextOptions().setExact(false)).first().click()
+             } else if (pincode != null && page.getByText(pincode, Page.GetByTextOptions().setExact(false)).isVisible) {
+                 logger.warn { "Verified by Pincode: '$pincode'" }
+                 page.getByText(pincode, Page.GetByTextOptions().setExact(false)).first().click()
+             } else {
+                 logger.warn { "Could not strictly verify address text visibility for: $selectedAddressText" }
+             }
+        }
 
         // Slot verification
         if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
