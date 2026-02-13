@@ -128,6 +128,8 @@ class OtpPage(page: Page) : BasePage(page) {
                         } else {
                             val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
                             TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
+                            TestConfig.USER_ID = responseObj.data.userId
+                            TestConfig.USER_NAME = responseObj.data.piiUser?.name ?: ""
                             logFullApiCall(response)
                         }
                     }

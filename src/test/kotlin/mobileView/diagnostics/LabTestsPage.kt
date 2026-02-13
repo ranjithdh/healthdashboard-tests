@@ -53,9 +53,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     fun goToDiagnosticsUrl() {
         StepHelper.step(NAVIGATE_TO_DIAGNOSTICS_URL)
-          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-//        page.waitForTimeout(2000.0)
-//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+//          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
@@ -65,43 +65,65 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
 
     init {
+        login()
         getLabTestsResponse()
     }
 
     fun getLabTestsResponse() {
-        val response = page.waitForResponse(
-            { response: Response? ->
-                response?.url()
-                    ?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true && response.status() == 200
-            },
-            {
-                navigateToDiagnostics()
+        // Use page.route to intercept the response robustly, avoiding "Protocol error" on navigation
+        page.route({ url -> 
+            url.contains(TestConfig.APIs.LAB_TEST_API_URL) 
+        }) { route ->
+            if (route.request().method() == "GET") {
+                try {
+                    val response = route.fetch()
+                    val body = response.text()
+                    
+                    try {
+                        val responseObj = json.decodeFromString<LabTestResponse>(body)
+                        if (responseObj.data != null) {
+                            labTestData = responseObj
+                            logger.info { "getLabTestsResponse: Intercepted and parsed Lab Data successfully." }
+                        }
+                    } catch (e: Exception) {
+                        logger.error { "getLabTestsResponse: Failed to parse API response JSON: ${e.message}" }
+                    }
+                    
+                    // Fulfill the request with the fetched response so the page behaves normally
+                    route.fulfill(
+                        com.microsoft.playwright.Route.FulfillOptions()
+                            .setResponse(response)
+                            .setBody(body)
+                    )
+                } catch (e: Exception) {
+                    logger.error { "getLabTestsResponse: Route fetch failed: ${e.message}" }
+                    // Fallback to continue logic if fetch fails
+                    try {
+                        route.resume()
+                    } catch (resumeError: Exception) {
+                        logger.error { "getLabTestsResponse: Route resume failed: ${resumeError.message}" }
+                    }
+                }
+            } else {
+                route.resume()
             }
-        )
+        }
+
+        goToDiagnosticsUrl()
         
-        // Fetch blood reports as per requirement
-        fetchBloodReports()
-
-        val responseBody = response.text()
-        if (responseBody.isNullOrBlank()) {
-            logger.info { "getLabTestsResponse API response body is empty" }
-//            return null
+        // Polling wait for labTestData to be populated
+        val maxRetries = 20
+        var retries = 0
+        while (labTestData == null && retries < maxRetries) {
+            page.waitForTimeout(500.0)
+            retries++
         }
-
-        try {
-            val responseObj = json.decodeFromString<LabTestResponse>(responseBody)
-
-            if (responseObj.data != null) {
-                labTestData = responseObj
-                LogFullApiCall.logFullApiCall(response)
-//                return labTestData
-            }
-        } catch (e: Exception) {
-            logger.error { "Failed to parse API response..${e.message}" }
-//            return null
+        
+        if (labTestData == null) {
+            logger.warn { "getLabTestsResponse: Lab test data was not captured within the timeout period." }
+        } else {
+             logger.info { "getLabTestsResponse: Data captured. Packages count: ${labTestData?.data?.diagnostic_product_list?.packages?.size}" }
         }
-
-//        return null
     }
 
     private fun fetchBloodReports() {

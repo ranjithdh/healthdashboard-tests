@@ -48,5 +48,14 @@ data class VerifyOtpData(
     val accessToken: String,
 
     @SerialName("refresh_token")
-    val refreshToken: String
+    val refreshToken: String,
+
+    @SerialName("pii_user")
+    val piiUser: PiiUser? = null
+)
+
+@Serializable
+data class PiiUser(
+    @SerialName("name")
+    val name: String? = null
 )

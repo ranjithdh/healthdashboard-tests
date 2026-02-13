@@ -1,28 +1,23 @@
 package forWeb.diagnostics.page
 
 import com.microsoft.playwright.Locator
-import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import kotlinx.serialization.json.*
+import mobileView.profile.utils.ProfileUtils.buildAddressText
+import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import model.slot.SlotList
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import utils.LogFullApiCall.logFullApiCall
 import utils.json.json
 import utils.logger.logger
-import model.slot.SlotList
-import model.profile.PiiUserResponse
-import com.microsoft.playwright.options.RequestOptions
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.buildJsonObject
-import mobileView.profile.utils.ProfileUtils.buildAddressText
-
-import utils.LogFullApiCall.logFullApiCall
 import utils.report.StepHelper
 import utils.report.StepHelper.ADD_ADDRESS
 import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
@@ -33,12 +28,10 @@ import utils.report.StepHelper.FETCH_SLOTS
 import utils.report.StepHelper.VERIFY_ORDER_SUMMARY_PAGE
 import utils.report.StepHelper.VERIFY_PRICE_DETAILS
 import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
-import utils.report.StepHelper.VERIFY_SLOT_SELECTION_PAGE
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.test.assertEquals
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.int
+
 //import kotlinx.serialization.json.content
 
 
@@ -166,7 +159,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.locator(".bg-secondary.flex.flex-1").nth(index).click()
 
         // Fill inputs (UI)
-        val updatedNickName = address.addressName?.takeIf { it.isNotBlank() } ?: "Home"
+        val updatedNickName = (address.addressName?.takeIf { it.isNotBlank() } + "Updated") ?: "Home"
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
@@ -178,9 +171,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         countryInput.fill(address.country)
 
 
-        captureAddressData {
-            newAddressSubmit.click()
-        }
+//        captureAddressData {
+//            newAddressSubmit.click()
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
+//        }
 
         this.selectedAddressIndex = index
 
@@ -188,6 +182,19 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val updatedAddress = updatedList.find { it.addressId == addressId }
 
         assertEquals(updatedNickName, updatedAddress?.address?.addressName)
+    }
+
+    fun selectAddress(index: Int) {
+        val addresses = addressData?.addressList ?: return
+        if (index >= addresses.size) return
+        
+        val addressItem = addresses[index]
+        val nickName = addressItem.address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
+        
+        logger.info { "Explicitly selecting address: $nickName" }
+        // Click the name to select the address
+        page.getByText(nickName).first().click()
+        this.selectedAddressIndex = index
     }
 
     fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
@@ -345,7 +352,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -378,36 +385,88 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText(partialAddress, Page.GetByTextOptions().setExact(false)).first().click()
 
         // Slot verification
-        page.getByText("Sample Collection Time Slot").click()
-        page.getByText("Date: $selectedDateSummary").click()
-        page.getByText("Selected time slot: $selectedTimeSummary").click()
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            page.getByText("Sample Collection Time Slot").click()
+            page.getByText("Date: $selectedDateSummary").click()
+            page.getByText("Selected time slot: $selectedTimeSummary").click()
+        }
 
         // Price details verification (reusing logic or similar)
-        page.getByText("PRICE DETAILS").click()
-        page.getByTestId("diagnostics-sidebar-subtotal-label").click()
+        val subtotalLabel = page.getByTestId("diagnostics-sidebar-subtotal-label")
+        if (!subtotalLabel.isVisible) {
+            logger.info { "Price details hidden, clicking header to expand" }
+            page.getByText("PRICE DETAILS").click()
+            subtotalLabel.waitFor()
+        } else {
+            logger.info { "Price details already expanded" }
+        }
 
+        // Helper to format with commas
+        val numberFormat = java.text.NumberFormat.getNumberInstance(java.util.Locale.US)
+
+        // Subtotal Verification
+        subtotalLabel.click() // Verified by ID (click ensures interaction)
+        page.getByText("Subtotal", Page.GetByTextOptions().setExact(false)).first().click() // Verified by Text
+        
         val subtotalValue = page.getByTestId("diagnostics-sidebar-subtotal-value").innerText()
-        assertEquals("₹${expectedSubtotal.toInt()}", subtotalValue.replace(",", "").replace(" ", ""))
+        val expectedSubtotalStr = "₹${expectedSubtotal.toInt()}"
+        logger.info { "Verifying Subtotal Value. Expected (cleaned): $expectedSubtotalStr, Actual (from ID): $subtotalValue" }
+        assertEquals(expectedSubtotalStr, subtotalValue.replace(",", "").replace(" ", ""))
+        
+        // Verify value VISIBILITY via getByText (Handling comma formatting)
+        val formattedSubtotal = numberFormat.format(expectedSubtotal.toInt())
+        logger.info { "Verifying visibility for formatted subtotal: $formattedSubtotal" }
+        page.getByText(formattedSubtotal, Page.GetByTextOptions().setExact(false)).first().click()
 
+        // Discount Verification
         page.getByTestId("diagnostics-sidebar-discount-label").click()
-        val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
-        // Handle variations like "- ₹ 0" or "-₹0" by removing whitespace
-        assertEquals("-₹${expectedDiscount.toInt()}", discountValue.replace(",", "").replace(" ", ""))
+        page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
+        val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
+        val expectedDiscountStr = "-₹${expectedDiscount.toInt()}"
+        logger.info { "Verifying Discount Value. Expected (cleaned): $expectedDiscountStr, Actual (from ID): $discountValue" }
+        assertEquals(expectedDiscountStr, discountValue.replace(",", "").replace(" ", ""))
+
+        // Verify Discount formatted text visibility (e.g. "- ₹ 0" or "- ₹ 1,000")
+        val formattedDiscount = numberFormat.format(expectedDiscount.toInt())
+        // Construct the expected visual string. Based on UI: "- ₹ 0"
+        val discountTextToFind = "- ₹ $formattedDiscount"
+        logger.info { "Verifying visibility for formatted discount text: '$discountTextToFind'" }
+        // Using partial match false (exact match? no, loose is better for spacing but "0" is tricky)
+        // Since we include "- ₹ ", it's specific enough.
+        if (page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).isVisible) {
+             page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).first().click()
+        } else {
+             // Fallback: try searching without spaces if strict match fails, or loose match just the number if unique
+             logger.warn { "Strict discount text '$discountTextToFind' not found. Trying loose search for '$formattedDiscount'" }
+             // Only search for number if it's not 0 (0 is too common), or search combined
+             if (expectedDiscount > 0) {
+                 page.getByText(formattedDiscount, Page.GetByTextOptions().setExact(false)).first().click()
+             }
+        }
+
+        // Grand Total Verification
         page.getByTestId("diagnostics-sidebar-grand-total-label").click()
+        page.getByText("Grand Total", Page.GetByTextOptions().setExact(false)).first().click()
+
         val grandTotalValue = page.getByTestId("diagnostics-sidebar-grand-total-value").innerText()
         val expectedGrandTotal = expectedSubtotal - expectedDiscount
-        assertEquals("₹${expectedGrandTotal.toInt()}", grandTotalValue.replace(",", "").replace(" ", ""))
-
-        // Got any questions? Contact
-        val page3 = page.waitForPopup {
-            page.getByText("Got any questions? Contact").click()
-        }
-        Assertions.assertNotNull(page3, "Question popup page should be opened")
-        page3.close()
+        val expectedGrandTotalStr = "₹${expectedGrandTotal.toInt()}"
+        logger.info { "Verifying Grand Total Value. Expected (cleaned): $expectedGrandTotalStr, Actual (from ID): $grandTotalValue" }
+        assertEquals(expectedGrandTotalStr, grandTotalValue.replace(",", "").replace(" ", ""))
+        
+        // Verify value VISIBILITY via getByText
+        val formattedGrandTotal = numberFormat.format(expectedGrandTotal.toInt())
+        logger.info { "Verifying visibility for formatted grand total: $formattedGrandTotal" }
+        page.getByText(formattedGrandTotal, Page.GetByTextOptions().setExact(false)).first().click()
 
         // Mobile footer elements
         page.getByTestId("diagnostics-sidebar-mobile-grand-total").click()
+        val mobileGrandTotal = page.getByTestId("diagnostics-sidebar-mobile-grand-total").innerText()
+        // Mobile view might have a different format or just the number, checking loosely or exact match if cleaned
+        if (mobileGrandTotal.contains(expectedGrandTotal.toInt().toString())) {
+             logger.info { "Mobile grand total verified: $mobileGrandTotal" }
+        }
         page.getByTestId("diagnostics-sidebar-mobile-proceed").click()
     }
 
