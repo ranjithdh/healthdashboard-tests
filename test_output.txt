@@ -1,0 +1,287 @@
+Initialized native services in: /Users/apple/.gradle/native
+Initialized jansi services in: /Users/apple/.gradle/native
+Received JVM installation metadata from '/Users/apple/Library/Java/JavaVirtualMachines/temurin-21.0.9/Contents/Home': {JAVA_HOME=/Users/apple/Library/Java/JavaVirtualMachines/temurin-21.0.9/Contents/Home, JAVA_VERSION=21.0.9, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.9+10-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.9+10-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=aarch64}
+Found daemon DaemonInfo{pid=56153, address=[3919c840-5bd3-497e-8fdb-620e0cfbff76 port:63867, addresses:[/127.0.0.1]], state=Idle, lastBusy=1770893881376, context=DefaultDaemonContext[uid=58830cae-7597-40a2-9310-0a18a1d9b47c,javaHome=/Users/apple/Library/Java/JavaVirtualMachines/openjdk-25.0.1/Contents/Home,daemonRegistryDir=/Users/apple/.gradle/daemon,pid=56153,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=IN,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+Java home is different.
+Wanted: DefaultDaemonContext[uid=null,javaHome=/Users/apple/Library/Java/JavaVirtualMachines/temurin-21.0.9/Contents/Home,daemonRegistryDir=/Users/apple/.gradle/daemon,pid=78103,idleTimeout=null,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=IN,-Duser.language=en,-Duser.variant]
+Actual: DefaultDaemonContext[uid=58830cae-7597-40a2-9310-0a18a1d9b47c,javaHome=/Users/apple/Library/Java/JavaVirtualMachines/openjdk-25.0.1/Contents/Home,daemonRegistryDir=/Users/apple/.gradle/daemon,pid=56153,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=IN,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 66484). The daemon log file: /Users/apple/.gradle/daemon/8.5/daemon-66484.out.log
+Starting 32nd build in daemon [uptime: 2 hrs 14 mins 12.235 secs, performance: 100%, GC rate: 0.00/s, heap usage: 2% of 512 MiB, non-heap usage: 22% of 384 MiB]
+Using 10 worker leases.
+Now considering [/Users/apple/Documents/QA-Automation/healthdashboard-tests] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file '/Users/apple/Documents/QA-Automation/healthdashboard-tests/settings.gradle.kts'.
+Projects loaded. Root project using build file '/Users/apple/Documents/QA-Automation/healthdashboard-tests/build.gradle.kts'.
+Included projects: [root project 'healthdashboard-tests']
+
+> Configure project :
+Evaluating root project 'healthdashboard-tests' using build file '/Users/apple/Documents/QA-Automation/healthdashboard-tests/build.gradle.kts'.
+Using Kotlin Gradle Plugin gradle82 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+Caching disabled for Kotlin DSL accessors for root project 'healthdashboard-tests' because:
+  Build cache is disabled
+Skipping Kotlin DSL accessors for root project 'healthdashboard-tests' as it is up-to-date.
+All projects evaluated.
+Task name matched 'cleanTest'
+Task name matched 'test'
+Selected primary task 'cleanTest' from project :
+Selected primary task 'test' from project :
+Tasks to be executed: [task ':cleanTest', task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':processResources', task ':classes', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :cleanTest (Thread[#2602,Execution worker,5,main]) started.
+:cleanTest (Thread[#2602,Execution worker,5,main]) started.
+destroyer locations for task group 0 (Thread[#2601,included builds,5,main]) started.
+
+> Task :cleanTest
+Caching disabled for task ':cleanTest' because:
+  Build cache is disabled
+Task ':cleanTest' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#2602,Execution worker,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors
+Caching disabled for task ':checkKotlinGradlePluginConfigurationErrors' because:
+  Build cache is disabled
+Task ':checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :compileKotlin (Thread[#2602,Execution worker,5,main]) started.
+:compileKotlin (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :compileKotlin NO-SOURCE
+Skipping task ':compileKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileJava (Thread[#2602,Execution worker,5,main]) started.
+:compileJava (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :compileJava NO-SOURCE
+Skipping task ':compileJava' as it has no source files and no previous output files.
+Resolve mutations for :processResources (Thread[#2602,Execution worker,5,main]) started.
+:processResources (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :processResources NO-SOURCE
+Skipping task ':processResources' as it has no source files and no previous output files.
+Resolve mutations for :classes (Thread[#2602,Execution worker,5,main]) started.
+:classes (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestKotlin (Thread[#2602,Execution worker,5,main]) started.
+:compileTestKotlin (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :compileTestKotlin UP-TO-DATE
+allure-gradle: added dependency io.qameta.allure:allure-junit5:2.29.0 to apiElements scope of org.junit.jupiter:junit-jupiter-api:5.10.2
+Transforming kotlin-test-junit5-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.2.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.2.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-logging-jvm-3.0.5.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.7.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.20.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.20.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming playwright-1.49.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.4.14.jar with ClasspathEntrySnapshotTransform
+Transforming junit-platform-commons-1.10.2.jar with ClasspathEntrySnapshotTransform
+Transforming junit-jupiter-params-5.10.2.jar with ClasspathEntrySnapshotTransform
+Transforming junit-jupiter-api-5.10.2.jar with ClasspathEntrySnapshotTransform
+Transforming allure-junit5-2.29.0.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming gson-2.11.0.jar with ClasspathEntrySnapshotTransform
+Transforming opentest4j-1.3.0.jar with ClasspathEntrySnapshotTransform
+Transforming driver-bundle-1.49.0.jar with ClasspathEntrySnapshotTransform
+Transforming driver-1.49.0.jar with ClasspathEntrySnapshotTransform
+Transforming allure-junit-platform-2.29.0.jar with ClasspathEntrySnapshotTransform
+Transforming allure-java-commons-2.29.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.13.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.4.14.jar with ClasspathEntrySnapshotTransform
+Transforming apiguardian-api-1.1.2.jar with ClasspathEntrySnapshotTransform
+Transforming error_prone_annotations-2.27.0.jar with ClasspathEntrySnapshotTransform
+Transforming allure-model-2.29.0.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileTestKotlin' because:
+  Build cache is disabled
+Skipping task ':compileTestKotlin' as it is up-to-date.
+Resolve mutations for :compileTestJava (Thread[#2602,Execution worker,5,main]) started.
+:compileTestJava (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :compileTestJava NO-SOURCE
+Skipping task ':compileTestJava' as it has no source files and no previous output files.
+Resolve mutations for :processTestResources (Thread[#2602,Execution worker,5,main]) started.
+:processTestResources (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :processTestResources UP-TO-DATE
+Caching disabled for task ':processTestResources' because:
+  Build cache is disabled
+Skipping task ':processTestResources' as it is up-to-date.
+Resolve mutations for :testClasses (Thread[#2602,Execution worker,5,main]) started.
+:testClasses (Thread[#2602,Execution worker,5,main]) started.
+
+> Task :testClasses UP-TO-DATE
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#2602,Execution worker,5,main]) started.
+:test (Thread[#2602,Execution worker,5,main]) started.
+Gradle Test Executor 27 started executing tests.
+
+> Task :test
+allure-gradle: added dependency io.qameta.allure:allure-junit5:2.29.0 to runtimeElements scope of org.junit.jupiter:junit-jupiter-api:5.10.3
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Output property '$1$1' file /Users/apple/Documents/QA-Automation/healthdashboard-tests/build/allure-results/072f9827-8b0c-49b6-9e99-facb01223b26-container.json has been removed.
+  Output property '$1$1' file /Users/apple/Documents/QA-Automation/healthdashboard-tests/build/allure-results/4efa01dc-d4ea-49de-b072-6153e0098576-result.json has been removed.
+  Output property '$1$1' file /Users/apple/Documents/QA-Automation/healthdashboard-tests/build/allure-results/5c44fc6c-69dc-4aa2-9d15-6baacaceca11-container.json has been removed.
+file or directory '/Users/apple/Documents/QA-Automation/healthdashboard-tests/build/classes/java/test', not found
+Starting process 'Gradle Test Executor 27'. Working directory: /Users/apple/Documents/QA-Automation/healthdashboard-tests Command: /Users/apple/Library/Java/JavaVirtualMachines/temurin-21.0.9/Contents/Home/bin/java -Dallure.results.directory=/Users/apple/Documents/QA-Automation/healthdashboard-tests/build/allure-results -Djunit.jupiter.execution.parallel.enabled=true -Djunit.jupiter.execution.parallel.mode.default=concurrent -Djunit.jupiter.extensions.autodetection.enabled=true -Dorg.gradle.internal.worker.tmpdir=/Users/apple/Documents/QA-Automation/healthdashboard-tests/build/tmp/test/work -Dorg.gradle.native=false -javaagent:/Users/apple/.gradle/caches/modules-2/files-2.1/org.aspectj/aspectjweaver/1.9.22/10736ab74a53af5e2e1b07e76335a5391526b6f8/aspectjweaver-1.9.22.jar -javaagent:/Users/apple/.gradle/caches/modules-2/files-2.1/org.aspectj/aspectjweaver/1.9.22.1/bca243d0af0db4758fbae45c5f4995cb5dabb612/aspectjweaver-1.9.22.1.jar @/Users/apple/.gradle/.tmp/gradle-worker-classpath3981892948442785601txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=IN -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 27'
+Successfully started process 'Gradle Test Executor 27'
+
+ActionPlanTest > generate and verify action plan() STANDARD_OUT
+    19:37:58.905 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - Starting ActionPlan flow...
+    19:37:58.912 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - Logging in with mobile: 7092424997
+    19:37:58.916 [ForkJoinPool-1-worker-1] INFO  config.BasePage - Navigating to: https://app.stg.deepholistics.com/login?utm_source=testing_internal
+    19:38:02.636 [ForkJoinPool-1-worker-1] INFO  onboard.page.LoginPage - enterMobileAndContinue(7092424997)
+    19:38:07.661 [ForkJoinPool-1-worker-1] INFO  onboard.page.LoginPage - selectCountryCode(India)
+    19:38:11.969 [ForkJoinPool-1-worker-1] INFO  onboard.page.LoginPage - enterMobileNumber(7092424997)
+    19:38:12.994 [ForkJoinPool-1-worker-1] INFO  onboard.page.LoginPage - clickContinue()
+    19:38:14.030 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - waitForConfirmScreen()
+    19:38:14.333 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST METHOD: POST
+    19:38:14.335 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST URL: https://api.stg.dh.deepholistics.com/v1/user/mobile/get/otp
+    19:38:14.336 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST HEADERS: {client_id=qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW, Content-Type=application/json}
+    19:38:14.336 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST BODY: {
+        "mobile": "7092424997",
+        "country_code": "91",
+        "secret_key": "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA",
+        "service": "DH_VERIFICATION"
+    }
+    19:38:14.337 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE STATUS: 200
+    19:38:14.338 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE HEADERS: {server=nginx, date=Thu, 12 Feb 2026 14:08:14 GMT, content-type=application/json; charset=utf-8, content-length=84, connection=keep-alive, x-powered-by=Express, vary=Origin, etag=W/"54-dHTq1VCf0qmQArIsrELyChG8Pkw"}
+    19:38:14.340 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE BODY: {"status":"success","message":"Mobile OTP fetched successfully","data":{"otp":null}}
+    19:38:14.349 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST METHOD: POST
+    19:38:14.350 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST URL: https://api.stg.dh.deepholistics.com/v1/user/mobile/get/otp
+    19:38:14.350 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST HEADERS: {}
+    19:38:14.350 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST BODY: {
+        "mobile": "7092424997",
+        "country_code": "91",
+        "secret_key": "jBytUIGw2FY0r2JBw9DBuSQ7WLc00anA",
+        "service": "DH_VERIFICATION"
+    }
+    19:38:14.350 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE STATUS: 200
+    19:38:14.350 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE HEADERS: {server=nginx, date=Thu, 12 Feb 2026 14:08:14 GMT, content-type=application/json; charset=utf-8, content-length=84, connection=keep-alive, x-powered-by=Express, vary=Origin, etag=W/"54-dHTq1VCf0qmQArIsrELyChG8Pkw"}
+    19:38:14.351 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE BODY: {"status":"success","message":"Mobile OTP fetched successfully","data":{"otp":null}}
+    19:38:14.352 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - enterOtp(678901)
+    19:38:14.360 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page-->
+    19:38:14.361 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Request: POST https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:14.362 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Request Payload: {"mh":"$2b$10$wjUWMrPDJJuSfTRMG3DB0eJF4MxpUDM4C7NRkV/bJ/zDWE2E2gaiC","otp":"678901","country_code":"91"}
+    19:38:14.362 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page-->
+    19:38:14.362 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Request: POST https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:14.362 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Request Payload: {"mh":"$2b$10$wjUWMrPDJJuSfTRMG3DB0eJF4MxpUDM4C7NRkV/bJ/zDWE2E2gaiC","otp":"678901","country_code":"91"}
+    19:38:16.482 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Response: 200 https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:16.523 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST METHOD: POST
+    19:38:16.524 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST URL: https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:16.524 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST HEADERS: {sec-ch-ua-platform="macOS", referer=https://app.stg.deepholistics.com/, sec-ch-ua="Chromium";v="131", "Not_A Brand";v="24", client_id=qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW, user_timezone=Asia/Calcutta, sec-ch-ua-mobile=?0, user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36, accept=application/json, text/plain, */*, content-type=application/json}
+    19:38:16.524 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST BODY: {"mh":"$2b$10$wjUWMrPDJJuSfTRMG3DB0eJF4MxpUDM4C7NRkV/bJ/zDWE2E2gaiC","otp":"678901","country_code":"91"}
+    19:38:16.524 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE STATUS: 200
+    19:38:16.524 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE HEADERS: {etag=W/"8da-GSi4Zd2VYNqyXbbqwqzR6FEvuhk", access-control-allow-origin=https://app.stg.deepholistics.com, content-length=2266, date=Thu, 12 Feb 2026 14:08:16 GMT, content-type=application/json; charset=utf-8, x-powered-by=Express, server=nginx, vary=Origin}
+    19:38:16.525 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE BODY: {"status":"success","message":"Successfully verified mobile OTP","data":{"is_verified":true,"is_paid":true,"is_eligible":true,"is_free_user":false,"ht_coupon":null,"pii_user":{"_id":"67f3adb3028f8536933de432","country_code":"91","mobile":"7092424997","email":"Vseeni@gmail.com","name":"Sdsdsds Dadas","gender":"male","dob":"1999-09-21T00:00:00.000Z","lead_source":"DH_VERIFICATION","is_customer":false,"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","createdAt":"2025-04-07T10:49:23.429Z","updatedAt":"2025-07-25T06:41:15.644Z","billing_address":{"address":"5A, HH Road, Balarengapuram, Madurai, 625009, Tamil Nadu, India","pincode":"625009","address_line_1":"5A, HH Road, Balarengapuram","address_line_2":"","city":"Madurai","state":"Tamil Nadu","country":"India","_id":"67f3ae61028f8536933de44a"},"communication_address":{"address":"Sddfdsfsdf, Sddadsadssad, Madurai, 625009, Tamil Nadu, undefined","pincode":"625009","address_line_1":"Sddfdsfsdf","address_line_2":"Sddadsadssad","city":"Madurai","state":"Tamil Nadu","_id":"6883270b0eb92ed70b12fd88"},"customer_id":"87924ba8-a37f-4981-8c21-95d1fc9aa879","payment_amount_inr":"177000","payment_date":"2025-04-07T10:52:56.000Z","payment_fee":2924.04,"payment_id":"pay_QG8pFun2JdurRM","height":150,"weight":90},"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","user_id":"484","user_uuid":"87924ba8-a37f-4981-8c21-95d1fc9aa879","profile_id":"454","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5Iiwic2Vzc2lvbl9pZCI6ImI1YzcwZWUyLWM4ZDMtNDAzZi1hM2U2LTY5OTk2NzZiYWJmYSIsInVzZXJfaW50X2lkIjoiNDg0IiwicHJvZmlsZV9pZCI6IjQ1NCIsImxlYWRfaWQiOiJmMzhhYzc4Mi03NzdlLTRmNGQtOTBhMi0wNWQ2NzA3M2EzMWUiLCJyb2xlIjpbIkFETUlOIl0sImlhdCI6MTc3MDkwNTI5NiwiZXhwIjoxNzcxNTEwMDk2fQ.90ynu9eGAjf4bUgqXPQ0JUNF9WVwpi7pjpySrmm-B3A","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5IiwiaXNzdWVyIjoiU2MwMWFwcCIsInNlc3Npb25faWQiOiJiNWM3MGVlMi1jOGQzLTQwM2YtYTNlNi02OTk5Njc2YmFiZmEiLCJ1c2VyX2ludF9pZCI6IjQ4NCIsInByb2ZpbGVfaWQiOiI0NTQiLCJsZWFkX2lkIjoiZjM4YWM3ODItNzc3ZS00ZjRkLTkwYTItMDVkNjcwNzNhMzFlIiwicm9sZSI6WyJBRE1JTiJdLCJpYXQiOjE3NzA5MDUyOTYsImV4cCI6MTc3MzQ5NzI5Nn0.J2vtqMDr3QscsDCFJLg263-ytTt_uj3G3FUqJYjIRUY"}}
+    19:38:16.527 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Response Body: {"status":"success","message":"Successfully verified mobile OTP","data":{"is_verified":true,"is_paid":true,"is_eligible":true,"is_free_user":false,"ht_coupon":null,"pii_user":{"_id":"67f3adb3028f8536933de432","country_code":"91","mobile":"7092424997","email":"Vseeni@gmail.com","name":"Sdsdsds Dadas","gender":"male","dob":"1999-09-21T00:00:00.000Z","lead_source":"DH_VERIFICATION","is_customer":false,"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","createdAt":"2025-04-07T10:49:23.429Z","updatedAt":"2025-07-25T06:41:15.644Z","billing_address":{"address":"5A, HH Road, Balarengapuram, Madurai, 625009, Tamil Nadu, India","pincode":"625009","address_line_1":"5A, HH Road, Balarengapuram","address_line_2":"","city":"Madurai","state":"Tamil Nadu","country":"India","_id":"67f3ae61028f8536933de44a"},"communication_address":{"address":"Sddfdsfsdf, Sddadsadssad, Madurai, 625009, Tamil Nadu, undefined","pincode":"625009","address_line_1":"Sddfdsfsdf","address_line_2":"Sddadsadssad","city":"Madurai","state":"Tamil Nadu","_id":"6883270b0eb92ed70b12fd88"},"customer_id":"87924ba8-a37f-4981-8c21-95d1fc9aa879","payment_amount_inr":"177000","payment_date":"2025-04-07T10:52:56.000Z","payment_fee":2924.04,"payment_id":"pay_QG8pFun2JdurRM","height":150,"weight":90},"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","user_id":"484","user_uuid":"87924ba8-a37f-4981-8c21-95d1fc9aa879","profile_id":"454","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5Iiwic2Vzc2lvbl9pZCI6ImI1YzcwZWUyLWM4ZDMtNDAzZi1hM2U2LTY5OTk2NzZiYWJmYSIsInVzZXJfaW50X2lkIjoiNDg0IiwicHJvZmlsZV9pZCI6IjQ1NCIsImxlYWRfaWQiOiJmMzhhYzc4Mi03NzdlLTRmNGQtOTBhMi0wNWQ2NzA3M2EzMWUiLCJyb2xlIjpbIkFETUlOIl0sImlhdCI6MTc3MDkwNTI5NiwiZXhwIjoxNzcxNTEwMDk2fQ.90ynu9eGAjf4bUgqXPQ0JUNF9WVwpi7pjpySrmm-B3A","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5IiwiaXNzdWVyIjoiU2MwMWFwcCIsInNlc3Npb25faWQiOiJiNWM3MGVlMi1jOGQzLTQwM2YtYTNlNi02OTk5Njc2YmFiZmEiLCJ1c2VyX2ludF9pZCI6IjQ4NCIsInByb2ZpbGVfaWQiOiI0NTQiLCJsZWFkX2lkIjoiZjM4YWM3ODItNzc3ZS00ZjRkLTkwYTItMDVkNjcwNzNhMzFlIiwicm9sZSI6WyJBRE1JTiJdLCJpYXQiOjE3NzA5MDUyOTYsImV4cCI6MTc3MzQ5NzI5Nn0.J2vtqMDr3QscsDCFJLg263-ytTt_uj3G3FUqJYjIRUY"}}
+    19:38:16.528 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Response: 200 https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:16.529 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST METHOD: POST
+    19:38:16.529 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST URL: https://api.stg.dh.deepholistics.com/v4/human-token/lead/verify-otp
+    19:38:16.529 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST HEADERS: {sec-ch-ua-platform="macOS", referer=https://app.stg.deepholistics.com/, sec-ch-ua="Chromium";v="131", "Not_A Brand";v="24", client_id=qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW, user_timezone=Asia/Calcutta, sec-ch-ua-mobile=?0, user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36, accept=application/json, text/plain, */*, content-type=application/json}
+    19:38:16.530 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ➡️ API REQUEST BODY: {"mh":"$2b$10$wjUWMrPDJJuSfTRMG3DB0eJF4MxpUDM4C7NRkV/bJ/zDWE2E2gaiC","otp":"678901","country_code":"91"}
+    19:38:16.530 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE STATUS: 200
+    19:38:16.530 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE HEADERS: {etag=W/"8da-GSi4Zd2VYNqyXbbqwqzR6FEvuhk", access-control-allow-origin=https://app.stg.deepholistics.com, content-length=2266, date=Thu, 12 Feb 2026 14:08:16 GMT, content-type=application/json; charset=utf-8, x-powered-by=Express, server=nginx, vary=Origin}
+    19:38:16.530 [ForkJoinPool-1-worker-1] ERROR utils.logger.KotlinLogger - ⬅️ API RESPONSE BODY: {"status":"success","message":"Successfully verified mobile OTP","data":{"is_verified":true,"is_paid":true,"is_eligible":true,"is_free_user":false,"ht_coupon":null,"pii_user":{"_id":"67f3adb3028f8536933de432","country_code":"91","mobile":"7092424997","email":"Vseeni@gmail.com","name":"Sdsdsds Dadas","gender":"male","dob":"1999-09-21T00:00:00.000Z","lead_source":"DH_VERIFICATION","is_customer":false,"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","createdAt":"2025-04-07T10:49:23.429Z","updatedAt":"2025-07-25T06:41:15.644Z","billing_address":{"address":"5A, HH Road, Balarengapuram, Madurai, 625009, Tamil Nadu, India","pincode":"625009","address_line_1":"5A, HH Road, Balarengapuram","address_line_2":"","city":"Madurai","state":"Tamil Nadu","country":"India","_id":"67f3ae61028f8536933de44a"},"communication_address":{"address":"Sddfdsfsdf, Sddadsadssad, Madurai, 625009, Tamil Nadu, undefined","pincode":"625009","address_line_1":"Sddfdsfsdf","address_line_2":"Sddadsadssad","city":"Madurai","state":"Tamil Nadu","_id":"6883270b0eb92ed70b12fd88"},"customer_id":"87924ba8-a37f-4981-8c21-95d1fc9aa879","payment_amount_inr":"177000","payment_date":"2025-04-07T10:52:56.000Z","payment_fee":2924.04,"payment_id":"pay_QG8pFun2JdurRM","height":150,"weight":90},"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","user_id":"484","user_uuid":"87924ba8-a37f-4981-8c21-95d1fc9aa879","profile_id":"454","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5Iiwic2Vzc2lvbl9pZCI6ImI1YzcwZWUyLWM4ZDMtNDAzZi1hM2U2LTY5OTk2NzZiYWJmYSIsInVzZXJfaW50X2lkIjoiNDg0IiwicHJvZmlsZV9pZCI6IjQ1NCIsImxlYWRfaWQiOiJmMzhhYzc4Mi03NzdlLTRmNGQtOTBhMi0wNWQ2NzA3M2EzMWUiLCJyb2xlIjpbIkFETUlOIl0sImlhdCI6MTc3MDkwNTI5NiwiZXhwIjoxNzcxNTEwMDk2fQ.90ynu9eGAjf4bUgqXPQ0JUNF9WVwpi7pjpySrmm-B3A","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5IiwiaXNzdWVyIjoiU2MwMWFwcCIsInNlc3Npb25faWQiOiJiNWM3MGVlMi1jOGQzLTQwM2YtYTNlNi02OTk5Njc2YmFiZmEiLCJ1c2VyX2ludF9pZCI6IjQ4NCIsInByb2ZpbGVfaWQiOiI0NTQiLCJsZWFkX2lkIjoiZjM4YWM3ODItNzc3ZS00ZjRkLTkwYTItMDVkNjcwNzNhMzFlIiwicm9sZSI6WyJBRE1JTiJdLCJpYXQiOjE3NzA5MDUyOTYsImV4cCI6MTc3MzQ5NzI5Nn0.J2vtqMDr3QscsDCFJLg263-ytTt_uj3G3FUqJYjIRUY"}}
+    19:38:16.534 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - OTP Page--> API Response Body: {"status":"success","message":"Successfully verified mobile OTP","data":{"is_verified":true,"is_paid":true,"is_eligible":true,"is_free_user":false,"ht_coupon":null,"pii_user":{"_id":"67f3adb3028f8536933de432","country_code":"91","mobile":"7092424997","email":"Vseeni@gmail.com","name":"Sdsdsds Dadas","gender":"male","dob":"1999-09-21T00:00:00.000Z","lead_source":"DH_VERIFICATION","is_customer":false,"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","createdAt":"2025-04-07T10:49:23.429Z","updatedAt":"2025-07-25T06:41:15.644Z","billing_address":{"address":"5A, HH Road, Balarengapuram, Madurai, 625009, Tamil Nadu, India","pincode":"625009","address_line_1":"5A, HH Road, Balarengapuram","address_line_2":"","city":"Madurai","state":"Tamil Nadu","country":"India","_id":"67f3ae61028f8536933de44a"},"communication_address":{"address":"Sddfdsfsdf, Sddadsadssad, Madurai, 625009, Tamil Nadu, undefined","pincode":"625009","address_line_1":"Sddfdsfsdf","address_line_2":"Sddadsadssad","city":"Madurai","state":"Tamil Nadu","_id":"6883270b0eb92ed70b12fd88"},"customer_id":"87924ba8-a37f-4981-8c21-95d1fc9aa879","payment_amount_inr":"177000","payment_date":"2025-04-07T10:52:56.000Z","payment_fee":2924.04,"payment_id":"pay_QG8pFun2JdurRM","height":150,"weight":90},"lead_id":"f38ac782-777e-4f4d-90a2-05d67073a31e","user_id":"484","user_uuid":"87924ba8-a37f-4981-8c21-95d1fc9aa879","profile_id":"454","access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5Iiwic2Vzc2lvbl9pZCI6ImI1YzcwZWUyLWM4ZDMtNDAzZi1hM2U2LTY5OTk2NzZiYWJmYSIsInVzZXJfaW50X2lkIjoiNDg0IiwicHJvZmlsZV9pZCI6IjQ1NCIsImxlYWRfaWQiOiJmMzhhYzc4Mi03NzdlLTRmNGQtOTBhMi0wNWQ2NzA3M2EzMWUiLCJyb2xlIjpbIkFETUlOIl0sImlhdCI6MTc3MDkwNTI5NiwiZXhwIjoxNzcxNTEwMDk2fQ.90ynu9eGAjf4bUgqXPQ0JUNF9WVwpi7pjpySrmm-B3A","refresh_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODc5MjRiYTgtYTM3Zi00OTgxLThjMjEtOTVkMWZjOWFhODc5IiwiaXNzdWVyIjoiU2MwMWFwcCIsInNlc3Npb25faWQiOiJiNWM3MGVlMi1jOGQzLTQwM2YtYTNlNi02OTk5Njc2YmFiZmEiLCJ1c2VyX2ludF9pZCI6IjQ4NCIsInByb2ZpbGVfaWQiOiI0NTQiLCJsZWFkX2lkIjoiZjM4YWM3ODItNzc3ZS00ZjRkLTkwYTItMDVkNjcwNzNhMzFlIiwicm9sZSI6WyJBRE1JTiJdLCJpYXQiOjE3NzA5MDUyOTYsImV4cCI6MTc3MzQ5NzI5Nn0.J2vtqMDr3QscsDCFJLg263-ytTt_uj3G3FUqJYjIRUY"}}
+    19:38:17.541 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - Tokens captured. ACCESS_TOKEN length: 403, USER_ID: 484, USER_NAME: Sdsdsds Dadas
+    19:38:20.035 [ForkJoinPool-1-worker-1] INFO  utils.logger.KotlinLogger - Found target user: Gowthaman with ID: 41
+    19:38:38.873 [ForkJoinPool-1-worker-1] WARN  utils.logger.KotlinLogger - Search result click failed for Gowthaman: Error {
+      message='Timeout 10000ms exceeded.
+      name='TimeoutError
+      stack='TimeoutError: Timeout 10000ms exceeded.
+        at ProgressController.run (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/progress.js:75:26)
+        at Frame.waitForSelector (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/frames.js:629:23)
+        at FrameDispatcher.waitForSelector (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/frameDispatcher.js:106:103)
+        at FrameDispatcher._handleCommand (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:94:40)
+        at DispatcherConnection.dispatch (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:361:39)
+    }
+    Call log:
+    -   - waiting for locator("button, a, div[role='button']").filter(new Locator.FilterOptions().setHasText(Pattern.compile(".*Gowthaman.*", Pattern.CASE_INSENSITIVE))).first() to be visible
+
+
+ActionPlanTest > generate and verify action plan() FAILED
+    com.microsoft.playwright.TimeoutError: Error {
+      message='Timeout 30000ms exceeded.
+      name='TimeoutError
+      stack='TimeoutError: Timeout 30000ms exceeded.
+        at ProgressController.run (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/progress.js:75:26)
+        at Frame.click (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/frames.js:1022:23)
+        at FrameDispatcher.click (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/frameDispatcher.js:158:30)
+        at FrameDispatcher._handleCommand (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:94:40)
+        at DispatcherConnection.dispatch (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:361:39)
+    }
+    Call log:
+    -   - waiting for locator("tr, div[role='row']").nth(1)
+        at app//com.microsoft.playwright.impl.WaitableResult.get(WaitableResult.java:52)
+        at app//com.microsoft.playwright.impl.ChannelOwner.runUntil(ChannelOwner.java:132)
+        at app//com.microsoft.playwright.impl.Connection.sendMessage(Connection.java:130)
+        at app//com.microsoft.playwright.impl.ChannelOwner.sendMessage(ChannelOwner.java:118)
+        at app//com.microsoft.playwright.impl.FrameImpl.clickImpl(FrameImpl.java:252)
+        at app//com.microsoft.playwright.impl.FrameImpl.lambda$click$8(FrameImpl.java:243)
+        at app//com.microsoft.playwright.impl.LoggingSupport.lambda$withLogging$0(LoggingSupport.java:36)
+        at app//com.microsoft.playwright.impl.LoggingSupport.withLogging(LoggingSupport.java:47)
+        at app//com.microsoft.playwright.impl.ChannelOwner.withLogging(ChannelOwner.java:97)
+        at app//com.microsoft.playwright.impl.LoggingSupport.withLogging(LoggingSupport.java:35)
+        at app//com.microsoft.playwright.impl.FrameImpl.click(FrameImpl.java:243)
+        at app//com.microsoft.playwright.impl.LocatorImpl.click(LocatorImpl.java:175)
+        at app//com.microsoft.playwright.Locator.click(Locator.java:2493)
+        at app//webView.actionplan.ActionPlanTest.generate and verify action plan(ActionPlanTest.kt:131)
+
+        Caused by:
+        com.microsoft.playwright.TimeoutError: Error {
+          message='Timeout 30000ms exceeded.
+          name='TimeoutError
+          stack='TimeoutError: Timeout 30000ms exceeded.
+            at ProgressController.run (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/progress.js:75:26)
+            at Frame.click (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/frames.js:1022:23)
+            at FrameDispatcher.click (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/frameDispatcher.js:158:30)
+            at FrameDispatcher._handleCommand (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:94:40)
+            at DispatcherConnection.dispatch (/private/var/folders/v6/jxz3166s4458d9t5yzkvnxyr0000gn/T/playwright-java-8345349429318968889/package/lib/server/dispatchers/dispatcher.js:361:39)
+        }
+        Call log:
+        -   - waiting for locator("tr, div[role='row']").nth(1)
+            at app//com.microsoft.playwright.impl.Connection.dispatch(Connection.java:254)
+            at app//com.microsoft.playwright.impl.Connection.processOneMessage(Connection.java:211)
+            at app//com.microsoft.playwright.impl.ChannelOwner.runUntil(ChannelOwner.java:130)
+            ... 12 more
+
+Gradle Test Executor 27 finished executing tests.
+
+> Task :test FAILED
+
+1 test completed, 1 failed
+Finished generating test XML results (0.002 secs) into: /Users/apple/Documents/QA-Automation/healthdashboard-tests/build/test-results/test
+Generating HTML test report...
+Finished generating test html results (0.004 secs) into: /Users/apple/Documents/QA-Automation/healthdashboard-tests/build/reports/tests/test
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///Users/apple/Documents/QA-Automation/healthdashboard-tests/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.5/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 18s
+5 actionable tasks: 3 executed, 2 up-to-date
+Watched directory hierarchies: [/Users/apple/Documents/QA-Automation/healthdashboard-tests]
