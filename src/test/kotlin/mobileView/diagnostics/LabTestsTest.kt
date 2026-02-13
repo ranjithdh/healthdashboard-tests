@@ -654,7 +654,7 @@ class LabTestsTest : BaseTest() {
             testSchedulingPage.clickProceed()
         }
 
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
         
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
@@ -780,7 +780,7 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
 
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
@@ -856,7 +856,7 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
         logger.info { "Edit flow test completed successfully." }

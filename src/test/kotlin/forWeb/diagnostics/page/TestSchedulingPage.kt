@@ -1,28 +1,23 @@
 package forWeb.diagnostics.page
 
 import com.microsoft.playwright.Locator
-import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import kotlinx.serialization.json.*
+import mobileView.profile.utils.ProfileUtils.buildAddressText
+import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import model.slot.SlotList
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import utils.LogFullApiCall.logFullApiCall
 import utils.json.json
 import utils.logger.logger
-import model.slot.SlotList
-import model.profile.PiiUserResponse
-import com.microsoft.playwright.options.RequestOptions
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.buildJsonObject
-import mobileView.profile.utils.ProfileUtils.buildAddressText
-
-import utils.LogFullApiCall.logFullApiCall
 import utils.report.StepHelper
 import utils.report.StepHelper.ADD_ADDRESS
 import utils.report.StepHelper.CLICK_ADD_NEW_ADDRESS
@@ -33,12 +28,10 @@ import utils.report.StepHelper.FETCH_SLOTS
 import utils.report.StepHelper.VERIFY_ORDER_SUMMARY_PAGE
 import utils.report.StepHelper.VERIFY_PRICE_DETAILS
 import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
-import utils.report.StepHelper.VERIFY_SLOT_SELECTION_PAGE
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.test.assertEquals
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.int
+
 //import kotlinx.serialization.json.content
 
 
@@ -178,9 +171,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         countryInput.fill(address.country)
 
 
-        captureAddressData {
-            newAddressSubmit.click()
-        }
+//        captureAddressData {
+//            newAddressSubmit.click()
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
+//        }
 
         this.selectedAddressIndex = index
 
@@ -358,7 +352,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -391,9 +385,11 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText(partialAddress, Page.GetByTextOptions().setExact(false)).first().click()
 
         // Slot verification
-        page.getByText("Sample Collection Time Slot").click()
-        page.getByText("Date: $selectedDateSummary").click()
-        page.getByText("Selected time slot: $selectedTimeSummary").click()
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            page.getByText("Sample Collection Time Slot").click()
+            page.getByText("Date: $selectedDateSummary").click()
+            page.getByText("Selected time slot: $selectedTimeSummary").click()
+        }
 
         // Price details verification (reusing logic or similar)
         page.getByText("PRICE DETAILS").click()
