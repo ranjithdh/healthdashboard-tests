@@ -571,7 +571,7 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetItem.code
             else -> null
         } ?: throw AssertionError("Target item selected but code is null")
-        targetCode = "GENE10001"
+//        targetCode = "GENE10001"
         logger.info { "Selected targetCode: $targetCode" }
         StepHelper.step("Selected targetCode: $targetCode")
 
