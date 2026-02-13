@@ -166,7 +166,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.locator(".bg-secondary.flex.flex-1").nth(index).click()
 
         // Fill inputs (UI)
-        val updatedNickName = address.addressName?.takeIf { it.isNotBlank() } ?: "Home"
+        val updatedNickName = (address.addressName?.takeIf { it.isNotBlank() } + "Updated") ?: "Home"
         nickNameInput.fill(updatedNickName)
         // mobileNumberInput.fill(address.addressMobile ?: "")
         houseNoInput.fill(address.address)
