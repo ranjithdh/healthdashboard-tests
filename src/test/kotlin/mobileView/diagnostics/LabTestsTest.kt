@@ -625,6 +625,9 @@ class LabTestsTest : BaseTest() {
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
+        
+        logger.info { "Explicitly selecting the address to ensure Proceed is enabled..." }
+        testSchedulingPage.selectAddress(randomIndex)
 
         logger.info { "Clicking Proceed and navigating to Slot Selection page..." }
         StepHelper.step("Clicking Proceed and navigating to Slot Selection page...")

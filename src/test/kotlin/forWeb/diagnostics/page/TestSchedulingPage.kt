@@ -190,6 +190,19 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         assertEquals(updatedNickName, updatedAddress?.address?.addressName)
     }
 
+    fun selectAddress(index: Int) {
+        val addresses = addressData?.addressList ?: return
+        if (index >= addresses.size) return
+        
+        val addressItem = addresses[index]
+        val nickName = addressItem.address.addressName?.takeIf { it.isNotBlank() } ?: "Primary"
+        
+        logger.info { "Explicitly selecting address: $nickName" }
+        // Click the name to select the address
+        page.getByText(nickName).first().click()
+        this.selectedAddressIndex = index
+    }
+
     fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
         StepHelper.step(VERIFY_PRICE_DETAILS)
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
