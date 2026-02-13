@@ -546,7 +546,34 @@ class LabTestsTest : BaseTest() {
         // Capture the API response during navigation
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-        val targetCode = "PROJ1056379"
+        val productList = responseObj.data?.diagnostic_product_list 
+            ?: throw AssertionError("diagnostic_product_list not found in API response")
+
+        val allItems = sequenceOf(
+            productList.packages,
+            productList.test_profiles,
+            productList.tests
+        ).filterNotNull().flatten()
+
+        val targetItem = allItems.filter { item ->
+            val (code, diKit) = when (item) {
+                is model.LabTestPackage -> item.code to item.di_kit
+                is model.LabTestProfile -> item.code to item.di_kit
+                is model.LabTestItem -> item.code to item.di_kit
+                else -> null to null
+            }
+            diKit == null && code != "DH_LONGEVITY_PANEL"
+        }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
+
+        val targetCode = when (targetItem) {
+            is model.LabTestPackage -> targetItem.code
+            is model.LabTestProfile -> targetItem.code
+            is model.LabTestItem -> targetItem.code
+            else -> null
+        } ?: throw AssertionError("Target item selected but code is null")
+        
+        logger.info { "Selected targetCode: $targetCode" }
+        StepHelper.step("Selected targetCode: $targetCode")
 
         logger.info { "Clicking View Details for code $targetCode" }
         StepHelper.step("Clicking View Details for code $targetCode")
@@ -581,13 +608,8 @@ class LabTestsTest : BaseTest() {
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
         testSchedulingPage.editUserAddress(randomIndex)
-        // Extract price for the targetCode from responseObj
-        val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
-
-        val targetProduct = productList.packages?.find { it.code == targetCode }
-            ?: productList.test_profiles?.find { it.code == targetCode }
-            ?: productList.tests?.find { it.code == targetCode }
-            ?: throw AssertionError("Product with code $targetCode not found in API response")
+        // Reuse the already found target item
+        val targetProduct = targetItem
 
         val rawPrice = when (targetProduct) {
             is model.LabTestPackage -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
@@ -703,7 +725,10 @@ class LabTestsTest : BaseTest() {
             else -> 0.0
         }
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        // Finalize the order automation by calling the workflow API
+        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
         logger.info { "Edit flow test completed successfully." }
         StepHelper.step("Edit flow test completed successfully.")
+
     }
 }

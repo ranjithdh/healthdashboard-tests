@@ -53,9 +53,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     fun goToDiagnosticsUrl() {
         StepHelper.step(NAVIGATE_TO_DIAGNOSTICS_URL)
-          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-//        page.waitForTimeout(2000.0)
-//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+//          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
@@ -65,6 +65,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
 
     init {
+        login()
         getLabTestsResponse()
     }
 
@@ -72,15 +73,17 @@ class LabTestsPage(page: Page) : BasePage(page) {
         val response = page.waitForResponse(
             { response: Response? ->
                 response?.url()
-                    ?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true && response.status() == 200
+                    ?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true 
+                    && response.status() == 200
+                    && response.request().method() == "GET"
             },
             {
-                navigateToDiagnostics()
+                goToDiagnosticsUrl()
             }
         )
         
         // Fetch blood reports as per requirement
-        fetchBloodReports()
+//        fetchBloodReports()
 
         val responseBody = response.text()
         if (responseBody.isNullOrBlank()) {
@@ -94,6 +97,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
             if (responseObj.data != null) {
                 labTestData = responseObj
                 LogFullApiCall.logFullApiCall(response)
+                logger.info { "getLabTestsResponse API is Success $response" }
 //                return labTestData
             }
         } catch (e: Exception) {
