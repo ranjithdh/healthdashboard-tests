@@ -565,7 +565,7 @@ class LabTestsTest : BaseTest() {
             diKit == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
         }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
 
-        var targetCode = when (targetItem) {
+        val targetCode = when (targetItem) {
             is model.LabTestPackage -> targetItem.code
             is model.LabTestProfile -> targetItem.code
             is model.LabTestItem -> targetItem.code
