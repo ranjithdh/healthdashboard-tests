@@ -640,20 +640,32 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.product_id
             else -> throw RuntimeException("Unknown product type")
         }
-        // slot selection
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
-            logger.info { "Verifying Slot Selection Page items..." }
-            StepHelper.step("Verifying Slot Selection Page items...")
-            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-            logger.info { "Verifying Price Details on Slot Selection page..." }
-            StepHelper.step("Verifying Price Details on Slot Selection page...")
+        // Duel slot selection
+        if (targetCode == "DH_METABOLIC_PANEL") {
+            logger.info { "Verifying Duel Slot Selection Page items..." }
+            StepHelper.step("Verifying Duel Slot Selection Page items...")
+            testSchedulingPage.verifyDualSlotSelectionPage(code = targetCode, productId = productId)
+            logger.info { "Verifying Price Details on Duel Slot Selection page..." }
+            StepHelper.step("Verifying Price Details on Duel Slot Selection page...")
             testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-            logger.info { "Verifying Footer Actions on Slot Selection page..." }
-            StepHelper.step("Verifying Footer Actions on Slot Selection page...")
+            logger.info { "Verifying Footer Actions on Duel Slot Selection page..." }
+            StepHelper.step("Verifying Footer Actions on Duel Slot Selection page...")
             testSchedulingPage.verifyFooterActions()
             testSchedulingPage.clickProceed()
+        } else {
+            if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+                logger.info { "Verifying Slot Selection Page items..." }
+                StepHelper.step("Verifying Slot Selection Page items...")
+                testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+                logger.info { "Verifying Price Details on Slot Selection page..." }
+                StepHelper.step("Verifying Price Details on Slot Selection page...")
+                testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+                logger.info { "Verifying Footer Actions on Slot Selection page..." }
+                StepHelper.step("Verifying Footer Actions on Slot Selection page...")
+                testSchedulingPage.verifyFooterActions()
+                testSchedulingPage.clickProceed()
+            }
         }
-
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
         
         // Finalize the order automation by calling the workflow API
@@ -665,7 +677,7 @@ class LabTestsTest : BaseTest() {
 
     @Test
     @Order(4)
-    fun `verify test scheduling for two slots booking`() {
+    fun `verify test scheduling for baseline`() {
         logger.info { "Starting test: verify test scheduling" }
         StepHelper.step("Starting test: verify test scheduling")
 

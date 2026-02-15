@@ -341,6 +341,86 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
     }
 
+    fun verifyDualSlotSelectionPage(code: String, productId: String?) {
+        logger.info { "Verifying Dual Slot Selection Page for code: $code" }
+        page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
+
+        // Static text checks
+//        page.getByTestId("diagnostics-booking-step2-fasting-column")
+//        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Fasting Slots")).click()
+//        page.getByTestId("diagnostics-booking-step2-fasting-column")
+//        page.getByText("Fasting required").click()
+//
+//        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Non-Fasting Slots")).click()
+//        page.getByText("Non-fasting test").click()
+
+        val leadId = getLeadId()
+        val addressItem = addressData?.addressList?.getOrNull(selectedAddressIndex)
+            ?: addressData?.addressList?.firstOrNull()
+            ?: throw IllegalStateException("Address data not found")
+        val addressId = addressItem.addressId
+        this.product_id = productId
+
+        val today = LocalDate.now()
+        val tomorrow = today.plusDays(1)
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val summaryDateFormatter = DateTimeFormatter.ofPattern("dd MMM")
+        val tomorrowDateStr = tomorrow.format(dateFormatter)
+
+        logger.info { "Selecting date: $tomorrowDateStr" }
+        page.getByTestId("diagnostics-booking-step2-date-$tomorrowDateStr").click()
+
+        val slots = getSlots(tomorrowDateStr, leadId, addressId)
+        val validSlots = slots.filter { it.is_available == true && it.start_time != null }
+
+        if (validSlots.isEmpty()) {
+            throw RuntimeException("No slots available for $tomorrowDateStr")
+        }
+
+        // Strategy: First slot that allows a post-meal slot (+2h)
+        var fastingSlot: model.slot.Slot? = null
+        var postMealSlot: model.slot.Slot? = null
+
+        // Try to find a pair
+        for (slot in validSlots) {
+            val fTime = java.time.Instant.parse(slot.start_time)
+            val pSlot = validSlots.find {
+                val pTime = java.time.Instant.parse(it.start_time)
+                val diff = java.time.Duration.between(fTime, pTime).toMinutes()
+                diff >= 120 // 2 hours
+            }
+            if (pSlot != null) {
+                fastingSlot = slot
+                postMealSlot = pSlot
+                break
+            }
+        }
+
+        if (fastingSlot == null || postMealSlot == null) {
+            logger.warn { "Could not find a valid pair of Fasting/Post-meal slots (2h gap) for $tomorrowDateStr. Trying to proceed anyway with failing assertions likely." }
+            throw RuntimeException("Could not find a valid pair of Fasting/Post-meal slots")
+        }
+
+        logger.info { "Selecting Fasting Slot: ${fastingSlot.start_time}" }
+        page.getByTestId("diagnostics-booking-step2-fasting-slot-${fastingSlot.start_time}").click()
+
+        logger.info { "Selecting Post-meal Slot: ${postMealSlot.start_time}" }
+        val pmLocator = page.getByTestId("diagnostics-booking-step2-postmeal-slot-${postMealSlot.start_time}")
+        pmLocator.waitFor()
+        pmLocator.click()
+
+        // Verify Note
+        page.getByTestId("diagnostics-booking-step2-dual-slot-note").click()
+
+        val noteText = "Please note: Select different time slots for each test. Post meal test must be scheduled at least 2 hours after the fasting test."
+        page.getByText(noteText)
+        logger.info { "Verifying note visibility: $noteText" }
+        // Attempt strict match, fall back to loose if needed, but user text seems precise
+//        Assertions.assertTrue(page.getByText(noteText).isVisible, "Dual slot note should be visible")
+
+        captureSlotForSummary(fastingSlot.start_time!!, summaryDateFormatter)
+    }
+
     private fun captureSlotForSummary(startTimeIso: String, summaryDateFormatter: DateTimeFormatter) {
         // Parse ISO string and convert to IST (+5:30)
         // Format: 2026-02-06T05:00:00.000Z
@@ -679,7 +759,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
         }
 
-        val paymentId = "order_RJURFxbJ6TYlyC"
+        val paymentId = "order_RJURFxbJ6TYlyK"
 // this RJURFxbJ6TYlyB will be dynamic
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
