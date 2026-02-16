@@ -11,4 +11,5 @@ sealed class ActionPlanType(val type: String) {
     object SLEEP : NutritionFoodType("sleep")
     object STRESS : NutritionFoodType("stress")
     object SUPPLEMENT : NutritionFoodType("supplement")
+    object TEST : NutritionFoodType("test")
 }

@@ -1161,8 +1161,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     /**---------------Supplements-------------------*/
-    fun supplementsMainCards(){
-        val supplementList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.SUPPLEMENT.type }
+    fun supplementsMainCards() {
+        val supplementList =
+            recommendationData?.recommendations?.filter { it.category == ActionPlanType.SUPPLEMENT.type }
         if (supplementList?.isNotEmpty() == true) {
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplements")).waitFor()
 
@@ -1172,8 +1173,118 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     fun validatingSupplementsMainCards(supplementList: List<Recommendation>) {
         supplementList.forEach { supplement ->
+            val id = supplement.id
+            val image = page.getByTestId("supplement-image-${id}")
+            val nameUiElement = page.getByTestId("supplement-name-${id}")
+            listOf(image, nameUiElement).forEach { it.waitFor() }
+
+            val nameExpected = nameUiElement.innerText()
+            val nameActual = supplement.variant_meta?.name
+                ?: supplement.display_name
+                ?: supplement.name
+
+
+            assertEquals(nameExpected, nameActual)
+
+            if (supplement.supplement_intraday_frequency != null ||
+                supplement.supplement_weekday_frequency != null
+            ) {
+                val expectedFrequency = if (supplement.supplement_weekday_frequency != null) "Weekly" else "Daily"
+
+                val frequencyUiElement = page.getByTestId("supplement-frequency-badge-${id}")
+                frequencyUiElement.waitFor()
+                val actualFrequency = frequencyUiElement.innerText()
+                assertEquals(actualFrequency, expectedFrequency)
+            }
+
+            supplement.supplement_meta?.dosage?.get("1")?.serving?.let {
+                val dosageUiElement = page.getByTestId("supplement-dosage-badge-1-${id}")
+
+                val item = supplement.supplement_meta.dosage["1"]
+
+                val text = "${item?.serving}x " +
+                        "${if (item?.timing == "after_food") "After" else "Before"} " +
+                        item?.meal
+
+                dosageUiElement.waitFor()
+
+                assertEquals(text, dosageUiElement.innerText())
+            }
+
+
+            supplement.supplement_meta?.dosage?.get("2")?.serving?.let {
+                val dosageUiElement = page.getByTestId("supplement-dosage-badge-2-${id}")
+
+                val item = supplement.supplement_meta.dosage["2"]
+
+                val text = "${item?.serving}x " +
+                        "${if (item?.timing == "after_food") "After" else "Before"} " +
+                        item?.meal
+
+                dosageUiElement.waitFor()
+
+                assertEquals(text, dosageUiElement.innerText())
+            }
+
+            supplement.supplement_duration?.let {
+                val durationUiElement = page.getByTestId("supplement-duration-badge-${id}")
+                durationUiElement.waitFor()
+                assertEquals(it, durationUiElement.innerText())
+            }
+
+            val note1 = supplement.supplement_meta?.dosage?.get("1")?.notes
+            val note2 = supplement.supplement_meta?.dosage?.get("2")?.notes
+
+            if (!note1.isNullOrBlank() || !note1.isNullOrBlank()) {
+                val noteUiElement = page.getByTestId("supplement-notes-$id")
+                val expected = buildString {
+                    append("Note: ")
+                    if (note1.isNotBlank()) append(note1)
+
+                    if (note1.isNotBlank() && !note2.isNullOrBlank()) {
+                        append("\n")
+                    }
+
+                    if (!note2.isNullOrBlank()) append(note2)
+                }
+
+                assertEquals(expected.normalizeForUiCompare(), noteUiElement.innerText().normalizeForUiCompare())
+
+
+            }
+
 
         }
     }
+
+    /**---------------Recommendation Test-------------------*/
+    fun stressTestCards() {
+        val testList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.TEST.type }
+
+
+        if (testList?.isNotEmpty() == true) {
+            logger.info("Stress list is not empty, waiting for Stress heading")
+
+            page.getByTestId("further-test-heading").waitFor()
+
+            validatingTestMainCards(testList)
+
+        } else {
+            logger.warn("No stress recommendations found")
+        }
+    }
+
+    private fun validatingTestMainCards(testList: List<Recommendation>) {
+        testList.forEach {
+            val image = page.getByTestId("further-test-card-image-400288")
+            val name = page.getByTestId("further-test-card-name-400288")
+            val bookTest = page.getByTestId("further-test-book-button-400288")
+
+            listOf(image, name, bookTest).forEach { it.waitFor() }
+
+
+        }
+    }
+
 
 }

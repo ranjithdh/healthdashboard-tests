@@ -92,5 +92,12 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.supplementsMainCards()
     }
 
+ /*   @Test
+    @Order(5)
+    fun recommendationsTest() {
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.supplementsMainCards()
+    }*/
+
 
 }

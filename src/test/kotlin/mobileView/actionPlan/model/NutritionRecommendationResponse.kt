@@ -94,14 +94,13 @@ data class Recommendation(
     val recommendation_id: String? = null,
     val display_name: String? = null,
     val img_url: String? = null,
-    val meta: Map<String, String>? = null,
+    val meta: Meta? = null,
     val created_at: String? = null,
     val updated_at: String? = null,
     val actions: List<Action>? = null,
     val variant_description: String? = null,
     val description_note: String? = null,
-    val supplement_meta: Map<String, String>? = null,
-    val variant_meta: Map<String, String>? = null,
+    val supplement_meta: SupplementMeta? = null,
     val is_trusted: Boolean? = null,
     val product_group: String? = null,
     val supplement_intraday_frequency: String? = null,
@@ -119,7 +118,8 @@ data class Recommendation(
     val is_admin_created: Boolean? = null,
     val approval_status: String? = null,
     val descriptive_meta: DescriptiveMeta? = null,
-    val detailed_description: String? = null
+    val detailed_description: String? = null,
+    val variant_meta: VariantMeta? = null
 )
 
 @Serializable
@@ -195,6 +195,95 @@ data class DescriptiveMeta(
     val why_supports_longevity: String? = null,
     val potential_biomarker_impact: String? = null
 )
+
+
+
+
+@Serializable
+data class VariantMeta(
+    val name: String? = null,
+    val brand: String? = null,
+    val price: Price? = null,
+    val imageUrls: List<String>? = null,
+    val productId: String? = null,
+    val is_trusted: Boolean? = null,
+    val productUrl: String? = null,
+    val ingredients: List<Ingredient>? = null,
+    val serving_unit: String? = null,
+    val recommendation: RecommendationMeta? = null,
+    val nutritionalFacts: List<NutritionalFact>? = null,
+    val productIngredientList: List<String>? = null
+)
+
+@Serializable
+data class Price(
+    val amount: Float? = null,
+    val currency: String? = null,
+    val unitType: String? = null,
+    val pricePerUnit: Double? = null,
+    val totalRatings: Double? = null,
+    val averageRating: Double? = null,
+    val unitsPerContainer: Int? = null
+)
+
+@Serializable
+data class Ingredient(
+    val name: String? = null,
+    val unit: String? = null,
+    val amount: Int? = null
+)
+
+@Serializable
+data class RecommendationMeta(
+    val reason: String? = null,
+    val priority: Int? = null
+)
+
+
+
+@Serializable
+data class SupplementMeta(
+    val day: Boolean? = null,
+    val night: Boolean? = null,
+    val dosage: Map<String, Dosage>? = null,
+    val timing: String? = null,
+    val same_time_everyday: Boolean? = null
+)
+
+@Serializable
+data class Dosage(
+    val meal: String? = null,
+    val notes: String? = null,
+    val timing: String? = null,
+    val serving: Int? = null,
+    val serving_unit: String? = null
+)
+
+
+@Serializable
+data class Meta(
+    val name: String? = null,
+    val brand: String? = null,
+    val price: Price? = null,
+    val imageUrls: List<String>? = null,
+    val productId: String? = null,
+    val is_trusted: Boolean? = null,
+    val productUrl: String? = null,
+    val ingredients: List<Ingredient>? = null,
+    val serving_unit: String? = null,
+    val recommendation: Recommendation? = null,
+    val nutritionalFacts: List<NutritionalFact>? = null,
+    val productIngredientList: List<String>? = null
+)
+
+
+@Serializable
+data class NutritionalFact(
+    val name: String? = null,
+    val unit: String? = null,
+    val amount: Double? = null
+)
+
 
 
 
