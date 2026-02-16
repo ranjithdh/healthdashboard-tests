@@ -10,7 +10,7 @@ import mobileView.actionPlan.model.*
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
-import mobileView.actionPlan.utils.ActionPlanUtils.removeWhitespace
+import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.actionPlan.utils.ActionPlanUtils.splitByNewLine
 import utils.json.json
 import utils.logger.logger
@@ -618,6 +618,23 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         header.waitFor()
         header.click()
 
+        if (type == ActionPlanType.STRESS.type || type == ActionPlanType.SLEEP.type) {
+            val descriptiveMeta = activity.descriptive_meta
+            val potentialBiomarkerImpact = descriptiveMeta?.potential_biomarker_impact
+            potentialBiomarkerImpact?.let { biomarkerImpact ->
+                val biomarkerImpactUiElement = if (type == ActionPlanType.SLEEP.type) {
+                    page.getByTestId("sleep-potential-biomarker-impact")
+                } else {
+                    page.getByTestId("stress-potential-biomarker-impact")
+                }
+                biomarkerImpactUiElement.waitFor()
+                val expected = biomarkerImpact.normalizeForUiCompare()
+                val actual = biomarkerImpactUiElement.innerText().normalizeForUiCompare()
+                logger.info { "stress expected:$expected\nactual:$actual" }
+                assertEquals(expected, actual)
+            }
+        }
+
         metricRecommendations?.forEachIndexed { index, recommendations ->
             val metric = recommendations.metric
 
@@ -631,11 +648,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val arrowUi = if (trendArrow == down) {
                 when (type) {
                     ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-down-$index")
+                    ActionPlanType.STRESS.type -> page.getByTestId("stress-impact-down-$index")
                     else -> page.getByTestId("sleep-impact-down-$index")
                 }
             } else {
                 when (type) {
                     ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-up-$index")
+                    ActionPlanType.STRESS.type -> page.getByTestId("stress-impact-up-$index")
                     else -> page.getByTestId("sleep-impact-up-$index")
                 }
             }
@@ -645,6 +664,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             val biomarkerUi = when (type) {
                 ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-$index")
+                ActionPlanType.STRESS.type -> page.getByTestId("stress-impact-$index")
                 else -> page.getByTestId("sleep-impact-$index")
             }
 
@@ -674,6 +694,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 val whyItWorkElement = when (type) {
                     ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-why-it-works-$index")
+                    ActionPlanType.STRESS.type -> page.getByTestId("stress-why-it-works-$index")
                     else -> page.getByTestId("sleep-why-it-works-$index")
                 }
                 whyItWorkElement.waitFor()
@@ -713,6 +734,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 val practiceElement = when (type) {
                     ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-how-to-practice-$index")
+                    ActionPlanType.STRESS.type -> page.getByTestId("stress-how-to-practice-$index")
                     else -> page.getByTestId("sleep-how-to-practice-$index")
                 }
                 practiceElement.waitFor()
@@ -740,14 +762,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             val subHeadingElement = when (type) {
                 ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-what-to-expect")
+                ActionPlanType.STRESS.type -> page.getByTestId("stress-what-to-expect")
                 else -> page.getByTestId("sleep-what-to-expect")
             }
             subHeadingElement.waitFor()
 
-            logger.info { "What To Expect actual=${removeWhitespace(subHeadingElement.innerText())}" }
-            logger.info { "What To Expect expected=${removeWhitespace(whatToExpect)}" }
+            logger.info { "What To Expect actual=${subHeadingElement.innerText().normalizeForUiCompare()}" }
+            logger.info { "What To Expect expected=${whatToExpect.normalizeForUiCompare()}" }
 
-            assertEquals(removeWhitespace(whatToExpect), removeWhitespace(subHeadingElement.innerText()))
+            assertEquals(whatToExpect.normalizeForUiCompare(), subHeadingElement.innerText().normalizeForUiCompare())
 
             logger.info { "What To Expect section validated for activityId=${activity.id}" }
         } else {
@@ -934,13 +957,18 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                     page.getByTestId("exercise-description")
                 }
 
+                ActionPlanType.STRESS.type -> {
+                    page.getByTestId("stress-description")
+                }
+
                 else -> {
                     page.getByTestId("sleep-description")
                 }
+
             }
             description.waitFor()
 
-            assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
+            assertEquals(descriptionExpected.normalizeForUiCompare(), description.innerText().normalizeForUiCompare())
         }
     }
 
@@ -994,7 +1022,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             validatingStressMainCards(stressList)
 
-            // validatingStressSidePanel(stressList)
+            validatingStressSidePanel(stressList)
         } else {
             logger.warn("No activity recommendations found")
         }
@@ -1059,16 +1087,44 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             stressHeaderSection(stress)
 
+            descriptionSection(descriptionExpected, ActionPlanType.STRESS.type)
+
+            potentialBiomarker(stress, ActionPlanType.STRESS.type)
+
+            validatingViewMore(stress)
+
+            whyItWorks(stress, ActionPlanType.STRESS.type)
+            intoPractice(stress, ActionPlanType.STRESS.type)
+            whatToExpect(stress, ActionPlanType.STRESS.type)
+
+            val closePanel = page.getByTestId("stress-panel-close")
+            closePanel.waitFor()
+            closePanel.click()
         }
     }
 
     private fun stressHeaderSection(stress: Recommendation) {
         val stressTitle = "Stress"
 
-        val heading = page.getByTestId("sleep-panel-heading")
-        val nameElement = page.getByTestId("sleep-detail-name")
-        val displayElement = page.getByTestId("sleep-detail-display-name")
-        val imageElement = page.getByTestId("sleep-detail-image")
+        val heading = page.getByTestId("stress-panel-heading")
+        val nameElement = page.getByTestId("stress-detail-name")
+        val displayElement = page.getByTestId("stress-detail-display-name")
+        val imageElement = page.getByTestId("stress-detail-image")
+
+        listOf(heading, nameElement, displayElement, imageElement).forEach {
+            it.scrollIntoViewIfNeeded()
+            it.waitFor()
+        }
+
+        val headingText = heading.innerText()
+        assertEquals(stressTitle, headingText)
+
+        val nameText = nameElement.innerText()
+        assertEquals(stress.name?.uppercase(), nameText)
+
+        val displayText = displayElement.innerText()
+        val expectedName = stress.display_name
+        assertEquals(expectedName, displayText)
     }
 
 

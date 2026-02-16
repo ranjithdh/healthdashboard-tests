@@ -97,22 +97,21 @@ object ActionPlanUtils {
     }
 
     fun findSubCategoryExist(category: String?): Boolean {
-        return nutritionCategorySubtext[category]!=null
+        return nutritionCategorySubtext[category] != null
     }
 
     fun splitByNewLine(text: String?): List<String> {
         return text
             ?.split("\n")
             ?.map { it.trim() }
-            ?.filter { it.isNotEmpty() }?:emptyList()
+            ?.filter { it.isNotEmpty() } ?: emptyList()
     }
 
 
-    fun removeWhitespace(text: String?): String {
-        return text?.replace("\\s+".toRegex(), " ")?:""
-    }
-
-
+    fun String.normalizeForUiCompare(): String =
+        this.replace("\u2028", " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
 
 
 }
