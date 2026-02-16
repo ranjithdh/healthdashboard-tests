@@ -55,6 +55,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     private var capturedAppointmentDate: String? = null
     private var capturedCreatedAt: String? = null
     private var capturedPaymentDate: String? = null
+    // Properties for Metabolic Panel (Dual Slots)
+    private var selectedFastingTimeSummary: String = ""
+    private var selectedPostMealTimeSummary: String = ""
+
+    private fun formatTime(isoTime: String): String {
+        val instant = java.time.Instant.parse(isoTime)
+        val istZone = java.time.ZoneId.of("Asia/Kolkata")
+        val zonedDateTime = instant.atZone(istZone)
+        return zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
+    }
 
     private val nickNameInput =
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Home, work, etc."))
@@ -418,7 +428,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // Attempt strict match, fall back to loose if needed, but user text seems precise
 //        Assertions.assertTrue(page.getByText(noteText).isVisible, "Dual slot note should be visible")
 
-        captureSlotForSummary(fastingSlot.start_time!!, summaryDateFormatter)
+        // Capture times for summary verification
+        selectedDateSummary = java.time.Instant.parse(fastingSlot.start_time).atZone(java.time.ZoneId.of("Asia/Kolkata")).format(summaryDateFormatter)
+        selectedFastingTimeSummary = formatTime(fastingSlot.start_time!!)
+        selectedPostMealTimeSummary = formatTime(postMealSlot.start_time!!)
+        
+        logger.info { "Captured Dual Slot Summary - Date: $selectedDateSummary, Fasting: $selectedFastingTimeSummary, Post-meal: $selectedPostMealTimeSummary" }
     }
 
     private fun captureSlotForSummary(startTimeIso: String, summaryDateFormatter: DateTimeFormatter) {
@@ -486,10 +501,18 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
 
         // Slot verification
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+        // Slot verification
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004", "DH_METABOLIC_PANEL")) {
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()
             page.getByText("Selected time slot: $selectedTimeSummary").click()
+        }
+        if (targetCode == "DH_METABOLIC_PANEL") {
+            logger.info { "Verifying Dual Slot Summary: Date: $selectedDateSummary, Fasting: $selectedFastingTimeSummary, PostMeal: $selectedPostMealTimeSummary" }
+            page.getByText("Sample Collection Time Slot").click()
+            page.getByText("Date: $selectedDateSummary").click()
+            page.getByText("Fasting time slot: $selectedFastingTimeSummary").click()
+            page.getByText("Post meal time slot: $selectedPostMealTimeSummary").click()
         }
 
         // Price details verification (reusing logic or similar)
