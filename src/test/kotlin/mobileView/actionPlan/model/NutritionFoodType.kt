@@ -5,3 +5,8 @@ sealed class NutritionFoodType(val type: String) {
     object LIMIT : NutritionFoodType("Limit")
     object AVOID : NutritionFoodType("Avoid")
 }
+
+sealed class ActionPlanType(val type: String) {
+    object ACTIVITY : NutritionFoodType("activity")
+    object SLEEP : NutritionFoodType("sleep")
+}

@@ -70,4 +70,13 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.activityMainCards()
     }
 
+
+    @Test
+    @Order(3)
+    fun sleepTest(){
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.sleepMainCards()
+    }
+
+
 }

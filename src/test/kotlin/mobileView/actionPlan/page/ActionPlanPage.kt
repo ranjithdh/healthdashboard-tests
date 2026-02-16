@@ -36,6 +36,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var normal = "Normal"
     private var question = "question"
     private var activity = "activity"
+    private var sleep = "sleep"
 
     init {
         //  monitorTraffic()
@@ -553,7 +554,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
-            validatingMainCards(activityList)
+            validatingActivityMainCards(activityList)
 
             validatingActivitySidePanel(activityList)
         } else {
@@ -580,24 +581,17 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             activityHeaderSection(activity)
 
-            val description = page.getByTestId("exercise-description")
-            description.waitFor()
+            sleepDescriptionSection(descriptionExpected, ActionPlanType.ACTIVITY.type)
 
-            logger.info { "Validating description for actual=${removeWhitespace(descriptionExpected)}" }
-            logger.info { "Validating description for actual=${removeWhitespace(description.innerText())}" }
-            assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
+            potentialBiomarker(activity, ActionPlanType.ACTIVITY.type)
 
-            potentialBiomarker(activity)
-
-            val viewMore = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View More"))
-            viewMore.waitFor()
-            viewMore.click()
+            validatingViewMore(activity)
 
             logger.info { "Clicked View More for activityId=${activity.id}" }
 
-            whyItWorks(activity)
-            intoPractice(activity)
-            whatToExpect(activity)
+            whyItWorks(activity, ActionPlanType.ACTIVITY.type)
+            intoPractice(activity, ActionPlanType.ACTIVITY.type)
+            whatToExpect(activity, ActionPlanType.ACTIVITY.type)
 
             val closePanel = page.getByTestId("exercise-panel-close")
             closePanel.waitFor()
@@ -610,7 +604,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun potentialBiomarker(activity: Recommendation) {
+    private fun potentialBiomarker(activity: Recommendation, type: String) {
         logger.info { "Validating Potential Biomarker section for activityId=${activity.id}" }
 
         val down = "down"
@@ -626,7 +620,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         metricRecommendations?.forEachIndexed { index, recommendations ->
             val metric = recommendations.metric
 
-            val biomarkerNameExpected = metric?.metric
+            val biomarkerNameExpected = metric?.display_name
             val trendArrow = metric?.trend_arrow
 
             logger.info {
@@ -634,14 +628,25 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             val arrowUi = if (trendArrow == down) {
-                page.getByTestId("exercise-impact-down-$index")
+                when (type) {
+                    ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-down-$index")
+                    else -> page.getByTestId("sleep-impact-down-$index")
+                }
             } else {
-                page.getByTestId("exercise-impact-up-$index")
+                when (type) {
+                    ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-up-$index")
+                    else -> page.getByTestId("sleep-impact-up-$index")
+                }
             }
 
             arrowUi.waitFor()
 
-            val biomarkerUi = page.getByTestId("exercise-impact-$index")
+
+            val biomarkerUi = when (type) {
+                ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-impact-$index")
+                else -> page.getByTestId("sleep-impact-$index")
+            }
+
             biomarkerUi.waitFor()
 
             assertEquals(biomarkerNameExpected, biomarkerUi.innerText())
@@ -651,22 +656,25 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun whyItWorks(activity: Recommendation) {
+    private fun whyItWorks(activity: Recommendation, type: String) {
         logger.info { "Validating Why It Works section for activityId=${activity.id}" }
-
-        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Why it works"))
-        heading.waitFor()
-        heading.click()
 
         val descriptiveMeta = activity.descriptive_meta
         val whyItWorks = descriptiveMeta?.why_it_works
         val workList = splitByNewLine(whyItWorks)
 
         if (workList.isNotEmpty()) {
+            val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Why it works"))
+            heading.waitFor()
+            heading.click()
+
             workList.forEachIndexed { index, work ->
                 logger.info { "Validating Why It Works item index=$index, value=$work" }
 
-                val whyItWorkElement = page.getByTestId("exercise-why-it-works-$index")
+                val whyItWorkElement = when (type) {
+                    ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-why-it-works-$index")
+                    else -> page.getByTestId("sleep-why-it-works-$index")
+                }
                 whyItWorkElement.waitFor()
 
                 assertEquals(work, whyItWorkElement.innerText())
@@ -677,25 +685,35 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun intoPractice(activity: Recommendation) {
+    private fun intoPractice(activity: Recommendation, type: String) {
         logger.info { "Validating How To Practice section for activityId=${activity.id}" }
-
-        val heading = page.getByRole(
-            AriaRole.HEADING,
-            Page.GetByRoleOptions().setName("How to put it into practice")
-        )
-        heading.waitFor()
-        heading.click()
 
         val descriptiveMeta = activity.descriptive_meta
         val howToPractice = descriptiveMeta?.how_to_practice
         val practiceList = splitByNewLine(howToPractice)
 
         if (practiceList.isNotEmpty()) {
+            val heading = when (type) {
+
+                ActionPlanType.ACTIVITY.type -> page.getByRole(
+                    AriaRole.HEADING,
+                    Page.GetByRoleOptions().setName("How to put it into practice")
+                )
+
+                else -> {
+                    page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("How to Implement"))
+                }
+            }
+            heading.waitFor()
+            heading.click()
+
             practiceList.forEachIndexed { index, practice ->
                 logger.info { "Validating Practice item index=$index, value=$practice" }
 
-                val practiceElement = page.getByTestId("exercise-how-to-practice-$index")
+                val practiceElement = when (type) {
+                    ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-how-to-practice-$index")
+                    else -> page.getByTestId("sleep-how-to-practice-$index")
+                }
                 practiceElement.waitFor()
 
                 assertEquals(practice, practiceElement.innerText())
@@ -706,26 +724,34 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun whatToExpect(activity: Recommendation) {
+    private fun whatToExpect(activity: Recommendation, type: String) {
         logger.info { "Validating What To Expect section for activityId=${activity.id}" }
 
         val descriptiveMeta = activity.descriptive_meta
         val whatToExpect = descriptiveMeta?.what_to_expect
 
-        val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What to expect"))
-        heading.waitFor()
-        heading.click()
+        if (!whatToExpect.isNullOrBlank()) {
+
+            val heading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What to expect"))
+            heading.waitFor()
+            heading.click()
 
 
-        val subHeadingElement = page.getByTestId("exercise-what-to-expect")
-        subHeadingElement.waitFor()
+            val subHeadingElement = when (type) {
+                ActionPlanType.ACTIVITY.type -> page.getByTestId("exercise-what-to-expect")
+                else -> page.getByTestId("sleep-what-to-expect")
+            }
+            subHeadingElement.waitFor()
 
-        logger.info { "What To Expect actual=${removeWhitespace(subHeadingElement.innerText())}" }
-        logger.info { "What To Expect expected=${removeWhitespace(whatToExpect)}" }
+            logger.info { "What To Expect actual=${removeWhitespace(subHeadingElement.innerText())}" }
+            logger.info { "What To Expect expected=${removeWhitespace(whatToExpect)}" }
 
-        assertEquals(removeWhitespace(whatToExpect), removeWhitespace(subHeadingElement.innerText()))
+            assertEquals(removeWhitespace(whatToExpect), removeWhitespace(subHeadingElement.innerText()))
 
-        logger.info { "What To Expect section validated for activityId=${activity.id}" }
+            logger.info { "What To Expect section validated for activityId=${activity.id}" }
+        } else {
+            logger.warn { "What to expect empty for activityId=${activity.id}" }
+        }
     }
 
 
@@ -740,6 +766,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val imageElement = page.getByTestId("exercise-detail-image")
 
         listOf(heading, nameElement, displayElement, imageElement).forEach {
+            it.scrollIntoViewIfNeeded()
             it.waitFor()
             logger.info { "✅ Element visible: ${it}" }
         }
@@ -782,7 +809,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
 
-    private fun validatingMainCards(activityList: List<Recommendation>) {
+    private fun validatingActivityMainCards(activityList: List<Recommendation>) {
         logger.info("Validating ${activityList.size} activity main cards")
 
         activityList.forEach { activity ->
@@ -825,5 +852,164 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
     }
 
+    /**---------------Sleep-------------------*/
+    fun sleepMainCards() {
+        logger.info("Fetching activity recommendations from data")
+
+        val sleepList = recommendationData?.recommendations?.filter { it.category == sleep }
+
+
+        if (sleepList?.isNotEmpty() == true) {
+            logger.info("Activity list is not empty, waiting for Exercise heading")
+
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
+
+            validatingSleepMainCards(sleepList)
+
+            validatingSleepSidePanel(sleepList)
+        } else {
+            logger.warn("No activity recommendations found")
+        }
+    }
+
+
+    private fun validatingSleepMainCards(sleepList: List<Recommendation>) {
+        sleepList.forEach { sleep ->
+
+            val title = page.getByTestId("sleep-card-name-${sleep.id}")
+            val image = page.getByTestId("sleep-card-image-${sleep.id}")
+
+            listOf(title, image).forEach {
+                title.scrollIntoViewIfNeeded()
+                it.waitFor()
+                logger.info("Element visible: ${it}")
+            }
+
+            val expectedName = sleep.variant_description ?: sleep.display_name
+            val uiName = title.innerText()
+
+            assertEquals(expectedName, uiName)
+        }
+    }
+
+
+    private fun validatingSleepSidePanel(sleepList: List<Recommendation>) {
+        sleepList.forEach { sleep ->
+            val descriptiveMeta = sleep.descriptive_meta
+            val descriptionExpected = descriptiveMeta?.description
+
+
+            val title = page.getByTestId("sleep-card-name-${sleep.id}")
+            title.click()
+
+            val dialog = page.getByRole(AriaRole.DIALOG)
+            dialog.waitFor()
+
+
+            sleepHeaderSection(sleep)
+
+
+            sleepDescriptionSection(descriptionExpected, ActionPlanType.SLEEP.type)
+
+            potentialBiomarker(sleep, ActionPlanType.SLEEP.type)
+
+            validatingViewMore(sleep)
+
+            whyItWorks(sleep, ActionPlanType.SLEEP.type)
+            intoPractice(sleep, ActionPlanType.SLEEP.type)
+            whatToExpect(sleep, ActionPlanType.SLEEP.type)
+
+            val closePanel = page.getByTestId("sleep-panel-close")
+            closePanel.waitFor()
+            closePanel.click()
+
+
+            /*  val descriptiveMeta = activity.descriptive_meta
+              val descriptionExpected = descriptiveMeta?.description
+
+              val title = page.getByTestId("exercise-title-${activity.id}")
+              title.click()
+
+              val dialog = page.getByRole(AriaRole.DIALOG)
+              dialog.waitFor()
+
+
+              activityHeaderSection(activity)
+
+              val description = page.getByTestId("exercise-description")
+              description.waitFor()
+
+              assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
+
+              potentialBiomarker(activity)
+
+              val viewMore = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View More"))
+              viewMore.waitFor()
+              viewMore.click()
+
+
+              whyItWorks(activity)
+              intoPractice(activity)
+              whatToExpect(activity)
+
+              val closePanel = page.getByTestId("exercise-panel-close")
+              closePanel.waitFor()
+              closePanel.click()*/
+
+        }
+    }
+
+    private fun sleepDescriptionSection(descriptionExpected: String?, type: String) {
+        descriptionExpected?.let {
+            val description = when (type) {
+                ActionPlanType.ACTIVITY.type -> {
+                    page.getByTestId("exercise-description")
+                }
+
+                else -> {
+                    page.getByTestId("sleep-description")
+                }
+            }
+            description.waitFor()
+
+            assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
+        }
+    }
+
+    private fun validatingViewMore(sleep: Recommendation) {
+        val descriptiveMeta = sleep.descriptive_meta
+        if (!descriptiveMeta?.why_it_works.isNullOrBlank() || !descriptiveMeta?.how_to_practice.isNullOrBlank() || !descriptiveMeta?.what_to_expect.isNullOrBlank()) {
+            val viewMore = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View More"))
+            viewMore.waitFor()
+            viewMore.click()
+        }
+    }
+
+
+    private fun sleepHeaderSection(sleep: Recommendation) {
+
+        val sleepTitle = "Sleep"
+
+        val heading = page.getByTestId("sleep-panel-heading")
+        val nameElement = page.getByTestId("sleep-detail-name")
+        val displayElement = page.getByTestId("sleep-detail-display-name")
+        val imageElement = page.getByTestId("sleep-detail-image")
+
+
+        listOf(heading, nameElement, displayElement, imageElement).forEach {
+            it.scrollIntoViewIfNeeded()
+            it.waitFor()
+        }
+
+        val headingText = heading.innerText()
+        assertEquals(sleepTitle, headingText)
+
+        val nameText = nameElement.innerText()
+        assertEquals(sleep.name?.uppercase(), nameText)
+
+        val displayText = displayElement.innerText()
+        val expectedName = sleep.variant_description ?: sleep.display_name
+        assertEquals(expectedName, displayText)
+    }
 
 }
