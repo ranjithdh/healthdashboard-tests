@@ -92,12 +92,12 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.supplementsMainCards()
     }
 
- /*   @Test
-    @Order(5)
+    @Test
+    @Order(6)
     fun recommendationsTest() {
         actionPlanPage.captureRecommendationData()
-        actionPlanPage.supplementsMainCards()
-    }*/
+        actionPlanPage.testCards()
+    }
 
 
 }

@@ -1320,7 +1320,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             keyIngredient.click()
 
 
-            val source = if (supplement.variant_meta?.ingredients?.isNotEmpty() == true) supplement.variant_meta?.ingredients else supplement.variant_meta?.nutritionalFacts
+            val source =
+                if (supplement.variant_meta?.ingredients?.isNotEmpty() == true) supplement.variant_meta?.ingredients else supplement.variant_meta?.nutritionalFacts
 
             val filteredItems = source?.filter { item ->
                 !item.name.isNullOrBlank() &&
@@ -1330,9 +1331,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             filteredItems?.forEachIndexed { index, fact ->
-                val ingredientUiElement=page.getByTestId("supplements-ingredient-$index")
+                val ingredientUiElement = page.getByTestId("supplements-ingredient-$index")
                 ingredientUiElement.waitFor()
-                val expectedFact="${fact.name} ${formatNumber(fact.amount?:0.0)} ${fact.unit ?: ""}"
+                val expectedFact = "${fact.name} ${formatNumber(fact.amount ?: 0.0)} ${fact.unit ?: ""}"
                 assertEquals(expectedFact, ingredientUiElement.innerText().normalizeForUiCompare())
             }
 
@@ -1345,7 +1346,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     /**---------------Recommendation Test-------------------*/
-    fun stressTestCards() {
+    fun testCards() {
         val testList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.TEST.type }
 
 
@@ -1362,13 +1363,17 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun validatingTestMainCards(testList: List<Recommendation>) {
-        testList.forEach {
-            val image = page.getByTestId("further-test-card-image-400288")
-            val name = page.getByTestId("further-test-card-name-400288")
-            val bookTest = page.getByTestId("further-test-book-button-400288")
+        testList.forEach { test ->
+            val id=test.id
+            val image = page.getByTestId("further-test-card-image-$id")
+            val nameUiElement = page.getByTestId("further-test-card-name-$id")
+            val bookTest = page.getByTestId("further-test-book-button-$id")
 
-            listOf(image, name, bookTest).forEach { it.waitFor() }
+            listOf(image, nameUiElement, bookTest).forEach { it.waitFor() }
 
+            val expected = nameUiElement.innerText()
+
+            assertEquals(expected, test.display_name)
 
         }
     }
