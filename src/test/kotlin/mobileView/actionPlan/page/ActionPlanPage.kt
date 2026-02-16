@@ -79,6 +79,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     /**-----------------Nutrition-----------------------*/
 
     fun dailyCaloriesIntakeCard() {
+        StepHelper.step("Validating Daily Calories Intake Card")
         val nutritionProfile = recommendationData?.nutrient_profile
         nutritionProfile?.let {
             dailyCaloriesFieldCheck()
@@ -160,6 +161,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun nutritionMainCard() {
+        StepHelper.step("Validating Nutrition Main Card")
         val foodSectionLocators = listOf<Locator?>(
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition")),
 
@@ -177,6 +179,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun whatToEat() {
+        StepHelper.step("Validating Food Recommendations (What To Eat/Limit/Avoid)")
         logger.info { "Clicking Food Eat section" }
         val foodRecommendations = recommendationData?.food_recommendations
 
@@ -541,6 +544,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     /**-----------------Activity-----------------------*/
 
     fun activityMainCards() {
+        StepHelper.step("Validating Activity Recommendations")
         logger.info("Fetching activity recommendations from data")
 
         val activityList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.ACTIVITY.type }
@@ -875,13 +879,14 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Sleep-------------------*/
     fun sleepMainCards() {
-        logger.info("Fetching activity recommendations from data")
+        StepHelper.step("Validating Sleep Recommendations")
+        logger.info("Fetching sleep recommendations from data")
 
         val sleepList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.SLEEP.type }
 
 
         if (sleepList?.isNotEmpty() == true) {
-            logger.info("Activity list is not empty, waiting for Exercise heading")
+            logger.info("Sleep list is not empty, waiting for Exercise heading")
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
@@ -889,13 +894,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             validatingSleepSidePanel(sleepList)
         } else {
-            logger.warn("No activity recommendations found")
+            logger.warn("No sleep recommendations found")
         }
     }
 
 
     private fun validatingSleepMainCards(sleepList: List<Recommendation>) {
+        logger.info("Validating ${sleepList.size} sleep main cards")
         sleepList.forEach { sleep ->
+            logger.info("Validating card for sleep id=${sleep.id}, name=${sleep.display_name}")
 
             val title = page.getByTestId("sleep-card-name-${sleep.id}")
             val image = page.getByTestId("sleep-card-image-${sleep.id}")
@@ -909,13 +916,17 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val expectedName = sleep.variant_description ?: sleep.display_name
             val uiName = title.innerText()
 
+            logger.info("Expected name: $expectedName | UI name: $uiName")
+
             assertEquals(expectedName, uiName)
         }
     }
 
 
     private fun validatingSleepSidePanel(sleepList: List<Recommendation>) {
+        logger.info("Starting sleep side panel validation for ${sleepList.size} items")
         sleepList.forEach { sleep ->
+            logger.info("Opening sleep panel for id=${sleep.id}")
             val descriptiveMeta = sleep.descriptive_meta
             val descriptionExpected = descriptiveMeta?.description
 
@@ -926,6 +937,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val dialog = page.getByRole(AriaRole.DIALOG)
             dialog.waitFor()
 
+            logger.info("Sleep dialog opened for id=${sleep.id}")
 
             sleepHeaderSection(sleep)
 
@@ -944,11 +956,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             closePanel.waitFor()
             closePanel.click()
 
+            logger.info("Closed sleep panel for id=${sleep.id}")
         }
     }
 
     private fun descriptionSection(descriptionExpected: String?, type: String) {
         descriptionExpected?.let {
+            logger.info("Validating description for type: $type")
             val description = when (type) {
                 ActionPlanType.ACTIVITY.type -> {
                     page.getByTestId("exercise-description")
@@ -965,7 +979,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
             description.waitFor()
 
-            assertEquals(descriptionExpected.normalizeForUiCompare(), description.innerText().normalizeForUiCompare())
+            val actual = description.innerText().normalizeForUiCompare()
+            val expected = descriptionExpected.normalizeForUiCompare()
+            logger.info("Description actual  : $actual")
+            logger.info("Description expected: $expected")
+
+            assertEquals(expected, actual)
         }
     }
 
@@ -980,8 +999,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun sleepHeaderSection(sleep: Recommendation) {
-
         val sleepTitle = "Sleep"
+        logger.info("🔹 Validating Sleep Header Section for: ${sleep.display_name}")
 
         val heading = page.getByTestId("sleep-panel-heading")
         val nameElement = page.getByTestId("sleep-detail-name")
@@ -992,28 +1011,33 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         listOf(heading, nameElement, displayElement, imageElement).forEach {
             it.scrollIntoViewIfNeeded()
             it.waitFor()
+            logger.info("✅ Element visible: ${it}")
         }
 
         val headingText = heading.innerText()
+        logger.info("Heading text: $headingText")
         assertEquals(sleepTitle, headingText)
 
         val nameText = nameElement.innerText()
+        logger.info("Name text: $nameText, Expected: ${sleep.name}")
         assertEquals(sleep.name?.uppercase(), nameText)
 
         val displayText = displayElement.innerText()
         val expectedName = sleep.variant_description ?: sleep.display_name
+        logger.info("Display name text: $displayText, Expected: $expectedName")
         assertEquals(expectedName, displayText)
     }
 
     /**---------------Stress-------------------*/
     fun stressMainCards() {
-        logger.info("Fetching activity recommendations from data")
+        StepHelper.step("Validating Stress Recommendations")
+        logger.info("Fetching stress recommendations from data")
 
         val stressList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.STRESS.type }
 
 
         if (stressList?.isNotEmpty() == true) {
-            logger.info("Activity list is not empty, waiting for Exercise heading")
+            logger.info("Stress list is not empty, waiting for Stress heading")
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true))
 
@@ -1021,7 +1045,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             validatingStressSidePanel(stressList)
         } else {
-            logger.warn("No activity recommendations found")
+            logger.warn("No stress recommendations found")
         }
     }
 
@@ -1072,7 +1096,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun validatingStressSidePanel(stressList: List<Recommendation>) {
+        logger.info("Starting stress side panel validation for ${stressList.size} items")
         stressList.forEach { stress ->
+            logger.info("Opening stress panel for id=${stress.id}")
             val descriptiveMeta = stress.descriptive_meta
             val descriptionExpected = descriptiveMeta?.description
 
@@ -1081,6 +1107,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             val dialog = page.getByRole(AriaRole.DIALOG)
             dialog.waitFor()
+
+            logger.info("Stress dialog opened for id=${stress.id}")
 
             stressHeaderSection(stress)
 
@@ -1097,11 +1125,14 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val closePanel = page.getByTestId("stress-panel-close")
             closePanel.waitFor()
             closePanel.click()
+
+            logger.info("Closed stress panel for id=${stress.id}")
         }
     }
 
     private fun stressHeaderSection(stress: Recommendation) {
         val stressTitle = "Stress"
+        logger.info("🔹 Validating Stress Header Section for: ${stress.display_name}")
 
         val heading = page.getByTestId("stress-panel-heading")
         val nameElement = page.getByTestId("stress-detail-name")
@@ -1111,16 +1142,20 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         listOf(heading, nameElement, displayElement, imageElement).forEach {
             it.scrollIntoViewIfNeeded()
             it.waitFor()
+            logger.info("✅ Element visible: ${it}")
         }
 
         val headingText = heading.innerText()
+        logger.info("Heading text: $headingText")
         assertEquals(stressTitle, headingText)
 
         val nameText = nameElement.innerText()
+        logger.info("Name text: $nameText, Expected: ${stress.name}")
         assertEquals(stress.name?.uppercase(), nameText)
 
         val displayText = displayElement.innerText()
         val expectedName = stress.display_name
+        logger.info("Display name text: $displayText, Expected: $expectedName")
         assertEquals(expectedName, displayText)
     }
 
