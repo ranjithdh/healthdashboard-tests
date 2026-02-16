@@ -208,7 +208,7 @@ data class VariantMeta(
     val productId: String? = null,
     val is_trusted: Boolean? = null,
     val productUrl: String? = null,
-    val ingredients: List<Ingredient>? = null,
+    val ingredients: List<NutritionalFact>? = null,
     val serving_unit: String? = null,
     val recommendation: RecommendationMeta? = null,
     val nutritionalFacts: List<NutritionalFact>? = null,
@@ -217,7 +217,7 @@ data class VariantMeta(
 
 @Serializable
 data class Price(
-    val amount: Float? = null,
+    val amount: Double? = null,
     val currency: String? = null,
     val unitType: String? = null,
     val pricePerUnit: Double? = null,
@@ -226,12 +226,6 @@ data class Price(
     val unitsPerContainer: Int? = null
 )
 
-@Serializable
-data class Ingredient(
-    val name: String? = null,
-    val unit: String? = null,
-    val amount: Int? = null
-)
 
 @Serializable
 data class RecommendationMeta(
@@ -269,7 +263,7 @@ data class Meta(
     val productId: String? = null,
     val is_trusted: Boolean? = null,
     val productUrl: String? = null,
-    val ingredients: List<Ingredient>? = null,
+    val ingredients: List<NutritionalFact>? = null,
     val serving_unit: String? = null,
     val recommendation: Recommendation? = null,
     val nutritionalFacts: List<NutritionalFact>? = null,
