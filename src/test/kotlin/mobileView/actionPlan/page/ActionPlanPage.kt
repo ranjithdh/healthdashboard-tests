@@ -581,7 +581,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             activityHeaderSection(activity)
 
-            sleepDescriptionSection(descriptionExpected, ActionPlanType.ACTIVITY.type)
+            descriptionSection(descriptionExpected, ActionPlanType.ACTIVITY.type)
 
             potentialBiomarker(activity, ActionPlanType.ACTIVITY.type)
 
@@ -909,7 +909,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             sleepHeaderSection(sleep)
 
 
-            sleepDescriptionSection(descriptionExpected, ActionPlanType.SLEEP.type)
+            descriptionSection(descriptionExpected, ActionPlanType.SLEEP.type)
 
             potentialBiomarker(sleep, ActionPlanType.SLEEP.type)
 
@@ -923,43 +923,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             closePanel.waitFor()
             closePanel.click()
 
-
-            /*  val descriptiveMeta = activity.descriptive_meta
-              val descriptionExpected = descriptiveMeta?.description
-
-              val title = page.getByTestId("exercise-title-${activity.id}")
-              title.click()
-
-              val dialog = page.getByRole(AriaRole.DIALOG)
-              dialog.waitFor()
-
-
-              activityHeaderSection(activity)
-
-              val description = page.getByTestId("exercise-description")
-              description.waitFor()
-
-              assertEquals(removeWhitespace(descriptionExpected), removeWhitespace(description.innerText()))
-
-              potentialBiomarker(activity)
-
-              val viewMore = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View More"))
-              viewMore.waitFor()
-              viewMore.click()
-
-
-              whyItWorks(activity)
-              intoPractice(activity)
-              whatToExpect(activity)
-
-              val closePanel = page.getByTestId("exercise-panel-close")
-              closePanel.waitFor()
-              closePanel.click()*/
-
         }
     }
 
-    private fun sleepDescriptionSection(descriptionExpected: String?, type: String) {
+    private fun descriptionSection(descriptionExpected: String?, type: String) {
         descriptionExpected?.let {
             val description = when (type) {
                 ActionPlanType.ACTIVITY.type -> {
