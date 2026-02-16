@@ -73,18 +73,24 @@ class ActionPlanTest : BaseTest() {
 
     @Test
     @Order(3)
-    fun sleepTest(){
+    fun sleepTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.sleepMainCards()
     }
 
     @Test
     @Order(4)
-    fun stressTest(){
+    fun stressTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.stressMainCards()
     }
 
+    @Test
+    @Order(5)
+    fun supplementsTest() {
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.supplementsMainCards()
+    }
 
 
 }

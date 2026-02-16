@@ -1039,7 +1039,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         if (stressList?.isNotEmpty() == true) {
             logger.info("Stress list is not empty, waiting for Stress heading")
 
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true))
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true)).waitFor()
 
             validatingStressMainCards(stressList)
 
@@ -1159,5 +1159,21 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         assertEquals(expectedName, displayText)
     }
 
+
+    /**---------------Supplements-------------------*/
+    fun supplementsMainCards(){
+        val supplementList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.SUPPLEMENT.type }
+        if (supplementList?.isNotEmpty() == true) {
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplements")).waitFor()
+
+            validatingSupplementsMainCards(supplementList)
+        }
+    }
+
+    fun validatingSupplementsMainCards(supplementList: List<Recommendation>) {
+        supplementList.forEach { supplement ->
+
+        }
+    }
 
 }
