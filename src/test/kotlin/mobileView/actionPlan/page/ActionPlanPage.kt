@@ -8,6 +8,7 @@ import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.model.*
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
+import mobileView.actionPlan.utils.ActionPlanUtils.formatNumber
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
@@ -35,6 +36,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var optimal = "Optimal"
     private var normal = "Normal"
     private var question = "question"
+    private var supplementsDisclaimer =
+        "Disclaimer: The supplement recommendations shared are based on the nutrient form, dosage, and intended therapeutic benefit. You are free to choose any trusted and good-quality brand available to you, ensuring that it matches the specified ingredient and dosage. Please consult your healthcare provider before purchasing, especially if you have concerns regarding allergies, specific ingredients, or medication interactions. The brand names are only indicative and not mandatory."
 
     init {
         //  monitorTraffic()
@@ -1168,8 +1171,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplements")).waitFor()
 
             validatingSupplementsMainCards(supplementList)
+            validatingSupplementsSideCards(supplementList)
         }
     }
+
 
     fun validatingSupplementsMainCards(supplementList: List<Recommendation>) {
         supplementList.forEach { supplement ->
@@ -1250,9 +1255,91 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 assertEquals(expected.normalizeForUiCompare(), noteUiElement.innerText().normalizeForUiCompare())
 
+            }
+
+            val disclaimerUiElement = page.getByTestId("supplements-disclaimer")
+            disclaimerUiElement.waitFor()
+            val actual = disclaimerUiElement.innerText()
+
+            assertEquals(supplementsDisclaimer, actual)
+        }
+    }
+
+    private fun validatingSupplementsSideCards(supplementList: List<Recommendation>) {
+        supplementList.forEach { supplement ->
+            val id = supplement.id
+            val nameUiElement = page.getByTestId("supplement-name-${id}")
+
+            nameUiElement.waitFor()
+            nameUiElement.click()
+
+            val dialog = page.getByRole(AriaRole.DIALOG)
+            dialog.waitFor()
+
+            val imageUrls = supplement.variant_meta?.imageUrls
+
+            if (imageUrls?.isNotEmpty() == true) {
+
+                val toLast = imageUrls.dropLast(1) // removes last item
+                toLast.forEach { _ ->
+                    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next slide")).click()
+                }
+                toLast.forEach {
+                    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous slide")).click()
+                }
 
             }
 
+            //TODO need to add rating
+
+            val cardNameUiElement = page.getByTestId("supplements-detail-name")
+
+            cardNameUiElement.waitFor()
+
+            val expectedName = cardNameUiElement.innerText()
+            assertEquals(expectedName, supplement.name)
+
+            val brand = supplement.variant_meta?.brand
+            if (!brand.isNullOrBlank() && brand != "NA") {
+                page.getByText(brand, Page.GetByTextOptions().setExact(true)).waitFor()
+            }
+
+            val amount = supplement.variant_meta?.price?.amount
+            if (amount != null) {
+                page.getByText("₹${formatNumber(amount)}", Page.GetByTextOptions().setExact(true)).waitFor()
+                page.getByText("Inclusive of all taxes").waitFor()
+            }
+
+            page.getByTestId("supplements-view-details-heading").waitFor()
+
+            //TODO need to check the description
+
+            val keyIngredient = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Key Ingredients"))
+            keyIngredient.waitFor()
+
+            keyIngredient.click()
+
+
+            val source = if (supplement.variant_meta?.ingredients?.isNotEmpty() == true) supplement.variant_meta?.ingredients else supplement.variant_meta?.nutritionalFacts
+
+            val filteredItems = source?.filter { item ->
+                !item.name.isNullOrBlank() &&
+                        item.name.trim().lowercase() !in listOf(
+                    "excipient", "excipients", "purified water", "flavour"
+                )
+            }
+
+            filteredItems?.forEachIndexed { index, fact ->
+                val ingredientUiElement=page.getByTestId("supplements-ingredient-$index")
+                ingredientUiElement.waitFor()
+                val expectedFact="${fact.name} ${formatNumber(fact.amount?:0.0)} ${fact.unit ?: ""}"
+                assertEquals(expectedFact, ingredientUiElement.innerText().normalizeForUiCompare())
+            }
+
+
+            val closePanel = page.getByTestId("supplements-panel-close")
+            closePanel.waitFor()
+            closePanel.click()
 
         }
     }
