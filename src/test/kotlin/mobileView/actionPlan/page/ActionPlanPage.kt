@@ -37,6 +37,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var question = "question"
     private var activity = "activity"
     private var sleep = "sleep"
+    private var stress = "stress"
 
     init {
         //  monitorTraffic()
@@ -978,5 +979,97 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val expectedName = sleep.variant_description ?: sleep.display_name
         assertEquals(expectedName, displayText)
     }
+
+    /**---------------Stress-------------------*/
+    fun stressMainCards() {
+        logger.info("Fetching activity recommendations from data")
+
+        val stressList = recommendationData?.recommendations?.filter { it.category == stress }
+
+
+        if (stressList?.isNotEmpty() == true) {
+            logger.info("Activity list is not empty, waiting for Exercise heading")
+
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true))
+
+            validatingStressMainCards(stressList)
+
+            // validatingStressSidePanel(stressList)
+        } else {
+            logger.warn("No activity recommendations found")
+        }
+    }
+
+
+    private fun validatingStressMainCards(stressList: List<Recommendation>) {
+        logger.info("Validating ${stressList.size} activity main cards")
+
+        stressList.forEach { stress ->
+
+            logger.info("Validating card for activity id=${stress.id}, name=${stress.display_name}")
+
+            val title = page.getByTestId("stress-card-name-${stress.id}")
+            val image = page.getByTestId("stress-card-image-${stress.id}")
+
+            listOf(title, image).forEach {
+                it.waitFor()
+                logger.info("Element visible: ${it}")
+            }
+
+            val expectedName = stress.display_name
+            val uiName = title.innerText()
+
+            logger.info("Expected name: $expectedName | UI name: $uiName")
+
+            assertEquals(expectedName, uiName)
+
+            val variantDescription = stress.variant_description
+            logger.info("Variant description: $variantDescription")
+
+            val bagList = variantDescription
+                ?.split(",")
+                ?.map { it.trim() }
+                ?: emptyList()
+
+            logger.info("Bag list: $bagList")
+
+            if (variantDescription?.isBlank() == false && bagList.isNotEmpty()) {
+                bagList.forEachIndexed { index, bag ->
+                    val bagText = page.getByTestId("stress-card-${stress.id}").getByTestId("stress-card-badge-${index}")
+                    bagText.waitFor()
+                    logger.info("Validating bag text: expected:$bag, actual:${bagText.innerText()}")
+                    assertEquals(bagText.innerText(), bag)
+                }
+            } else {
+                logger.info("No bags to validate for activity id=${stress.id}")
+            }
+        }
+    }
+
+    private fun validatingStressSidePanel(stressList: List<Recommendation>) {
+        stressList.forEach { stress ->
+            val descriptiveMeta = stress.descriptive_meta
+            val descriptionExpected = descriptiveMeta?.description
+
+            val title = page.getByTestId("stress-card-name-${stress.id}")
+            title.click()
+
+            val dialog = page.getByRole(AriaRole.DIALOG)
+            dialog.waitFor()
+
+            stressHeaderSection(stress)
+
+        }
+    }
+
+    private fun stressHeaderSection(stress: Recommendation) {
+        val stressTitle = "Stress"
+
+        val heading = page.getByTestId("sleep-panel-heading")
+        val nameElement = page.getByTestId("sleep-detail-name")
+        val displayElement = page.getByTestId("sleep-detail-display-name")
+        val imageElement = page.getByTestId("sleep-detail-image")
+    }
+
 
 }

@@ -78,5 +78,13 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.sleepMainCards()
     }
 
+    @Test
+    @Order(4)
+    fun stressTest(){
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.stressMainCards()
+    }
+
+
 
 }
