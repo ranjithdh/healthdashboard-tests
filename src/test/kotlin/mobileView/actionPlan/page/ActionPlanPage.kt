@@ -35,9 +35,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var optimal = "Optimal"
     private var normal = "Normal"
     private var question = "question"
-    private var activity = "activity"
-    private var sleep = "sleep"
-    private var stress = "stress"
 
     init {
         //  monitorTraffic()
@@ -546,7 +543,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     fun activityMainCards() {
         logger.info("Fetching activity recommendations from data")
 
-        val activityList = recommendationData?.recommendations?.filter { it.category == activity }
+        val activityList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.ACTIVITY.type }
 
         logger.info("Filtered activity list size: ${activityList?.size ?: 0}")
 
@@ -880,7 +877,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     fun sleepMainCards() {
         logger.info("Fetching activity recommendations from data")
 
-        val sleepList = recommendationData?.recommendations?.filter { it.category == sleep }
+        val sleepList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.SLEEP.type }
 
 
         if (sleepList?.isNotEmpty() == true) {
@@ -1012,7 +1009,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     fun stressMainCards() {
         logger.info("Fetching activity recommendations from data")
 
-        val stressList = recommendationData?.recommendations?.filter { it.category == stress }
+        val stressList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.STRESS.type }
 
 
         if (stressList?.isNotEmpty() == true) {
