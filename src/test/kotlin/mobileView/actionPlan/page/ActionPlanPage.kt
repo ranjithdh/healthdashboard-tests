@@ -49,6 +49,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     fun captureRecommendationData() {
         if (recommendationData === null) {
+            logger.info { "Step: $FETCH_RECOMMENDATION_DATA" }
             StepHelper.step(FETCH_RECOMMENDATION_DATA)
             try {
                 val response = page.waitForResponse(
@@ -82,6 +83,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     /**-----------------Nutrition-----------------------*/
 
     fun dailyCaloriesIntakeCard() {
+        logger.info("Step: Validating Daily Calories Intake Card")
         StepHelper.step("Validating Daily Calories Intake Card")
         val nutritionProfile = recommendationData?.nutrient_profile
         nutritionProfile?.let {
@@ -164,6 +166,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun nutritionMainCard() {
+        logger.info("Step: Validating Nutrition Main Card")
         StepHelper.step("Validating Nutrition Main Card")
         val foodSectionLocators = listOf<Locator?>(
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition")),
@@ -182,6 +185,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun whatToEat() {
+        logger.info("Step: Validating Food Recommendations (What To Eat/Limit/Avoid)")
         StepHelper.step("Validating Food Recommendations (What To Eat/Limit/Avoid)")
         logger.info { "Clicking Food Eat section" }
         val foodRecommendations = recommendationData?.food_recommendations
@@ -455,6 +459,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         foodRecommendations?.let {
 
+            logger.info("Step: Validating Search Food Items")
+            StepHelper.step("Validating Search Food Items")
             logger.info { "Starting search validation" }
 
             val searchBox =
@@ -547,6 +553,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     /**-----------------Activity-----------------------*/
 
     fun activityMainCards() {
+        logger.info("Step: Validating Activity Recommendations")
         StepHelper.step("Validating Activity Recommendations")
         logger.info("Fetching activity recommendations from data")
 
@@ -882,6 +889,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Sleep-------------------*/
     fun sleepMainCards() {
+        logger.info("Step: Validating Sleep Recommendations")
         StepHelper.step("Validating Sleep Recommendations")
         logger.info("Fetching sleep recommendations from data")
 
@@ -1033,6 +1041,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Stress-------------------*/
     fun stressMainCards() {
+        logger.info("Step: Validating Stress Recommendations")
         StepHelper.step("Validating Stress Recommendations")
         logger.info("Fetching stress recommendations from data")
 
@@ -1165,6 +1174,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Supplements-------------------*/
     fun supplementsMainCards() {
+        logger.info("Step: Validating Supplements")
+        StepHelper.step("Validating Supplements")
         val supplementList =
             recommendationData?.recommendations?.filter { it.category == ActionPlanType.SUPPLEMENT.type }
         if (supplementList?.isNotEmpty() == true) {
@@ -1347,6 +1358,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Recommendation Test-------------------*/
     fun testCards() {
+        logger.info("Step: Validating Further Test Recommendations")
+        StepHelper.step("Validating Further Test Recommendations")
         val testList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.TEST.type }
 
 
