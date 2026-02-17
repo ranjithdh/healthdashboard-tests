@@ -55,7 +55,6 @@ data class Food(
 )
 
 
-
 @Serializable
 data class InferenceBucket(
     val id: String? = null,
@@ -72,6 +71,7 @@ data class ImpactBiomarker(
     val inference: String? = null,
     val category: String? = null
 )
+
 @Serializable
 data class NutrientProfile(
     val calories: String? = null,
@@ -80,7 +80,6 @@ data class NutrientProfile(
     val fat: String? = null,
     val fiber: String? = null
 )
-
 
 
 @Serializable
@@ -133,6 +132,7 @@ data class MetricRecommendation(
     val metric: Metric? = null,
     val inference_bucket: InferenceBucket? = null
 )
+
 @Serializable
 data class Metric(
     val id: String? = null,
@@ -155,6 +155,7 @@ data class Metric(
     val inference: Double? = null,
     val trend_arrow: String? = null
 )
+
 @Serializable
 data class Action(
     val id: String? = null,
@@ -182,7 +183,8 @@ data class EventConfig(
 
 @Serializable
 data class UserRecommendationAction(
-    val id: String? = null
+    val id: String? = null,
+    val is_completed: Boolean = false,
 )
 
 @Serializable
@@ -195,8 +197,6 @@ data class DescriptiveMeta(
     val why_supports_longevity: String? = null,
     val potential_biomarker_impact: String? = null
 )
-
-
 
 
 @Serializable
@@ -232,7 +232,6 @@ data class RecommendationMeta(
     val reason: String? = null,
     val priority: Int? = null
 )
-
 
 
 @Serializable

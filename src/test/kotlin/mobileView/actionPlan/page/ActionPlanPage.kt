@@ -1463,18 +1463,17 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private fun validatingTestMainCards(testList: List<Recommendation>) {
         testList.forEach { test ->
             val id = test.id
-            logger.info{ " Test.... id .. $id" }
             val image = page.getByTestId("further-test-card-image-$id")
             val nameUiElement = page.getByTestId("further-test-card-name-$id")
             val bookTest = page.getByTestId("further-test-book-button-$id")
+            val addTestButton = page.getByTestId("further-test-added-button-$id")
 
-            listOf(image, nameUiElement, bookTest).forEach { it.waitFor() }
+            listOf(image, nameUiElement).forEach { it.waitFor() }
 
             val expected = nameUiElement.innerText()
             page.waitForTimeout(1000.0)
             assertEquals(expected, test.display_name)
 
-            val bookTestActual = bookTest.innerText()
 
             val isBooked = isTestBooked(
                 labTestsData = allTests,
@@ -1482,14 +1481,26 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 testType = test.test_type
             )
 
-            val bookTestExpected = if (isBooked) {
-                "Booked"
+            val isCompleted = test.actions
+                ?.getOrNull(0)
+                ?.user_recommendation_actions
+                ?.getOrNull(0)
+                ?.is_completed
+
+
+            if (isCompleted == true) {
+                addTestButton.waitFor()
+                assertEquals("Added to Plan", addTestButton.innerText())
             } else {
-                "Book a Test"
+                bookTest.waitFor()
+                val bookTestActual = bookTest.innerText()
+                val bookTestExpected = if (isBooked) {
+                    "Booked"
+                } else {
+                    "Book a Test"
+                }
+                assertEquals(bookTestExpected, bookTestActual)
             }
-
-
-            assertEquals(bookTestExpected, bookTestActual)
         }
     }
 
