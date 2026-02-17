@@ -53,6 +53,7 @@ class ActionPlanTest : BaseTest() {
         return actionPage
     }
 
+
     @Test
     @Order(1)
     fun nutritionTest() {
@@ -61,6 +62,7 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.whatToEat()
         actionPlanPage.searchValidation()
     }
+
 
 
     @Test
