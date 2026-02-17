@@ -19,7 +19,6 @@ import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
-import utils.report.StepHelper.FETCH_ACCOUNT_INFORMATION
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
 import utils.report.StepHelper.OPENING_ACTIVITY_PANEL
 import utils.report.StepHelper.OPENING_SLEEP_PANEL
@@ -35,6 +34,7 @@ import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
+import mobileView.diagnostics.TestDetailPage
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -1444,7 +1444,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             listOf(image, nameUiElement).forEach { it.waitFor() }
 
             val expected = nameUiElement.innerText()
-            page.waitForTimeout(1000.0)
+
             assertEquals(expected, test.display_name)
 
 
@@ -1471,6 +1471,14 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                     "Booked"
                 } else {
                     "Book a Test"
+                }
+
+                if (!isBooked) {
+                    page.waitForTimeout(2000.0)
+                    bookTest.click()
+                    TestDetailPage(page)
+                        .waitForPageLoad()
+                        .clickBackButton()
                 }
                 assertEquals(bookTestExpected, bookTestActual)
             }

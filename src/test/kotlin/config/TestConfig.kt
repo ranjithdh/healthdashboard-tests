@@ -75,6 +75,8 @@ object TestConfig {
         val TRACK_RESULT = "${BASE_URL}order/"
         val RECOMMENDATIONS_URL = "${BASE_URL}recommendations"
 
+        val TEST_DETAIL_URL = "${BASE_URL}test-detail"
+
 
     }
 
