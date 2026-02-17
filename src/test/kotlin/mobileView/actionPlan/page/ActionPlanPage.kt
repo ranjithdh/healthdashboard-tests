@@ -1363,6 +1363,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         supplementList.forEach { supplement ->
             val id = supplement.id
             val nameUiElement = page.getByTestId("supplement-name-${id}")
+            val totalRatings = supplement.variant_meta?.price?.totalRatings
 
             nameUiElement.waitFor()
             nameUiElement.click()
@@ -1384,7 +1385,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             }
 
-            //TODO need to add rating
+            if (totalRatings != null) {
+                val totalRatingNumber = page.getByTestId("supplements-total-ratings")
+                logger.info { "Rating Start.... ${totalRatingNumber.innerText()}" }
+
+                assertEquals("(${formatNumber(totalRatings)})", totalRatingNumber.innerText())
+            }
+
 
             val cardNameUiElement = page.getByTestId("supplements-detail-name")
 
@@ -1405,8 +1412,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             page.getByTestId("supplements-view-details-heading").waitFor()
-
-            //TODO need to check the description
 
             val keyIngredient = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Key Ingredients"))
             keyIngredient.waitFor()
