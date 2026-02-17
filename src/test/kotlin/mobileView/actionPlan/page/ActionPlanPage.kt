@@ -1405,6 +1405,14 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 assertEquals(expectedFact, ingredientUiElement.innerText().normalizeForUiCompare())
             }
 
+            val buyButton = page.getByTestId("supplements-buy-button")
+            buyButton.waitFor()
+
+            val popup = page.waitForPopup {
+                buyButton.click()
+            }
+            logger.info { "Supplement Buy Button Clicked, opened: ${popup.url()}" }
+            popup.close()
 
             val closePanel = page.getByTestId("supplements-panel-close")
             closePanel.waitFor()
