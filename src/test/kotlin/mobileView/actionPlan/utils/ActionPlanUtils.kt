@@ -2,6 +2,8 @@ package mobileView.actionPlan.utils
 
 import mobileView.actionPlan.model.NutritionCategorySubtext
 import mobileView.actionPlan.model.NutritionFoodType
+import mobileView.actionPlan.model.RecommendationLabTestPackage
+import model.LabTestPackage
 import kotlin.math.roundToInt
 
 object ActionPlanUtils {
@@ -120,6 +122,15 @@ object ActionPlanUtils {
             value.toString()
         }
     }
+
+    fun isTestBooked(testId: String?, testType: String?, labTestsData: List<RecommendationLabTestPackage>): Boolean {
+        val test = labTestsData.find { t ->
+            t.id == testId && (testType == null || t.type == testType)
+        } ?: return false
+
+        return test.di_order != null || test.di_kit != null
+    }
+
 
 
 }

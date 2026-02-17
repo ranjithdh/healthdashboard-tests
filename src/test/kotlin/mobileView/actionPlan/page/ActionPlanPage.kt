@@ -4,15 +4,18 @@ import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.model.*
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
 import mobileView.actionPlan.utils.ActionPlanUtils.formatNumber
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
+import mobileView.actionPlan.utils.ActionPlanUtils.isTestBooked
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.actionPlan.utils.ActionPlanUtils.splitByNewLine
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -38,6 +41,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var question = "question"
     private var supplementsDisclaimer =
         "Disclaimer: The supplement recommendations shared are based on the nutrient form, dosage, and intended therapeutic benefit. You are free to choose any trusted and good-quality brand available to you, ensuring that it matches the specified ingredient and dosage. Please consult your healthcare provider before purchasing, especially if you have concerns regarding allergies, specific ingredients, or medication interactions. The brand names are only indicative and not mandatory."
+
+    var labTestData: RecommendationLabTest? = null
+    var allTests = listOf<RecommendationLabTestPackage>()
 
     init {
         //  monitorTraffic()
@@ -77,6 +83,83 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             } catch (e: Exception) {
                 logger.error { "Failed to parse API response or API call failed..${e.message}" }
             }
+        }
+    }
+
+    fun fetchAccountInformation() {
+
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.LAB_TEST_API_URL,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            val responseObj = json.decodeFromString<RecommendationLabTest>(responseBody)
+
+            if (responseObj.status == "success") {
+                labTestData = responseObj
+                val productList = labTestData?.data?.diagnostic_product_list
+
+                val packages = productList?.packages ?: emptyList()
+                val testProfiles = productList?.test_profiles ?: emptyList()
+                val tests = productList?.tests ?: emptyList()
+
+                allTests = (packages + testProfiles + tests)
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
+        }
+    }
+
+    fun captureLabTestsData() {
+        try {
+            val response = page.waitForResponse(
+                { response: Response? ->
+                    response?.url()?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true &&
+                            response.request().method() == "GET"
+                }, {
+
+                }
+            )
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                return
+            }
+
+
+            val responseObj = json.decodeFromString<RecommendationLabTest>(responseBody)
+
+            if (responseObj.data != null) {
+                labTestData = responseObj
+                val productList = labTestData?.data?.diagnostic_product_list
+
+                val packages = productList?.packages ?: emptyList()
+                val testProfiles = productList?.test_profiles ?: emptyList()
+                val tests = productList?.tests ?: emptyList()
+
+                allTests = (packages + testProfiles + tests)
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response or API call failed..${e.message}" }
         }
     }
 
@@ -845,7 +928,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun validatingActivityMainCards(activityList: List<Recommendation>) {
-        logger.info{"Validating ${activityList.size} activity main cards"}
+        logger.info { "Validating ${activityList.size} activity main cards" }
 
         activityList.forEach { activity ->
 
@@ -1358,13 +1441,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Recommendation Test-------------------*/
     fun testCards() {
-        logger.info("Step: Validating Further Test Recommendations")
+        logger.info("Test.... testCards")
         StepHelper.step("Validating Further Test Recommendations")
         val testList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.TEST.type }
 
 
         if (testList?.isNotEmpty() == true) {
-            logger.info("Stress list is not empty, waiting for Stress heading")
+            fetchAccountInformation()
+            logger.info("Test.... Stress list is not empty, waiting for Stress heading")
+            logger.info("Test.... allTests .. ${allTests.size}")
 
             page.getByTestId("further-test-heading").waitFor()
 
@@ -1377,7 +1462,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     private fun validatingTestMainCards(testList: List<Recommendation>) {
         testList.forEach { test ->
-            val id=test.id
+            val id = test.id
+            logger.info{ " Test.... id .. $id" }
             val image = page.getByTestId("further-test-card-image-$id")
             val nameUiElement = page.getByTestId("further-test-card-name-$id")
             val bookTest = page.getByTestId("further-test-book-button-$id")
@@ -1385,9 +1471,25 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             listOf(image, nameUiElement, bookTest).forEach { it.waitFor() }
 
             val expected = nameUiElement.innerText()
-
+            page.waitForTimeout(1000.0)
             assertEquals(expected, test.display_name)
 
+            val bookTestActual = bookTest.innerText()
+
+            val isBooked = isTestBooked(
+                labTestsData = allTests,
+                testId = test.test_id,
+                testType = test.test_type
+            )
+
+            val bookTestExpected = if (isBooked) {
+                "Booked"
+            } else {
+                "Book a Test"
+            }
+
+
+            assertEquals(bookTestExpected, bookTestActual)
         }
     }
 
