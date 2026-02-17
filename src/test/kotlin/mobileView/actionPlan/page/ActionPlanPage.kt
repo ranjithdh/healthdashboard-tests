@@ -845,7 +845,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun validatingActivityMainCards(activityList: List<Recommendation>) {
-        logger.info("Validating ${activityList.size} activity main cards")
+        logger.info{"Validating ${activityList.size} activity main cards"}
 
         activityList.forEach { activity ->
 
