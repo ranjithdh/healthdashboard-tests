@@ -19,7 +19,21 @@ import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
+import utils.report.StepHelper.FETCH_ACCOUNT_INFORMATION
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
+import utils.report.StepHelper.OPENING_ACTIVITY_PANEL
+import utils.report.StepHelper.OPENING_SLEEP_PANEL
+import utils.report.StepHelper.OPENING_STRESS_PANEL
+import utils.report.StepHelper.OPENING_SUPPLEMENTS_PANEL
+import utils.report.StepHelper.VALIDATING_ACTIVITY_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_DAILY_CALORIES_CARD
+import utils.report.StepHelper.VALIDATING_FOOD_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_FURTHER_TESTS
+import utils.report.StepHelper.VALIDATING_NUTRITION_MAIN_CARD
+import utils.report.StepHelper.VALIDATING_SEARCH_FOOD_ITEMS
+import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -45,17 +59,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     var labTestData: RecommendationLabTest? = null
     var allTests = listOf<RecommendationLabTestPackage>()
 
-    init {
-        //  monitorTraffic()
-    }
-
-    private fun monitorTraffic() {
-        captureRecommendationData()
-    }
-
     fun captureRecommendationData() {
         if (recommendationData === null) {
-            logger.info { "Step: $FETCH_RECOMMENDATION_DATA" }
             StepHelper.step(FETCH_RECOMMENDATION_DATA)
             try {
                 val response = page.waitForResponse(
@@ -73,8 +78,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                     return
                 }
 
-                //logger.info { "API response...${responseBody}" }
-
                 val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
 
                 if (responseObj.data != null) {
@@ -86,7 +89,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun fetchAccountInformation() {
+    fun captureLabTestsData() {
 
         try {
             val timeZone = java.util.TimeZone.getDefault().id
@@ -129,45 +132,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun captureLabTestsData() {
-        try {
-            val response = page.waitForResponse(
-                { response: Response? ->
-                    response?.url()?.contains(TestConfig.APIs.LAB_TEST_API_URL) == true &&
-                            response.request().method() == "GET"
-                }, {
-
-                }
-            )
-
-            val responseBody = response.text()
-            if (responseBody.isNullOrBlank()) {
-                return
-            }
-
-
-            val responseObj = json.decodeFromString<RecommendationLabTest>(responseBody)
-
-            if (responseObj.data != null) {
-                labTestData = responseObj
-                val productList = labTestData?.data?.diagnostic_product_list
-
-                val packages = productList?.packages ?: emptyList()
-                val testProfiles = productList?.test_profiles ?: emptyList()
-                val tests = productList?.tests ?: emptyList()
-
-                allTests = (packages + testProfiles + tests)
-            }
-        } catch (e: Exception) {
-            logger.error { "Failed to parse API response or API call failed..${e.message}" }
-        }
-    }
 
     /**-----------------Nutrition-----------------------*/
 
     fun dailyCaloriesIntakeCard() {
-        logger.info("Step: Validating Daily Calories Intake Card")
-        StepHelper.step("Validating Daily Calories Intake Card")
+        StepHelper.step(VALIDATING_DAILY_CALORIES_CARD)
         val nutritionProfile = recommendationData?.nutrient_profile
         nutritionProfile?.let {
             dailyCaloriesFieldCheck()
@@ -190,11 +159,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val uiFat = fatValue.innerText()
         val uiFiber = fiberValue.innerText()
 
-        logger.info("UI Daily Calories : $uiDailyCalories")
-        logger.info("UI Carbohydrate   : $uiCarbohydrate")
-        logger.info("UI Protein        : $uiProtein")
-        logger.info("UI Fat            : $uiFat")
-        logger.info("UI Fiber          : $uiFiber")
+        logger.info { "UI Daily Calories : $uiDailyCalories" }
+        logger.info { "UI Carbohydrate   : $uiCarbohydrate" }
+        logger.info { "UI Protein        : $uiProtein" }
+        logger.info { "UI Fat            : $uiFat" }
+        logger.info { "UI Fiber          : $uiFiber" }
 
         val apiCalories = nutritionProfile?.calories
         val apiCarbohydrate = nutritionProfile?.carbohydrate
@@ -214,11 +183,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val fatValues = "$apiFatPercentage-$apiFat".plus("g")
         val fiberValues = "$apiFiberPercentage-$apiFiber".plus("g")
 
-        logger.info("API Daily Calories : $caloriesValues")
-        logger.info("API Carbohydrate   : $carbohydrateValues")
-        logger.info("API Protein        : $proteinValues")
-        logger.info("API Fat            : $fatValues")
-        logger.info("API Fiber          : $fiberValues")
+        logger.info { "API Daily Calories : $caloriesValues" }
+        logger.info { "API Carbohydrate   : $carbohydrateValues" }
+        logger.info { "API Protein        : $proteinValues" }
+        logger.info { "API Fat            : $fatValues" }
+        logger.info { "API Fiber          : $fiberValues" }
 
         assertEquals(caloriesValues, uiDailyCalories)
         assertEquals(carbohydrateValues, uiCarbohydrate)
@@ -249,8 +218,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun nutritionMainCard() {
-        logger.info("Step: Validating Nutrition Main Card")
-        StepHelper.step("Validating Nutrition Main Card")
+        StepHelper.step(VALIDATING_NUTRITION_MAIN_CARD)
         val foodSectionLocators = listOf<Locator?>(
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition")),
 
@@ -268,8 +236,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun whatToEat() {
-        logger.info("Step: Validating Food Recommendations (What To Eat/Limit/Avoid)")
-        StepHelper.step("Validating Food Recommendations (What To Eat/Limit/Avoid)")
+        StepHelper.step(VALIDATING_FOOD_RECOMMENDATIONS)
         logger.info { "Clicking Food Eat section" }
         val foodRecommendations = recommendationData?.food_recommendations
 
@@ -542,8 +509,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         foodRecommendations?.let {
 
-            logger.info("Step: Validating Search Food Items")
-            StepHelper.step("Validating Search Food Items")
+            StepHelper.step(VALIDATING_SEARCH_FOOD_ITEMS)
             logger.info { "Starting search validation" }
 
             val searchBox =
@@ -636,9 +602,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     /**-----------------Activity-----------------------*/
 
     fun activityMainCards() {
-        logger.info("Step: Validating Activity Recommendations")
-        StepHelper.step("Validating Activity Recommendations")
-        logger.info("Fetching activity recommendations from data")
+        StepHelper.step(VALIDATING_ACTIVITY_RECOMMENDATIONS)
+        logger.info { "Fetching activity recommendations from data" }
 
         val activityList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.ACTIVITY.type }
 
@@ -661,6 +626,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         logger.info { "Starting activity side panel validation for ${activityList.size} activities" }
 
         activityList.forEach { activity ->
+            StepHelper.step("${OPENING_ACTIVITY_PANEL}: ${activity.display_name}")
             logger.info { "Opening activity panel for activityId=${activity.id}" }
 
             val descriptiveMeta = activity.descriptive_meta
@@ -932,55 +898,54 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         activityList.forEach { activity ->
 
-            logger.info("Validating card for activity id=${activity.id}, name=${activity.display_name}")
+            logger.info { "Validating card for activity id=${activity.id}, name=${activity.display_name}" }
 
             val title = page.getByTestId("exercise-title-${activity.id}")
             val image = page.getByTestId("exercise-image-${activity.id}")
 
             listOf(title, image).forEach {
                 it.waitFor()
-                logger.info("Element visible: ${it}")
+                logger.info { "✅ Element visible: ${it}" }
             }
 
             val expectedName = activity.display_name
             val uiName = title.innerText()
 
-            logger.info("Expected name: $expectedName | UI name: $uiName")
+            logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
             assertEquals(expectedName, uiName)
 
             val variantDescription = activity.variant_description
-            logger.info("Variant description: $variantDescription")
+            logger.info { "Variant description: $variantDescription" }
 
             val bagList = variantDescription
                 ?.split(",")
                 ?.map { it.trim() }
                 ?: emptyList()
 
-            logger.info("Bag list: $bagList")
+            logger.info { "Bag list: $bagList" }
 
             if (variantDescription?.isBlank() == false && bagList.isNotEmpty()) {
                 bagList.forEach { bag ->
-                    logger.info("Validating bag text: $bag")
+                    logger.info { "Validating bag text: $bag" }
                     page.getByText(bag).waitFor()
                 }
             } else {
-                logger.info("No bags to validate for activity id=${activity.id}")
+                logger.info { "No bags to validate for activity id=${activity.id}" }
             }
         }
     }
 
     /**---------------Sleep-------------------*/
     fun sleepMainCards() {
-        logger.info("Step: Validating Sleep Recommendations")
-        StepHelper.step("Validating Sleep Recommendations")
-        logger.info("Fetching sleep recommendations from data")
+        StepHelper.step(VALIDATING_SLEEP_RECOMMENDATIONS)
+        logger.info { "Fetching sleep recommendations from data" }
 
         val sleepList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.SLEEP.type }
 
 
         if (sleepList?.isNotEmpty() == true) {
-            logger.info("Sleep list is not empty, waiting for Exercise heading")
+            logger.info { "Sleep list is not empty, waiting for Exercise heading" }
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
@@ -988,15 +953,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             validatingSleepSidePanel(sleepList)
         } else {
-            logger.warn("No sleep recommendations found")
+            logger.warn { "No sleep recommendations found" }
         }
     }
 
 
     private fun validatingSleepMainCards(sleepList: List<Recommendation>) {
-        logger.info("Validating ${sleepList.size} sleep main cards")
+        logger.info { "Validating ${sleepList.size} sleep main cards" }
         sleepList.forEach { sleep ->
-            logger.info("Validating card for sleep id=${sleep.id}, name=${sleep.display_name}")
+            logger.info { "Validating card for sleep id=${sleep.id}, name=${sleep.display_name}" }
 
             val title = page.getByTestId("sleep-card-name-${sleep.id}")
             val image = page.getByTestId("sleep-card-image-${sleep.id}")
@@ -1004,13 +969,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             listOf(title, image).forEach {
                 title.scrollIntoViewIfNeeded()
                 it.waitFor()
-                logger.info("Element visible: ${it}")
+                logger.info { "✅ Element visible: ${it}" }
             }
 
             val expectedName = sleep.variant_description ?: sleep.display_name
             val uiName = title.innerText()
 
-            logger.info("Expected name: $expectedName | UI name: $uiName")
+            logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
             assertEquals(expectedName, uiName)
         }
@@ -1018,9 +983,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun validatingSleepSidePanel(sleepList: List<Recommendation>) {
-        logger.info("Starting sleep side panel validation for ${sleepList.size} items")
+        logger.info { "Starting sleep side panel validation for ${sleepList.size} items" }
         sleepList.forEach { sleep ->
-            logger.info("Opening sleep panel for id=${sleep.id}")
+            StepHelper.step("${OPENING_SLEEP_PANEL}: ${sleep.display_name}")
+            logger.info { "Opening sleep panel for id=${sleep.id}" }
             val descriptiveMeta = sleep.descriptive_meta
             val descriptionExpected = descriptiveMeta?.description
 
@@ -1031,7 +997,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val dialog = page.getByRole(AriaRole.DIALOG)
             dialog.waitFor()
 
-            logger.info("Sleep dialog opened for id=${sleep.id}")
+            logger.info { "Sleep dialog opened for id=${sleep.id}" }
 
             sleepHeaderSection(sleep)
 
@@ -1050,13 +1016,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             closePanel.waitFor()
             closePanel.click()
 
-            logger.info("Closed sleep panel for id=${sleep.id}")
+            logger.info { "Closed sleep panel for id=${sleep.id}" }
         }
     }
 
     private fun descriptionSection(descriptionExpected: String?, type: String) {
         descriptionExpected?.let {
-            logger.info("Validating description for type: $type")
+            logger.info { "Validating description for type: $type" }
             val description = when (type) {
                 ActionPlanType.ACTIVITY.type -> {
                     page.getByTestId("exercise-description")
@@ -1075,8 +1041,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             val actual = description.innerText().normalizeForUiCompare()
             val expected = descriptionExpected.normalizeForUiCompare()
-            logger.info("Description actual  : $actual")
-            logger.info("Description expected: $expected")
+            logger.info { "Description actual  : $actual" }
+            logger.info { "Description expected: $expected" }
 
             assertEquals(expected, actual)
         }
@@ -1094,7 +1060,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     private fun sleepHeaderSection(sleep: Recommendation) {
         val sleepTitle = "Sleep"
-        logger.info("🔹 Validating Sleep Header Section for: ${sleep.display_name}")
+        logger.info { "🔹 Validating Sleep Header Section for: ${sleep.display_name}" }
 
         val heading = page.getByTestId("sleep-panel-heading")
         val nameElement = page.getByTestId("sleep-detail-name")
@@ -1105,34 +1071,33 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         listOf(heading, nameElement, displayElement, imageElement).forEach {
             it.scrollIntoViewIfNeeded()
             it.waitFor()
-            logger.info("✅ Element visible: ${it}")
+            logger.info { "✅ Element visible: ${it}" }
         }
 
         val headingText = heading.innerText()
-        logger.info("Heading text: $headingText")
+        logger.info { "Heading text: $headingText" }
         assertEquals(sleepTitle, headingText)
 
         val nameText = nameElement.innerText()
-        logger.info("Name text: $nameText, Expected: ${sleep.name}")
+        logger.info { "Name text: $nameText, Expected: ${sleep.name}" }
         assertEquals(sleep.name?.uppercase(), nameText)
 
         val displayText = displayElement.innerText()
         val expectedName = sleep.variant_description ?: sleep.display_name
-        logger.info("Display name text: $displayText, Expected: $expectedName")
+        logger.info { "Display name text: $displayText, Expected: $expectedName" }
         assertEquals(expectedName, displayText)
     }
 
     /**---------------Stress-------------------*/
     fun stressMainCards() {
-        logger.info("Step: Validating Stress Recommendations")
-        StepHelper.step("Validating Stress Recommendations")
-        logger.info("Fetching stress recommendations from data")
+        StepHelper.step(VALIDATING_STRESS_RECOMMENDATIONS)
+        logger.info { "Fetching stress recommendations from data" }
 
         val stressList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.STRESS.type }
 
 
         if (stressList?.isNotEmpty() == true) {
-            logger.info("Stress list is not empty, waiting for Stress heading")
+            logger.info { "Stress list is not empty, waiting for Stress heading" }
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true)).waitFor()
 
@@ -1140,60 +1105,61 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             validatingStressSidePanel(stressList)
         } else {
-            logger.warn("No stress recommendations found")
+            logger.warn { "No stress recommendations found" }
         }
     }
 
 
     private fun validatingStressMainCards(stressList: List<Recommendation>) {
-        logger.info("Validating ${stressList.size} activity main cards")
+        logger.info { "Validating ${stressList.size} activity main cards" }
 
         stressList.forEach { stress ->
 
-            logger.info("Validating card for activity id=${stress.id}, name=${stress.display_name}")
+            logger.info { "Validating card for activity id=${stress.id}, name=${stress.display_name}" }
 
             val title = page.getByTestId("stress-card-name-${stress.id}")
             val image = page.getByTestId("stress-card-image-${stress.id}")
 
             listOf(title, image).forEach {
                 it.waitFor()
-                logger.info("Element visible: ${it}")
+                logger.info { "✅ Element visible: ${it}" }
             }
 
             val expectedName = stress.display_name
             val uiName = title.innerText()
 
-            logger.info("Expected name: $expectedName | UI name: $uiName")
+            logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
             assertEquals(expectedName, uiName)
 
             val variantDescription = stress.variant_description
-            logger.info("Variant description: $variantDescription")
+            logger.info { "Variant description: $variantDescription" }
 
             val bagList = variantDescription
                 ?.split(",")
                 ?.map { it.trim() }
                 ?: emptyList()
 
-            logger.info("Bag list: $bagList")
+            logger.info { "Bag list: $bagList" }
 
             if (variantDescription?.isBlank() == false && bagList.isNotEmpty()) {
                 bagList.forEachIndexed { index, bag ->
                     val bagText = page.getByTestId("stress-card-${stress.id}").getByTestId("stress-card-badge-${index}")
                     bagText.waitFor()
-                    logger.info("Validating bag text: expected:$bag, actual:${bagText.innerText()}")
+                    logger.info { "Validating bag text: expected:$bag, actual:${bagText.innerText()}" }
                     assertEquals(bagText.innerText(), bag)
                 }
             } else {
-                logger.info("No bags to validate for activity id=${stress.id}")
+                logger.info { "No bags to validate for activity id=${stress.id}" }
             }
         }
     }
 
     private fun validatingStressSidePanel(stressList: List<Recommendation>) {
-        logger.info("Starting stress side panel validation for ${stressList.size} items")
+        logger.info { "Starting stress side panel validation for ${stressList.size} items" }
         stressList.forEach { stress ->
-            logger.info("Opening stress panel for id=${stress.id}")
+            StepHelper.step("${OPENING_STRESS_PANEL}: ${stress.display_name}")
+            logger.info { "Opening stress panel for id=${stress.id}" }
             val descriptiveMeta = stress.descriptive_meta
             val descriptionExpected = descriptiveMeta?.description
 
@@ -1257,8 +1223,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Supplements-------------------*/
     fun supplementsMainCards() {
-        logger.info("Step: Validating Supplements")
-        StepHelper.step("Validating Supplements")
+        StepHelper.step(VALIDATING_SUPPLEMENTS)
         val supplementList =
             recommendationData?.recommendations?.filter { it.category == ActionPlanType.SUPPLEMENT.type }
         if (supplementList?.isNotEmpty() == true) {
@@ -1366,6 +1331,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val totalRatings = supplement.variant_meta?.price?.totalRatings
 
             nameUiElement.waitFor()
+            StepHelper.step("${OPENING_SUPPLEMENTS_PANEL}: ${supplement.display_name ?: supplement.name}")
             nameUiElement.click()
 
             val dialog = page.getByRole(AriaRole.DIALOG)
@@ -1446,13 +1412,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**---------------Recommendation Test-------------------*/
     fun testCards() {
-        logger.info("Test.... testCards")
-        StepHelper.step("Validating Further Test Recommendations")
+        StepHelper.step(VALIDATING_FURTHER_TESTS)
         val testList = recommendationData?.recommendations?.filter { it.category == ActionPlanType.TEST.type }
 
 
         if (testList?.isNotEmpty() == true) {
-            fetchAccountInformation()
+            captureLabTestsData()
             logger.info("Test.... Stress list is not empty, waiting for Stress heading")
             logger.info("Test.... allTests .. ${allTests.size}")
 

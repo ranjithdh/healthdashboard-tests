@@ -213,4 +213,17 @@ object StepHelper {
 
     //Action Plan
     const val FETCH_RECOMMENDATION_DATA = "Fetch Recommendation data"
+    const val VALIDATING_DAILY_CALORIES_CARD = "Validating Daily Calories Intake Card"
+    const val VALIDATING_NUTRITION_MAIN_CARD = "Validating Nutrition Main Card"
+    const val VALIDATING_FOOD_RECOMMENDATIONS = "Validating Food Recommendations"
+    const val VALIDATING_SEARCH_FOOD_ITEMS = "Validating Search Food Items"
+    const val VALIDATING_ACTIVITY_RECOMMENDATIONS = "Validating Activity Recommendations"
+    const val VALIDATING_SLEEP_RECOMMENDATIONS = "Validating Sleep Recommendations"
+    const val VALIDATING_STRESS_RECOMMENDATIONS = "Validating Stress Recommendations"
+    const val VALIDATING_SUPPLEMENTS = "Validating Supplements"
+    const val VALIDATING_FURTHER_TESTS = "Validating Further Test Recommendations"
+    const val OPENING_ACTIVITY_PANEL = "Opening activity panel"
+    const val OPENING_SLEEP_PANEL = "Opening sleep panel"
+    const val OPENING_STRESS_PANEL = "Opening stress panel"
+    const val OPENING_SUPPLEMENTS_PANEL = "Opening supplements panel"
 }
