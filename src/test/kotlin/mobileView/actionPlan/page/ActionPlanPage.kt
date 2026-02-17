@@ -34,6 +34,7 @@ import utils.report.StepHelper.VALIDATING_SEARCH_FOOD_ITEMS
 import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
+import utils.report.StepHelper.logApiResponse
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -82,6 +83,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 if (responseObj.data != null) {
                     recommendationData = responseObj.data
+                    logApiResponse(TestConfig.APIs.API_RECOMMENDATION, responseObj)
                 }
             } catch (e: Exception) {
                 logger.error { "Failed to parse API response or API call failed..${e.message}" }
@@ -126,6 +128,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 val tests = productList?.tests ?: emptyList()
 
                 allTests = (packages + testProfiles + tests)
+                logApiResponse(TestConfig.APIs.LAB_TEST_API_URL, responseObj)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch account information: ${e.message}" }
