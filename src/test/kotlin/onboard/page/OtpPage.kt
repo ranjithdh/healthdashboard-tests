@@ -7,9 +7,8 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.SECRET_KEY
-import config.TestConfig.TestUsers.EXISTING_USER
 import config.TestUser
-import healthdata.page.HealthDataPage
+import webView.healthdata.page.HealthDataPage
 import kotlinx.serialization.encodeToString
 import mobileView.home.HomePage
 import mobileView.profile.page.ProfilePage
@@ -301,7 +300,7 @@ class OtpPage(page: Page) : BasePage(page) {
         return page.getByText("Incorrect OTP").isVisible
     }
 
-    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
+    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): webView.healthdata.page.HealthDataPage {
         StepHelper.step(ENTER_OTP_HEALTH_DATA)
         enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 

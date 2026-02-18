@@ -85,7 +85,6 @@ tasks.register<Test>("appTests") {
     useJUnitPlatform()
     filter {
         includeTestsMatching("login.*")
-        includeTestsMatching("healthdata.*")
         includeTestsMatching("mobileView.profile.*")
         includeTestsMatching("webView.*")
     }

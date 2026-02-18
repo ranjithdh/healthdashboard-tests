@@ -1,4 +1,4 @@
-package healthdata.page
+package webView.healthdata.page
 
 import com.microsoft.playwright.Download
 import com.microsoft.playwright.Locator
@@ -15,7 +15,6 @@ import utils.report.StepHelper.DOWNLOAD_REPORT
 import utils.report.StepHelper.FETCH_HEALTH_DATA
 import utils.report.StepHelper.VERIFY_BIOMARKER_DATA
 import utils.LogFullApiCall
-import java.util.regex.Pattern
 
 
 class HealthDataPage(page: Page, val healthData: HealthData?=null) : BasePage(page) {
