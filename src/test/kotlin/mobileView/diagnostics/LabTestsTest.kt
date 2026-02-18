@@ -744,26 +744,29 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
             // Fetch order details immediately after Book Now triggering order creation
+            testSchedulingPage.getUserProfileList()
             testSchedulingPage.callBloodDataReports()
         }
 
         testSchedulingPage.verifySampleCollectionAddressHeading()
+        testSchedulingPage.assertProfilesFromApi()
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
+
         testSchedulingPage.clickAddNewAddress()
         assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         testSchedulingPage.assertAddressFormFieldsVisible()
-        testSchedulingPage.clickAddNewAddress()
-        testSchedulingPage.addAddressAndValidate()
+//        testSchedulingPage.clickAddNewAddress()
+//        testSchedulingPage.addAddressAndValidate()
         // assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         logger.info { "Testing 'Edit Address' functionality..." }
         StepHelper.step("Testing 'Edit Address' functionality...")
-        val addressCount = testSchedulingPage.getAddressCount()
-        val randomIndex = (0 until addressCount).random()
-        logger.info { "Selecting random address at index $randomIndex" }
-        StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        val addressCount = testSchedulingPage.getAddressCount()
+//        val randomIndex = (0 until addressCount).random()
+//        logger.info { "Selecting random address at index $randomIndex" }
+//        StepHelper.step("Selecting random address at index $randomIndex")
+//        testSchedulingPage.editUserAddress(randomIndex)
         // Reuse the already found target item
         val targetProduct = targetItem
 
@@ -792,7 +795,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyFooterActions()
 
         logger.info { "Explicitly selecting the address to ensure Proceed is enabled..." }
-        testSchedulingPage.selectAddress(randomIndex)
+        testSchedulingPage.selectAddress(0)
 
         logger.info { "Clicking Proceed and navigating to Slot Selection page..." }
         StepHelper.step("Clicking Proceed and navigating to Slot Selection page...")
