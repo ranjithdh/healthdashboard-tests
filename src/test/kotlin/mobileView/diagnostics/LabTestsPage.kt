@@ -79,9 +79,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     fun goToDiagnosticsUrl() {
         StepHelper.step(NAVIGATE_TO_DIAGNOSTICS_URL)
-          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-//        page.waitForTimeout(2000.0)
-//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+//          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+        page.waitForTimeout(2000.0)
+        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
