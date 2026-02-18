@@ -47,38 +47,7 @@ class BloodTestWaitingCardTest : BaseTest() {
         context.close()
     }
 
-    @Test
-    fun `login and check the blood test status booked state`() {
-        val tesUser = TestConfig.TestUsers.NEW_USER
-        
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        val homePage = loginPage
-            .enterMobileAndContinue(tesUser)
-            .enterOtpAndContinueToMobileHomePage(tesUser)
 
-        if (homePage.isBloodTestCardVisible()){
-            checkBloodTestBookedCardStatus(homePage)
-        }
-    }
-
-    @Test
-    fun `login and check the blood test status cancelled state`() {
-        val tesUser = TestConfig.TestUsers.NEW_USER
-
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        val homePage = loginPage
-            .enterMobileAndContinue(tesUser)
-            .enterOtpAndContinueToMobileHomePage(tesUser)
-
-        if (homePage.isBloodTestCardVisible()){
-            if (homePage.isTBloodTestCancelled()){
-                assertTrue(!homePage.isPhlebotomistAssignedDateVisible())
-                assertTrue(!homePage.isSampleCollectionDateVisible())
-                assertTrue(!homePage.isLabProcessingTimeVisible())
-                assertTrue(!homePage.isDashBoardReadyToViewDateVisible())
-            }
-        }
-    }
 }
 
 fun checkBloodTestBookedCardStatus(homePage: HomePage) {

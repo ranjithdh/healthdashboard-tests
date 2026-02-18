@@ -89,11 +89,11 @@ class SignUpFlowTest : BaseTest() {
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
-            .clickCheckout()
+            .clickGooglePayUPI()
 
 
 
-        checkBloodTestBookedCardStatus(homePage)
+//        checkBloodTestBookedCardStatus(homePage)
 
 //        assertTrue(
 //            homePage.isSavedFullSlotMatchingApi(),

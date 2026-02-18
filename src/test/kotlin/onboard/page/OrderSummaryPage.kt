@@ -1,10 +1,12 @@
 package onboard.page
 
+import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import io.qameta.allure.Step
 import kotlinx.serialization.json.*
 import mobileView.home.HomePage
 import utils.DateHelper
@@ -14,7 +16,6 @@ import utils.logger.logger
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import io.qameta.allure.Step
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
@@ -28,10 +29,11 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     }
 
 
-
     private fun monitorTraffic() {
         page.onResponse { response ->
-            if (response.url().contains("https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true") && response.status() == 200) {
+            if (response.url()
+                    .contains("https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true") && response.status() == 200
+            ) {
                 try {
                     val responseBody = response.text()
                     if (!responseBody.isNullOrBlank()) {
@@ -78,12 +80,30 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     @Step("Click Checkout")
     fun clickCheckout(): HomePage {
         logger.info { "clickCheckout()" }
-        page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
 
         return homePage
+    }
+
+    fun clickGooglePayUPI(): OrderSummaryPage {
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
+        page.locator("iframe").contentFrame().getByTestId("contactNumber").click()
+        page.locator("iframe").contentFrame().getByTestId("contactNumber").fill("7010165836")
+        page.locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, FrameLocator.GetByRoleOptions().setName("Continue")).click()
+        page.locator("iframe").contentFrame().getByTestId("UPI - Google Pay").click()
+
+        page.locator("iframe").contentFrame().getByPlaceholder("@okhdfcbank").fill("fhranjith17@okhdfcbank")
+        page.locator("iframe").contentFrame().getByPlaceholder("@okhdfcbank").press("Enter")
+
+        page.locator("iframe").contentFrame().getByTestId("fee-bearer-cta").waitFor()
+        page.locator("iframe").contentFrame().getByTestId("fee-bearer-cta").click()
+
+        val homePage = HomePage(page)
+        homePage.waitForMobileHomePageConfirmation()
+        return this
     }
 
 
@@ -236,7 +256,8 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             ?.withMinute(fastingSlotTime?.last()?.trim()?.toInt() ?: 0)?.withSecond(0)
 
         val appointmentUtcTime = DateHelper.localDateTimeToUtc(savedLocalDate)
-        val utcNow = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+        val utcNow =
+            ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
 
         val payload = buildJsonObject {
             put("is_user_present", false)
@@ -258,16 +279,19 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
                             thyrocareProductIds.add("OMEGA1003")
                             orderIds.add("VL192031")
                         }
+
                         lowerName.contains("cortisol") -> {
                             productIds.add(110)
                             thyrocareProductIds.add("CORTISOL1004")
                             orderIds.add("VL192029")
                         }
+
                         lowerName.contains("toxic metal") -> {
                             productIds.add(91)
                             thyrocareProductIds.add("P250")
                             orderIds.add("VL192032")
                         }
+
                         lowerName.contains("allergy") -> {
                             productIds.add(92)
                             thyrocareProductIds.add("TTGA")
