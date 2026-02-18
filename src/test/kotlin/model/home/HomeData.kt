@@ -44,7 +44,8 @@ data class Diagnostic(
 @Serializable
 data class FreeConsultation(
     val product_id: String?=null,
-    val status: String?=null
+    val status: String?=null,
+    val scheduled_at: String?=null
 )
 
 @Serializable

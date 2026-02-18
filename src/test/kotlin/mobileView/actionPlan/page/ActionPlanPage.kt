@@ -1,6 +1,7 @@
 package mobileView.actionPlan.page
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -9,6 +10,7 @@ import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.model.*
 import mobileView.actionPlan.utils.ActionPlanUtils.findSubCategoryExist
+import mobileView.actionPlan.utils.ActionPlanUtils.formatConsultationDate
 import mobileView.actionPlan.utils.ActionPlanUtils.formatNumber
 import mobileView.actionPlan.utils.ActionPlanUtils.getCategorySubtext
 import mobileView.actionPlan.utils.ActionPlanUtils.isTestBooked
@@ -1634,7 +1636,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             isConsultationPending -> {
-
+                consultationBookPending()
             }
 
             isRecommendationPending -> {
@@ -1648,6 +1650,107 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     }
 
+    private fun consultationBookPending() {
+        val status = homeData?.next_steps?.free_consultation?.status
+        val productId = homeData?.next_steps?.free_consultation?.product_id
+
+        val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
+
+        val subtitle = page.getByText("Your test results are ready,")
+        val buttonStatus = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book consultation"))
+
+
+        val formattedDate = formatConsultationDate(
+            homeData?.next_steps?.free_consultation?.scheduled_at
+        )
+
+
+        listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
+
+        val isConsultationBooked =
+            (status == "completed" || status == "booked") &&
+                    !productId.isNullOrBlank()
+
+        val isConsultationPending =
+            status == "not_booked"
+
+        val titleExpected =
+            messages[if (!isConsultationBooked) ActionPlanStatus.NOT_SCHEDULED else ActionPlanStatus.SCHEDULED]
+        var subTitleExpected =
+            subText[if (!isConsultationBooked) ActionPlanStatus.NOT_SCHEDULED else ActionPlanStatus.SCHEDULED]
+
+        if (isConsultationBooked) {
+            subTitleExpected = subTitleExpected?.plus(" $formattedDate.")
+        }
+
+        assertEquals(titleExpected, title.innerText())
+        assertEquals(subTitleExpected, subtitle.innerText())
+
+        val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
+
+        buttonStatus.click()
+
+        when {
+            hasQuestionnaireDone && !isConsultationBooked -> {
+                //Symptoms
+
+            }
+
+            !hasQuestionnaireDone || isConsultationPending -> {
+                freeConsultationsInfo()
+            }
+        }
+    }
+
+    fun freeConsultationsInfo() {
+        val headImage = page.locator(".absolute.inset-0").first()
+        val headTitle = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What's included"))
+        val paragraphOne =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Quick overview of dashboard"))
+        val paragraphTwo =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Symptoms check-in and mapping"))
+        val paragraphThree =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("State of existing medical"))
+        val paragraphFour =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Highlight any urgent or"))
+        val paragraphFive =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Suggest further medical"))
+        val paragraphSix =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Action Plan - Activity,"))
+        val noteText =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Note: Consultations will not"))
+        val nextButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
+
+        listOf(
+            headImage,
+            headTitle,
+            paragraphOne,
+            paragraphTwo,
+            paragraphThree,
+            paragraphFour,
+            paragraphFive,
+            paragraphSix,
+            noteText,
+            nextButton
+        ).forEach { it.waitFor() }
+
+        val paragraphComponent = listOf(
+            paragraphOne,
+            paragraphTwo,
+            paragraphThree,
+            paragraphFour,
+            paragraphFive,
+            paragraphSix
+        )
+
+        paragraphComponent.forEachIndexed { index, component ->
+            assertEquals(CONSULTATION_CALENDLY_INCLUSIONS[index], component.innerText())
+        }
+
+        nextButton.click()
+    }
+
     private fun bloodTestInProgress() {
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
         val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
@@ -1658,11 +1761,17 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
 
 
-        val titleExpected=messages[ActionPlanStatus.TEST_IN_PROGRESS]
-        val subTitleExpected=subText[ActionPlanStatus.TEST_IN_PROGRESS]
+        val titleExpected = messages[ActionPlanStatus.TEST_IN_PROGRESS]
+        val subTitleExpected = subText[ActionPlanStatus.TEST_IN_PROGRESS]
 
         assertEquals(titleExpected, title.innerText())
         assertEquals(subTitleExpected, subtitle.innerText())
+        buttonStatus.click()
+
+        page.waitForURL {
+            page.url().contains(TestConfig.Urls.TRACK_RESULT)
+        }
+
     }
 
     private fun isShowEmptyTestInProgress(): Boolean {

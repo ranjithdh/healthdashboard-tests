@@ -42,3 +42,13 @@ val subText = mapOf(
             "Our experts are adding some finishing touches. This might take a while"
 )
 
+val CONSULTATION_CALENDLY_INCLUSIONS = listOf(
+    "Quick overview of dashboard and results",
+    "Symptoms check-in and mapping results",
+    "State of existing medical conditions (if any reported)",
+    "Highlight any urgent or clinically significant flags",
+    "Suggest further medical diagnosis if any required",
+    "Action Plan - Activity, Nutrition Guidelines, Sleep, Stress, Re-Test Schedule, Supplement Plan"
+)
+
+
