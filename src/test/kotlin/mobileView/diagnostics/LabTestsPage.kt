@@ -8,6 +8,7 @@ import config.BasePage
 import config.TestConfig
 import model.LabTestResponse
 import model.WalletResponse
+import model.signup.VerifyOtpResponse
 import mu.KotlinLogging
 import onboard.page.LoginPage
 import utils.json.json
@@ -17,6 +18,7 @@ import utils.report.StepHelper.VERIFY_CERTIFIED_LABS
 import utils.report.StepHelper.VERIFY_HOW_IT_WORKS
 import utils.report.StepHelper.VERIFY_STATIC_CONTENT
 import utils.LogFullApiCall
+import utils.Normalize.refactorTimeZone
 
 private val logger = KotlinLogging.logger {}
 
@@ -50,14 +52,36 @@ class LabTestsPage(page: Page) : BasePage(page) {
         loginPage.enterMobileAndContinue(testUser)
         
         val otpPage = onboard.page.OtpPage(page)
-        otpPage.enterOtp(testUser.otp,testUser.mobileNumber,testUser.countryCode)
+        
+        try {
+            // Wait for verify-otp response to capture token
+            val verifyOtpResponse = page.waitForResponse(
+                { response -> 
+                    response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && 
+                    response.status() == 200 &&
+                    response.request().method() == "POST"
+                }
+            ) {
+                otpPage.enterOtp(testUser.otp,testUser.mobileNumber,testUser.countryCode)
+            }
+            
+            val responseBody = verifyOtpResponse.text()
+            val responseObj = json.decodeFromString<VerifyOtpResponse>(responseBody)
+            TestConfig.ACCESS_TOKEN = responseObj.data.accessToken
+            TestConfig.USER_ID = responseObj.data.userId
+            logger.info { "Login successful. Access Token captured: ${TestConfig.ACCESS_TOKEN.take(10)}..." }
+            
+        } catch (e: Exception) {
+            logger.error { "Failed to capture login token: ${e.message}" }
+            // Continue best effort, maybe token was set elsewhere (unlikely)
+        }
     }
 
     fun goToDiagnosticsUrl() {
         StepHelper.step(NAVIGATE_TO_DIAGNOSTICS_URL)
-//          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
-        page.waitForTimeout(2000.0)
-        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
+          page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book Now")).first().click()
+//        page.waitForTimeout(2000.0)
+//        page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
     }
 
     fun navigateToDiagnostics() {
@@ -164,7 +188,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
                 logger.error { "Failed to parse Wallet API response: ${e.message}" }
             }
         } else {
-            logger.warn { "Failed to fetch wallet data: ${response.status()}" }
+            logger.warn { "Failed to fetch wallet data: ${response}" }
         }
     }
 
