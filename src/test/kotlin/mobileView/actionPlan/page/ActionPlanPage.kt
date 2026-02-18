@@ -35,6 +35,9 @@ import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
 import mobileView.diagnostics.TestDetailPage
+import model.healthdata.HealthData
+import model.home.HomeData
+import model.home.HomeDataResponse
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -51,6 +54,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private var recommendationData: RecommendationData? = null
+    private var healthData: HealthData? = null
+    private var homeData: HomeData? = HomeData()
+    private var programGoalData: ProgramGoalData? = null
+
     private var optimal = "Optimal"
     private var normal = "Normal"
     private var question = "question"
@@ -91,8 +98,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun captureLabTestsData() {
-
+    fun getLabTestsData() {
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -129,6 +135,111 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 allTests = (packages + testProfiles + tests)
                 logApiResponse(TestConfig.APIs.LAB_TEST_API_URL, responseObj)
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
+        }
+    }
+
+    fun getHealthData() {
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.HEALTH_DATA,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            val responseData = json.decodeFromString<HealthData>(responseBody)
+
+            if (responseData.status == "success") {
+                healthData = responseData
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
+        }
+    }
+
+    fun getHomeData() {
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_HOME,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            val responseData = json.decodeFromString<HomeDataResponse>(responseBody)
+
+            if (responseData.status == "success") {
+                homeData = responseData.data
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
+        }
+    }
+
+    fun getGoalData() {
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_GOAL,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            val responseData = json.decodeFromString<ProgramGoalResponse>(responseBody)
+
+            if (responseData.status == "success") {
+                programGoalData = responseData.data
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch account information: ${e.message}" }
@@ -1428,7 +1539,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
         if (testList?.isNotEmpty() == true) {
-            captureLabTestsData()
+            getLabTestsData()
             logger.info("Test.... Stress list is not empty, waiting for Stress heading")
             logger.info("Test.... allTests .. ${allTests.size}")
 
@@ -1491,6 +1602,39 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 assertEquals(bookTestExpected, bookTestActual)
             }
         }
+    }
+
+    /**-------------Empty Action Plan-----------------*/
+    fun emptyActionPlanPage() {
+        getHomeData()
+        getHealthData()
+        getGoalData()
+        isShowEmptyTestInProgress()
+        isShouldShowEmptyState()
+        isShouldRecommendationInProgress()
+
+    }
+
+    private fun isShowEmptyTestInProgress(): Boolean {
+        return homeData?.next_steps?.has_completed_consultation != true &&
+                healthData?.data?.blood?.data != null &&
+                healthData?.data?.blood?.data?.isEmpty() == true
+    }
+
+    private fun isShouldShowEmptyState(): Boolean {
+        return homeData?.next_steps?.has_completed_consultation != true &&
+                healthData?.data?.blood?.data != null &&
+                healthData?.data?.blood?.data?.isNotEmpty() == true
+
+    }
+
+    private fun isShouldRecommendationInProgress() {
+        val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
+        hasQuestionnaireDone &&
+                homeData?.next_steps?.has_completed_consultation == true &&
+                recommendationData?.recommendations?.isEmpty() == true &&
+                recommendationData?.food_recommendations?.isEmpty() == true
+
     }
 
 

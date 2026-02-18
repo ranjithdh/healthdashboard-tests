@@ -49,6 +49,7 @@ data class FreeConsultation(
 
 @Serializable
 data class NextSteps(
+    val has_completed_consultation: Boolean=false,
     val credit_points: CreditPoints?=null,
     val free_consultation: FreeConsultation?=null,
     val personalized_action: PersonalizedAction?=null,

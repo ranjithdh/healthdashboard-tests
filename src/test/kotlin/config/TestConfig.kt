@@ -103,6 +103,7 @@ object TestConfig {
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
         val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
+        val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
     }
 
 

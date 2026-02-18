@@ -33,7 +33,6 @@ class ActionPlanTest : BaseTest() {
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
-        // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
         actionPlanPage = performInitialNavigation()
     }
@@ -53,6 +52,13 @@ class ActionPlanTest : BaseTest() {
         return actionPage
     }
 
+    @Test
+    @Order(1)
+    fun recommendationsEmpty() {
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.emptyActionPlanPage()
+    }
+
 
     @Test
     @Order(1)
@@ -62,7 +68,6 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.whatToEat()
         actionPlanPage.searchValidation()
     }
-
 
 
     @Test
