@@ -226,4 +226,7 @@ object StepHelper {
     const val OPENING_SLEEP_PANEL = "Opening sleep panel"
     const val OPENING_STRESS_PANEL = "Opening stress panel"
     const val OPENING_SUPPLEMENTS_PANEL = "Opening supplements panel"
+    const val FETCH_LAB_TEST_DATA = "Fetch Lab Tests data"
+    const val FETCH_GOAL_DATA = "Fetch Goal data"
+    const val VALIDATING_EMPTY_ACTION_PLAN_PAGE = "Validating Empty Action Plan Page"
 }

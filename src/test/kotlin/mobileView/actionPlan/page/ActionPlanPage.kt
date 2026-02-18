@@ -15,10 +15,18 @@ import mobileView.actionPlan.utils.ActionPlanUtils.isTestBooked
 import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.actionPlan.utils.ActionPlanUtils.splitByNewLine
+import mobileView.diagnostics.TestDetailPage
+import model.healthdata.HealthData
+import model.home.HomeData
+import model.home.HomeDataResponse
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
+import utils.report.StepHelper.FETCH_GOAL_DATA
+import utils.report.StepHelper.FETCH_HEALTH_DATA
+import utils.report.StepHelper.FETCH_HOME_DATA
+import utils.report.StepHelper.FETCH_LAB_TEST_DATA
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
 import utils.report.StepHelper.OPENING_ACTIVITY_PANEL
 import utils.report.StepHelper.OPENING_SLEEP_PANEL
@@ -26,6 +34,7 @@ import utils.report.StepHelper.OPENING_STRESS_PANEL
 import utils.report.StepHelper.OPENING_SUPPLEMENTS_PANEL
 import utils.report.StepHelper.VALIDATING_ACTIVITY_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_DAILY_CALORIES_CARD
+import utils.report.StepHelper.VALIDATING_EMPTY_ACTION_PLAN_PAGE
 import utils.report.StepHelper.VALIDATING_FOOD_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_FURTHER_TESTS
 import utils.report.StepHelper.VALIDATING_NUTRITION_MAIN_CARD
@@ -34,10 +43,6 @@ import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
-import mobileView.diagnostics.TestDetailPage
-import model.healthdata.HealthData
-import model.home.HomeData
-import model.home.HomeDataResponse
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -45,7 +50,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.RECOMMENDATIONS_URL
 
     private val actionPlanTitle: Locator =
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action Plan"))
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action Plan").setExact(true))
+
 
     fun waitForConfirmation(): ActionPlanPage {
         page.waitForURL(TestConfig.Urls.RECOMMENDATIONS_URL)
@@ -68,6 +74,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     var allTests = listOf<RecommendationLabTestPackage>()
 
     fun captureRecommendationData() {
+
         if (recommendationData === null) {
             StepHelper.step(FETCH_RECOMMENDATION_DATA)
             try {
@@ -99,6 +106,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun getLabTestsData() {
+        StepHelper.step(FETCH_LAB_TEST_DATA)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -137,11 +145,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 logApiResponse(TestConfig.APIs.LAB_TEST_API_URL, responseObj)
             }
         } catch (e: Exception) {
-            logger.error { "Failed to fetch account information: ${e.message}" }
+            logger.error { "Failed to fetch lab tests data: ${e.message}" }
         }
     }
 
     fun getHealthData() {
+        StepHelper.step(FETCH_HEALTH_DATA)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -170,13 +179,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             if (responseData.status == "success") {
                 healthData = responseData
+                logApiResponse(TestConfig.APIs.HEALTH_DATA, responseData)
             }
         } catch (e: Exception) {
-            logger.error { "Failed to fetch account information: ${e.message}" }
+            logger.error { "Failed to fetch health data: ${e.message}" }
         }
     }
 
     fun getHomeData() {
+        StepHelper.step(FETCH_HOME_DATA)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -205,13 +216,15 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             if (responseData.status == "success") {
                 homeData = responseData.data
+                logApiResponse(TestConfig.APIs.API_HOME, responseData)
             }
         } catch (e: Exception) {
-            logger.error { "Failed to fetch account information: ${e.message}" }
+            logger.error { "Failed to fetch home data: ${e.message}" }
         }
     }
 
     fun getGoalData() {
+        StepHelper.step(FETCH_GOAL_DATA)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -240,9 +253,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             if (responseData.status == "success") {
                 programGoalData = responseData.data
+                logApiResponse(TestConfig.APIs.API_GOAL, responseData)
             }
         } catch (e: Exception) {
-            logger.error { "Failed to fetch account information: ${e.message}" }
+            logger.error { "Failed to fetch goal data: ${e.message}" }
         }
     }
 
@@ -1606,13 +1620,49 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     /**-------------Empty Action Plan-----------------*/
     fun emptyActionPlanPage() {
+        StepHelper.step(VALIDATING_EMPTY_ACTION_PLAN_PAGE)
         getHomeData()
         getHealthData()
         getGoalData()
-        isShowEmptyTestInProgress()
-        isShouldShowEmptyState()
-        isShouldRecommendationInProgress()
+        val isTestPending = isShowEmptyTestInProgress()
+        val isConsultationPending = isShouldShowEmptyState()
+        val isRecommendationPending = isShouldRecommendationInProgress()
 
+        when {
+            isTestPending -> {
+                bloodTestInProgress()
+            }
+
+            isConsultationPending -> {
+
+            }
+
+            isRecommendationPending -> {
+
+            }
+        }
+
+        logger.info { "Action Plan isTestPending:$isTestPending" }
+        logger.info { "Action Plan isConsultationPending:$isConsultationPending" }
+        logger.info { "Action Plan isRecommendationPending:$isRecommendationPending" }
+
+    }
+
+    private fun bloodTestInProgress() {
+        val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
+
+        val subtitle = page.getByText("Currently your test results")
+        val buttonStatus = page.getByText("Track test status")
+
+        listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
+
+
+        val titleExpected=messages[ActionPlanStatus.TEST_IN_PROGRESS]
+        val subTitleExpected=subText[ActionPlanStatus.TEST_IN_PROGRESS]
+
+        assertEquals(titleExpected, title.innerText())
+        assertEquals(subTitleExpected, subtitle.innerText())
     }
 
     private fun isShowEmptyTestInProgress(): Boolean {
@@ -1628,9 +1678,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     }
 
-    private fun isShouldRecommendationInProgress() {
+    private fun isShouldRecommendationInProgress(): Boolean {
         val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
-        hasQuestionnaireDone &&
+        return hasQuestionnaireDone &&
                 homeData?.next_steps?.has_completed_consultation == true &&
                 recommendationData?.recommendations?.isEmpty() == true &&
                 recommendationData?.food_recommendations?.isEmpty() == true

@@ -3,7 +3,9 @@ package mobileView.actionPlan.utils
 import mobileView.actionPlan.model.NutritionCategorySubtext
 import mobileView.actionPlan.model.NutritionFoodType
 import mobileView.actionPlan.model.RecommendationLabTestPackage
-import model.LabTestPackage
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 import kotlin.math.roundToInt
 
 object ActionPlanUtils {
@@ -130,6 +132,21 @@ object ActionPlanUtils {
 
         return test.di_order != null || test.di_kit != null
     }
+
+
+
+    fun formatConsultationDate(dateStr: String?): String {
+        return if (dateStr != null) {
+            val zonedDateTime = ZonedDateTime.parse(dateStr)
+                .withZoneSameInstant(ZoneId.systemDefault())
+
+            val formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM, 'at' hh:mm a")
+            zonedDateTime.format(formatter)
+        } else {
+            "-"
+        }
+    }
+
 
 
 
