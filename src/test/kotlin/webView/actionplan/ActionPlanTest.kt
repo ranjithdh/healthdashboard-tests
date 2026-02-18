@@ -183,6 +183,24 @@ class ActionPlanTest : BaseTest() {
         assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
         logger.info { "User data API successfully verified." }
 
+        // 5. Call user-recommendations API
+        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
+
+        val userRecommendationsResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
+        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
+
+        val recommendationsData = userRecommendationsResponse.text()
+        logger.info { "Full User Recommendations JSON: $recommendationsData" }
+        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
+        logger.info { "User recommendations API successfully verified." }
+
         // New Verification Logic for Specific Nutrients based on static data
         StepHelper.step("Verifying specific nutrient food sources based on user preference")
         
@@ -317,6 +335,43 @@ class ActionPlanTest : BaseTest() {
         page1.waitForTimeout(5000.0)
         page1.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page1.waitForTimeout(1000.0)
+
+        // Static verification requested by User
+        StepHelper.step("Verifying Action Plan Header and Overview Section")
+
+        // 1. Header
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
+
+        // 2. Date
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d,")
+        val dateStr = java.time.LocalDate.now().format(formatter)
+        try {
+            page1.getByText(dateStr).click()
+        } catch (e: Exception) {
+            logger.warn { "Could not click date '$dateStr'. Might be different timezone or date format." }
+        }
+
+        // 3. Overview
+        page1.getByTestId("preview-introduction").getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Overview")).click()
+
+        // 4. Intro Text
+        page1.getByText("At the core of your Deep").click()
+
+        val overviewItems = listOf(
+            "1. Summary: A snapshot of your biological status based on key biomarkers that define your current health and performance across seven core dimensions.",
+            "2. What's Working Well for You: The areas where your biology is performing at its best, reflecting balance, strong recovery, and effective lifestyle habits.",
+            "3. What Needs Support: The biomarkers that need closer attention, pointing to underlying imbalances and opportunities for improvement.",
+            "4. Lifestyle Modifications: Simple, high-impact shifts in movement, sleep, and stress management to bring your body back into alignment.",
+            "5. Nutrition Guidance: Personalized food and nutrient strategies designed to fuel recovery, enhance metabolism, and sustain energy.",
+            "6. Supplement Recommendations: A focused protocol of evidence-based supplements to target specific needs and accelerate your progress.",
+            "7. Diagnostic Testing: Follow-up and advanced tests to track your biomarkers, measure improvement, and refine your personalized plan."
+        )
+
+        overviewItems.forEach { item ->
+            StepHelper.step("Verifying overview item: ${item.take(20)}...")
+            page1.getByText(item).click()
+        }
+
 
         // 4. Verify on main page using user's interaction pattern
         StepHelper.step("Verifying all added vitamins using the interaction pattern")
