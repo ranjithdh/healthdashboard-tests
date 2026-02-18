@@ -18,9 +18,11 @@ import mobileView.actionPlan.utils.ActionPlanUtils.ninetyPercent
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.actionPlan.utils.ActionPlanUtils.splitByNewLine
 import mobileView.diagnostics.TestDetailPage
+import mobileView.profile.page.ProfilePage
 import model.healthdata.HealthData
 import model.home.HomeData
 import model.home.HomeDataResponse
+import model.profile.QuestionerMealType
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
@@ -1749,6 +1751,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
 
         nextButton.click()
+
+        val profilePage = ProfilePage(page)
+        profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
+        profilePage.assertQuestionerForConsultations(QuestionerMealType.VEGETARIAN)
+
+
     }
 
     private fun bloodTestInProgress() {
