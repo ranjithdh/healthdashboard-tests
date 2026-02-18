@@ -210,13 +210,77 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
         StepHelper.step(VERIFY_PRICE_DETAILS)
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
-        page.getByText("PRICE DETAILS").click()
+        
+        // Ensure Price Details section is expanded
+        val priceDetailsHeader = page.getByText("PRICE DETAILS")
+        priceDetailsHeader.waitFor()
+        // If the sidebar elements aren't visible, click to expand. Or just click to be safe/toggle.
+        // Better: Check visibility of a child element.
+        if (!page.getByTestId("diagnostics-sidebar-subtotal-label").isVisible) {
+             priceDetailsHeader.click()
+        }
+
+        // Subtotal Verification
         page.getByTestId("diagnostics-sidebar-subtotal-label").click()
-        page.getByTestId("diagnostics-sidebar-subtotal-value").click()
-        page.getByTestId("diagnostics-sidebar-discount-label").click()
-        page.getByTestId("diagnostics-sidebar-discount-value").click()
+        val subtotalElement = page.getByTestId("diagnostics-sidebar-subtotal-value")
+        subtotalElement.click()
+        val subtotalText = subtotalElement.innerText().replace("₹", "").replace(",", "").trim()
+        val subtotalVal = subtotalText.toDoubleOrNull() ?: 0.0
+        // assertEquals(expectedSubtotal, subtotalVal, 1.0, "Subtotal mismatch") // Using assertion with message
+
+        if (Math.abs(expectedSubtotal - subtotalVal) > 1.0) {
+            throw AssertionError("Subtotal mismatch. Expected: $expectedSubtotal, Found: $subtotalVal")
+        }
+
+        // Discount Verification only if expectedDiscount > 0
+        if (expectedDiscount > 0) {
+            page.getByTestId("diagnostics-sidebar-discount-label").click()
+            val discountElement = page.getByTestId("diagnostics-sidebar-discount-value")
+            discountElement.click()
+            
+            // Verify structure: "-" text, Coin Image, Value
+            val discountTextAll = discountElement.innerText() // " - 3000" or similar
+            logger.info { "Discount Element Text: $discountTextAll" }
+            
+            // Check for minus sign
+            if (!discountTextAll.contains("-")) {
+                 logger.warn("Discount display missing minus sign: $discountTextAll")
+            }
+            
+            // Check for Coin Image (DH-Coin)
+            val coinImg = discountElement.locator("img")
+            if (coinImg.count() > 0 && coinImg.first().isVisible) {
+                 logger.info { "DH-Coin image is visible in discount section." }
+            } else {
+                 logger.warn { "DH-Coin image NOT found in discount section." }
+            }
+
+            // Check Value
+            // " - 3000" -> "3000"
+            // Remove non-numeric except decimal if needed, but here simple replace works
+            val discountCleaned = discountTextAll.replace("-", "").replace("₹", "").replace(",", "").trim()
+            val discountVal = discountCleaned.toDoubleOrNull() ?: 0.0
+            
+            if (Math.abs(expectedDiscount - discountVal) > 1.0) {
+                throw AssertionError("Discount value mismatch. Expected: $expectedDiscount, Found: $discountVal")
+            }
+            
+        } else {
+             logger.info { "No discount expected, skipping specific discount UI verification." }
+        }
+
+        // Grand Total Verification
         page.getByTestId("diagnostics-sidebar-grand-total-label").click()
-        page.getByTestId("diagnostics-sidebar-grand-total-value").click()
+        val grandTotalElement = page.getByTestId("diagnostics-sidebar-grand-total-value")
+        grandTotalElement.click()
+        
+        val grandTotalText = grandTotalElement.innerText().replace("₹", "").replace(",", "").trim()
+        val grandTotalVal = grandTotalText.toDoubleOrNull() ?: 0.0
+        val expectedGrandTotal = expectedSubtotal - expectedDiscount
+        
+        if (Math.abs(expectedGrandTotal - grandTotalVal) > 1.0) {
+             throw AssertionError("Grand Total mismatch. Expected: $expectedGrandTotal, Found: $grandTotalVal")
+        }
     }
 
     fun verifyFooterActions() {
@@ -547,7 +611,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
         val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
-        val expectedDiscountStr = "-₹${expectedDiscount.toInt()}"
+        val expectedDiscountStr = "-${expectedDiscount.toInt()}"
         logger.info { "Verifying Discount Value. Expected (cleaned): $expectedDiscountStr, Actual (from ID): $discountValue" }
         assertEquals(expectedDiscountStr, discountValue.replace(",", "").replace(" ", ""))
 
