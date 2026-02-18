@@ -47,6 +47,7 @@ import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
+import webView.diagnostics.symptoms.page.SymptomsPage
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -1696,7 +1697,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         when {
             hasQuestionnaireDone && !isConsultationBooked -> {
                 //Symptoms
-
+                reportSymptoms()
             }
 
             !hasQuestionnaireDone || isConsultationPending -> {
@@ -1756,6 +1757,20 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.assertQuestionerForConsultations(QuestionerMealType.VEGETARIAN)
 
+        reportSymptoms()
+    }
+
+    private fun reportSymptoms() {
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report symptoms"))
+        val content = page.getByText("Your questionnaire response")
+        val skipButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Skip"))
+        val reportSymptom = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom"))
+
+        listOf(title, content, skipButton, reportSymptom).forEach { it.waitFor() }
+
+        reportSymptom.click()
+        val symptomsPage = SymptomsPage(page)
+        symptomsPage.consultationsReport()
 
     }
 
