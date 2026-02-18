@@ -13,6 +13,8 @@ import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import model.slot.SlotList
+import model.ProfileListResponse
+import model.ProfileListData
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
 import utils.LogFullApiCall.logFullApiCall
@@ -41,6 +43,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     override val pageUrl = ""
     private var addressData: UserAddressData? = null
+    private var profileListData: ProfileListData? = null
     private var selectedAddressIndex: Int = 0
     private var selectedAddressName: String = ""
     private var selectedAddressText: String = ""
@@ -136,6 +139,23 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val heading = page.getByText("Sample Collection Address")
         logger.info { "Verifying Sample Collection Address heading" }
         Assertions.assertTrue(heading.isVisible, "Sample Collection Address heading should be visible")
+    }
+
+    fun assertProfilesFromApi() {
+        logger.info { "Asserting profiles from API are visible on UI..." }
+        if (profileListData == null || profileListData!!.profiles.isNullOrEmpty()) {
+            logger.warn { "No profile data available to assert" }
+            return
+        }
+        profileListData!!.profiles!!.forEach { profile ->
+            if (!profile.name.isNullOrBlank()) {
+                // We check if the name is present in the DOM. 
+                // Depending on UI, it might be inside a list or a dropdown.
+                val profileLocator = page.getByText(profile.name!!, Page.GetByTextOptions().setExact(false)).first()
+                assert(profileLocator.isVisible) { "Profile with name '${profile.name}' should be visible on the UI" }
+                logger.info { "Verified profile visibility: ${profile.name}" }
+            }
+        }
     }
 
     fun assertAddressesFromApi() {
@@ -759,6 +779,26 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         return addressData?.addressList?.size ?: 0
     }
 
+    fun getUserProfileList() {
+        logger.info { "Fetching User Profile Lists (triggered by Book Now)..." }
+        // Wait briefly for backend to process order creation if triggered immediately after click
+        page.waitForTimeout(3000.0)
+
+        val response = page.request().get(
+            TestConfig.APIs.PROFILE_LIST,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+        if (response.status() != 200) {
+            throw RuntimeException("Failed to fetch profile list: ${response.status()} ${response.text()}")
+        }
+        val responseObj = json.decodeFromString<model.ProfileListResponse>(response.text())
+        profileListData = responseObj.data
+        logger.info { "Successfully fetched ${profileListData?.profiles?.size ?: 0} profiles" }
+
+    }
     fun callBloodDataReports() {
         logger.info { "Fetching Blood Data Reports (triggered by Book Now)..." }
 
