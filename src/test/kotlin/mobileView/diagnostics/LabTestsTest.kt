@@ -14,7 +14,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode
 import utils.logger.logger
 import utils.report.Modules
 import utils.report.StepHelper
-
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -556,13 +557,14 @@ class LabTestsTest : BaseTest() {
         ).filterNotNull().flatten()
 
         val targetItem = allItems.filter { item ->
-            val (code, diKit) = when (item) {
-                is model.LabTestPackage -> item.code to item.di_kit
-                is model.LabTestProfile -> item.code to item.di_kit
-                is model.LabTestItem -> item.code to item.di_kit
-                else -> null to null
+            val (code, diKit, diOrder) = when (item) {
+                is model.LabTestPackage -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestProfile -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestItem -> Triple(item.code, item.di_kit, item.di_order)
+                else -> Triple(null, null, null)
             }
-            diKit == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            diKit == null && diOrder == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            // here we have to check di_order as well like di_kit..
         }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
 
         val targetCode = when (targetItem) {
@@ -621,20 +623,21 @@ class LabTestsTest : BaseTest() {
         // Calculate Discount Logic
         val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
         logger.info { "Wallet Balance $walletBalance" }
-        val maxDiscount = rawPrice * 0.20
-        var applicableDiscount = if (walletBalance >= maxDiscount) maxDiscount else walletBalance
-        // Assuming integer points application
-        applicableDiscount = applicableDiscount.toInt().toDouble()
-        page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
-        page.getByTestId("diagnostics-sidebar-dh-points").click()
+
+        val discountPercent = 20
+        val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+        val roundedDiscount = ceil(calculatedDiscount)
+        val applicableDiscount = minOf(roundedDiscount, walletBalance)
+
         // Assuming user points text format, we use a softer check or verify visibility
-        // page.getByText("Use $applicableDiscount from $walletBalance DH Points")
         logger.info { "Verifying price details on address selection page..." }
         StepHelper.step("Verifying price details on address selection page...")
         if (walletBalance > 0.0) {
-            testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+            page.getByText("Use $applicableDiscount from $walletBalance DH Points")
+            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+            page.getByTestId("diagnostics-sidebar-dh-points").click()
         }
-
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
