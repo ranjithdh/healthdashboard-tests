@@ -282,12 +282,12 @@ class ProfilePage(page: Page) : BasePage(page) {
         page.onRequest(preferenceProfileRequest)
         page.onResponse(preferenceProfileResponse)
         try {
-         } finally {
-             page.offRequest(updateProfileRequest)
-             page.offResponse(updateProfileResponse)
-             page.offRequest(preferenceProfileRequest)
-             page.offResponse(preferenceProfileResponse)
-         }
+        } finally {
+            page.offRequest(updateProfileRequest)
+            page.offResponse(updateProfileResponse)
+            page.offRequest(preferenceProfileRequest)
+            page.offResponse(preferenceProfileResponse)
+        }
     }
 
 
@@ -810,8 +810,6 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
 
-
-
     fun selectCommunicationOption() {
         StepHelper.step(SELECT_COMMUNICATION_OPTION)
 
@@ -1254,6 +1252,15 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
+
+    fun assertQuestionerForConsultations(type: QuestionerMealType = QuestionerMealType.VEGETARIAN) {
+        val bookConsultation =
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book the consultation"))
+        val getStarted =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("To get started answer a few"))
+        listOf(bookConsultation, getStarted).forEach { it.waitFor() }
+        question_1_veg(type)
+    }
 
     fun assertQuestionerVegInitialCheck(type: QuestionerMealType = QuestionerMealType.VEGETARIAN) {
         fetchAccountInformation()
@@ -4497,9 +4504,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Waist input
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
-        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
 
-        (listOf(title, subTitle, faittyIndex, waistTextBox, completeButton) + questionerCount).forEach { it.waitFor() }
+
+        (listOf(title, subTitle, faittyIndex, waistTextBox) + questionerCount).forEach { it.waitFor() }
         assertProgressCount()
 
         val rangeError = page.getByRole(AriaRole.PARAGRAPH)
@@ -4517,16 +4524,116 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         waistTextBox.fill("")
 
-        performTextInputComplete(
+        performTextInput(
             values,
             waistTextBox,
             QuestionSubType.WAIST_CIRCUMFERENCE,
             "What is your waist circumference at its narrowest point?",
         ) {
-            if (shouldClickComplete) {
-                completeButton.click()
-            }
+            question_53()
         }
+    }
+
+    private fun question_53() {
+        logQuestion("Over the last 2 weeks, how often have you been bothered by little interest or pleasure in doing things?")
+        val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how"))
+        val optionNames = listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+        val options = optionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        (listOf(title).plus(options) + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
+
+
+        performSingleSelect(
+            options[1],
+            QuestionSubType.METAL_INTEREST,
+            "Over the last 2 weeks, how often have you been bothered by little interest or pleasure in doing things?",
+            "Several days"
+        ) { question_54() }
+    }
+
+    private fun question_54() {
+        logQuestion("Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?")
+        val title =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how"))
+        val optionNames = listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = optionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        (listOf(title).plus(options) + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
+
+        performSingleSelect(
+            options[1],
+            QuestionSubType.METAL_DEPRESSED,
+            "Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?",
+            "Several days"
+        ) { question_55() }
+
+    }
+
+    private fun question_55() {
+        logQuestion("Over the last 2 weeks, how often have you been bothered by feeling nervous, anxious, or on edge?")
+        val title =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how"))
+
+        val optionNames = listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = optionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        (listOf(title).plus(options) + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
+
+        performSingleSelect(
+            options[1],
+            QuestionSubType.METAL_NERVOUS,
+            "Over the last 2 weeks, how often have you been bothered by feeling nervous, anxious, or on edge?",
+            "Several days"
+        ) { question_56() }
+
+    }
+
+    private fun question_56() {
+        logQuestion("Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?")
+        val title =
+            page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how"))
+
+        val optionNames = listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
+
+        val options = optionNames.map {
+            page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName(it)
+            )
+        }
+
+        (listOf(title).plus(options).plus(completeButton) + questionerCount).forEach { it.waitFor() }
+        assertProgressCount()
+
+        performSingleSelectCompleted(
+            options[1],
+            QuestionSubType.METAL_WORRY,
+            "Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?",
+            "Several days",
+            shouldClickComplete
+        )
     }
 
 
@@ -4606,7 +4713,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Validate all questions sequentially based on stored answers
         answersStored.keys.forEach { key ->
             runChecker(key)
-            if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
+            if (key != QuestionSubType.METAL_WORRY) {
                 nextButton.click()
             }
         }
@@ -4687,6 +4794,11 @@ class ProfilePage(page: Page) : BasePage(page) {
             QuestionSubType.CANCER_TYPE -> question_50_checker(index)
             QuestionSubType.MEDICINES_TAKING -> question_51_checker(index)
             QuestionSubType.WAIST_CIRCUMFERENCE -> question_52_checker(index)
+
+            QuestionSubType.METAL_INTEREST -> question_53_checker(index)
+            QuestionSubType.METAL_DEPRESSED -> question_54_checker(index)
+            QuestionSubType.METAL_NERVOUS -> question_55_checker(index)
+            QuestionSubType.METAL_WORRY -> question_56_checker(index)
             else -> println("No checker implemented for QuestionSubType: $subType")
         }
     }
@@ -5920,6 +6032,131 @@ class ProfilePage(page: Page) : BasePage(page) {
         checkTextInput(storedAnswer, waistTextBox)
     }
 
+
+    private fun question_53_checker(index: Int) {
+        if (answersStored[QuestionSubType.METAL_INTEREST] == null) return
+        logQuestion("Checking: Cancer Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
+
+        listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = mapOf(
+            "Not at all" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Not at all")
+            ),
+            "Several days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Several days")
+            ),
+            "More than half the days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than half the days")
+            ),
+            "Nearly every day" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Nearly every day")
+            )
+        )
+
+        (options.values + questionerCount).forEach { it.waitFor() }
+        assertProgressCount(index)
+        checkSingleSelect(answersStored[QuestionSubType.METAL_INTEREST]?.answer as? String, options)
+    }
+
+    private fun question_54_checker(index: Int) {
+        if (answersStored[QuestionSubType.METAL_DEPRESSED] == null) return
+        logQuestion("Checking: Cancer Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
+
+        listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = mapOf(
+            "Not at all" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Not at all")
+            ),
+            "Several days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Several days")
+            ),
+            "More than half the days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than half the days")
+            ),
+            "Nearly every day" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Nearly every day")
+            )
+        )
+
+        (options.values + questionerCount).forEach { it.waitFor() }
+        assertProgressCount(index)
+        checkSingleSelect(answersStored[QuestionSubType.METAL_DEPRESSED]?.answer as? String, options)
+    }
+
+    private fun question_55_checker(index: Int) {
+        if (answersStored[QuestionSubType.METAL_NERVOUS] == null) return
+        logQuestion("Checking: Cancer Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
+
+        listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = mapOf(
+            "Not at all" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Not at all")
+            ),
+            "Several days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Several days")
+            ),
+            "More than half the days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than half the days")
+            ),
+            "Nearly every day" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Nearly every day")
+            )
+        )
+
+        (options.values + questionerCount).forEach { it.waitFor() }
+        assertProgressCount(index)
+        checkSingleSelect(answersStored[QuestionSubType.METAL_NERVOUS]?.answer as? String, options)
+    }
+
+    private fun question_56_checker(index: Int) {
+        if (answersStored[QuestionSubType.METAL_WORRY] == null) return
+        logQuestion("Checking: Cancer Status")
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
+
+        listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
+
+        val options = mapOf(
+            "Not at all" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Not at all")
+            ),
+            "Several days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Several days")
+            ),
+            "More than half the days" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("More than half the days")
+            ),
+            "Nearly every day" to page.getByRole(
+                AriaRole.BUTTON,
+                Page.GetByRoleOptions().setName("Nearly every day")
+            )
+        )
+
+        (options.values + questionerCount).forEach { it.waitFor() }
+        assertProgressCount(index)
+        checkSingleSelect(answersStored[QuestionSubType.METAL_WORRY]?.answer as? String, options)
+    }
+
     // --- Checker Helpers ---
 
     private fun normalize(text: String): String =
@@ -6148,7 +6385,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         // Validate all questions sequentially based on stored answers
         answersStored.keys.forEach { key ->
             runChecker(key)
-            if (key != QuestionSubType.WAIST_CIRCUMFERENCE) {
+            if (key != QuestionSubType.METAL_WORRY) {
                 nextButton.click()
             }
         }
@@ -6268,6 +6505,22 @@ class ProfilePage(page: Page) : BasePage(page) {
         if (nextAction != null) {
             nextButton.click()
             nextAction()
+        }
+    }
+
+    private fun performSingleSelectCompleted(
+        option: Locator,
+        subType: String,
+        question: String,
+        answerLabel: String,
+        shouldClickComplete: Boolean
+    ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabel)
+        logAnswer(subType, question, answerLabel)
+        if (shouldClickComplete) {
+            if (!isButtonChecked(option)) {
+                option.click()
+            }
         }
     }
 
