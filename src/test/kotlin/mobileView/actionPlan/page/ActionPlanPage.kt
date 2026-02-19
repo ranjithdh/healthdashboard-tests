@@ -47,6 +47,8 @@ import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
+import webView.diagnostics.symptoms.model.Symptom
+import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import webView.diagnostics.symptoms.page.SymptomsPage
 import kotlin.test.assertEquals
 
@@ -68,6 +70,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var healthData: HealthData? = null
     private var homeData: HomeData? = HomeData()
     private var programGoalData: ProgramGoalData? = null
+    private var listOfSymptoms = listOf<Symptom>()
 
     private var optimal = "Optimal"
     private var normal = "Normal"
@@ -76,7 +79,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         "Disclaimer: The supplement recommendations shared are based on the nutrient form, dosage, and intended therapeutic benefit. You are free to choose any trusted and good-quality brand available to you, ensuring that it matches the specified ingredient and dosage. Please consult your healthcare provider before purchasing, especially if you have concerns regarding allergies, specific ingredients, or medication interactions. The brand names are only indicative and not mandatory."
 
     var labTestData: RecommendationLabTest? = null
-    var allTests = listOf<RecommendationLabTestPackage>()
+    private var allTests = listOf<RecommendationLabTestPackage>()
+
 
     fun captureRecommendationData() {
 
@@ -259,6 +263,41 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             if (responseData.status == "success") {
                 programGoalData = responseData.data
                 logApiResponse(TestConfig.APIs.API_GOAL, responseData)
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch goal data: ${e.message}" }
+        }
+    }
+
+    fun getSymptoms() {
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                TestConfig.APIs.API_SYMPTOMS_LIST,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+            val responseData = json.decodeFromString<UserSymptomsResponse>(responseBody)
+
+            if (responseData.status == "success") {
+                listOfSymptoms = responseData.data.symptoms
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch goal data: ${e.message}" }
@@ -1629,6 +1668,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         getHomeData()
         getHealthData()
         getGoalData()
+        getSymptoms()
         val isTestPending = isShowEmptyTestInProgress()
         val isConsultationPending = isShouldShowEmptyState()
         val isRecommendationPending = isShouldRecommendationInProgress()
@@ -1643,7 +1683,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             isRecommendationPending -> {
-
+                //tODO
             }
         }
 
@@ -1658,18 +1698,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val productId = homeData?.next_steps?.free_consultation?.product_id
 
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
-        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
-
-        val subtitle = page.getByText("Your test results are ready,")
-        val buttonStatus = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book consultation"))
 
 
         val formattedDate = formatConsultationDate(
             homeData?.next_steps?.free_consultation?.scheduled_at
         )
 
-
-        listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
 
         val isConsultationBooked =
             (status == "completed" || status == "booked") &&
@@ -1687,23 +1721,64 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             subTitleExpected = subTitleExpected?.plus(" $formattedDate.")
         }
 
-        assertEquals(titleExpected, title.innerText())
-        assertEquals(subTitleExpected, subtitle.innerText())
 
         val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
 
-        buttonStatus.click()
+        if (isConsultationBooked) {
 
-        when {
-            hasQuestionnaireDone && !isConsultationBooked -> {
-                //Symptoms
-                reportSymptoms()
+            val viewConsultation = page.getByText("View consultation")
+            val title =
+                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
+            val subtitle = page.getByText("Your consultation is")
+
+            listOf(image, title, subtitle, viewConsultation).forEach { it.waitFor() }
+
+            assertEquals(titleExpected, title.innerText())
+            assertEquals(subTitleExpected?.normalizeForUiCompare()?.lowercase(), subtitle.innerText().normalizeForUiCompare().lowercase())
+
+            viewConsultation.click()
+
+            page.waitForURL {
+                page.url().contains(TestConfig.Urls.SERVICES_URL)
             }
+        } else {
+            val title =
+                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
 
-            !hasQuestionnaireDone || isConsultationPending -> {
-                freeConsultationsInfo()
+            val subtitle = page.getByText("Your test results are ready,")
+
+            val buttonStatus = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Book consultation"))
+
+            listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
+
+            assertEquals(titleExpected, title.innerText())
+            assertEquals(subTitleExpected, subtitle.innerText())
+
+            buttonStatus.click()
+
+            when {
+                hasQuestionnaireDone && !isConsultationBooked -> {
+                    if (listOfSymptoms.size > 0) {
+                        consultationBookDialog()
+                    } else {
+                        reportSymptoms()
+                    }
+                }
+
+                !hasQuestionnaireDone || isConsultationPending -> {
+                    freeConsultationsInfo()
+                }
             }
         }
+    }
+
+    private fun consultationBookDialog() {
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Consultation with Longevity"))
+        val content = page.getByText("Personalized consultation")
+        val maybeLater = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Maybe later"))
+        val scheduleNow = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule now"))
+        listOf(title, content, maybeLater, scheduleNow).forEach { it.waitFor() }
+        scheduleNow.click()
     }
 
     fun freeConsultationsInfo() {
