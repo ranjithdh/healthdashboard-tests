@@ -1683,7 +1683,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             }
 
             isRecommendationPending -> {
-                //tODO
+                recommendationPending()
             }
         }
 
@@ -1693,17 +1693,31 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     }
 
+    private fun recommendationPending() {
+        val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
+        val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Generating your action plan..."))
+        val subtitle = page.getByText("Our experts are adding some")
+        val info = page.getByText("We'll notify you when it's")
+
+        listOf(image, title, subtitle, info).forEach { it.waitFor() }
+
+        val titleExpected = messages[ActionPlanStatus.NOT_PERSONALIZED]
+        val subTitleExpected = subText[ActionPlanStatus.NOT_PERSONALIZED]
+
+        assertEquals(titleExpected, title.innerText())
+        assertEquals(subTitleExpected, subtitle.innerText())
+
+    }
+
     private fun consultationBookPending() {
         val status = homeData?.next_steps?.free_consultation?.status
         val productId = homeData?.next_steps?.free_consultation?.product_id
 
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
 
-
         val formattedDate = formatConsultationDate(
             homeData?.next_steps?.free_consultation?.scheduled_at
         )
-
 
         val isConsultationBooked =
             (status == "completed" || status == "booked") &&
@@ -1721,9 +1735,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             subTitleExpected = subTitleExpected?.plus(" $formattedDate.")
         }
 
-
-        val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
-
         if (isConsultationBooked) {
 
             val viewConsultation = page.getByText("View consultation")
@@ -1734,7 +1745,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             listOf(image, title, subtitle, viewConsultation).forEach { it.waitFor() }
 
             assertEquals(titleExpected, title.innerText())
-            assertEquals(subTitleExpected?.normalizeForUiCompare()?.lowercase(), subtitle.innerText().normalizeForUiCompare().lowercase())
+            assertEquals(
+                subTitleExpected?.normalizeForUiCompare()?.lowercase(),
+                subtitle.innerText().normalizeForUiCompare().lowercase()
+            )
 
             viewConsultation.click()
 
@@ -1742,6 +1756,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 page.url().contains(TestConfig.Urls.SERVICES_URL)
             }
         } else {
+            val hasQuestionnaireDone = programGoalData?.program?.is_questionnaire_taken == true
+
             val title =
                 page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
 
@@ -1828,11 +1844,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         nextButton.click()
 
+        //questioner flow
         val profilePage = ProfilePage(page)
         profilePage.setActivityType(type = mobileView.profile.model.ActivityLevel.SEDENTARY)
         profilePage.assertQuestionerForConsultations(QuestionerMealType.VEGETARIAN)
 
-        reportSymptoms()
+        emptyActionPlanPage()
     }
 
     private fun reportSymptoms() {
@@ -1847,6 +1864,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val symptomsPage = SymptomsPage(page)
         symptomsPage.consultationsReport()
 
+        emptyActionPlanPage()
     }
 
     private fun bloodTestInProgress() {
