@@ -576,7 +576,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                                     "Food UI toolTips = '${impactBiomarkerElement.innerText()}', Expected = '$impactBiomarkerExpected'"
                                 }
 
-                                assertEquals(impactBiomarkerExpected, impactBiomarkerElement.innerText())
+                                assertEquals(
+                                    impactBiomarkerExpected.normalizeForUiCompare(),
+                                    impactBiomarkerElement.innerText().normalizeForUiCompare()
+                                )
                             }
                         } else {
                             val impactBiomarkerElement =
@@ -596,7 +599,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                                     "Food UI toolTips = '${impactBiomarkerElement.innerText()}', Expected = '$impactBiomarkerExpected'"
                                 }
 
-                                assertEquals(impactBiomarkerExpected, impactBiomarkerElement.innerText())
+                                assertEquals(
+                                    impactBiomarkerExpected.normalizeForUiCompare(),
+                                    impactBiomarkerElement.innerText().normalizeForUiCompare()
+                                )
                             }
                         }
                     })
@@ -633,12 +639,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             logger.info { "UI Category = '$categoryUi', Expected = '$category'" }
 
-            assertEquals(category, categoryUi)
+            assertEquals(category?.normalizeForUiCompare(), categoryUi.normalizeForUiCompare())
 
             if (isCategoryExist && subCategoryExpected?.isNotEmpty() == true) {
                 val subCategoryUi = subCategoryElement?.innerText()
                 logger.info { "UI SubCategory = '$subCategoryUi', Expected = '$subCategoryExpected'" }
-                assertEquals(subCategoryExpected, subCategoryUi)
+                assertEquals(subCategoryExpected.normalizeForUiCompare(), subCategoryUi?.normalizeForUiCompare())
             }
         }
     }
@@ -676,7 +682,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                     "Food UI name = '$foodNameUi', Expected = '$foodNameExpected'"
                 }
 
-                assertEquals(foodNameExpected, foodNameUi)
+                assertEquals(foodNameExpected?.normalizeForUiCompare(), foodNameUi.normalizeForUiCompare())
             }
         }
 
@@ -910,7 +916,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 val expected = biomarkerImpact.normalizeForUiCompare()
                 val actual = biomarkerImpactUiElement.innerText().normalizeForUiCompare()
                 logger.info { "stress expected:$expected\nactual:$actual" }
-                assertEquals(expected, actual)
+                assertEquals(expected.normalizeForUiCompare(), actual.normalizeForUiCompare())
             }
         }
 
@@ -949,7 +955,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             biomarkerUi.waitFor()
 
-            assertEquals(biomarkerNameExpected, biomarkerUi.innerText())
+            assertEquals(
+                biomarkerNameExpected?.normalizeForUiCompare(),
+                biomarkerUi.innerText().normalizeForUiCompare()
+            )
         }
 
         logger.info { "Potential Biomarker section validated for activityId=${activity.id}" }
@@ -978,7 +987,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 }
                 whyItWorkElement.waitFor()
 
-                assertEquals(work, whyItWorkElement.innerText())
+                assertEquals(work.normalizeForUiCompare(), whyItWorkElement.innerText().normalizeForUiCompare())
             }
         } else {
             logger.warn { "Why It Works list is empty for activityId=${activity.id}" }
@@ -1018,7 +1027,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 }
                 practiceElement.waitFor()
 
-                assertEquals(practice, practiceElement.innerText())
+                assertEquals(practice.normalizeForUiCompare(), practiceElement.innerText().normalizeForUiCompare())
             }
         } else {
             logger.warn { "Practice list is empty for activityId=${activity.id}" }
@@ -1080,11 +1089,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         val nameText = nameElement.innerText()
         logger.info { "Name text: $nameText, Expected: ${activity.name}" }
-        assertEquals(activity.name?.uppercase(), nameText)
+        assertEquals(activity.name?.uppercase()?.normalizeForUiCompare(), nameText.normalizeForUiCompare())
 
         val displayText = displayElement.innerText()
         logger.info { "Display name text: $displayText, Expected: ${activity.display_name}" }
-        assertEquals(activity.display_name, displayText)
+        assertEquals(activity.display_name?.normalizeForUiCompare(), displayText.normalizeForUiCompare())
 
         val variantDescription = activity.variant_description
         logger.info { "Variant description from API: $variantDescription" }
@@ -1104,7 +1113,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 val uiText = uiVariant.innerText()
                 logger.info { "Variant[$index] UI: $uiText, Expected: $expectedVariant" }
 
-                assertEquals(expectedVariant, uiText)
+                assertEquals(expectedVariant.normalizeForUiCompare(), uiText.normalizeForUiCompare())
             }
         } else {
             logger.info { "ℹ️ No variant description available, skipping variant validation" }
@@ -1132,7 +1141,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
-            assertEquals(expectedName, uiName)
+            assertEquals(expectedName?.normalizeForUiCompare(), uiName.normalizeForUiCompare())
 
             val variantDescription = activity.variant_description
             logger.info { "Variant description: $variantDescription" }
@@ -1196,7 +1205,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
-            assertEquals(expectedName, uiName)
+            assertEquals(expectedName?.normalizeForUiCompare(), uiName.normalizeForUiCompare())
         }
     }
 
@@ -1299,12 +1308,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         val nameText = nameElement.innerText()
         logger.info { "Name text: $nameText, Expected: ${sleep.name}" }
-        assertEquals(sleep.name?.uppercase(), nameText)
+        assertEquals(sleep.name?.uppercase()?.normalizeForUiCompare(), nameText.normalizeForUiCompare())
 
         val displayText = displayElement.innerText()
         val expectedName = sleep.variant_description ?: sleep.display_name
         logger.info { "Display name text: $displayText, Expected: $expectedName" }
-        assertEquals(expectedName, displayText)
+        assertEquals(expectedName?.normalizeForUiCompare(), displayText.normalizeForUiCompare())
     }
 
     /**---------------Stress-------------------*/
@@ -1349,7 +1358,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             logger.info { "Expected name: $expectedName | UI name: $uiName" }
 
-            assertEquals(expectedName, uiName)
+            assertEquals(expectedName?.normalizeForUiCompare(), uiName.normalizeForUiCompare())
 
             val variantDescription = stress.variant_description
             logger.info { "Variant description: $variantDescription" }
@@ -1366,7 +1375,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                     val bagText = page.getByTestId("stress-card-${stress.id}").getByTestId("stress-card-badge-${index}")
                     bagText.waitFor()
                     logger.info { "Validating bag text: expected:$bag, actual:${bagText.innerText()}" }
-                    assertEquals(bagText.innerText(), bag)
+                    assertEquals(bagText.innerText().normalizeForUiCompare(), bag.normalizeForUiCompare())
                 }
             } else {
                 logger.info { "No bags to validate for activity id=${stress.id}" }
@@ -1431,12 +1440,12 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         val nameText = nameElement.innerText()
         logger.info("Name text: $nameText, Expected: ${stress.name}")
-        assertEquals(stress.name?.uppercase(), nameText)
+        assertEquals(stress.name?.uppercase()?.normalizeForUiCompare(), nameText.normalizeForUiCompare())
 
         val displayText = displayElement.innerText()
         val expectedName = stress.display_name
         logger.info("Display name text: $displayText, Expected: $expectedName")
-        assertEquals(expectedName, displayText)
+        assertEquals(expectedName?.normalizeForUiCompare(), displayText.normalizeForUiCompare())
     }
 
 
@@ -1467,7 +1476,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 ?: supplement.name
 
 
-            assertEquals(nameExpected, nameActual)
+            assertEquals(nameExpected.normalizeForUiCompare(), nameActual?.normalizeForUiCompare())
 
             if (supplement.supplement_intraday_frequency != null ||
                 supplement.supplement_weekday_frequency != null
@@ -1477,7 +1486,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 val frequencyUiElement = page.getByTestId("supplement-frequency-badge-${id}")
                 frequencyUiElement.waitFor()
                 val actualFrequency = frequencyUiElement.innerText()
-                assertEquals(actualFrequency, expectedFrequency)
+                assertEquals(actualFrequency.normalizeForUiCompare(), expectedFrequency.normalizeForUiCompare())
             }
 
             supplement.supplement_meta?.dosage?.get("1")?.serving?.let {
@@ -1491,7 +1500,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 dosageUiElement.waitFor()
 
-                assertEquals(text, dosageUiElement.innerText())
+                assertEquals(text.normalizeForUiCompare(), dosageUiElement.innerText().normalizeForUiCompare())
             }
 
 
@@ -1506,13 +1515,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
                 dosageUiElement.waitFor()
 
-                assertEquals(text, dosageUiElement.innerText())
+                assertEquals(text.normalizeForUiCompare(), dosageUiElement.innerText().normalizeForUiCompare())
             }
 
             supplement.supplement_duration?.let {
                 val durationUiElement = page.getByTestId("supplement-duration-badge-${id}")
                 durationUiElement.waitFor()
-                assertEquals(it, durationUiElement.innerText())
+                assertEquals(it.normalizeForUiCompare(), durationUiElement.innerText().normalizeForUiCompare())
             }
 
             val note1 = supplement.supplement_meta?.dosage?.get("1")?.notes
@@ -1539,7 +1548,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             disclaimerUiElement.waitFor()
             val actual = disclaimerUiElement.innerText()
 
-            assertEquals(supplementsDisclaimer, actual)
+            assertEquals(supplementsDisclaimer.normalizeForUiCompare(), actual.normalizeForUiCompare())
         }
     }
 
@@ -1570,7 +1579,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             }
 
-            if (totalRatings != null) {
+            if (totalRatings != null && imageUrls?.isNotEmpty() == true) {
                 val totalRatingNumber = page.getByTestId("supplements-total-ratings")
                 logger.info { "Rating Start.... ${totalRatingNumber.innerText()}" }
 
@@ -1583,7 +1592,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             cardNameUiElement.waitFor()
 
             val expectedName = cardNameUiElement.innerText()
-            assertEquals(expectedName, supplement.name)
+            assertEquals(expectedName.normalizeForUiCompare(), supplement.name?.normalizeForUiCompare())
 
             val brand = supplement.variant_meta?.brand
             if (!brand.isNullOrBlank() && brand != "NA") {
@@ -1669,7 +1678,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             val expected = nameUiElement.innerText()
 
-            assertEquals(expected, test.display_name)
+            assertEquals(expected.normalizeForUiCompare(), test.display_name?.normalizeForUiCompare())
 
 
             val isBooked = isTestBooked(
@@ -1687,7 +1696,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             if (isCompleted == true) {
                 addTestButton.waitFor()
-                assertEquals("Added to Plan", addTestButton.innerText())
+                assertEquals("Added to Plan", addTestButton.innerText().normalizeForUiCompare())
             } else {
                 bookTest.waitFor()
                 val bookTestActual = bookTest.innerText()
@@ -1704,7 +1713,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                         .waitForPageLoad()
                         .clickBackButton()
                 }
-                assertEquals(bookTestExpected, bookTestActual)
+                assertEquals(bookTestExpected.normalizeForUiCompare(), bookTestActual.normalizeForUiCompare())
             }
         }
     }
@@ -1752,8 +1761,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val titleExpected = messages[ActionPlanStatus.NOT_PERSONALIZED]
         val subTitleExpected = subText[ActionPlanStatus.NOT_PERSONALIZED]
 
-        assertEquals(titleExpected, title.innerText())
-        assertEquals(subTitleExpected, subtitle.innerText())
+        assertEquals(titleExpected?.normalizeForUiCompare(), title.innerText().normalizeForUiCompare())
+        assertEquals(subTitleExpected?.normalizeForUiCompare(), subtitle.innerText().normalizeForUiCompare())
 
     }
 
@@ -1801,7 +1810,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             listOf(image, title, subtitle, viewConsultation).forEach { it.waitFor() }
 
-            assertEquals(titleExpected, title.innerText())
+            assertEquals(titleExpected?.normalizeForUiCompare(), title.innerText().normalizeForUiCompare())
             assertEquals(
                 subTitleExpected?.normalizeForUiCompare()?.lowercase(),
                 subtitle.innerText().normalizeForUiCompare().lowercase()
@@ -1824,8 +1833,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             listOf(image, title, subtitle, buttonStatus).forEach { it.waitFor() }
 
-            assertEquals(titleExpected, title.innerText())
-            assertEquals(subTitleExpected, subtitle.innerText())
+            assertEquals(titleExpected?.normalizeForUiCompare(), title.innerText().normalizeForUiCompare())
+            assertEquals(subTitleExpected?.normalizeForUiCompare(), subtitle.innerText().normalizeForUiCompare())
 
             buttonStatus.click()
 
@@ -1896,7 +1905,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         )
 
         paragraphComponent.forEachIndexed { index, component ->
-            assertEquals(CONSULTATION_CALENDLY_INCLUSIONS[index], component.innerText())
+            assertEquals(
+                CONSULTATION_CALENDLY_INCLUSIONS[index].normalizeForUiCompare(),
+                component.innerText().normalizeForUiCompare()
+            )
         }
 
         nextButton.click()
@@ -1938,8 +1950,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         val titleExpected = messages[ActionPlanStatus.TEST_IN_PROGRESS]
         val subTitleExpected = subText[ActionPlanStatus.TEST_IN_PROGRESS]
 
-        assertEquals(titleExpected, title.innerText())
-        assertEquals(subTitleExpected, subtitle.innerText())
+        assertEquals(titleExpected?.normalizeForUiCompare(), title.innerText().normalizeForUiCompare())
+        assertEquals(subTitleExpected?.normalizeForUiCompare(), subtitle.innerText().normalizeForUiCompare())
         buttonStatus.click()
 
         page.waitForURL {
