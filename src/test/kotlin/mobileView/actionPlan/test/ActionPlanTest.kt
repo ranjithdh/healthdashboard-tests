@@ -61,7 +61,7 @@ class ActionPlanTest : BaseTest() {
 
 
     @Test
-    @Order(1)
+    @Order(2)
     fun nutritionTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.dailyCaloriesIntakeCard()
@@ -71,7 +71,7 @@ class ActionPlanTest : BaseTest() {
 
 
     @Test
-    @Order(2)
+    @Order(3)
     fun activityTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.activityMainCards()
@@ -79,28 +79,28 @@ class ActionPlanTest : BaseTest() {
 
 
     @Test
-    @Order(3)
+    @Order(4)
     fun sleepTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.sleepMainCards()
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     fun stressTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.stressMainCards()
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     fun supplementsTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.supplementsMainCards()
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     fun recommendationsTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.testCards()

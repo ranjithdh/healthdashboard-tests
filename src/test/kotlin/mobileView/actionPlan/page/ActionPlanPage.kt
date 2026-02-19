@@ -86,7 +86,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var allTests = listOf<RecommendationLabTestPackage>()
 
 
-    fun captureRecommendationData() {
+  /*  fun captureRecommendationData() {
 
         if (recommendationData === null) {
             StepHelper.step(FETCH_RECOMMENDATION_DATA)
@@ -109,6 +109,45 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
 
                 if (responseObj.data != null) {
+                    recommendationData = responseObj.data
+                    logApiResponse(TestConfig.APIs.API_RECOMMENDATION, responseObj)
+                }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            }
+        }
+    }*/
+
+    fun captureRecommendationData() {
+        if (recommendationData === null) {
+            StepHelper.step(FETCH_RECOMMENDATION_DATA)
+            try {
+                val timeZone = java.util.TimeZone.getDefault().id
+
+                val apiContext = page.context().request()
+                val response = apiContext.get(
+                    TestConfig.APIs.API_RECOMMENDATION,
+                    RequestOptions.create()
+                        .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                        .setHeader("client_id", TestConfig.CLIENT_ID)
+                        .setHeader("user_timezone", refactorTimeZone(timeZone))
+                )
+
+
+                if (response.status() != 200) {
+                    logger.error { "API returned error status: ${response.status()}" }
+                    return
+                }
+
+                val responseBody = response.text()
+                if (responseBody.isNullOrBlank()) {
+                    logger.error { "API response body is empty" }
+                    return
+                }
+
+                val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
+
+                if (responseObj.status == "success") {
                     recommendationData = responseObj.data
                     logApiResponse(TestConfig.APIs.API_RECOMMENDATION, responseObj)
                 }
