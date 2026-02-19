@@ -86,37 +86,37 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var allTests = listOf<RecommendationLabTestPackage>()
 
 
-  /*  fun captureRecommendationData() {
+    /*  fun captureRecommendationData() {
 
-        if (recommendationData === null) {
-            StepHelper.step(FETCH_RECOMMENDATION_DATA)
-            try {
-                val response = page.waitForResponse(
-                    { response: Response? ->
-                        response?.url()?.contains(TestConfig.APIs.API_RECOMMENDATION) == true &&
-                                response.request().method() == "GET"
-                    }, {
+          if (recommendationData === null) {
+              StepHelper.step(FETCH_RECOMMENDATION_DATA)
+              try {
+                  val response = page.waitForResponse(
+                      { response: Response? ->
+                          response?.url()?.contains(TestConfig.APIs.API_RECOMMENDATION) == true &&
+                                  response.request().method() == "GET"
+                      }, {
 
-                    }
-                )
+                      }
+                  )
 
-                val responseBody = response.text()
-                if (responseBody.isNullOrBlank()) {
-                    logger.info { "API response body is empty" }
-                    return
-                }
+                  val responseBody = response.text()
+                  if (responseBody.isNullOrBlank()) {
+                      logger.info { "API response body is empty" }
+                      return
+                  }
 
-                val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
+                  val responseObj = json.decodeFromString<NutritionRecommendationResponse>(responseBody)
 
-                if (responseObj.data != null) {
-                    recommendationData = responseObj.data
-                    logApiResponse(TestConfig.APIs.API_RECOMMENDATION, responseObj)
-                }
-            } catch (e: Exception) {
-                logger.error { "Failed to parse API response or API call failed..${e.message}" }
-            }
-        }
-    }*/
+                  if (responseObj.data != null) {
+                      recommendationData = responseObj.data
+                      logApiResponse(TestConfig.APIs.API_RECOMMENDATION, responseObj)
+                  }
+              } catch (e: Exception) {
+                  logger.error { "Failed to parse API response or API call failed..${e.message}" }
+              }
+          }
+      }*/
 
     fun captureRecommendationData() {
         if (recommendationData === null) {
@@ -615,7 +615,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val categoryElement = page.getByTestId(parentId).getByTestId("food-category-title-${category}")
             var subCategoryElement: Locator? = null
 
-            val elements = if (isCategoryExist) {
+            val subCategoryExpected = getCategorySubtext(type, category)
+
+            val elements = if (isCategoryExist && subCategoryExpected?.isNotEmpty() == true) {
                 subCategoryElement = page.getByTestId(parentId).getByTestId("food-category-subtext-${category}")
                 listOf<Locator?>(categoryElement, subCategoryElement)
             } else {
@@ -633,8 +635,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             assertEquals(category, categoryUi)
 
-            if (isCategoryExist) {
-                val subCategoryExpected = getCategorySubtext(type, category)
+            if (isCategoryExist && subCategoryExpected?.isNotEmpty() == true) {
                 val subCategoryUi = subCategoryElement?.innerText()
                 logger.info { "UI SubCategory = '$subCategoryUi', Expected = '$subCategoryExpected'" }
                 assertEquals(subCategoryExpected, subCategoryUi)
@@ -771,6 +772,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             validateSearchForType(foodRecommendations, NutritionFoodType.LIMIT.type, searchBox)
             validateSearchForType(foodRecommendations, NutritionFoodType.AVOID.type, searchBox)
 
+            page.getByRole(AriaRole.BUTTON).nth(1).click()
             logger.info { "Search validation completed" }
         }
     }
