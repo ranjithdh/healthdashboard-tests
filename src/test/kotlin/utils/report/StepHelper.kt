@@ -228,5 +228,9 @@ object StepHelper {
     const val OPENING_SUPPLEMENTS_PANEL = "Opening supplements panel"
     const val FETCH_LAB_TEST_DATA = "Fetch Lab Tests data"
     const val FETCH_GOAL_DATA = "Fetch Goal data"
+    const val FETCH_SYMPTOMS_DATA = "Fetch Symptoms data"
     const val VALIDATING_EMPTY_ACTION_PLAN_PAGE = "Validating Empty Action Plan Page"
+    const val VALIDATING_RECOMMENDATION_PENDING = "Validating Recommendation Pending"
+    const val VALIDATING_CONSULTATION_PENDING = "Validating Consultation Pending"
+    const val VALIDATING_BLOOD_TEST_IN_PROGRESS = "Validating Blood Test In Progress"
 }

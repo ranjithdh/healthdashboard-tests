@@ -32,16 +32,20 @@ import utils.report.StepHelper.FETCH_HEALTH_DATA
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.FETCH_LAB_TEST_DATA
 import utils.report.StepHelper.FETCH_RECOMMENDATION_DATA
+import utils.report.StepHelper.FETCH_SYMPTOMS_DATA
 import utils.report.StepHelper.OPENING_ACTIVITY_PANEL
 import utils.report.StepHelper.OPENING_SLEEP_PANEL
 import utils.report.StepHelper.OPENING_STRESS_PANEL
 import utils.report.StepHelper.OPENING_SUPPLEMENTS_PANEL
 import utils.report.StepHelper.VALIDATING_ACTIVITY_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_BLOOD_TEST_IN_PROGRESS
+import utils.report.StepHelper.VALIDATING_CONSULTATION_PENDING
 import utils.report.StepHelper.VALIDATING_DAILY_CALORIES_CARD
 import utils.report.StepHelper.VALIDATING_EMPTY_ACTION_PLAN_PAGE
 import utils.report.StepHelper.VALIDATING_FOOD_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_FURTHER_TESTS
 import utils.report.StepHelper.VALIDATING_NUTRITION_MAIN_CARD
+import utils.report.StepHelper.VALIDATING_RECOMMENDATION_PENDING
 import utils.report.StepHelper.VALIDATING_SEARCH_FOOD_ITEMS
 import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
@@ -270,6 +274,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     fun getSymptoms() {
+        StepHelper.step(FETCH_SYMPTOMS_DATA)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -298,6 +303,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             if (responseData.status == "success") {
                 listOfSymptoms = responseData.data.symptoms
+                logApiResponse(TestConfig.APIs.API_SYMPTOMS_LIST, responseData)
             }
         } catch (e: Exception) {
             logger.error { "Failed to fetch goal data: ${e.message}" }
@@ -1694,6 +1700,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun recommendationPending() {
+        StepHelper.step(VALIDATING_RECOMMENDATION_PENDING)
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
         val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Generating your action plan..."))
         val subtitle = page.getByText("Our experts are adding some")
@@ -1710,14 +1717,18 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun consultationBookPending() {
+        StepHelper.step(VALIDATING_CONSULTATION_PENDING)
         val status = homeData?.next_steps?.free_consultation?.status
         val productId = homeData?.next_steps?.free_consultation?.product_id
 
+        logger.info { "Consultation Status: $status, Product ID: $productId" }
+
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
 
-        val formattedDate = formatConsultationDate(
-            homeData?.next_steps?.free_consultation?.scheduled_at
-        )
+        val scheduledAt = homeData?.next_steps?.free_consultation?.scheduled_at
+        val formattedDate = formatConsultationDate(scheduledAt)
+
+        logger.info { "Scheduled At: $scheduledAt, Formatted Date: $formattedDate" }
 
         val isConsultationBooked =
             (status == "completed" || status == "booked") &&
@@ -1725,6 +1736,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
         val isConsultationPending =
             status == "not_booked"
+
+        logger.info { "isConsultationBooked: $isConsultationBooked, isConsultationPending: $isConsultationPending" }
 
         val titleExpected =
             messages[if (!isConsultationBooked) ActionPlanStatus.NOT_SCHEDULED else ActionPlanStatus.SCHEDULED]
@@ -1734,6 +1747,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         if (isConsultationBooked) {
             subTitleExpected = subTitleExpected?.plus(" $formattedDate.")
         }
+
+        logger.info { "Expected Title: $titleExpected" }
+        logger.info { "Expected Subtitle: $subTitleExpected" }
 
         if (isConsultationBooked) {
 
@@ -1868,6 +1884,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun bloodTestInProgress() {
+        StepHelper.step(VALIDATING_BLOOD_TEST_IN_PROGRESS)
         val image = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("generate action-plan"))
         val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Action plan will be generated"))
 
