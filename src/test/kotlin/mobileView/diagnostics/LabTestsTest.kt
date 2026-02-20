@@ -1,9 +1,7 @@
 package mobileView.diagnostics
 
-import com.microsoft.playwright.Browser
-import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.*
+import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
@@ -254,7 +252,7 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
-        val targetCode = "PROJ1056379" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "DH_LONGEVITY_PANEL" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -378,6 +376,13 @@ class LabTestsTest : BaseTest() {
         // Verify Header Info (Name, Short Description, About Description)
         testDetailPage.verifyTestHeaderInfo(targetCode)
         testDetailPage.verifyHighlights(expectedHighlights)
+
+        if (targetCode == "DH_LONGEVITY_PANEL") {
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("I’m booking this test for")).click()
+            page.locator("#gender").click()
+            page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Others")).click()
+        }
+
         // Verify "How it Works?" section
         logger.info { "Verifying How it Works section..." }
         StepHelper.step("Verifying How it Works section...")
