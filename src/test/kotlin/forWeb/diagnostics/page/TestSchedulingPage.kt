@@ -157,8 +157,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Add New User").click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Add a new member")).click()
         page.getByText("Mobile number *").click()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
-        page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(2).click()
+       if (isBookingForSelf) {
+           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
+           page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(2).click()
+       } else {
+           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
+           page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(1).click()
+       }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
         page.getByText("Nick name *").click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).click()
