@@ -740,6 +740,10 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
 
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("I’m booking this test for")).click()
+        page.locator("#gender").click()
+        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Others")).click()
+        
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
         val testSchedulingPage = TestSchedulingPage(page)
