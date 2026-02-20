@@ -9,12 +9,11 @@ import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.json.*
 import mobileView.profile.utils.ProfileUtils.buildAddressText
+import model.ProfileListData
 import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
 import model.slot.SlotList
-import model.ProfileListResponse
-import model.ProfileListData
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
 import utils.LogFullApiCall.logFullApiCall
@@ -141,6 +140,53 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         Assertions.assertTrue(heading.isVisible, "Sample Collection Address heading should be visible")
     }
 
+    fun verifyUserOption(isBookingForSelf: Boolean) {
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("I’m booking this test for")).click()
+        page.locator("#gender").click()
+        if (isBookingForSelf) {
+            page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Myself")).click()
+        } else {
+            page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Others")).click()
+        }
+    }
+
+    fun verifyAddNewUserFields(isBookingForSelf: Boolean) {
+        if (isBookingForSelf) {
+            page.getByRole(AriaRole.COMBOBOX).click()
+        }
+        page.getByText("Add New User").click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Add a new member")).click()
+        page.getByText("Mobile number *").click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
+        page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(2).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
+        page.getByText("Nick name *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).click()
+        page.getByText("Enter name *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).click()
+        page.getByText("Email *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).click()
+        page.getByText("Date of Birth *").click()
+        page.getByLabel("Month:").selectOption("8")
+        page.getByRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName("21")).click()
+        page.getByText("Gender *").click()
+        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Male").setExact(true)).click()
+        page.getByText("Height (cm) *").click()
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).click()
+        page.getByText("Weight (kg) *").click()
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).click()
+        page.getByText("Flat, House no., Building,").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,")).click()
+        page.getByText("Street address *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
+        page.getByText("city *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).click()
+        page.getByText("State *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).click()
+        page.getByText("Pin code *").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
+    }
     fun assertProfilesFromApi() {
         logger.info { "Asserting profiles from API are visible on UI..." }
         if (profileListData == null || profileListData!!.profiles.isNullOrEmpty()) {
@@ -586,12 +632,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         // Slot verification
         // Slot verification
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004", "DH_METABOLIC_PANEL")) {
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004", "DH_METABOLIC_PANEL", "DH_LONGEVITY_PANEL")) {
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()
             page.getByText("Selected time slot: $selectedTimeSummary").click()
         }
-        if (targetCode == "DH_METABOLIC_PANEL") {
+        if (targetCode == "DH_METABOLIC_PANEL" || targetCode == "DH_LONGEVITY_PANEL") {
             logger.info { "Verifying Dual Slot Summary: Date: $selectedDateSummary, Fasting: $selectedFastingTimeSummary, PostMeal: $selectedPostMealTimeSummary" }
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()

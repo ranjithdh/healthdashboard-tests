@@ -13,7 +13,7 @@ import utils.logger.logger
 import utils.report.Modules
 import utils.report.StepHelper
 import kotlin.math.ceil
-import kotlin.math.roundToInt
+
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -614,7 +614,7 @@ class LabTestsTest : BaseTest() {
         val randomIndex = (0 until addressCount).random()
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        testSchedulingPage.editUserAddress(randomIndex)
         // Reuse the already found target item
         val targetProduct = targetItem
 
@@ -629,10 +629,14 @@ class LabTestsTest : BaseTest() {
         val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
         logger.info { "Wallet Balance $walletBalance" }
 
-        val discountPercent = 20
-        val calculatedDiscount = (rawPrice * discountPercent) / 100.0
-        val roundedDiscount = ceil(calculatedDiscount)
-        val applicableDiscount = minOf(roundedDiscount, walletBalance)
+        var applicableDiscount = 0.0
+        if (walletBalance > 0.0) {
+            // Assuming integer points application
+            val discountPercent = 20
+            val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+            val roundedDiscount = ceil(calculatedDiscount)
+            applicableDiscount = minOf(roundedDiscount, walletBalance)
+        }
 
         // Assuming user points text format, we use a softer check or verify visibility
         logger.info { "Verifying price details on address selection page..." }
@@ -699,6 +703,7 @@ class LabTestsTest : BaseTest() {
     @Test
     @Order(4)
     fun `verify test scheduling for baseline`() {
+        val isBookingForSelf = true
         logger.info { "Starting test: verify test scheduling" }
         StepHelper.step("Starting test: verify test scheduling")
 
@@ -721,7 +726,7 @@ class LabTestsTest : BaseTest() {
                 is model.LabTestItem -> item.code to item.di_kit
                 else -> null to null
             }
-            diKit == null && code != "DH_LONGEVITY_PANEL"
+            diKit == null && code == "DH_LONGEVITY_PANEL"
         }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
 
         var targetCode = when (targetItem) {
@@ -740,15 +745,13 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Clicking View Details for code $targetCode")
         labTestsPage.clickViewDetails(targetCode)
 
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("I’m booking this test for")).click()
-        page.locator("#gender").click()
-        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Others")).click()
-        
         val testDetailPage = forWeb.diagnostics.page.TestDetailPage(page)
 
         val testSchedulingPage = TestSchedulingPage(page)
         logger.info { "Capturing address list and verifying scheduling page..." }
         StepHelper.step("Capturing address list and verifying scheduling page...")
+        // selection for test
+        testSchedulingPage.verifyUserOption(isBookingForSelf = isBookingForSelf)
 
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
@@ -758,6 +761,8 @@ class LabTestsTest : BaseTest() {
         }
 
         testSchedulingPage.verifySampleCollectionAddressHeading()
+        // add a new user flow
+        testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
         testSchedulingPage.assertProfilesFromApi()
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
@@ -765,16 +770,16 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.clickAddNewAddress()
         assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         testSchedulingPage.assertAddressFormFieldsVisible()
-//        testSchedulingPage.clickAddNewAddress()
-//        testSchedulingPage.addAddressAndValidate()
-        // assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
+        testSchedulingPage.clickAddNewAddress()
+        testSchedulingPage.addAddressAndValidate()
+         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         logger.info { "Testing 'Edit Address' functionality..." }
         StepHelper.step("Testing 'Edit Address' functionality...")
-//        val addressCount = testSchedulingPage.getAddressCount()
-//        val randomIndex = (0 until addressCount).random()
-//        logger.info { "Selecting random address at index $randomIndex" }
-//        StepHelper.step("Selecting random address at index $randomIndex")
+        val addressCount = testSchedulingPage.getAddressCount()
+        val randomIndex = (0 until addressCount).random()
+        logger.info { "Selecting random address at index $randomIndex" }
+        StepHelper.step("Selecting random address at index $randomIndex")
 //        testSchedulingPage.editUserAddress(randomIndex)
         // Reuse the already found target item
         val targetProduct = targetItem
@@ -788,12 +793,18 @@ class LabTestsTest : BaseTest() {
 
         // Calculate Discount Logic
         val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
-        val maxDiscount = rawPrice * 0.20
-        var applicableDiscount = if (walletBalance >= maxDiscount) maxDiscount else walletBalance
-        // Assuming integer points application
-        applicableDiscount = applicableDiscount.toInt().toDouble()
-        page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
-        page.getByTestId("diagnostics-sidebar-dh-points").click()
+        logger.info { "Wallet Balance $walletBalance" }
+        var applicableDiscount = 0.0
+        if (walletBalance > 0.0) {
+            // Assuming integer points application
+            val discountPercent = 20
+            val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+            val roundedDiscount = ceil(calculatedDiscount)
+             applicableDiscount = minOf(roundedDiscount, walletBalance)
+
+            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+            page.getByTestId("diagnostics-sidebar-dh-points").click()
+        }
 
         logger.info { "Verifying price details on address selection page..." }
         StepHelper.step("Verifying price details on address selection page...")
@@ -819,7 +830,7 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.product_id
             else -> throw RuntimeException("Unknown product type")
         }
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+        testSchedulingPage.verifyDualSlotSelectionPage(code = targetCode, productId = productId)
 
         logger.info { "Verifying Price Details on Slot Selection page..." }
         StepHelper.step("Verifying Price Details on Slot Selection page...")
