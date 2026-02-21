@@ -153,27 +153,44 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun fillAddNewUserFields() {
+    fun fillAddNewUserFields(
+        mobileNumber: String? = null,
+        nickName: String? = null,
+        name: String? = null,
+        email: String? = null,
+        dobDay: String = "5",
+        gender: String = "Male",
+        height: String = "190",
+        weight: String = "90"
+    ) {
+        val randomNum = (100..999).random()
+        val finalMobile = mobileNumber ?: "7092424$randomNum" 
+        val finalNickName = nickName ?: "Seeni$randomNum"
+        val finalName = name ?: "SeeniV$randomNum"
+        val finalEmail = email ?: "vseeni$randomNum@yopmail.com"
+
+        logger.info { "Filling Add New User fields with dynamic number: $randomNum" }
+
         page.getByRole(AriaRole.COMBOBOX).click()
         page.getByText("Add New User").click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number"))
-            .fill("70924 24996")
+            .fill(finalMobile)
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).fill("Seeni")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).fill(finalNickName)
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).fill("SeeniV")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).fill(finalName)
 
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).fill("vseeni@yopmail.com")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).fill(finalEmail)
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Date of Birth *")).click()
-        page.getByRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName("5")).first().click()
+        page.getByRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(dobDay)).first().click()
         page.getByRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender *")).click()
-        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Male").setExact(true)).click()
+        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(gender).setExact(true)).click()
         page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).click()
-        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).fill("190")
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).fill(height)
         page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).click()
-        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).fill("90")
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).fill(weight)
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,")).click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,"))
             .fill("14C3, H H Road")
