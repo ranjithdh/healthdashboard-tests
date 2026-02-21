@@ -703,7 +703,7 @@ class LabTestsTest : BaseTest() {
     @Test
     @Order(4)
     fun `verify test scheduling for baseline`() {
-        val isBookingForSelf = true
+        val isBookingForSelf = false
         logger.info { "Starting test: verify test scheduling" }
         StepHelper.step("Starting test: verify test scheduling")
 
@@ -764,7 +764,18 @@ class LabTestsTest : BaseTest() {
         // add a new user flow
         testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
         testSchedulingPage.fillAddNewUserFields()
+        testSchedulingPage.getUserProfileList() // Refresh list after adding new user
         testSchedulingPage.assertProfilesFromApi()
+        
+        // Switch user logic
+        val profiles = testSchedulingPage.getProfileListData()?.profiles
+            ?: throw AssertionError("Profile list data not found")
+        val targetProfile = profiles.randomOrNull()
+            ?: throw AssertionError("No profiles available in the list to switch")
+        val leadId = targetProfile.lead_id ?: throw AssertionError("Lead ID is null for selected profile '${targetProfile.name}'")
+        
+        logger.info { "Dynamically selected profile to switch: ${targetProfile.name} (leadId: $leadId)" }
+        testSchedulingPage.switchUser(leadId, targetCode)
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
 
