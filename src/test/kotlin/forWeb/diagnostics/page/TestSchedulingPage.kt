@@ -150,6 +150,45 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
     }
 
+    fun fillAddNewUserFields() {
+        page.getByRole(AriaRole.COMBOBOX).click()
+        page.getByText("Add New User").click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number"))
+            .fill("70924 24996")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Nick name *")).fill("Seeni")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter name *")).fill("SeeniV")
+
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Email *")).fill("vseeni@yopmail.com")
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Date of Birth *")).click()
+        page.getByRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName("5")).first().click()
+        page.getByRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender *")).click()
+        page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Male").setExact(true)).click()
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).click()
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm) *")).fill("190")
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).click()
+        page.getByRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg) *")).fill("90")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,"))
+            .fill("14C3, H H Road")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
+        page.getByRole(
+            AriaRole.BUTTON,
+            Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
+        ).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).fill("Madurai")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).press("ArrowRight")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).fill("Tamil Nadu")
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).fill("625009")
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
+
+    }
     fun verifyAddNewUserFields(isBookingForSelf: Boolean) {
         if (isBookingForSelf) {
             page.getByRole(AriaRole.COMBOBOX).click()

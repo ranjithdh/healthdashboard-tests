@@ -763,6 +763,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifySampleCollectionAddressHeading()
         // add a new user flow
         testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
+        testSchedulingPage.fillAddNewUserFields()
         testSchedulingPage.assertProfilesFromApi()
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
