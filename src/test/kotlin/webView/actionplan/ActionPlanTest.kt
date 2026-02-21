@@ -201,6 +201,21 @@ class ActionPlanTest : BaseTest() {
         assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
         logger.info { "User recommendations API successfully verified." }
 
+        // here onwards u have to take it
+        // 3. Overview
+        page1.getByTestId("preview-introduction").getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Overview")).click()
+
+        // 4. Intro Text
+        page1.getByText("At the core of your Deep").click()
+
+        page1.getByText("1. Summary: A snapshot of your biological status based on key biomarkers that define your current health and performance across seven core dimensions.")
+        page1.getByText("2. What's Working Well for You: The areas where your biology is performing at its best, reflecting balance, strong recovery, and effective lifestyle habits.")
+        page1.getByText("3. What Needs Support: The biomarkers that need closer attention, pointing to underlying imbalances and opportunities for improvement.")
+        page1.getByText("4. Lifestyle Modifications: Simple, high-impact shifts in movement, sleep, and stress management to bring your body back into alignment.")
+        page1.getByText("5. Nutrition Guidance: Personalized food and nutrient strategies designed to fuel recovery, enhance metabolism, and sustain energy.")
+        page1.getByText("6. Supplement Recommendations: A focused protocol of evidence-based supplements to target specific needs and accelerate your progress.")
+        page1.getByText("7. Diagnostic Testing: Follow-up and advanced tests to track your biomarkers, measure improvement, and refine your personalized plan.")
+
         // New Verification Logic for Specific Nutrients based on static data
         StepHelper.step("Verifying specific nutrient food sources based on user preference")
         
@@ -351,26 +366,6 @@ class ActionPlanTest : BaseTest() {
             logger.warn { "Could not click date '$dateStr'. Might be different timezone or date format." }
         }
 
-        // 3. Overview
-        page1.getByTestId("preview-introduction").getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Overview")).click()
-
-        // 4. Intro Text
-        page1.getByText("At the core of your Deep").click()
-
-        val overviewItems = listOf(
-            "1. Summary: A snapshot of your biological status based on key biomarkers that define your current health and performance across seven core dimensions.",
-            "2. What's Working Well for You: The areas where your biology is performing at its best, reflecting balance, strong recovery, and effective lifestyle habits.",
-            "3. What Needs Support: The biomarkers that need closer attention, pointing to underlying imbalances and opportunities for improvement.",
-            "4. Lifestyle Modifications: Simple, high-impact shifts in movement, sleep, and stress management to bring your body back into alignment.",
-            "5. Nutrition Guidance: Personalized food and nutrient strategies designed to fuel recovery, enhance metabolism, and sustain energy.",
-            "6. Supplement Recommendations: A focused protocol of evidence-based supplements to target specific needs and accelerate your progress.",
-            "7. Diagnostic Testing: Follow-up and advanced tests to track your biomarkers, measure improvement, and refine your personalized plan."
-        )
-
-        overviewItems.forEach { item ->
-            StepHelper.step("Verifying overview item: ${item.take(20)}...")
-            page1.getByText(item).click()
-        }
 
 
         // 4. Verify on main page using user's interaction pattern
