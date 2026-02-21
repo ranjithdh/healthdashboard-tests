@@ -97,6 +97,7 @@ object TestConfig {
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
         val PROFILE_LIST = "$BASE_URL/v4/human-token/lead/profiles"
+        val PROFILE_DETAIL = "$BASE_URL/v4/human-token/lead/profile/"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
         val API_USERS = "$BASE_URL/v4/human-token/users"
@@ -166,7 +167,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "9952538864",
+            mobileNumber = "7092424997",
             otp = "678901",
             country = "India",
             countryCode = "+91"
