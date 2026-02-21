@@ -239,6 +239,34 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         return profileListData
     }
 
+    private fun getProfileDisplayString(name: String?, dob: String?, gender: String?): String {
+        if (name == null || dob == null || gender == null) return ""
+        val birthDate = try {
+            // Try ISO format first
+            ZonedDateTime.parse(dob).toLocalDate()
+        } catch (e: Exception) {
+            try {
+                // Try yyyy-MM-dd
+                LocalDate.parse(dob.substring(0, 10))
+            } catch (e2: Exception) {
+                try {
+                    // Try dd/MM/yyyy (found in ht_user_verification)
+                    LocalDate.parse(dob, DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                } catch (e3: Exception) {
+                    logger.error { "Failed to parse DOB: $dob" }
+                    return "$name ?? ?"
+                }
+            }
+        }
+        val age = Period.between(birthDate, LocalDate.now()).years
+        val genderInitial = when {
+            gender.lowercase().startsWith("female") -> "F"
+            gender.lowercase().startsWith("male") -> "M"
+            else -> ""
+        }
+        return "$name $age $genderInitial"
+    }
+
     fun switchUser(leadId: String, productCode: String) {
         logger.info { "Switching user for leadId: $leadId" }
         
@@ -273,15 +301,24 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
         
         // Construct dynamic name for option selection
-        val dynamicName = "${piiData.name} $age $genderInitial"
+        val dynamicName = getProfileDisplayString(piiData.name, piiData.dob, piiData.gender)
         logger.info { "Dynamic user name constructed: $dynamicName" }
+
+        // Find index for identical users
+        val allProfiles = profileListData?.profiles ?: emptyList()
+        val identicalProfiles = allProfiles.filter { 
+            getProfileDisplayString(it.name, it.dob, it.gender) == dynamicName 
+        }
+        val occurrenceIndex = identicalProfiles.indexOfFirst { it.lead_id == leadId }.let { if (it == -1) 0 else it }
+        
+        logger.info { "Occurrence index for $dynamicName (leadId: $leadId): $occurrenceIndex" }
 
         // UI Interactions
         page.getByRole(AriaRole.COMBOBOX).click()
         val userOption = page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(dynamicName))
         
         if (userOption.count() > 1) {
-            userOption.first().click()
+            userOption.nth(occurrenceIndex).click()
         } else {
             userOption.click()
         }
