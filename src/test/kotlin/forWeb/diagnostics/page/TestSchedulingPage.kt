@@ -13,9 +13,12 @@ import model.ProfileListData
 import model.profile.PiiUserResponse
 import model.profile.UserAddressData
 import model.profile.UserAddressResponse
+import model.profile.ProfileDetailResponse
 import model.slot.SlotList
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import java.time.Period
+import java.time.ZonedDateTime
 import utils.LogFullApiCall.logFullApiCall
 import utils.json.json
 import utils.logger.logger
@@ -230,6 +233,69 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Pin code *").click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
+    }
+
+    fun getProfileListData(): ProfileListData? {
+        return profileListData
+    }
+
+    fun switchUser(leadId: String, productCode: String) {
+        logger.info { "Switching user for leadId: $leadId" }
+        
+        // Fetch profile detail from API
+        val url = "${TestConfig.APIs.PROFILE_DETAIL}$leadId?product_code=$productCode"
+        val response = page.request().get(
+            url,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+        
+        if (response.status() != 200) {
+            throw RuntimeException("Failed to fetch profile detail: ${response.status()} ${response.text()}")
+        }
+        
+        val profileDetail = json.decodeFromString<ProfileDetailResponse>(response.text())
+        val piiData = profileDetail.data?.piiData ?: throw RuntimeException("Profile detail data is null")
+        
+        // Calculate Age
+        val dobStr = piiData.dob ?: throw RuntimeException("DOB is null for leadId: $leadId")
+        val birthDate = ZonedDateTime.parse(dobStr).toLocalDate()
+        val age = Period.between(birthDate, LocalDate.now()).years
+        
+        // Gender Initial
+        val gender = piiData.gender?.lowercase() ?: ""
+        val genderInitial = when {
+            gender.startsWith("female") -> "F"
+            gender.startsWith("male") -> "M"
+            else -> ""
+        }
+        
+        // Construct dynamic name for option selection
+        val dynamicName = "${piiData.name} $age $genderInitial"
+        logger.info { "Dynamic user name constructed: $dynamicName" }
+
+        // UI Interactions
+        page.getByRole(AriaRole.COMBOBOX).click()
+        val userOption = page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName(dynamicName))
+        
+        if (userOption.count() > 1) {
+            userOption.first().click()
+        } else {
+            userOption.click()
+        }
+        
+        // Wait for address to be available and select it
+        val addressText = piiData.communicationAddress?.address ?: throw RuntimeException("Address is null in API response")
+        logger.info { "Selecting address: $addressText" }
+        
+        // Trying to find and click the address. It might be by text or a specific button
+        page.getByText(addressText, Page.GetByTextOptions().setExact(false)).first().click()
+    }
+
+    fun chooseTheUser() {
+        logger.info { "Asserting profiles from API are visible on UI..." }
     }
     fun assertProfilesFromApi() {
         logger.info { "Asserting profiles from API are visible on UI..." }
