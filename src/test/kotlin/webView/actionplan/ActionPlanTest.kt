@@ -200,6 +200,30 @@ class ActionPlanTest : BaseTest() {
         // Static verification requested by User
         StepHelper.step("Verifying Action Plan Header and Overview Section")
 
+        // User Information Section (Dynamic)
+        StepHelper.step("Verifying User Information Section")
+        val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val apiData = userDataJson["data"]?.jsonObject?.get("data")?.jsonObject
+        val userProfile = apiData?.get("user_profile")?.jsonObject
+        
+        val dynName = userProfile?.get("name")?.jsonPrimitive?.contentOrNull ?: name
+        val dynAge = userProfile?.get("age")?.jsonPrimitive?.contentOrNull ?: "22"
+        val dynGender = userProfile?.get("gender")?.jsonPrimitive?.contentOrNull ?: "male"
+        val dynHeight = userProfile?.get("height")?.jsonPrimitive?.contentOrNull ?: "291"
+        val dynWeight = userProfile?.get("weight")?.jsonPrimitive?.contentOrNull ?: "110"
+        
+        val foodDataCount = apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.size ?: 280
+
+        page1.getByTestId("user-info-display").click()
+        page1.getByText("User Information").click()
+        
+        page1.getByText("Name: $dynName").click()
+        page1.getByText("Age: $dynAge years").click()
+        page1.getByText("Gender: $dynGender").click()
+        page1.getByText("Height: $dynHeight cm").click()
+        page1.getByText("Weight: $dynWeight kg").click()
+        page1.getByText("Foods List: Loaded ($foodDataCount items)").click()
+
         // 1. Header
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
 
