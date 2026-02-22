@@ -238,6 +238,39 @@ class ActionPlanTest : BaseTest() {
 //            assert(locator.isVisible) { "Overview item starting with '$item' not found or not visible" }
         }
 
+        // Summary Section
+        StepHelper.step("Verifying Summary and Biomarker Overview Section")
+        val optimalMarkers = 69
+        val needsImprovementMarkers = 13
+        val atRiskMarkers = 27
+
+        // 1. Click Summary Heading
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Summary")).click()
+
+        // 2. Count Summary Text
+        val summaryText = "$optimalMarkers Optimal markers $needsImprovementMarkers Needs Improvement $atRiskMarkers At Risk"
+//        page1.getByText(summaryText).click()
+
+        // 3. Biomarker Overview
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Biomarker Overview")).click()
+        page1.getByText("${optimalMarkers}Optimal markers").click()
+        page1.getByText("${needsImprovementMarkers}Needs Improvement").click()
+        page1.getByText("${atRiskMarkers}At Risk").click()
+
+        // 4. Data Review Paragraph
+        val reviewText = "Here's the data we reviewed to create your action plan: - Your current blood test results - 1-on-1 interaction with the longevity expert - Pre-consult questionnaire"
+        page1.getByText(reviewText)
+
+        // 5. Health Status Overview
+        val healthTitle = page1.getByTestId("editable-title-health-overview")
+        assert(healthTitle.innerText().contains("Health Status Overview")) { "Health Status Overview title missing" }
+        healthTitle.click()
+
+        val healthContent = page1.getByTestId("editable-content-health-overview")
+        val expectedContent = "Your current health metrics show overall positive trends with targeted areas for optimization. Key focus areas include iron status monitoring, sleep quality improvement, and maintaining cardiovascular health through diet and exercise."
+        assert(healthContent.innerText().contains(expectedContent)) { "Health Status Overview content mismatch" }
+        healthContent.click()
+
         // 5. Lifestyle Modifications Verification
         StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
         
