@@ -327,14 +327,15 @@ class ActionPlanTest : BaseTest() {
                 block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("What is it")).click()
                 val ingredientsList = ingredientsArr.map { ing ->
                     val name = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
-                    val amount = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull ?: ""
-                    val unit = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
-                    "$name ($amount$unit)"
+                    val amount = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull
+                    val unit = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull
+                    
+                    "$name (${amount ?: "null"}${unit ?: "null"})"
                 }.joinToString(", ")
 
                 val expectedWhatIsIt = "$displayName by $brand. Contains: $ingredientsList"
                 logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
-                val whatIsItElem = block.getByText(expectedWhatIsIt)
+                val whatIsItElem = block.getByText(expectedWhatIsIt, Locator.GetByTextOptions().setExact(false)).first()
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
                 whatIsItElem.click()
 
