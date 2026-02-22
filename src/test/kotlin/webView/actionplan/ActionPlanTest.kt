@@ -362,6 +362,69 @@ class ActionPlanTest : BaseTest() {
                 }
             }
         }
+
+        // 7. Diagnostic Testing Verification
+        val tests = recommendationsList.filter {
+            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("test", ignoreCase = true) == true
+        }
+
+        if (tests.isNotEmpty()) {
+            StepHelper.step("Verifying Diagnostic Testing Section")
+            page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Diagnostic Testing")).click()
+
+            tests.forEach { testRec ->
+                val id = testRec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayName = testRec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+                val dueDateRaw = testRec.jsonObject["test_to_be_taken_at"]?.jsonPrimitive?.contentOrNull ?: ""
+                val description = testRec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                val block = page1.getByTestId("preview-recommendation-$id")
+                block.scrollIntoViewIfNeeded()
+
+                StepHelper.step("Verifying Test: $displayName")
+
+                // Click card
+                block.getByTestId("test-card").click()
+
+                // Verify Display Name
+                val nameElem = block.getByText(displayName).first()
+                assert(nameElem.isVisible) { "Test name mismatch: $displayName" }
+                nameElem.click()
+
+                // Verify Due Date
+                if (dueDateRaw.isNotEmpty()) {
+                    try {
+                        val dateTime = java.time.OffsetDateTime.parse(dueDateRaw)
+                            .atZoneSameInstant(java.time.ZoneId.of("Asia/Kolkata"))
+                        val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy"))
+                        val expectedDueText = "Due on: $formattedDate"
+                        logger.info { "Checking due date text: $expectedDueText" }
+                        val dueElem = block.getByText(expectedDueText).first()
+                        assert(dueElem.isVisible) { "Due date mismatch for $displayName. Expected: $expectedDueText" }
+                    } catch (e: Exception) {
+                        logger.warn { "Failed to parse/verify due date '$dueDateRaw': ${e.message}" }
+                    }
+                }
+
+                // Book Now Popup
+                StepHelper.step("Verifying Book Now popup for $displayName")
+                val bookNowPopup = page1.waitForPopup {
+                    block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Book Now")).click()
+                }
+                bookNowPopup.waitForLoadState()
+                logger.info { "Successfully opened Book Now link for $displayName: ${bookNowPopup.url()}" }
+                assert(bookNowPopup.url().isNotBlank()) { "Book Now URL is empty for $displayName" }
+                bookNowPopup.close()
+
+                // Why test it?
+                if (description.isNotEmpty()) {
+                    block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why test it")).click()
+                    val descElem = block.getByText(description).first()
+                    assert(descElem.isVisible) { "Test description missing for $displayName" }
+                    descElem.click()
+                }
+            }
+        }
         // New Verification Logic for Specific Nutrients based on static data
         StepHelper.step("Verifying specific nutrient food sources based on user preference")
         
