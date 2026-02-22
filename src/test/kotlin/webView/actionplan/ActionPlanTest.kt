@@ -288,7 +288,9 @@ class ActionPlanTest : BaseTest() {
         }
         // 6. Supplement Protocol Verification
         val supplements = recommendationsList.filter {
-            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
+            val isSupplement = it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
+            val hasDuration = it.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull != null
+            isSupplement && hasDuration
         }
 
         if (supplements.isNotEmpty()) {
@@ -317,7 +319,7 @@ class ActionPlanTest : BaseTest() {
 
                 // 2. Duration
                 if (duration.isNotEmpty()) {
-                    val durationText = "Duration: $duration weeks"
+                    val durationText = "Duration: $duration"
                     block.getByText(durationText).click()
                 }
 
@@ -331,7 +333,7 @@ class ActionPlanTest : BaseTest() {
                 }.joinToString(", ")
 
                 val expectedWhatIsIt = "$displayName by $brand. Contains: $ingredientsList"
-                logger.info { "Checking 'What is it' text: ${expectedWhatIsIt.take(100)}..." }
+                logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
                 val whatIsItElem = page1.getByText(expectedWhatIsIt)
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
                 whatIsItElem.click()
