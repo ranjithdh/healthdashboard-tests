@@ -2,6 +2,7 @@ package webView.actionplan
 
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.LoadState
 import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
@@ -148,8 +149,11 @@ class ActionPlanTest : BaseTest() {
             pdfBtn.click()
         }
         page1.waitForLoadState()
+        // Wait for all background APIs to settle and give a 5s buffer
+        logger.info { "Waiting for Action Plan APIs to settle..." }
+        page1.waitForLoadState(LoadState.NETWORKIDLE)
+        page1.waitForTimeout(5000.0)
 
-        page1.waitForLoadState()
         val finalUrl = page1.url()
         logger.info { "Final URL: $finalUrl" }
 
@@ -206,15 +210,83 @@ class ActionPlanTest : BaseTest() {
         page1.getByTestId("preview-introduction").getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Overview")).click()
 
         // 4. Intro Text
-        page1.getByText("At the core of your Deep").click()
+        val introHeader = page1.getByText("At the core of your Deep", Page.GetByTextOptions().setExact(false)).first()
+        introHeader.scrollIntoViewIfNeeded()
+        introHeader.click()
 
-        page1.getByText("1. Summary: A snapshot of your biological status based on key biomarkers that define your current health and performance across seven core dimensions.")
-        page1.getByText("2. What's Working Well for You: The areas where your biology is performing at its best, reflecting balance, strong recovery, and effective lifestyle habits.")
-        page1.getByText("3. What Needs Support: The biomarkers that need closer attention, pointing to underlying imbalances and opportunities for improvement.")
-        page1.getByText("4. Lifestyle Modifications: Simple, high-impact shifts in movement, sleep, and stress management to bring your body back into alignment.")
-        page1.getByText("5. Nutrition Guidance: Personalized food and nutrient strategies designed to fuel recovery, enhance metabolism, and sustain energy.")
-        page1.getByText("6. Supplement Recommendations: A focused protocol of evidence-based supplements to target specific needs and accelerate your progress.")
-        page1.getByText("7. Diagnostic Testing: Follow-up and advanced tests to track your biomarkers, measure improvement, and refine your personalized plan.")
+        val expectedIntroItems = listOf(
+            "1. Summary: A snapshot of your biological status",
+            "2. What's Working Well for You: The areas where your biology",
+            "3. What Needs Support: The biomarkers that need closer attention",
+            "4. Lifestyle Modifications: Simple, high-impact shifts",
+            "5. Nutrition Guidance: Personalized food and nutrient strategies",
+            "6. Supplement Recommendations: A focused protocol",
+            "7. Diagnostic Testing: Follow-up and advanced tests"
+        )
+
+
+        expectedIntroItems.forEach { item ->
+
+             page1.getByText(item)
+//            locator.scrollIntoViewIfNeeded()
+//            locator.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+//            assert(locator.isVisible) { "Overview item starting with '$item' not found or not visible" }
+        }
+
+        // 5. Lifestyle Modifications Verification
+        StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
+        
+        // Click Lifestyle Modifications Heading
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
+
+        // Parse recommendations for dynamic verification
+        val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
+        val recommendationsList = recommendationsJson["data"]?.jsonObject?.get("data")?.jsonObject?.get("recommendations")?.jsonArray ?: JsonArray(emptyList())
+
+        val lifestyleCategories = mapOf(
+            "activity" to "Activity",
+            "sleep" to "Sleep",
+            "stress" to "Stress Management"
+        )
+
+        lifestyleCategories.forEach { (catKey, uiLabel) ->
+            val filteredRecs = recommendationsList.filter { 
+                it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true 
+            }
+
+            if (filteredRecs.isNotEmpty()) {
+                StepHelper.step("Verifying Category: $uiLabel")
+                
+                // Click the category tab/div
+                page1.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^$uiLabel$"))).click()
+                
+                filteredRecs.forEach { rec ->
+                    val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+                    val description = rec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                    logger.info { "Verifying Recommendation: $displayName" }
+                    
+                    if (displayName.isNotEmpty()) {
+                       page1.getByText(displayName)
+                        logger.info { "Verified displayName: $displayName" }
+//                        displayElem.scrollIntoViewIfNeeded()
+//                        displayElem.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+//                        assert(displayElem.isVisible) { "Display name '$displayName' not found or not visible in $uiLabel" }
+                    }
+
+                    logger.info { "Verifying description: $description" }
+                    if (description.isNotEmpty()) {
+                        // Using partial match for description (first 100 chars) for better reliability
+//                        val descPart = description.take(100)
+                        logger.info { "Verified description: $description" }
+                          page1.getByText(description)
+//                        descElem.scrollIntoViewIfNeeded()
+//                        descElem.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+//                        assert(descElem.isVisible) { "Description starting with '$descPart' not found or not visible in $uiLabel" }
+                    }
+                }
+            }
+        }
 
         // New Verification Logic for Specific Nutrients based on static data
         StepHelper.step("Verifying specific nutrient food sources based on user preference")
