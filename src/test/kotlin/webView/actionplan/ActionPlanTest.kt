@@ -3,27 +3,19 @@ package webView.actionplan
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.LoadState
+import com.microsoft.playwright.options.RequestOptions
 import config.BaseTest
 import config.TestConfig
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.*
+import model.UsersResponse
 import onboard.page.LoginPage
 import onboard.page.OtpPage
 import org.junit.jupiter.api.*
-import utils.json.json as jsonParser
-import model.UsersResponse
-import com.microsoft.playwright.options.RequestOptions
 import utils.logger.logger
 import utils.report.StepHelper
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.buildJsonObject
 import java.util.regex.Pattern
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.contentOrNull
+import utils.json.json as jsonParser
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -323,7 +315,21 @@ class ActionPlanTest : BaseTest() {
                     block.getByText(durationText).click()
                 }
 
-                // 3. What is it (Ingredients)
+                // 3. Buy Now link check
+                val buyNow = block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Buy Now"))
+                assert(buyNow.isVisible) { "Buy Now link not visible for $displayName" }
+
+                StepHelper.step("Verifying Buy Now popup for $displayName")
+                val buyNowPopup = page1.waitForPopup {
+                    block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Buy Now")).click()
+                }
+                buyNowPopup.waitForLoadState()
+                logger.info { "Successfully opened Buy Now link for $displayName: ${buyNowPopup.url()}" }
+                assert(buyNowPopup.url().isNotBlank()) { "Buy Now URL is empty for $displayName" }
+                buyNowPopup.close()
+
+
+                // 4. What is it (Ingredients)
                 block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("What is it")).click()
                 val ingredientsList = ingredientsArr.map { ing ->
                     val name = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
@@ -339,7 +345,7 @@ class ActionPlanTest : BaseTest() {
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
                 whatIsItElem.click()
 
-                // 4. Why this matters?
+                // 5. Why this matters?
                 if (detailedDesc.isNotEmpty()) {
                     block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why this matters?")).click()
                     val whyElem = block.getByText(detailedDesc)
@@ -347,17 +353,13 @@ class ActionPlanTest : BaseTest() {
                     whyElem.click()
                 }
 
-                // 5. How to take it
+                // 6. How to take it
                 if (cardDesc.isNotEmpty()) {
                     block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("How to take it")).click()
                     val howElem = block.getByText(cardDesc)
                     assert(howElem.isVisible) { "Card description missing for $displayName" }
                     howElem.click()
                 }
-
-                // 6. Buy Now link check
-                val buyNow = block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Buy Now"))
-                assert(buyNow.isVisible) { "Buy Now link not visible for $displayName" }
             }
         }
         // New Verification Logic for Specific Nutrients based on static data
