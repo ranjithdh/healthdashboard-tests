@@ -396,7 +396,7 @@ class ActionPlanTest : BaseTest() {
                     try {
                         val dateTime = java.time.OffsetDateTime.parse(dueDateRaw)
                             .atZoneSameInstant(java.time.ZoneId.of("Asia/Kolkata"))
-                        val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy"))
+                        val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))
                         val expectedDueText = "Due on: $formattedDate"
                         logger.info { "Checking due date text: $expectedDueText" }
                         val dueElem = block.getByText(expectedDueText).first()
