@@ -334,14 +334,14 @@ class ActionPlanTest : BaseTest() {
 
                 val expectedWhatIsIt = "$displayName by $brand. Contains: $ingredientsList"
                 logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
-                val whatIsItElem = page1.getByText(expectedWhatIsIt)
+                val whatIsItElem = block.getByText(expectedWhatIsIt)
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
                 whatIsItElem.click()
 
                 // 4. Why this matters?
                 if (detailedDesc.isNotEmpty()) {
                     block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why this matters?")).click()
-                    val whyElem = page1.getByText(detailedDesc)
+                    val whyElem = block.getByText(detailedDesc)
                     assert(whyElem.isVisible) { "Detailed description missing for $displayName" }
                     whyElem.click()
                 }
@@ -349,7 +349,7 @@ class ActionPlanTest : BaseTest() {
                 // 5. How to take it
                 if (cardDesc.isNotEmpty()) {
                     block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("How to take it")).click()
-                    val howElem = page1.getByText(cardDesc)
+                    val howElem = block.getByText(cardDesc)
                     assert(howElem.isVisible) { "Card description missing for $displayName" }
                     howElem.click()
                 }
