@@ -304,7 +304,7 @@ class ActionPlanTest : BaseTest() {
                 val detailedDesc = rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: ""
                 val cardDesc = rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: ""
 
-                val supplementMeta = rec.jsonObject["supplement_meta"]?.jsonObject
+                val supplementMeta = rec.jsonObject["meta"]?.jsonObject
                 val brand = supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: ""
                 val ingredientsArr = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
 
