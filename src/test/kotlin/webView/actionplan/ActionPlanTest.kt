@@ -197,7 +197,20 @@ class ActionPlanTest : BaseTest() {
         assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
         logger.info { "User recommendations API successfully verified." }
 
-        // here onwards u have to take it
+        // Static verification requested by User
+        StepHelper.step("Verifying Action Plan Header and Overview Section")
+
+        // 1. Header
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
+
+        // 2. Date
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d,")
+        val dateStr = java.time.LocalDate.now().format(formatter)
+        try {
+            page1.getByText(dateStr).click()
+        } catch (e: Exception) {
+            logger.warn { "Could not click date '$dateStr'. Might be different timezone or date format." }
+        }
         // 3. Overview
         page1.getByTestId("preview-introduction").getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Overview")).click()
 
@@ -559,23 +572,6 @@ class ActionPlanTest : BaseTest() {
         page1.waitForTimeout(5000.0)
         page1.evaluate("window.scrollTo(0, document.body.scrollHeight)")
         page1.waitForTimeout(1000.0)
-
-        // Static verification requested by User
-        StepHelper.step("Verifying Action Plan Header and Overview Section")
-
-        // 1. Header
-        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
-
-        // 2. Date
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d,")
-        val dateStr = java.time.LocalDate.now().format(formatter)
-        try {
-            page1.getByText(dateStr).click()
-        } catch (e: Exception) {
-            logger.warn { "Could not click date '$dateStr'. Might be different timezone or date format." }
-        }
-
-
 
         // 4. Verify on main page using user's interaction pattern
         StepHelper.step("Verifying all added vitamins using the interaction pattern")
