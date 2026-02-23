@@ -69,11 +69,17 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val SIGNUP_VIA_WEBSITE =
+            "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
         val TRACK_RESULT = "${BASE_URL}order/"
+        val RECOMMENDATIONS_URL = "${BASE_URL}recommendations"
+
+        val TEST_DETAIL_URL = "${BASE_URL}test-detail"
+
+
     }
 
     object APIs {
@@ -83,7 +89,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_SLOTS_AVAILABILITY = "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
+        val API_SLOTS_AVAILABILITY =
+            "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
         val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
         val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
@@ -98,13 +105,15 @@ object TestConfig {
         val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
+        val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
+        val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
         val API_USERS = "$BASE_URL/v4/human-token/users"
         val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
     }
 
 
     object Browser {
-        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val SLOW_MO: Double = (1 * 100).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
@@ -137,7 +146,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998195",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998368",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -163,7 +172,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India",
             countryCode = "+91"

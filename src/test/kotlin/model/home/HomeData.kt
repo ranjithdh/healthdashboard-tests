@@ -44,11 +44,13 @@ data class Diagnostic(
 @Serializable
 data class FreeConsultation(
     val product_id: String?=null,
-    val status: String?=null
+    val status: String?=null,
+    val scheduled_at: String?=null
 )
 
 @Serializable
 data class NextSteps(
+    val has_completed_consultation: Boolean=false,
     val credit_points: CreditPoints?=null,
     val free_consultation: FreeConsultation?=null,
     val personalized_action: PersonalizedAction?=null,

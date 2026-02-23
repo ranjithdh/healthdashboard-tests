@@ -194,6 +194,12 @@ class SymptomsPage(page: Page) : BasePage(page) {
         onReportSymptomsValidation()
     }
 
+    fun consultationsReport() {
+        reportOptionsValidations()
+        selectAllSymptoms()
+        submitSymptoms()
+    }
+
 
     val selectionSymptoms = mutableMapOf<String, List<String>>()
 
