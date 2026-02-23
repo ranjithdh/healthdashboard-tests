@@ -1,9 +1,9 @@
 package mobileView.actionPlan.page
 
+import com.microsoft.playwright.Download
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
@@ -23,6 +23,7 @@ import model.healthdata.HealthData
 import model.home.HomeData
 import model.home.HomeDataResponse
 import model.profile.QuestionerMealType
+import org.junit.jupiter.api.Assertions.assertTrue
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
@@ -54,6 +55,8 @@ import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.Symptom
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import webView.diagnostics.symptoms.page.SymptomsPage
+import java.nio.file.Files
+import java.nio.file.Paths
 import kotlin.test.assertEquals
 
 class ActionPlanPage(page: Page) : BasePage(page) {
@@ -81,6 +84,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     private var question = "question"
     private var supplementsDisclaimer =
         "Disclaimer: The supplement recommendations shared are based on the nutrient form, dosage, and intended therapeutic benefit. You are free to choose any trusted and good-quality brand available to you, ensuring that it matches the specified ingredient and dosage. Please consult your healthcare provider before purchasing, especially if you have concerns regarding allergies, specific ingredients, or medication interactions. The brand names are only indicative and not mandatory."
+
+
+    private val pdfPath = "/Users/apple/Downloads/action-planmlkjmskd.pdf"
 
     var labTestData: RecommendationLabTest? = null
     private var allTests = listOf<RecommendationLabTestPackage>()
@@ -1314,7 +1320,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         assertEquals(sleep.name?.uppercase()?.normalizeForUiCompare(), nameText.normalizeForUiCompare())
 
         val displayText = displayElement.innerText()
-        val expectedName =   sleep.variant_description
+        val expectedName = sleep.variant_description
             ?.takeIf { it.isNotBlank() }
             ?: sleep.display_name
         logger.info { "Display name text: $displayText, Expected: $expectedName" }
@@ -2005,5 +2011,42 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
     }
 
+    /**---------------Download Report Test-------------------*/
+    fun downloadPdf() {
+        val testList = recommendationData?.recommendations
+        val foodList = recommendationData?.food_recommendations
 
+
+        if (testList?.isNotEmpty() == true || foodList?.isNotEmpty() == true) {
+            val download = downloadReport()
+            val suggestedFilename = download.suggestedFilename()
+            assertTrue(
+                suggestedFilename.contains("action-plan"),
+                "Filename should contain 'action-plan'"
+            )
+            assertTrue(suggestedFilename.endsWith(".pdf"), "File should be a PDF")
+
+
+            val downloadPath = Paths.get(pdfPath)
+            Files.deleteIfExists(downloadPath)
+
+            download.saveAs(downloadPath)
+
+            assertTrue(Files.exists(downloadPath), "Downloaded file should exist at $pdfPath")
+            assertTrue(Files.size(downloadPath) > 0, "Downloaded file should not be empty")
+
+            println("Download successful: $downloadPath")
+
+        } else {
+            logger.warn("No stress recommendations found")
+        }
+    }
+
+    fun downloadReport(): Download {
+        val download = page.waitForDownload {
+            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Download")).click()
+            byTestId("download-report-button")
+        }
+        return download
+    }
 }

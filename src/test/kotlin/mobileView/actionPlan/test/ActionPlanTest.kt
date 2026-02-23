@@ -106,5 +106,13 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.testCards()
     }
 
+    @Test
+    @Order(8)
+    fun downloadPdf() {
+        actionPlanPage.captureRecommendationData()
+        actionPlanPage.downloadPdf()
+    }
+
+
 
 }
