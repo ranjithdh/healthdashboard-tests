@@ -79,15 +79,15 @@ jobs:
             build/screenshots/
           retention-days: 30
 
-  #      - name: Send Slack Notification
-  #        uses: 8398a7/action-slack@v3
-  #        with:
-  #          status: ${{ job.status }}
-  #          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-  #          text: 'Mobile View Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-  #        env:
-  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #        if: always()
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'Mobile View Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
 
   #  # Website-only tests
   #  test-website:
@@ -189,15 +189,15 @@ jobs:
             build/screenshots/
           retention-days: 30
 
-  #      - name: Send Slack Notification
-  #        uses: 8398a7/action-slack@v3
-  #        with:
-  #          status: ${{ job.status }}
-  #          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-  #          text: 'WebView Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-  #        env:
-  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #        if: always()
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'WebView Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
 
   # Onboard-only tests
   test-onboard:
@@ -246,16 +246,16 @@ jobs:
             build/allure-report-v3/
             build/screenshots/
           retention-days: 30
-#
-#      - name: Send Slack Notification
-#        uses: 8398a7/action-slack@v3
-#        with:
-#          status: ${{ job.status }}
-#          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-#          text: 'Onboard Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#        if: always()
+
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: 'Onboard Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
 
 
 
