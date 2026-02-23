@@ -133,6 +133,7 @@ object StepHelper {
     const val EDIT_ADDRESS_SUMMARY = "Click Edit Address from Summary Page"
     const val EDIT_SLOT_SUMMARY = "Click Edit Slot from Summary Page"
     const val CLICK_ACCOUNT_PROFILE = "Click Account Profile"
+    const val CLICK_ACTION_PLAN = "Click Action Plan"
 
     // ProfilePage - Preference
     const val FETCH_PREFERENCE = "Fetch communication preference"
@@ -209,4 +210,27 @@ object StepHelper {
     const val VIEW_FAQ_QUESTION = "View FAQ question: "
     const val NAVIGATE_TO_DIAGNOSTICS_URL = "Navigate to Diagnostics URL"
     const val VERIFY_PRICE_DETAILS = "Verify Price Details"
+
+    //Action Plan
+    const val FETCH_RECOMMENDATION_DATA = "Fetch Recommendation data"
+    const val VALIDATING_DAILY_CALORIES_CARD = "Validating Daily Calories Intake Card"
+    const val VALIDATING_NUTRITION_MAIN_CARD = "Validating Nutrition Main Card"
+    const val VALIDATING_FOOD_RECOMMENDATIONS = "Validating Food Recommendations"
+    const val VALIDATING_SEARCH_FOOD_ITEMS = "Validating Search Food Items"
+    const val VALIDATING_ACTIVITY_RECOMMENDATIONS = "Validating Activity Recommendations"
+    const val VALIDATING_SLEEP_RECOMMENDATIONS = "Validating Sleep Recommendations"
+    const val VALIDATING_STRESS_RECOMMENDATIONS = "Validating Stress Recommendations"
+    const val VALIDATING_SUPPLEMENTS = "Validating Supplements"
+    const val VALIDATING_FURTHER_TESTS = "Validating Further Test Recommendations"
+    const val OPENING_ACTIVITY_PANEL = "Opening activity panel"
+    const val OPENING_SLEEP_PANEL = "Opening sleep panel"
+    const val OPENING_STRESS_PANEL = "Opening stress panel"
+    const val OPENING_SUPPLEMENTS_PANEL = "Opening supplements panel"
+    const val FETCH_LAB_TEST_DATA = "Fetch Lab Tests data"
+    const val FETCH_GOAL_DATA = "Fetch Goal data"
+    const val FETCH_SYMPTOMS_DATA = "Fetch Symptoms data"
+    const val VALIDATING_EMPTY_ACTION_PLAN_PAGE = "Validating Empty Action Plan Page"
+    const val VALIDATING_RECOMMENDATION_PENDING = "Validating Recommendation Pending"
+    const val VALIDATING_CONSULTATION_PENDING = "Validating Consultation Pending"
+    const val VALIDATING_BLOOD_TEST_IN_PROGRESS = "Validating Blood Test In Progress"
 }
