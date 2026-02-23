@@ -2027,7 +2027,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             assertTrue(suggestedFilename.endsWith(".pdf"), "File should be a PDF")
 
 
-            val downloadPath = Paths.get(pdfPath)
+            val downloadPath = Paths.get("/Users/apple/Downloads", suggestedFilename)
+          //  val downloadPath = Paths.get(pdfPath)
             Files.deleteIfExists(downloadPath)
 
             download.saveAs(downloadPath)
