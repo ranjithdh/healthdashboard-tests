@@ -1200,7 +1200,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 logger.info { "✅ Element visible: ${it}" }
             }
 
-            val expectedName = sleep.variant_description ?: sleep.display_name
+            val expectedName = sleep.variant_description
+                ?.takeIf { it.isNotBlank() }
+                ?: sleep.display_name
+
             val uiName = title.innerText()
 
             logger.info { "Expected name: $expectedName | UI name: $uiName" }
@@ -1311,7 +1314,9 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         assertEquals(sleep.name?.uppercase()?.normalizeForUiCompare(), nameText.normalizeForUiCompare())
 
         val displayText = displayElement.innerText()
-        val expectedName = sleep.variant_description ?: sleep.display_name
+        val expectedName =   sleep.variant_description
+            ?.takeIf { it.isNotBlank() }
+            ?: sleep.display_name
         logger.info { "Display name text: $displayText, Expected: $expectedName" }
         assertEquals(expectedName?.normalizeForUiCompare(), displayText.normalizeForUiCompare())
     }
@@ -1471,9 +1476,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             listOf(image, nameUiElement).forEach { it.waitFor() }
 
             val nameExpected = nameUiElement.innerText()
-            val nameActual = supplement.variant_meta?.name
-                ?: supplement.display_name
-                ?: supplement.name
+
+            val nameActual =
+                supplement.variant_meta?.name?.takeIf { it.isNotBlank() }
+                    ?: supplement.display_name?.takeIf { it.isNotBlank() }
+                    ?: supplement.name
 
 
             assertEquals(nameExpected.normalizeForUiCompare(), nameActual?.normalizeForUiCompare())
@@ -1626,7 +1633,23 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             filteredItems?.forEachIndexed { index, fact ->
                 val ingredientUiElement = page.getByTestId("supplements-ingredient-$index")
                 ingredientUiElement.waitFor()
-                val expectedFact = "${fact.name} ${formatNumber(fact.amount ?: 0.0)} ${fact.unit ?: ""}"
+                val expectedFact = StringBuilder().apply {
+
+                    if (!fact.name.isNullOrBlank()) {
+                        append(fact.name)
+                    }
+
+                    if (fact.amount != null) {
+                        if (isNotEmpty()) append(" ")
+                        append(formatNumber(fact.amount))
+                    }
+
+                    if (!fact.unit.isNullOrBlank()) {
+                        if (isNotEmpty()) append(" ")
+                        append(fact.unit)
+                    }
+
+                }.toString()
                 assertEquals(expectedFact, ingredientUiElement.innerText().normalizeForUiCompare())
             }
 
