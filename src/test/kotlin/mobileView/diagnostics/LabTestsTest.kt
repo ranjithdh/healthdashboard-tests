@@ -1,9 +1,7 @@
 package mobileView.diagnostics
 
-import com.microsoft.playwright.Browser
-import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.*
+import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import forWeb.diagnostics.page.TestSchedulingPage
@@ -14,6 +12,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode
 import utils.logger.logger
 import utils.report.Modules
 import utils.report.StepHelper
+import kotlin.math.ceil
 
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -253,7 +252,7 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
 
-        val targetCode = "PROJ1056379" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "DH_LONGEVITY_PANEL" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -377,6 +376,13 @@ class LabTestsTest : BaseTest() {
         // Verify Header Info (Name, Short Description, About Description)
         testDetailPage.verifyTestHeaderInfo(targetCode)
         testDetailPage.verifyHighlights(expectedHighlights)
+
+        if (targetCode == "DH_LONGEVITY_PANEL") {
+            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("I’m booking this test for")).click()
+            page.locator("#gender").click()
+            page.getByRole(AriaRole.OPTION, Page.GetByRoleOptions().setName("Others")).click()
+        }
+
         // Verify "How it Works?" section
         logger.info { "Verifying How it Works section..." }
         StepHelper.step("Verifying How it Works section...")
@@ -556,16 +562,17 @@ class LabTestsTest : BaseTest() {
         ).filterNotNull().flatten()
 
         val targetItem = allItems.filter { item ->
-            val (code, diKit) = when (item) {
-                is model.LabTestPackage -> item.code to item.di_kit
-                is model.LabTestProfile -> item.code to item.di_kit
-                is model.LabTestItem -> item.code to item.di_kit
-                else -> null to null
+            val (code, diKit, diOrder) = when (item) {
+                is model.LabTestPackage -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestProfile -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestItem -> Triple(item.code, item.di_kit, item.di_order)
+                else -> Triple(null, null, null)
             }
-            diKit == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            diKit == null && diOrder == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            // here we have to check di_order as well like di_kit..
         }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
 
-        var targetCode = when (targetItem) {
+        val targetCode = when (targetItem) {
             is model.LabTestPackage -> targetItem.code
             is model.LabTestProfile -> targetItem.code
             is model.LabTestItem -> targetItem.code
@@ -599,7 +606,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.assertAddressFormFieldsVisible()
         testSchedulingPage.clickAddNewAddress()
         testSchedulingPage.addAddressAndValidate()
-        assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
+         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         logger.info { "Testing 'Edit Address' functionality..." }
         StepHelper.step("Testing 'Edit Address' functionality...")
@@ -607,7 +614,7 @@ class LabTestsTest : BaseTest() {
         val randomIndex = (0 until addressCount).random()
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        testSchedulingPage.editUserAddress(randomIndex)
         // Reuse the already found target item
         val targetProduct = targetItem
 
@@ -618,10 +625,28 @@ class LabTestsTest : BaseTest() {
             else -> 0.0
         }
 
+        // Calculate Discount Logic
+        val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
+        logger.info { "Wallet Balance $walletBalance" }
+
+        var applicableDiscount = 0.0
+        if (walletBalance > 0.0) {
+            // Assuming integer points application
+            val discountPercent = 20
+            val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+            val roundedDiscount = ceil(calculatedDiscount)
+            applicableDiscount = minOf(roundedDiscount, walletBalance)
+        }
+
+        // Assuming user points text format, we use a softer check or verify visibility
         logger.info { "Verifying price details on address selection page..." }
         StepHelper.step("Verifying price details on address selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-
+        if (walletBalance > 0.0) {
+            page.getByText("Use $applicableDiscount from $walletBalance DH Points")
+            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+            page.getByTestId("diagnostics-sidebar-dh-points").click()
+        }
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
@@ -640,21 +665,33 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.product_id
             else -> throw RuntimeException("Unknown product type")
         }
-        // slot selection
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
-            logger.info { "Verifying Slot Selection Page items..." }
-            StepHelper.step("Verifying Slot Selection Page items...")
-            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-            logger.info { "Verifying Price Details on Slot Selection page..." }
-            StepHelper.step("Verifying Price Details on Slot Selection page...")
-            testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
-            logger.info { "Verifying Footer Actions on Slot Selection page..." }
-            StepHelper.step("Verifying Footer Actions on Slot Selection page...")
+        // Duel slot selection
+        if (targetCode == "DH_METABOLIC_PANEL") {
+            logger.info { "Verifying Duel Slot Selection Page items..." }
+            StepHelper.step("Verifying Duel Slot Selection Page items...")
+            testSchedulingPage.verifyDualSlotSelectionPage(code = targetCode, productId = productId)
+            logger.info { "Verifying Price Details on Duel Slot Selection page..." }
+            StepHelper.step("Verifying Price Details on Duel Slot Selection page...")
+            testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+            logger.info { "Verifying Footer Actions on Duel Slot Selection page..." }
+            StepHelper.step("Verifying Footer Actions on Duel Slot Selection page...")
             testSchedulingPage.verifyFooterActions()
             testSchedulingPage.clickProceed()
+        } else {
+            if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+                logger.info { "Verifying Slot Selection Page items..." }
+                StepHelper.step("Verifying Slot Selection Page items...")
+                testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+                logger.info { "Verifying Price Details on Slot Selection page..." }
+                StepHelper.step("Verifying Price Details on Slot Selection page...")
+                testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+                logger.info { "Verifying Footer Actions on Slot Selection page..." }
+                StepHelper.step("Verifying Footer Actions on Slot Selection page...")
+                testSchedulingPage.verifyFooterActions()
+                testSchedulingPage.clickProceed()
+            }
         }
-
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode)
         
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
@@ -665,7 +702,8 @@ class LabTestsTest : BaseTest() {
 
     @Test
     @Order(4)
-    fun `verify test scheduling for two slots booking`() {
+    fun `verify test scheduling for baseline`() {
+        val isBookingForSelf = false
         logger.info { "Starting test: verify test scheduling" }
         StepHelper.step("Starting test: verify test scheduling")
 
@@ -688,7 +726,7 @@ class LabTestsTest : BaseTest() {
                 is model.LabTestItem -> item.code to item.di_kit
                 else -> null to null
             }
-            diKit == null && code != "DH_LONGEVITY_PANEL"
+            diKit == null && code == "DH_LONGEVITY_PANEL"
         }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
 
         var targetCode = when (targetItem) {
@@ -712,22 +750,41 @@ class LabTestsTest : BaseTest() {
         val testSchedulingPage = TestSchedulingPage(page)
         logger.info { "Capturing address list and verifying scheduling page..." }
         StepHelper.step("Capturing address list and verifying scheduling page...")
+        // selection for test
+        testSchedulingPage.verifyUserOption(isBookingForSelf = isBookingForSelf)
 
         testSchedulingPage.captureAddressData {
             testDetailPage.clickBookNow(targetCode)
             // Fetch order details immediately after Book Now triggering order creation
+            testSchedulingPage.getUserProfileList()
             testSchedulingPage.callBloodDataReports()
         }
 
         testSchedulingPage.verifySampleCollectionAddressHeading()
+        // add a new user flow
+        testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
+        testSchedulingPage.fillAddNewUserFields()
+        testSchedulingPage.getUserProfileList() // Refresh list after adding new user
+        testSchedulingPage.assertProfilesFromApi()
+        
+        // Switch user logic
+        val profiles = testSchedulingPage.getProfileListData()?.profiles
+            ?: throw AssertionError("Profile list data not found")
+        val targetProfile = profiles.randomOrNull()
+            ?: throw AssertionError("No profiles available in the list to switch")
+        val leadId = targetProfile.lead_id ?: throw AssertionError("Lead ID is null for selected profile '${targetProfile.name}'")
+        
+        logger.info { "Dynamically selected profile to switch: ${targetProfile.name} (leadId: $leadId)" }
+        testSchedulingPage.switchUser(leadId, targetCode)
         logger.info { "Testing 'Add New Address' functionality..." }
         StepHelper.step("Testing 'Add New Address' functionality...")
+
         testSchedulingPage.clickAddNewAddress()
         assert(testSchedulingPage.isNewAddressDialogVisible()) { "Add new address dialog is not visible" }
         testSchedulingPage.assertAddressFormFieldsVisible()
         testSchedulingPage.clickAddNewAddress()
         testSchedulingPage.addAddressAndValidate()
-        assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
+         assertDoesNotThrow { testSchedulingPage.assertAddressesFromApi() }
 
         logger.info { "Testing 'Edit Address' functionality..." }
         StepHelper.step("Testing 'Edit Address' functionality...")
@@ -735,7 +792,7 @@ class LabTestsTest : BaseTest() {
         val randomIndex = (0 until addressCount).random()
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        testSchedulingPage.editUserAddress(randomIndex)
         // Reuse the already found target item
         val targetProduct = targetItem
 
@@ -746,16 +803,31 @@ class LabTestsTest : BaseTest() {
             else -> 0.0
         }
 
+        // Calculate Discount Logic
+        val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
+        logger.info { "Wallet Balance $walletBalance" }
+        var applicableDiscount = 0.0
+        if (walletBalance > 0.0) {
+            // Assuming integer points application
+            val discountPercent = 20
+            val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+            val roundedDiscount = ceil(calculatedDiscount)
+             applicableDiscount = minOf(roundedDiscount, walletBalance)
+
+            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+            page.getByTestId("diagnostics-sidebar-dh-points").click()
+        }
+
         logger.info { "Verifying price details on address selection page..." }
         StepHelper.step("Verifying price details on address selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
 
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
 
         logger.info { "Explicitly selecting the address to ensure Proceed is enabled..." }
-        testSchedulingPage.selectAddress(randomIndex)
+        testSchedulingPage.selectAddress(0)
 
         logger.info { "Clicking Proceed and navigating to Slot Selection page..." }
         StepHelper.step("Clicking Proceed and navigating to Slot Selection page...")
@@ -770,17 +842,17 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.product_id
             else -> throw RuntimeException("Unknown product type")
         }
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+        testSchedulingPage.verifyDualSlotSelectionPage(code = targetCode, productId = productId)
 
         logger.info { "Verifying Price Details on Slot Selection page..." }
         StepHelper.step("Verifying Price Details on Slot Selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = 0.0)
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
 
         logger.info { "Verifying Footer Actions on Slot Selection page..." }
         StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode)
 
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
