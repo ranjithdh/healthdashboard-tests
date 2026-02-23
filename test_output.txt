@@ -238,7 +238,7 @@ ActionPlanTest > generate and verify action plan() FAILED
         at app//com.microsoft.playwright.impl.FrameImpl.click(FrameImpl.java:243)
         at app//com.microsoft.playwright.impl.LocatorImpl.click(LocatorImpl.java:175)
         at app//com.microsoft.playwright.Locator.click(Locator.java:2493)
-        at app//webView.actionplan.ActionPlanTest.generate and verify action plan(ActionPlanTest.kt:131)
+        at app//webView.actionPlanAdmin.ActionPlanTest.generate and verify action plan(ActionPlanTest.kt:131)
 
         Caused by:
         com.microsoft.playwright.TimeoutError: Error {
