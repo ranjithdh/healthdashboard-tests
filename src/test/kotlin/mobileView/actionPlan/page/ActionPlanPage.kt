@@ -28,6 +28,7 @@ import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
+import utils.report.StepHelper.DOWNLOAD_ACTION_PLAN_REPORT
 import utils.report.StepHelper.FETCH_GOAL_DATA
 import utils.report.StepHelper.FETCH_HEALTH_DATA
 import utils.report.StepHelper.FETCH_HOME_DATA
@@ -38,18 +39,31 @@ import utils.report.StepHelper.OPENING_ACTIVITY_PANEL
 import utils.report.StepHelper.OPENING_SLEEP_PANEL
 import utils.report.StepHelper.OPENING_STRESS_PANEL
 import utils.report.StepHelper.OPENING_SUPPLEMENTS_PANEL
+import utils.report.StepHelper.SEARCH_FOOD_ITEM
+import utils.report.StepHelper.VALIDATING_ACTIVITY_CARDS
+import utils.report.StepHelper.VALIDATING_ACTIVITY_DETAILS
 import utils.report.StepHelper.VALIDATING_ACTIVITY_RECOMMENDATIONS
 import utils.report.StepHelper.VALIDATING_BLOOD_TEST_IN_PROGRESS
+import utils.report.StepHelper.VALIDATING_CONSULTATION_DIALOG
 import utils.report.StepHelper.VALIDATING_CONSULTATION_PENDING
 import utils.report.StepHelper.VALIDATING_DAILY_CALORIES_CARD
 import utils.report.StepHelper.VALIDATING_EMPTY_ACTION_PLAN_PAGE
 import utils.report.StepHelper.VALIDATING_FOOD_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_FREE_CONSULTATION_INFO
 import utils.report.StepHelper.VALIDATING_FURTHER_TESTS
+import utils.report.StepHelper.VALIDATING_FURTHER_TESTS_CARDS
 import utils.report.StepHelper.VALIDATING_NUTRITION_MAIN_CARD
 import utils.report.StepHelper.VALIDATING_RECOMMENDATION_PENDING
+import utils.report.StepHelper.VALIDATING_REPORT_SYMPTOMS_FLOW
 import utils.report.StepHelper.VALIDATING_SEARCH_FOOD_ITEMS
+import utils.report.StepHelper.VALIDATING_SLEEP_CARDS
+import utils.report.StepHelper.VALIDATING_SLEEP_DETAILS
 import utils.report.StepHelper.VALIDATING_SLEEP_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_STRESS_CARDS
+import utils.report.StepHelper.VALIDATING_STRESS_DETAILS
 import utils.report.StepHelper.VALIDATING_STRESS_RECOMMENDATIONS
+import utils.report.StepHelper.VALIDATING_SUPPLEMENT_CARDS
+import utils.report.StepHelper.VALIDATING_SUPPLEMENT_DETAILS
 import utils.report.StepHelper.VALIDATING_SUPPLEMENTS
 import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.Symptom
@@ -816,6 +830,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             return
         }
 
+        StepHelper.step("${SEARCH_FOOD_ITEM}: ${singleValue?.food?.name}")
         logger.info {
             "Validating search for type=$type, category=${singleItem.key}, food=${singleValue?.food?.name}"
         }
@@ -845,6 +860,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
+            StepHelper.step(VALIDATING_ACTIVITY_CARDS)
             validatingActivityMainCards(activityList)
 
             validatingActivitySidePanel(activityList)
@@ -1074,6 +1090,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun activityHeaderSection(activity: Recommendation) {
+        StepHelper.step("${VALIDATING_ACTIVITY_DETAILS}: ${activity.display_name}")
         val exercise = "Exercise"
 
         logger.info { "🔹 Validating Activity Header Section for activity: ${activity.name}" }
@@ -1183,6 +1200,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Exercise")).waitFor()
 
+            StepHelper.step(VALIDATING_SLEEP_CARDS)
             validatingSleepMainCards(sleepList)
 
             validatingSleepSidePanel(sleepList)
@@ -1296,6 +1314,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
     private fun sleepHeaderSection(sleep: Recommendation) {
+        StepHelper.step("${VALIDATING_SLEEP_DETAILS}: ${sleep.display_name}")
         val sleepTitle = "Sleep"
         logger.info { "🔹 Validating Sleep Header Section for: ${sleep.display_name}" }
 
@@ -1340,6 +1359,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Stress").setExact(true)).waitFor()
 
+            StepHelper.step(VALIDATING_STRESS_CARDS)
             validatingStressMainCards(stressList)
 
             validatingStressSidePanel(stressList)
@@ -1431,6 +1451,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     private fun stressHeaderSection(stress: Recommendation) {
+        StepHelper.step("${VALIDATING_STRESS_DETAILS}: ${stress.display_name}")
         val stressTitle = "Stress"
         logger.info("🔹 Validating Stress Header Section for: ${stress.display_name}")
 
@@ -1468,6 +1489,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         if (supplementList?.isNotEmpty() == true) {
             page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplements")).waitFor()
 
+            StepHelper.step(VALIDATING_SUPPLEMENT_CARDS)
             validatingSupplementsMainCards(supplementList)
             validatingSupplementsSideCards(supplementList)
         }
@@ -1572,7 +1594,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             val totalRatings = supplement.variant_meta?.price?.totalRatings
 
             nameUiElement.waitFor()
-            StepHelper.step("${OPENING_SUPPLEMENTS_PANEL}: ${supplement.display_name ?: supplement.name}")
+            StepHelper.step("${VALIDATING_SUPPLEMENT_DETAILS}: ${supplement.display_name ?: supplement.name}")
             nameUiElement.click()
 
             val dialog = page.getByRole(AriaRole.DIALOG)
@@ -1688,6 +1710,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             page.getByTestId("further-test-heading").waitFor()
 
+            StepHelper.step(VALIDATING_FURTHER_TESTS_CARDS)
             validatingTestMainCards(testList)
 
         } else {
@@ -1870,13 +1893,16 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             when {
                 hasQuestionnaireDone && !isConsultationBooked -> {
                     if (listOfSymptoms.size > 0) {
+                        StepHelper.step(VALIDATING_CONSULTATION_DIALOG)
                         consultationBookDialog()
                     } else {
+                        StepHelper.step(VALIDATING_REPORT_SYMPTOMS_FLOW)
                         reportSymptoms()
                     }
                 }
 
                 !hasQuestionnaireDone || isConsultationPending -> {
+                    StepHelper.step(VALIDATING_FREE_CONSULTATION_INFO)
                     freeConsultationsInfo()
                 }
             }
@@ -2018,6 +2044,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
 
         if (testList?.isNotEmpty() == true || foodList?.isNotEmpty() == true) {
+            StepHelper.step(DOWNLOAD_ACTION_PLAN_REPORT)
             val download = downloadReport()
             val suggestedFilename = download.suggestedFilename()
             logger.info{"suggestedFilename.... ${suggestedFilename}"}

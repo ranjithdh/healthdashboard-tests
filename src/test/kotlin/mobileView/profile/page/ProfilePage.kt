@@ -6030,9 +6030,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val storedAnswer = answersStored[QuestionSubType.WAIST_CIRCUMFERENCE]?.answer as? String
         checkTextInput(storedAnswer, waistTextBox)
-        if (shouldClickComplete) {
+       /* if (shouldClickComplete) {
             completeButton.click()
-        }
+        }*/
     }
 
 

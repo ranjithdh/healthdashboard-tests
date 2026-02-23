@@ -233,4 +233,20 @@ object StepHelper {
     const val VALIDATING_RECOMMENDATION_PENDING = "Validating Recommendation Pending"
     const val VALIDATING_CONSULTATION_PENDING = "Validating Consultation Pending"
     const val VALIDATING_BLOOD_TEST_IN_PROGRESS = "Validating Blood Test In Progress"
+
+    // Action Plan Details & Cards
+    const val VALIDATING_ACTIVITY_DETAILS = "Validating Activity Details"
+    const val VALIDATING_SLEEP_DETAILS = "Validating Sleep Details"
+    const val VALIDATING_STRESS_DETAILS = "Validating Stress Details"
+    const val VALIDATING_SUPPLEMENT_DETAILS = "Validating Supplement Details"
+    const val VALIDATING_ACTIVITY_CARDS = "Validating Activity Cards"
+    const val VALIDATING_SLEEP_CARDS = "Validating Sleep Cards"
+    const val VALIDATING_STRESS_CARDS = "Validating Stress Cards"
+    const val VALIDATING_SUPPLEMENT_CARDS = "Validating Supplement Cards"
+    const val VALIDATING_FURTHER_TESTS_CARDS = "Validating Further Tests Cards"
+    const val DOWNLOAD_ACTION_PLAN_REPORT = "Download Action Plan Report"
+    const val SEARCH_FOOD_ITEM = "Search food item: "
+    const val VALIDATING_CONSULTATION_DIALOG = "Validating Consultation Booking Dialog"
+    const val VALIDATING_FREE_CONSULTATION_INFO = "Validating Free Consultation Info"
+    const val VALIDATING_REPORT_SYMPTOMS_FLOW = "Validating Report Symptoms Flow"
 }
