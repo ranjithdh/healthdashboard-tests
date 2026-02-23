@@ -2392,7 +2392,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         logQuestion("Set your ideal Bedtime")
         if (stopAtQuestion == 20) {
             logger.info { "Stopping at question 20 and clicking goBack()." }
-            goBackQuestioner()
+            goBackQuestioner(isStartQuestion = true)
             return
         }
 
@@ -6019,7 +6019,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     private fun question_52_checker(index: Int) {
         logQuestion("Checking: What is your waist circumference?")
-        //   val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
+        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
         val title = page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What is your waist"))
         val waistTextBox = page.getByRole(AriaRole.TEXTBOX)
 
@@ -6030,6 +6030,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val storedAnswer = answersStored[QuestionSubType.WAIST_CIRCUMFERENCE]?.answer as? String
         checkTextInput(storedAnswer, waistTextBox)
+        if (shouldClickComplete) {
+            completeButton.click()
+        }
     }
 
 
@@ -6391,7 +6394,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
     }
 
-    fun goBackQuestioner() {
+    fun goBackQuestioner(isStartQuestion: Boolean = false) {
         page.goBack()
         val title = page.getByText("Confirm ExitAre you sure you")
         val quitButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Quit"))
@@ -6406,20 +6409,23 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         waitForConfirmation()
 
-        val questionHeading =
-            page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
-        val editQuestionerButton =
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
-        val questionDialog = page.locator(".bg-zinc-900").first()
+        if (isStartQuestion) {
 
-        questionHeading.waitFor()
-        editQuestionerButton.waitFor()
+            val questionHeading =
+                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("View/Edit Questionnaire"))
+            val editQuestionerButton =
+                page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("View/Edit Responses"))
+            val questionDialog = page.locator(".bg-zinc-900").first()
 
-        editQuestionerButton.click()
+            questionHeading.waitFor()
+            editQuestionerButton.waitFor()
 
-        questionDialog.waitFor()
+            editQuestionerButton.click()
 
-        question_20()
+            questionDialog.waitFor()
+
+            question_20()
+        }
     }
 
     // --- Performance Helpers ---

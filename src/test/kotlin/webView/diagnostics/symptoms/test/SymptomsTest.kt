@@ -9,11 +9,85 @@ import io.qameta.allure.Epic
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.report.Modules
+import webView.diagnostics.symptoms.page.SymptomsPage
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_SYMPTOMS)
+class SymptomsTest : BaseTest() {
+    private lateinit var playwright: Playwright
+    private lateinit var browser: Browser
+    private lateinit var context: BrowserContext
+    private lateinit var symptomsMain: SymptomsPage
+
+    @BeforeAll
+    fun setup() {
+        playwright = Playwright.create()
+        browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
+
+        val contextOptions = Browser.NewContextOptions()
+            .setViewportSize(1366, 768)   // Desktop resolution
+            .setIsMobile(false)
+            .setHasTouch(false)
+
+        context = browser.newContext(contextOptions)
+        page = context.newPage()
+        symptomsMain = performInitialNavigation()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        context.close()
+        browser.close()
+        playwright.close()
+    }
+
+    private fun performInitialNavigation(): SymptomsPage {
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+
+        val loginPage = LoginPage(page).navigate() as LoginPage
+
+        val symptomsMain =
+            loginPage.enterMobileAndContinue(testUser)
+                .enterOtpAndContinueToInsightsForWeb(testUser.otp)
+        return symptomsMain
+    }
+
+    @Test
+    @Order(1)
+    fun `report symptoms with validation`() {
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
+        symptomsMain.dialogValidation()
+        symptomsMain.reportOptionsValidations()
+        symptomsMain.cancelButtonClick()
+        symptomsMain.headerValidation()
+        symptomsMain.onReportSymptomsButtonClick()
+        symptomsMain.selectAllSymptoms()
+        symptomsMain.submitSymptoms()
+
+        // 🔥 NEW: wait for all APIs + then validate
+        symptomsMain.waitForApiAndValidate()
+    }
+
+
+    @Test
+    @Order(2)
+    fun `remove symptoms`() {
+
+        symptomsMain.headerValidation()
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.cancelConfirmationDialog()
+        symptomsMain.resetAllSymptoms()
+        symptomsMain.resetConfirmationDialog()
+        symptomsMain.continueConfirmationDialog()
+        symptomsMain.emptySymptoms()
+    }
+}
+
+/*
 class SymptomsTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
@@ -33,13 +107,15 @@ class SymptomsTest : BaseTest() {
 
     @BeforeEach
     fun createContext() {
-        /*  val viewport = TestConfig.Viewports.ANDROID
+        */
+/*  val viewport = TestConfig.Viewports.ANDROID
           val contextOptions =
               Browser.NewContextOptions().setViewportSize(viewport.width, viewport.height).setHasTouch(viewport.hasTouch)
                   .setIsMobile(viewport.isMobile).setDeviceScaleFactor(viewport.deviceScaleFactor)
 
           context = browser.newContext(contextOptions)
-          page = context.newPage()*/
+          page = context.newPage()*//*
+
 
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(1366, 768)   // Desktop resolution
@@ -105,6 +181,7 @@ class SymptomsTest : BaseTest() {
     }
 
 
+*/
 /*    @Test
     fun `reported symptoms with validation`() {
         val testUser = TestConfig.TestUsers.EXISTING_USER
@@ -118,7 +195,8 @@ class SymptomsTest : BaseTest() {
         symptomsMain.headerValidation()
         symptomsMain.onReportSymptomsValidation()
 
-    }*/
+    }*//*
 
 
-}
+
+}*/
