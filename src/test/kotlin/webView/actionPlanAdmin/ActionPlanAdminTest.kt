@@ -20,7 +20,7 @@ import utils.json.json as jsonParser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @OptIn(ExperimentalSerializationApi::class)
-class ActionPlanTest : BaseTest() {
+class ActionPlanAdminTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
