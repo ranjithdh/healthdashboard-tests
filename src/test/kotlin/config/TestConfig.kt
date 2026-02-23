@@ -108,7 +108,7 @@ object TestConfig {
 
 
     object Browser {
-        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val SLOW_MO: Double = (1 * 100).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
@@ -166,7 +166,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "7373791414",
+            mobileNumber = "9952538864",
             otp = "678901",
             country = "India",
             countryCode = "+91"
