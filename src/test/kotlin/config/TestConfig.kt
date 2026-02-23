@@ -137,7 +137,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583696",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583690",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -184,6 +184,7 @@ object TestConfig {
 
     object Coupons {
         const val VALID_COUPON = "D261C0"
+        const val FREE_COUPON = "NASH100"
         const val INVALID_COUPON = "INVALID123"
         const val DISCOUNT_AMOUNT = 1000f
     }

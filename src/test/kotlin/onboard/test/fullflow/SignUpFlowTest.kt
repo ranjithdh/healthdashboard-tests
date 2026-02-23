@@ -93,13 +93,7 @@ class SignUpFlowTest : BaseTest() {
 
 
 
-//        checkBloodTestBookedCardStatus(homePage)
-
-//        assertTrue(
-//            homePage.isSavedFullSlotMatchingApi(),
-//            "Selected full slot (Date & Time) should match API response on HomePage"
-//        )
-
+        checkBloodTestBookedCardStatus(homePage)
         homePage.takeScreenshot("signup-order-placed")
     }
 
@@ -118,18 +112,33 @@ class SignUpFlowTest : BaseTest() {
             .selectSlotsAndContinue()
             .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
-            .clickCheckout()
-
+            .clickGooglePayUPI()
 
         checkBloodTestBookedCardStatus(homePage)
-
-     /*   assertTrue(
-            homePage.isSavedFullSlotMatchingApi(),
-            "Selected full slot (Date & Time) should match API response on HomePage"
-        )*/
-
         homePage.takeScreenshot("signup-order-placed")
     }
+
+    @Test
+    fun `complete full signup flow with free coupon code`() {
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.NEW_USER
+
+        val homePage = loginPage
+            .clickSignUp()
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToAccountCreation(testUser)
+            .fillBasicDetails()
+            .fillPersonalDetails()
+            .fillAddressDetails()
+            .selectSlotsAndContinue()
+            .enterCouponCode(TestConfig.Coupons.FREE_COUPON)
+            .clickApplyCoupon()
+            .clickCheckout()
+
+        checkBloodTestBookedCardStatus(homePage)
+        homePage.takeScreenshot("signup-order-placed")
+    }
+
 
     @Test
     fun `complete full signup flow with add-on tests`() {
@@ -173,17 +182,8 @@ class SignUpFlowTest : BaseTest() {
             }
         }
 
-        val homePage = orderSummaryPage
-            .clickCheckout()
-            .waitForMobileHomePageConfirmation()
-
+        val homePage = orderSummaryPage.clickGooglePayUPI()
         checkBloodTestBookedCardStatus(homePage)
-
-       /* assertTrue(
-            homePage.isSavedFullSlotMatchingApi(),
-            "Selected full slot (Date & Time) should match API response on HomePage"
-        )*/
-
         homePage.takeScreenshot("signup-with-addons-placed")
     }
 }

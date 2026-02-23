@@ -88,7 +88,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         return homePage
     }
 
-    fun clickGooglePayUPI(): OrderSummaryPage {
+    fun clickGooglePayUPI(): HomePage {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
         page.locator("iframe").contentFrame().getByTestId("contactNumber").click()
         page.locator("iframe").contentFrame().getByTestId("contactNumber").fill("7010165836")
@@ -103,7 +103,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
-        return this
+        return homePage
     }
 
 
