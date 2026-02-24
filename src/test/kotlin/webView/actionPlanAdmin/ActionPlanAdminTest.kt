@@ -407,14 +407,16 @@ class ActionPlanAdminTest : BaseTest() {
             supplements.forEach { rec ->
                 logger.info { "Verifying Supplement: $rec)" }
                 val id = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
-                val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
-                val duration = rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: ""
-                val detailedDesc = rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: ""
-                val cardDesc = rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: ""
+                val name = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
+                val nameInRespone = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "")
+                val displayName = (rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: "")
+                val duration = (rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: "")
+                val detailedDesc = (rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: "")
+                val cardDesc = (rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: "")
 
                 val supplementMeta = rec.jsonObject["variant_meta"]?.jsonObject
                 logger.info { "Verifying supplementMeta : $supplementMeta )" }
-                val brand = supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: ""
+                val brand = (supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
                 val ingredientsArr = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
 
                 logger.info { "Verifying Supplement: $displayName (ID: $id)" }
@@ -424,7 +426,7 @@ class ActionPlanAdminTest : BaseTest() {
 
                 // 1. Click card/display name
                 block.getByTestId("supplement-card").click()
-                page1.getByText(displayName)
+                page1.getByText(name)
                 dynamicPdfStrings.add(displayName)
 
                 // 2. Duration
@@ -458,7 +460,7 @@ class ActionPlanAdminTest : BaseTest() {
                     "$name (${amount ?: "null"}${unit ?: "null"})"
                 }.joinToString(", ")
 
-                val expectedWhatIsIt = "$displayName by $brand. Contains: $ingredientsList"
+                val expectedWhatIsIt = "$nameInRespone by $brand. Contains: $ingredientsList"
                 logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
                 val whatIsItElem = block.getByText(expectedWhatIsIt, Locator.GetByTextOptions().setExact(false)).first()
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
