@@ -111,8 +111,10 @@ object TestConfig {
         val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
         val API_USERS = "$BASE_URL/v4/human-token/users"
         val API_WALLET = "$BASE_URL/v4/human-token/user/wallet"
+        val API_GUT = "$BASE_URL/v4/human-token/health-data/gut"
         const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
-        const val API_ACTION_PLAN_USER_RECOMMENDATIONS = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
+        const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
+            "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
     }
 
 
@@ -176,7 +178,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "7373791414",
+            mobileNumber = "9952538864",
             otp = "678901",
             country = "India",
             countryCode = "+91"

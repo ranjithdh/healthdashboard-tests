@@ -134,6 +134,7 @@ object StepHelper {
     const val EDIT_SLOT_SUMMARY = "Click Edit Slot from Summary Page"
     const val CLICK_ACCOUNT_PROFILE = "Click Account Profile"
     const val CLICK_ACTION_PLAN = "Click Action Plan"
+    const val CLICK_DATA = "Click Data"
 
     // ProfilePage - Preference
     const val FETCH_PREFERENCE = "Fetch communication preference"

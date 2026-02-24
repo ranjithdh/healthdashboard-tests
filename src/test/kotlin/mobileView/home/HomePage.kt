@@ -12,6 +12,7 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.actionPlan.page.ActionPlanPage
+import mobileView.home.gut.page.GutPage
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
 import model.home.HomeData
@@ -22,6 +23,7 @@ import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_ACTION_PLAN
+import utils.report.StepHelper.CLICK_DATA
 import utils.report.StepHelper.CLICK_PROFILE_ICON
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
@@ -33,6 +35,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
     val actionButtonPlan = page.getByText("Action Plan")
+    val dataButton = page.getByText("Data")
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
@@ -191,6 +194,13 @@ class HomePage(page: Page) : BasePage(page) {
         actionButtonPlan.click()
         val actionPlan = ActionPlanPage(page)
         return actionPlan
+    }
+
+    fun clickDataTab(): GutPage {
+        StepHelper.step(CLICK_DATA)
+        dataButton.click()
+        val gutPage = GutPage(page)
+        return gutPage
     }
 
 
