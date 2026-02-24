@@ -311,6 +311,9 @@ class ActionPlanAdminTest : BaseTest() {
 
         // NEW: "What's Working Well for You" Verification
         verifyWhatsWorkingWell(page1, userData)
+        
+        // NEW: "What Needs Support" Verification
+        verifyWhatNeedsSupport(page1, userData)
 
         // 5. Lifestyle Modifications Verification
         StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
@@ -796,6 +799,102 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Clicking Create Subsection")
         page1.getByTestId("button-create-subsection").click()
         logger.info { "Subsection 'What's Working Well' created successfully" }
+    }
+
+    private fun verifyWhatNeedsSupport(page1: Page, userData: String) {
+        StepHelper.step("Verifying 'What Needs Support' section and selector")
+        
+        // Step 1: Navigate to selector
+        page1.getByTestId("button-toggle-category-what-needs-support").click()
+        page1.getByTestId("category-what-needs-support").getByTestId("button-biomarker-selector").click()
+        
+        // Wait for dialog
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Select Biomarkers for")).waitFor()
+        page1.getByText("Choose biomarkers to create a").click()
+        page1.getByTestId("input-search-biomarkers").click()
+
+        // Step 2: Dynamic verification based on API
+        val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val rootData = userDataJson["data"]?.jsonObject
+        val apiData = rootData?.get("data")?.jsonObject ?: rootData
+        val allBiomarkers = mutableListOf<JsonElement>()
+        
+        apiData?.forEach { _, value ->
+            if (value is JsonObject) {
+                val dataArray = value["data"]
+                if (dataArray is JsonArray) {
+                    allBiomarkers.addAll(dataArray)
+                }
+            }
+        }
+        val biomarkers = JsonArray(allBiomarkers)
+        
+        // Filter for: low, high, borderline low, borderline high, monitor
+        val needsSupportMarkers = biomarkers.filter {
+            if (it !is JsonObject) return@filter false
+            val rating = it.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase() ?: ""
+            rating in listOf("low", "high", "borderline low", "borderline high", "monitor", "very high", "very low", "needs attention")
+        }
+
+        logger.info { "Found ${needsSupportMarkers.size} biomarkers for 'What Needs Support'" }
+
+        // Group by group_name for better verification flow
+        val groupedMarkers = needsSupportMarkers.groupBy { it.jsonObject["group_name"]?.jsonPrimitive?.contentOrNull ?: "Other" }
+
+        groupedMarkers.forEach { (groupName, markers) ->
+            logger.info { "Verifying group: $groupName" }
+            try {
+                // Click group heading to expand
+                page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(groupName)).click()
+            } catch (e: Exception) {
+                logger.warn { "Could not click group heading: $groupName" }
+            }
+            
+            markers.forEach { marker ->
+                val metricId = marker.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayName = marker.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayRating = marker.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull ?: ""
+                val value = marker.jsonObject["value"]?.jsonPrimitive?.contentOrNull ?: ""
+                val unit = marker.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
+                val range = marker.jsonObject["range"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                logger.info { "Verifying marker: $displayName ($metricId)" }
+                
+                // Click option
+                val option = page1.getByTestId("biomarker-option-$metricId")
+                option.scrollIntoViewIfNeeded()
+                option.click()
+                
+                // Verify display name and rating (combined text in UI: e.g., "HematocritHigh")
+                option.getByText("$displayName$displayRating").first().click()
+                
+                // Value: e.g., "Value: 50.3 %"
+                if (value.isNotEmpty() && value != "null") {
+                    val valueText = if (unit.isNotEmpty()) "Value: $value $unit" else "Value: $value"
+                    option.getByText(valueText).first().click()
+                }
+                
+                // Reference: e.g., "Reference: >50"
+                if (range.isNotEmpty() && range != "null") {
+                    val referenceText = "Reference: $range"
+                    option.getByText(referenceText).first().click()
+                }
+            }
+        }
+
+        // Step 3: Select random ones
+        StepHelper.step("Selecting random biomarkers for 'What Needs Support'")
+        val randomSelection = needsSupportMarkers.shuffled().take(3) // Selecting 3 as an example
+        randomSelection.forEach { marker ->
+            val metricId = marker.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull ?: ""
+            logger.info { "Selecting checkbox for: $metricId" }
+            page1.getByTestId("checkbox-biomarker-$metricId").click()
+        }
+
+        // Step 4: Create subsection
+        StepHelper.step("Clicking Create Subsection")
+        page1.getByTestId("button-create-subsection").click()
+        logger.info { "Subsection 'What Needs Support' created successfully" }
     }
 
     // Helper function to calculate allowed food sources
