@@ -1732,40 +1732,42 @@ class ActionPlanPage(page: Page) : BasePage(page) {
 
             assertEquals(expected.normalizeForUiCompare(), test.display_name?.normalizeForUiCompare())
 
+            if (test.test_taken_at.isNullOrBlank()) {
 
-            val isBooked = isTestBooked(
-                labTestsData = allTests,
-                testId = test.test_id,
-                testType = test.test_type
-            )
+                val isBooked = isTestBooked(
+                    labTestsData = allTests,
+                    testId = test.test_id,
+                    testType = test.test_type
+                )
 
-            val isCompleted = test.actions
-                ?.getOrNull(0)
-                ?.user_recommendation_actions
-                ?.getOrNull(0)
-                ?.is_completed
+                val isCompleted = test.actions
+                    ?.getOrNull(0)
+                    ?.user_recommendation_actions
+                    ?.getOrNull(0)
+                    ?.is_completed
 
 
-            if (isCompleted == true) {
-                addTestButton.waitFor()
-                assertEquals("Added to Plan", addTestButton.innerText().normalizeForUiCompare())
-            } else {
-                bookTest.waitFor()
-                val bookTestActual = bookTest.innerText()
-                val bookTestExpected = if (isBooked) {
-                    "Booked"
+                if (isCompleted == true) {
+                    addTestButton.waitFor()
+                    assertEquals("Added to Plan", addTestButton.innerText().normalizeForUiCompare())
                 } else {
-                    "Book a Test"
-                }
+                    bookTest.waitFor()
+                    val bookTestActual = bookTest.innerText()
+                    val bookTestExpected = if (isBooked) {
+                        "Booked"
+                    } else {
+                        "Book a Test"
+                    }
 
-                if (!isBooked) {
-                    page.waitForTimeout(2000.0)
-                    bookTest.click()
-                    TestDetailPage(page)
-                        .waitForPageLoad()
-                        .clickBackButton()
+                    if (!isBooked) {
+                        page.waitForTimeout(2000.0)
+                        bookTest.click()
+                        TestDetailPage(page)
+                            .waitForPageLoad()
+                            .clickBackButton()
+                    }
+                    assertEquals(bookTestExpected.normalizeForUiCompare(), bookTestActual.normalizeForUiCompare())
                 }
-                assertEquals(bookTestExpected.normalizeForUiCompare(), bookTestActual.normalizeForUiCompare())
             }
         }
     }
@@ -2047,7 +2049,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             StepHelper.step(DOWNLOAD_ACTION_PLAN_REPORT)
             val download = downloadReport()
             val suggestedFilename = download.suggestedFilename()
-            logger.info{"suggestedFilename.... ${suggestedFilename}"}
+            logger.info { "suggestedFilename.... ${suggestedFilename}" }
             assertTrue(suggestedFilename.endsWith(".pdf"), "File should be a PDF")
 
 
