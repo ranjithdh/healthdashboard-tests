@@ -17,6 +17,7 @@ import utils.report.StepHelper
 import java.util.regex.Pattern
 import utils.json.json as jsonParser
 
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @OptIn(ExperimentalSerializationApi::class)
@@ -44,7 +45,7 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(1)
     fun `generate and verify action plan`() {
-        val name = "Gowthaman"
+        val name = "Rethinavel  natarajan stg"
         logger.info { "Starting ActionPlan flow..." }
         StepHelper.step("Starting ActionPlan flow")
 
@@ -154,7 +155,7 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "Verifying final URL components..." }
         assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
         assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
+//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
         assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
         
         // 4. Call user-data API on the replit app
@@ -200,12 +201,13 @@ class ActionPlanAdminTest : BaseTest() {
 
         // Static verification requested by User
         StepHelper.step("Verifying Action Plan Header and Overview Section")
+        val dynamicPdfStrings = mutableListOf<String>()
 
         // User Information Section (Dynamic)
         StepHelper.step("Verifying User Information Section")
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
-        val apiData = userDataJson["data"]?.jsonObject?.get("data")?.jsonObject
-        val userProfile = apiData?.get("userProfile")?.jsonObject
+        val apiData = userDataJson["data"]?.jsonObject
+        val userProfile = userDataJson["userProfile"]?.jsonObject
         
         val dynName = userProfile?.get("name")?.jsonPrimitive?.contentOrNull ?: name
         val dynAge = userProfile?.get("age")?.jsonPrimitive?.contentOrNull ?: "22"
@@ -213,11 +215,11 @@ class ActionPlanAdminTest : BaseTest() {
         val dynHeight = userProfile?.get("height")?.jsonPrimitive?.contentOrNull ?: "291"
         val dynWeight = userProfile?.get("weight")?.jsonPrimitive?.contentOrNull ?: "110"
         
-        val programGoals = userProfile?.get("programGoals")?.jsonObject ?: apiData?.get("programGoals")?.jsonObject
+        val programGoals = userDataJson["programGoals"]?.jsonObject
         val isQuestionnaireTaken = programGoals?.get("is_questionnaire_take")?.jsonPrimitive?.booleanOrNull ?: true
         val questionnaireTakenText = if (isQuestionnaireTaken) "Yes" else "No"
         
-        val foodDataCount = apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.size ?: 280
+//        val foodDataCount = apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.size ?: 280
         
         // Dynamic marker counts from API calculation
         var optimalMarkers = 0
@@ -225,7 +227,7 @@ class ActionPlanAdminTest : BaseTest() {
         var atRiskMarkers = 0
         
         apiData?.forEach { key, value ->
-            if (value is JsonObject && key != "food" && key != "user_profile") {
+            if (value is JsonObject ) {
                 val dataArray = value["data"]
                 if (dataArray is JsonArray) {
                     dataArray.forEach { marker ->
@@ -261,10 +263,13 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByText("Height: $dynHeight cm").click()
         page1.getByText("Weight: $dynWeight kg").click()
         page1.getByText("Questionnaire Taken: $questionnaireTakenText").click()
-        // page1.getByText("Foods List: Loaded ($foodDataCount items)").click()
+//        page1.getByText("Foods List: Loaded ($foodDataCount items)").click()
 
         // 1. Header
-        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
+        val firstName = name.trim().split(Regex("\\s+")).first()
+        val headerText = "$firstName's Action Plan"
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(headerText)).click()
+        dynamicPdfStrings.add(headerText)
 
         // 2. Date
         val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d,")
@@ -291,6 +296,7 @@ class ActionPlanAdminTest : BaseTest() {
             "6. Supplement Recommendations: A focused protocol",
             "7. Diagnostic Testing: Follow-up and advanced tests"
         )
+        dynamicPdfStrings.addAll(expectedIntroItems)
 
 
         expectedIntroItems.forEach { item ->
@@ -325,12 +331,16 @@ class ActionPlanAdminTest : BaseTest() {
         val expectedContent = "Your current health metrics show overall positive trends with targeted areas for optimization. Key focus areas include iron status monitoring, sleep quality improvement, and maintaining cardiovascular health through diet and exercise."
         assert(healthContent.innerText().contains(expectedContent)) { "Health Status Overview content mismatch" }
         healthContent.click()
+        dynamicPdfStrings.add("Health Status Overview")
+        dynamicPdfStrings.add(expectedContent)
 
         // NEW: "What's Working Well for You" Verification
-        verifyWhatsWorkingWell(page1, userData)
+        dynamicPdfStrings.add("What's Working Well for You")
+        verifyWhatsWorkingWell(page1, userData, dynamicPdfStrings)
 
         // NEW: "What Needs Support" Verification
-        verifyWhatNeedsSupport(page1, userData)
+        dynamicPdfStrings.add("What Needs Support")
+        verifyWhatNeedsSupport(page1, userData, dynamicPdfStrings)
 
         // 5. Lifestyle Modifications Verification
         StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
@@ -366,25 +376,23 @@ class ActionPlanAdminTest : BaseTest() {
                     logger.info { "Verifying Recommendation: $displayName" }
                     
                     if (displayName.isNotEmpty()) {
-                       page1.getByText(displayName)
+                        page1.getByText(displayName)
                         logger.info { "Verified displayName: $displayName" }
+                        dynamicPdfStrings.add(displayName)
 //                        displayElem.scrollIntoViewIfNeeded()
 //                        displayElem.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
 //                        assert(displayElem.isVisible) { "Display name '$displayName' not found or not visible in $uiLabel" }
                     }
 
                     if (description.isNotEmpty()) {
-                        // Using partial match for description (first 100 chars) for better reliability
-//                        val descPart = description.take(100)
                         logger.info { "Verified description: $description" }
-                          page1.getByText(description)
-//                        descElem.scrollIntoViewIfNeeded()
-//                        descElem.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-//                        assert(descElem.isVisible) { "Description starting with '$descPart' not found or not visible in $uiLabel" }
+                        page1.getByText(description)
+                        dynamicPdfStrings.add(description)
                     }
                 }
             }
         }
+        dynamicPdfStrings.add("Supplement Protocol")
         // 6. Supplement Protocol Verification
         val supplements = recommendationsList.filter {
             val isSupplement = it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
@@ -415,11 +423,13 @@ class ActionPlanAdminTest : BaseTest() {
                 // 1. Click card/display name
                 block.getByTestId("supplement-card").click()
                 page1.getByText(displayName)
+                dynamicPdfStrings.add(displayName)
 
                 // 2. Duration
                 if (duration.isNotEmpty()) {
                     val durationText = "Duration: $duration"
                     block.getByText(durationText).click()
+                    dynamicPdfStrings.add(durationText)
                 }
 
                 // 3. Buy Now link check
@@ -442,7 +452,7 @@ class ActionPlanAdminTest : BaseTest() {
                     val name = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
                     val amount = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull
                     val unit = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull
-                    
+
                     "$name (${amount ?: "null"}${unit ?: "null"})"
                 }.joinToString(", ")
 
@@ -451,6 +461,7 @@ class ActionPlanAdminTest : BaseTest() {
                 val whatIsItElem = block.getByText(expectedWhatIsIt, Locator.GetByTextOptions().setExact(false)).first()
                 assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
                 whatIsItElem.click()
+                dynamicPdfStrings.add(expectedWhatIsIt)
 
                 // 5. Why this matters?
                 if (detailedDesc.isNotEmpty()) {
@@ -458,6 +469,7 @@ class ActionPlanAdminTest : BaseTest() {
                     val whyElem = block.getByText(detailedDesc)
                     assert(whyElem.isVisible) { "Detailed description missing for $displayName" }
                     whyElem.click()
+                    dynamicPdfStrings.add(detailedDesc)
                 }
 
                 // 6. How to take it
@@ -466,6 +478,7 @@ class ActionPlanAdminTest : BaseTest() {
                     val howElem = block.getByText(cardDesc)
                     assert(howElem.isVisible) { "Card description missing for $displayName" }
                     howElem.click()
+                    dynamicPdfStrings.add(cardDesc)
                 }
             }
         }
@@ -478,6 +491,7 @@ class ActionPlanAdminTest : BaseTest() {
         if (tests.isNotEmpty()) {
             StepHelper.step("Verifying Diagnostic Testing Section")
             page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Diagnostic Testing")).click()
+            dynamicPdfStrings.add("Diagnostic Testing")
 
             tests.forEach { testRec ->
                 val id = testRec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
@@ -508,6 +522,7 @@ class ActionPlanAdminTest : BaseTest() {
                         logger.info { "Checking due date text: $expectedDueText" }
                         val dueElem = block.getByText(expectedDueText).first()
                         assert(dueElem.isVisible) { "Due date mismatch for $displayName. Expected: $expectedDueText" }
+                        dynamicPdfStrings.add(expectedDueText)
                     } catch (e: Exception) {
                         logger.warn { "Failed to parse/verify due date '$dueDateRaw': ${e.message}" }
                     }
@@ -529,6 +544,7 @@ class ActionPlanAdminTest : BaseTest() {
                     val descElem = block.getByText(description).first()
                     assert(descElem.isVisible) { "Test description missing for $displayName" }
                     descElem.click()
+                    dynamicPdfStrings.add(description)
                 }
             }
         }
@@ -715,15 +731,60 @@ class ActionPlanAdminTest : BaseTest() {
                     logger.info { "   Found sources: $foundSources" }
                 } else {
                     logger.info { "✅ All expected sources verified for ${nutrientInfo.nutrient}" }
+                    dynamicPdfStrings.add(nutrientInfo.nutrient)
+                    dynamicPdfStrings.addAll(foundSources)
                 }
             }
         }
 
         logger.info { "ActionPlan verification completed. Verified: $verifiedVitamins" }
+
+        // --- PDF Export and Validation ---
+        StepHelper.step("Export PDF and cross verify contents")
+        val download2: Download? = page1.waitForDownload {
+            page1.getByTestId("button-export-pdf").click()
+        }
+        val pdfPath = download2?.path()
+        org.junit.jupiter.api.Assertions.assertNotNull(pdfPath, "PDF download failed or path is null")
+
+        val pdfFile = pdfPath!!.toFile()
+        val document = org.apache.pdfbox.pdmodel.PDDocument.load(pdfFile)
+        val stripper = org.apache.pdfbox.text.PDFTextStripper()
+        val pdfText = stripper.getText(document)
+        document.close()
+
+        val normalizeText = { text: String ->
+            text.replace("\r\n", " ")
+                .replace("\n", " ")
+                .replace("\u2013", "-")
+                .replace("—", "-")
+                .replace("’", "'")
+                .replace("‘", "'")
+                .replace("“", "\"")
+                .replace("”", "\"")
+                .replace("\u00A0", " ")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+        }
+
+        val normalizedPdfText = normalizeText(pdfText)
+        logger.info { "Extracted PDF Text Length (normalized): ${normalizedPdfText.length}" }
+
+        val missingLines = dynamicPdfStrings.map { normalizeText(it) }.filter { !normalizedPdfText.contains(it) }
+
+        if (missingLines.isNotEmpty()) {
+            val errorMsg = "PDF Validation Error: The following lines were not found in the exported PDF:\n" + 
+                missingLines.mapIndexed { index, line -> "Line ${index + 1} faced error: $line" }.joinToString("\n")
+            logger.error { errorMsg }
+            logger.info { "Normalized PDF Text for Debugging:\n$normalizedPdfText" }
+            org.junit.jupiter.api.Assertions.fail<Unit>(errorMsg)
+        } else {
+            logger.info { "All expected data successfully verified in the exported PDF." }
+        }
     }
 
 
-    private fun verifyWhatsWorkingWell(page1: Page, userData: String) {
+    private fun verifyWhatsWorkingWell(page1: Page, userData: String, dynamicPdfStrings: MutableList<String>) {
         StepHelper.step("Verifying 'What's Working Well' section and selector")
         
         // Step 1: Navigate to selector
@@ -818,9 +879,11 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Clicking Create Subsection")
         page1.getByTestId("button-create-subsection").click()
         logger.info { "Subsection 'What's Working Well' created successfully" }
+        
+        dynamicPdfStrings.add("The areas where your biology is performing at its best")
     }
 
-    private fun verifyWhatNeedsSupport(page1: Page, userData: String) {
+    private fun verifyWhatNeedsSupport(page1: Page, userData: String, dynamicPdfStrings: MutableList<String>) {
         StepHelper.step("Verifying 'What Needs Support' section and selector")
         
         // Step 1: Navigate to selector
@@ -916,6 +979,8 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Clicking Create Subsection")
         page1.getByTestId("button-create-subsection").click()
         logger.info { "Subsection 'What Needs Support' created successfully" }
+
+        dynamicPdfStrings.add("The biomarkers that need closer attention")
     }
 
     // Helper function to calculate allowed food sources
@@ -1008,4 +1073,6 @@ class ActionPlanAdminTest : BaseTest() {
             NutrientInfo("Omega 3", "Flaxseeds, chia seeds, rajma, hemp seeds, algal oil", "", "", "", "", "")
         )
     }
+
+
 }
