@@ -214,22 +214,31 @@ class ActionPlanAdminTest : BaseTest() {
         
         val foodDataCount = apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.size ?: 280
         
-        // Dynamic marker counts from API
-        var optimalMarkers = 69
-        var needsImprovementMarkers = 13
-        var atRiskMarkers = 27
+        // Dynamic marker counts from API calculation
+        var optimalMarkers = 0
+        var needsImprovementMarkers = 0
+        var atRiskMarkers = 0
         
-//        try {
-//            val stats = apiData?.get("biomarker_stats")?.jsonObject ?: apiData?.get("stats")?.jsonObject
-//            if (stats != null) {
-//                optimalMarkers = stats["optimal"]?.jsonPrimitive?.intOrNull ?: optimalMarkers
-//                needsImprovementMarkers = stats["needs_improvement"]?.jsonPrimitive?.intOrNull ?: needsImprovementMarkers
-//                atRiskMarkers = stats["at_risk"]?.jsonPrimitive?.intOrNull ?: atRiskMarkers
-//                logger.info { "Extracted marker counts: $optimalMarkers Optimal, $needsImprovementMarkers Needs Improvement, $atRiskMarkers At Risk" }
-//            }
-//        } catch (e: Exception) {
-//            logger.warn { "Could not extract biomarker stats from API: ${e.message}" }
-//        }
+        apiData?.forEach { key, value ->
+            if (value is JsonObject && key != "food" && key != "user_profile") {
+                val dataArray = value["data"]
+                if (dataArray is JsonArray) {
+                    dataArray.forEach { marker ->
+                        if (marker is JsonObject) {
+                            val rating = marker["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase()?.trim()
+                            if (rating != null) {
+                                when {
+                                    rating == "optimal" || rating == "normal" -> optimalMarkers++
+                                    rating == "monitor" || rating.contains("borderline") -> needsImprovementMarkers++
+                                    else -> atRiskMarkers++
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.info { "Dynamic marker counts: $optimalMarkers Optimal, $needsImprovementMarkers Needs Improvement, $atRiskMarkers At Risk" }
 
         page1.getByTestId("user-info-display").click()
         page1.getByText("User Information").click()
@@ -286,14 +295,16 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Summary")).click()
 
         // 2. Count Summary Text
-        val summaryText = "$optimalMarkers Optimal markers $needsImprovementMarkers Needs Improvement $atRiskMarkers At Risk"
-//        page1.getByText(summaryText).click()
+        // Using flexible text matching to handle potential spacing differences in UI (e.g. "69 Optimal markers")
+        page1.getByText(Pattern.compile("$optimalMarkers\\s*Optimal markers")).first().click()
+        page1.getByText(Pattern.compile("$needsImprovementMarkers\\s*Needs Improvement")).first().click()
+        page1.getByText(Pattern.compile("$atRiskMarkers\\s*At Risk")).first().click()
 
         // 3. Biomarker Overview
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Biomarker Overview")).click()
-//        page1.getByText("${optimalMarkers}Optimal markers").click()
-//        page1.getByText("${needsImprovementMarkers}Needs Improvement").click()
-//        page1.getByText("${atRiskMarkers}At Risk").click()
+        page1.getByText(Pattern.compile("$optimalMarkers\\s*Optimal markers"), Page.GetByTextOptions().setExact(false)).first().click()
+        page1.getByText(Pattern.compile("$needsImprovementMarkers\\s*Needs Improvement"), Page.GetByTextOptions().setExact(false)).first().click()
+        page1.getByText(Pattern.compile("$atRiskMarkers\\s*At Risk"), Page.GetByTextOptions().setExact(false)).first().click()
 
         // 4. Data Review Paragraph
         val reviewText = "Here's the data we reviewed to create your action plan: - Your current blood test results - 1-on-1 interaction with the longevity expert - Pre-consult questionnaire"
