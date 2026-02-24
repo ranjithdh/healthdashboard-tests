@@ -311,7 +311,7 @@ class ActionPlanAdminTest : BaseTest() {
 
         // NEW: "What's Working Well for You" Verification
         verifyWhatsWorkingWell(page1, userData)
-        
+
         // NEW: "What Needs Support" Verification
         verifyWhatNeedsSupport(page1, userData)
 
@@ -742,8 +742,10 @@ class ActionPlanAdminTest : BaseTest() {
 
         logger.info { "Found ${workWellMarkers.size} biomarkers with Optimal/Normal rating" }
 
-        // Group by group_name for better verification flow
-        val groupedMarkers = workWellMarkers.groupBy { it.jsonObject["group_name"]?.jsonPrimitive?.contentOrNull ?: "Other" }
+        // Group by group_name for better verification flow (fallback to identifier if group_name is null)
+        val groupedMarkers = workWellMarkers.groupBy { 
+            it.jsonObject["group_name"]?.jsonPrimitive?.contentOrNull ?: it.jsonObject["identifier"]?.jsonPrimitive?.contentOrNull ?: "Other" 
+        }
 
         groupedMarkers.forEach { (groupName, markers) ->
             logger.info { "Verifying group: $groupName" }
@@ -838,8 +840,10 @@ class ActionPlanAdminTest : BaseTest() {
 
         logger.info { "Found ${needsSupportMarkers.size} biomarkers for 'What Needs Support'" }
 
-        // Group by group_name for better verification flow
-        val groupedMarkers = needsSupportMarkers.groupBy { it.jsonObject["group_name"]?.jsonPrimitive?.contentOrNull ?: "Other" }
+        // Group by group_name for better verification flow (fallback to identifier if group_name is null)
+        val groupedMarkers = needsSupportMarkers.groupBy { 
+            it.jsonObject["group_name"]?.jsonPrimitive?.contentOrNull ?: it.jsonObject["identifier"]?.jsonPrimitive?.contentOrNull ?: "Other" 
+        }
 
         groupedMarkers.forEach { (groupName, markers) ->
             logger.info { "Verifying group: $groupName" }
