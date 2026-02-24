@@ -155,6 +155,9 @@ class OtpPage(page: Page) : BasePage(page) {
         requestOtp()
         logger.info { "enterOtp($otp)" }
         byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+//        if (isIncorrectOtpMessageVisible()){
+//            byRole(AriaRole.TEXTBOX).fill(TestConfig.STATIC_OTP)
+//        }
         return this
     }
 

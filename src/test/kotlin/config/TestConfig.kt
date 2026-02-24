@@ -24,15 +24,10 @@ object TestConfig {
     object Urls {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
         private const val PROD_BASE = "https://app.deepholistics.com/"
-
         val BASE_URL: String = if (isStaging) STG_BASE else PROD_BASE
 
-        // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
-
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-
         val SERVICES_URL = "${BASE_URL}services"
-
 
         val LOGIN_URL = "${BASE_URL}login?utm_source=testing_internal"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
@@ -44,6 +39,8 @@ object TestConfig {
         val WEBSITE_HOME_PAGE_URL =
             if (isStaging) "https://app.stg.deepholistics.com" else "https://app.deepholistics.com"
         val PROFILE_URL = "${BASE_URL}profile"
+
+        val BASELINE_SCORE_URL = "${BASE_URL}baseline-score"
 
 
         const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
@@ -115,20 +112,15 @@ object TestConfig {
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)
-//                .setArgs(listOf("--start-maximized", "--no-sandbox"))
         }
     }
 
     object Viewports {
-        // Mobile devices
         val MOBILE_PORTRAIT = Viewport(390, 844, "iPhone 13", true)
-        val MOBILE_LANDSCAPE = Viewport(844, 390, "iPhone 13 Landscape", true)
         val ANDROID = Viewport(412, 915, "Pixel 5", true)
 
-        // Tablets
         val TABLET_PORTRAIT = Viewport(768, 1024, "iPad", true)
 
-        // Desktop
         val DESKTOP_HD = Viewport(1280, 720, "Desktop HD", false)
         val DESKTOP_FHD = Viewport(1920, 1080, "Desktop Full HD", false)
 
@@ -163,7 +155,7 @@ object TestConfig {
                     country = "India"
                 )*/
         val EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",
+            mobileNumber = "9159439327",
             otp = "678901",
             country = "India",
             countryCode = "+91"

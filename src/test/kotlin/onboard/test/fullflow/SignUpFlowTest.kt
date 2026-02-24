@@ -2,18 +2,16 @@ package onboard.test.fullflow
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
+import mobileView.home.HomePage
 import onboard.page.LoginPage
-import mobileView.home.checkBloodTestBookedCardStatus
 import org.junit.jupiter.api.*
 import utils.SignupDataStore
-import io.qameta.allure.Epic
-import io.qameta.allure.Feature
 import utils.report.Modules
 import java.nio.file.Paths
 import kotlin.test.assertTrue
@@ -186,4 +184,20 @@ class SignUpFlowTest : BaseTest() {
         checkBloodTestBookedCardStatus(homePage)
         homePage.takeScreenshot("signup-with-addons-placed")
     }
+
+    fun checkBloodTestBookedCardStatus(homePage: HomePage) {
+        homePage.waitForBloodTestCardToLoad()
+        assertTrue(homePage.isPhlebotomistAssignedTitleVisible())
+        assertTrue(homePage.isPhlebotomistAssignedDateVisible())
+
+        assertTrue(homePage.isSampleCollectionTitleVisible())
+        assertTrue(homePage.isSampleCollectionDateVisible())
+
+        assertTrue(homePage.isLabProcessingTitleVisible())
+        assertTrue(homePage.isLabProcessingTimeVisible())
+
+        assertTrue(homePage.isDashBoardReadyToViewTitleVisible())
+        assertTrue(homePage.isDashBoardReadyToViewDateVisible())
+    }
+
 }

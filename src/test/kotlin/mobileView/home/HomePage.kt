@@ -12,19 +12,20 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
-import model.healthdata.HealthData
+import mobileView.profile.page.ProfilePage
+import model.home.BaselineScoreDetails
 import model.home.HomeData
 import model.home.HomeDataResponse
-import mobileView.profile.page.ProfilePage
 import utils.DateHelper
 import utils.SignupDataStore
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_PROFILE_ICON
-import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.FETCH_HOME_DATA
+import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
+import kotlin.math.roundToInt
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -34,6 +35,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
+    private var baselineScoreDetails: BaselineScoreDetails? = null
 
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -95,6 +97,7 @@ class HomePage(page: Page) : BasePage(page) {
                 logApiResponse(TestConfig.APIs.API_HOME, responseObj)
                 val diagnostic = homeData?.diagnostics?.firstOrNull { it.blood_test_appointment_date != null }
                 appointmentDate = diagnostic?.blood_test_appointment_date
+                baselineScoreDetails = homeData?.baseline_score_details
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response..${e.message}" }
@@ -184,7 +187,34 @@ class HomePage(page: Page) : BasePage(page) {
         return profilePage
     }
 
+    fun isBaselineScoreTitleVisible(): Boolean {
+        val locator = page.locator("p").filter(Locator.FilterOptions().setHasText("Baseline Score")).first()
+        locator.waitFor()
+        return locator.isVisible
+    }
 
+    fun isBetaTagVisible(): Boolean {
+        return page.getByText("Beta").isVisible
+    }
+
+    fun getBaselineScore() = baselineScoreDetails?.score?.roundToInt().toString().plus("\nof 100")
+
+    fun getBaseLineScoreFromUI(): String? {
+       return page.locator("h2").filter(Locator.FilterOptions().setHasText("of 100")).first().innerText()
+    }
+
+    fun isBaselineScoreStatusMatching(): Boolean {
+        val status = baselineScoreDetails?.inference ?: ""
+
+        val description = baselineScoreDetails?.ranges?.find {
+            it.display_rating == status
+        }
+
+        logger.info { "status...$status" }
+        logger.info { "description...$description" }
+
+       return page.getByText(status).isVisible && page.getByText(description?.display_description ?: "").isVisible
+    }
 
 
 }
