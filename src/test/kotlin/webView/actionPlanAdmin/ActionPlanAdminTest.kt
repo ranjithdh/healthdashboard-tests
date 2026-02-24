@@ -226,7 +226,7 @@ class ActionPlanAdminTest : BaseTest() {
         var needsImprovementMarkers = 0
         var atRiskMarkers = 0
         
-        apiData?.forEach { key, value ->
+        apiData?.forEach { (key, value) ->
             if (value is JsonObject ) {
                 val dataArray = value["data"]
                 if (dataArray is JsonArray) {
@@ -256,7 +256,7 @@ class ActionPlanAdminTest : BaseTest() {
 
         page1.getByTestId("user-info-display").click()
         page1.getByText("User Information").click()
-        
+
         page1.getByText("Name: $dynName").click()
         page1.getByText("Age: $dynAge years").click()
         page1.getByText("Gender: $dynGender").click()
@@ -359,22 +359,22 @@ class ActionPlanAdminTest : BaseTest() {
         )
 
         lifestyleCategories.forEach { (catKey, uiLabel) ->
-            val filteredRecs = recommendationsList.filter { 
-                it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true 
+            val filteredRecs = recommendationsList.filter {
+                it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true
             }
 
             if (filteredRecs.isNotEmpty()) {
                 StepHelper.step("Verifying Category: $uiLabel")
-                
+
                 // Click the category tab/div
                 page1.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^$uiLabel$"))).click()
-                
+
                 filteredRecs.forEach { rec ->
                     val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
                     val description = rec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
 
                     logger.info { "Verifying Recommendation: $displayName" }
-                    
+
                     if (displayName.isNotEmpty()) {
                         page1.getByText(displayName)
                         logger.info { "Verified displayName: $displayName" }
@@ -405,13 +405,15 @@ class ActionPlanAdminTest : BaseTest() {
             page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplement Protocol")).click()
 
             supplements.forEach { rec ->
+                logger.info { "Verifying Supplement: $rec)" }
                 val id = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
                 val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
                 val duration = rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: ""
                 val detailedDesc = rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: ""
                 val cardDesc = rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: ""
 
-                val supplementMeta = rec.jsonObject["meta"]?.jsonObject
+                val supplementMeta = rec.jsonObject["variant_meta"]?.jsonObject
+                logger.info { "Verifying supplementMeta : $supplementMeta )" }
                 val brand = supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: ""
                 val ingredientsArr = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
 
@@ -511,6 +513,7 @@ class ActionPlanAdminTest : BaseTest() {
                 val nameElem = block.getByText(displayName).first()
                 assert(nameElem.isVisible) { "Test name mismatch: $displayName" }
                 nameElem.click()
+                dynamicPdfStrings.add(displayName)
 
                 // Verify Due Date
                 if (dueDateRaw.isNotEmpty()) {
@@ -802,7 +805,7 @@ class ActionPlanAdminTest : BaseTest() {
         val apiData = rootData?.get("data")?.jsonObject ?: rootData
         val allBiomarkers = mutableListOf<JsonElement>()
         
-        apiData?.forEach { _, value ->
+        apiData?.forEach { (_, value) ->
             if (value is JsonObject) {
                 val dataArray = value["data"]
                 if (dataArray is JsonArray) {
@@ -901,7 +904,7 @@ class ActionPlanAdminTest : BaseTest() {
         val apiData = rootData?.get("data")?.jsonObject ?: rootData
         val allBiomarkers = mutableListOf<JsonElement>()
         
-        apiData?.forEach { _, value ->
+        apiData?.forEach { (_, value) ->
             if (value is JsonObject) {
                 val dataArray = value["data"]
                 if (dataArray is JsonArray) {
