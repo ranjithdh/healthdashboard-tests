@@ -766,17 +766,19 @@ class ActionPlanAdminTest : BaseTest() {
                 option.click()
                 
                 // Verify display name and rating (combined text in UI)
-                page1.getByText("$displayName$displayRating").click()
+                // Use scrolling and first() to avoid strict mode violations from hidden/multiple elements
+                option.getByText("$displayName$displayRating").first().click()
                 
-                // Value
+                // Value: Include unit to be more specific and avoid substring matching issues (e.g., "0.4" matching "0.47")
                 if (value.isNotEmpty() && value != "null") {
-                    page1.getByText("Value: $value").click()
+                    val valueText = if (unit.isNotEmpty()) "Value: $value $unit" else "Value: $value"
+                    option.getByText(valueText).first().click()
                 }
                 
                 // Reference
                 if (range.isNotEmpty() && range != "null") {
                     val referenceText = "Reference: $range"
-                    page1.getByText(referenceText).first().click()
+                    option.getByText(referenceText).first().click()
                 }
             }
         }
