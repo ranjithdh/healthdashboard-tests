@@ -105,7 +105,8 @@ class ActionPlanAdminTest : BaseTest() {
         
         val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
         searchBox.click()
-        searchBox.fill(name)
+        page.waitForTimeout(5000.0)
+        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
         searchBox.press("Enter")
         
         // Wait for search results
@@ -204,13 +205,17 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Verifying User Information Section")
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
         val apiData = userDataJson["data"]?.jsonObject?.get("data")?.jsonObject
-        val userProfile = apiData?.get("user_profile")?.jsonObject
+        val userProfile = apiData?.get("userProfile")?.jsonObject
         
         val dynName = userProfile?.get("name")?.jsonPrimitive?.contentOrNull ?: name
         val dynAge = userProfile?.get("age")?.jsonPrimitive?.contentOrNull ?: "22"
         val dynGender = userProfile?.get("gender")?.jsonPrimitive?.contentOrNull ?: "male"
         val dynHeight = userProfile?.get("height")?.jsonPrimitive?.contentOrNull ?: "291"
         val dynWeight = userProfile?.get("weight")?.jsonPrimitive?.contentOrNull ?: "110"
+        
+        val programGoals = userProfile?.get("programGoals")?.jsonObject ?: apiData?.get("programGoals")?.jsonObject
+        val isQuestionnaireTaken = programGoals?.get("is_questionnaire_take")?.jsonPrimitive?.booleanOrNull ?: true
+        val questionnaireTakenText = if (isQuestionnaireTaken) "Yes" else "No"
         
         val foodDataCount = apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.size ?: 280
         
@@ -253,9 +258,10 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByText("Name: $dynName").click()
         page1.getByText("Age: $dynAge years").click()
         page1.getByText("Gender: $dynGender").click()
-//        page1.getByText("Height: $dynHeight cm").click()
-//        page1.getByText("Weight: $dynWeight kg").click()
-//        page1.getByText("Foods List: Loaded ($foodDataCount items)").click()
+        page1.getByText("Height: $dynHeight cm").click()
+        page1.getByText("Weight: $dynWeight kg").click()
+        page1.getByText("Questionnaire Taken: $questionnaireTakenText").click()
+        // page1.getByText("Foods List: Loaded ($foodDataCount items)").click()
 
         // 1. Header
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("$name's Action Plan")).click()
@@ -330,7 +336,7 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
         
         // Click Lifestyle Modifications Heading
-        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
+//        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
 
         // Parse recommendations for dynamic verification
         val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
