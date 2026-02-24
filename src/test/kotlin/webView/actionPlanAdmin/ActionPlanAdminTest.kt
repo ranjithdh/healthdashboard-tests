@@ -45,7 +45,7 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(1)
     fun `generate and verify action plan`() {
-        val name = "Rethinavel  natarajan stg"
+        val name = "Gowthaman"
         logger.info { "Starting ActionPlan flow..." }
         StepHelper.step("Starting ActionPlan flow")
 
@@ -342,12 +342,6 @@ class ActionPlanAdminTest : BaseTest() {
         dynamicPdfStrings.add("What Needs Support")
         verifyWhatNeedsSupport(page1, userData, dynamicPdfStrings)
 
-        // 5. Lifestyle Modifications Verification
-        StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
-        
-        // Click Lifestyle Modifications Heading
-//        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
-
         // Parse recommendations for dynamic verification
         val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
         val recommendationsList = recommendationsJson["data"]?.jsonObject?.get("data")?.jsonObject?.get("recommendations")?.jsonArray ?: JsonArray(emptyList())
@@ -358,7 +352,17 @@ class ActionPlanAdminTest : BaseTest() {
             "stress" to "Stress Management"
         )
 
-        lifestyleCategories.forEach { (catKey, uiLabel) ->
+        val hasLifestyleRecs = recommendationsList.any { rec ->
+            val cat = rec.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.lowercase() ?: ""
+            cat in lifestyleCategories.keys
+        }
+
+        if (hasLifestyleRecs) {
+            StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
+            // Optionally uncomment heading click if needed, but keeping logic consistent with user requirement
+            // page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
+            
+            lifestyleCategories.forEach { (catKey, uiLabel) ->
             val filteredRecs = recommendationsList.filter {
                 it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true
             }
@@ -391,8 +395,8 @@ class ActionPlanAdminTest : BaseTest() {
                     }
                 }
             }
+            }
         }
-        dynamicPdfStrings.add("Supplement Protocol")
         // 6. Supplement Protocol Verification
         val supplements = recommendationsList.filter {
             val isSupplement = it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
@@ -403,6 +407,7 @@ class ActionPlanAdminTest : BaseTest() {
         if (supplements.isNotEmpty()) {
             StepHelper.step("Verifying Supplement Protocol")
             page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Supplement Protocol")).click()
+            dynamicPdfStrings.add("Supplement Protocol")
 
             supplements.forEach { rec ->
                 logger.info { "Verifying Supplement: $rec)" }
