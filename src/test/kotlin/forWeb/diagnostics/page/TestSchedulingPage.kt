@@ -195,6 +195,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,"))
             .fill("14C3, H H Road")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).fill("Balarengapuram")
         page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
