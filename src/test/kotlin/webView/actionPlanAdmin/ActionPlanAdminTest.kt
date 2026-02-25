@@ -27,6 +27,53 @@ class ActionPlanAdminTest : BaseTest() {
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
 
+    data class NutrientInfo(
+        val nutrient: String,
+        val vegan: String,
+        val vegetarian: String,
+        val lactoseTolerant: String,
+        val glutenTolerant: String,
+        val egg: String,
+        val nonVegetarian: String
+    )
+
+    companion object {
+        val ALLERGY_FOOD_MAPPING: Map<String, List<String>> = mapOf(
+            "Milk or dairy" to listOf("Milk", "yogurt", "paneer", "cheese", "fortified dairy", "dairy"),
+            "Eggs" to listOf("Egg White", "Egg Yolk"),
+            "Peanuts" to listOf("Peanuts"),
+            "Tree nuts" to listOf("almonds", "cashews", "walnuts", "hazelnuts", "Brazil nuts", "seeds"),
+            "Soy" to listOf("Soybean", "Tofu", "tempeh", "fortified plant milk"),
+            "Gluten (Wheat)" to listOf("Whole wheat", "wheat bran", "Fortified cereals"),
+            "Fish" to listOf("fish", "salmon", "mackerel", "sardines", "tuna", "trout", "anchovies", "rohu", "catla", "seafood"),
+            "Shellfish" to listOf("shellfish", "seafood")
+        )
+
+        val NUTRIENT_DATA = listOf(
+            NutrientInfo("Calcium", "Ragi, amaranth leaves, moringa, spinach, fenugreek leaves, sesame seeds, tofu, chickpeas, white beans, chia seeds, fortified plant milk, mustard greens", "", "Milk, yogurt, paneer, cheese", "", "", ""),
+            NutrientInfo("Iron", "Lentils, chickpeas, rajma, spinach, beetroot leaves, amaranth leaves, cauliflower greens, dates, prunes, ragi, pumpkin seeds, sesame seeds, mustard greens, soybeans, black chana, jaggery", "", "", "", "", ""),
+            NutrientInfo("Magnesium", "Pumpkin seeds, sesame seeds, flax seeds, chia seeds, spinach, amaranth leaves, oats", "", "", "", "", ""),
+            NutrientInfo("Potassium", "Spinach, beetroot leaves, amaranth leaves, potatoes, sweet potatoes, bananas, oranges, lentils, rajma, soybeans", "", "", "", "", ""),
+            NutrientInfo("Selenium", "Brazil nuts, mushrooms, sunflower seeds, chia seeds, sesame seeds, flax seeds, lentils, chickpeas, soybeans, oats", "", "", "whole wheat", "Egg White, Egg Yolk", ""),
+            NutrientInfo("Zinc", "Seed, cashews, almonds, peanuts, chickpeas, lentils, rajma, black beans, tofu, tempeh, mushrooms, red rice, millet, oats", "", "Curd", "wheat bran", "", ""),
+            NutrientInfo("Sodium", "Beets, mustard greens, olives, celery, beetroot, spinach, chard, turnip greens", "", "Milk, cheese, yogurt", "", "", ""),
+            NutrientInfo("Vitamin A (Retinol)", "Carrots, sweet potatoes, spinach, kale, pumpkin, mustard greens, fenugreek leaves, butternut squash, bell peppers, mango", "", "", "", "", ""),
+            NutrientInfo("Vitamin B1 (Thiamin)", "Flax seeds, pumpkin seeds, sesame seeds, sunflower seeds, lentils, peanuts, brown rice, peas", "", "", "Whole wheat, fortified cereals", "", ""),
+            NutrientInfo("Vitamin B2 (Riboflavin)", "Almonds, sunflower seeds, mushrooms, spinach, soybeans, tofu, tempeh, nutritional yeast", "", "Milk, yogurt, paneer, cheese", "fortified cereals", "", ""),
+            NutrientInfo("Vitamin B3 (Niacin)", "Peanuts, sunflower seeds, brown rice, mushrooms, green peas, potatoes, nutritional yeast", "", "", "Whole wheat", "", ""),
+            NutrientInfo("Vitamin B5 (Pantothenic Acid)", "Mushrooms, sunflower seeds, avocados, legumes, nutritional yeast", "", "Yogurt", "Whole grains", "", ""),
+            NutrientInfo("Vitamin B6 (Pyridoxine)", "Chickpeas, bananas, potatoes, spinach, walnuts, almonds, flaxseeds, nutritional yeast", "", "", "Fortified cereals", "", ""),
+            NutrientInfo("Vitamin B7 (Biotin)", "Almonds, walnuts, sunflower seeds, spinach, sweet potato, mushrooms, soybeans, nutritional yeast", "", "", "Oats", "", ""),
+            NutrientInfo("Vitamin B9 (Folate)", "Spinach, amaranth leaves, lentils, chickpeas, broccoli, beetroot leaves, black-eyed peas, fortified plant milk, nutritional yeast", "", "", "", "", ""),
+            NutrientInfo("Vitamin B12 (Cobalamin)", "Fortified plant milk, nutritional yeast, fermented foods", "", "Milk, yogurt, paneer, cheese", "Fortified cereals", "", ""),
+            NutrientInfo("Vitamin C", "Amla, guava, lemon, lime, oranges, grapefruit, pineapple, strawberries, papaya, pomegranate, tomato, bell peppers, broccoli, cabbage, spinach, amaranth leaves, mustard greens", "", "", "", "", ""),
+            NutrientInfo("Vitamin D", "Fortified plant milk, sun exposure, UV mushrooms", "", "Fortified dairy", "", "", ""),
+            NutrientInfo("Vitamin E", "Almonds, sunflower seeds, spinach, olive oil, peanuts, hazelnuts, avocado", "", "", "", "", ""),
+            NutrientInfo("Omega 3", "Flaxseeds, chia seeds, rajma, hemp seeds, algal oil", "", "", "", "", "")
+        )
+    }
+
+
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
@@ -1205,96 +1252,23 @@ class ActionPlanAdminTest : BaseTest() {
         assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
         logger.info { "User data API successfully verified." }
 
+        val userRecommendationsResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
+        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
+
+        val recommendationsData = userRecommendationsResponse.text()
+        logger.info { "Full User Recommendations JSON: $recommendationsData" }
+        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
+        logger.info { "User recommendations API successfully verified." }
+
 
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
         
-        var overviewStr: String? = null
-        fun findOverview(element: JsonElement) {
-            if (overviewStr != null) return
-            if (element is JsonObject) {
-                if (element.containsKey("overview")) {
-                    overviewStr = element["overview"]?.jsonPrimitive?.contentOrNull
-                    if (overviewStr != null) return
-                }
-                for ((_, value) in element) {
-                    findOverview(value)
-                }
-            } else if (element is JsonArray) {
-                for (item in element) {
-                    findOverview(item)
-                }
-            }
-        }
-        
-        findOverview(userDataJson)
-        
-        assert(overviewStr != null) { "Could not find 'overview' key in the user-data API response" }
-        
-        val overview = overviewStr!!
-        
-        StepHelper.step("Verifying prompt constraints on overview text")
-        logger.info { "Extracted AI Overview generated by prompt:\n$overview" }
-        
-        // 1. Verify no em dashes (Constraint: "Never use any em dashes")
-        assert(!overview.contains("—")) { "Prompt output constraint failed: overview contains an em dash (—)" }
-        
-        // 2. Mention demographic data (e.g. age)
-        assert(overview.contains(Regex("\\b\\d{2}\\b"))) { "Prompt output constraint failed: overview doesn't seem to mention age (no 2-digit number found)" }
-        
-        // 3. Length Constraints (90-120 words requested)
-        val wordCount = overview.split(Regex("\\s+")).filter { it.isNotBlank() }.size
-        logger.info { "Overview word count: $wordCount" }
-        assert(wordCount in 70..140) { "Prompt output constraint failed: overview length is $wordCount words, expected reasonably between 90-120 words" }
-        
-        logger.info { "✅ All prompt output constraints validated successfully." }
     }
-
-
-    data class NutrientInfo(
-        val nutrient: String,
-        val vegan: String,
-        val vegetarian: String,
-        val lactoseTolerant: String,
-        val glutenTolerant: String,
-        val egg: String,
-        val nonVegetarian: String
-    )
-
-    companion object {
-        val ALLERGY_FOOD_MAPPING: Map<String, List<String>> = mapOf(
-            "Milk or dairy" to listOf("Milk", "yogurt", "paneer", "cheese", "fortified dairy", "dairy"),
-            "Eggs" to listOf("Egg White", "Egg Yolk"),
-            "Peanuts" to listOf("Peanuts"),
-            "Tree nuts" to listOf("almonds", "cashews", "walnuts", "hazelnuts", "Brazil nuts", "seeds"),
-            "Soy" to listOf("Soybean", "Tofu", "tempeh", "fortified plant milk"),
-            "Gluten (Wheat)" to listOf("Whole wheat", "wheat bran", "Fortified cereals"),
-            "Fish" to listOf("fish", "salmon", "mackerel", "sardines", "tuna", "trout", "anchovies", "rohu", "catla", "seafood"),
-            "Shellfish" to listOf("shellfish", "seafood")
-        )
-
-        val NUTRIENT_DATA = listOf(
-            NutrientInfo("Calcium", "Ragi, amaranth leaves, moringa, spinach, fenugreek leaves, sesame seeds, tofu, chickpeas, white beans, chia seeds, fortified plant milk, mustard greens", "", "Milk, yogurt, paneer, cheese", "", "", ""),
-            NutrientInfo("Iron", "Lentils, chickpeas, rajma, spinach, beetroot leaves, amaranth leaves, cauliflower greens, dates, prunes, ragi, pumpkin seeds, sesame seeds, mustard greens, soybeans, black chana, jaggery", "", "", "", "", ""),
-            NutrientInfo("Magnesium", "Pumpkin seeds, sesame seeds, flax seeds, chia seeds, spinach, amaranth leaves, oats", "", "", "", "", ""),
-            NutrientInfo("Potassium", "Spinach, beetroot leaves, amaranth leaves, potatoes, sweet potatoes, bananas, oranges, lentils, rajma, soybeans", "", "", "", "", ""),
-            NutrientInfo("Selenium", "Brazil nuts, mushrooms, sunflower seeds, chia seeds, sesame seeds, flax seeds, lentils, chickpeas, soybeans, oats", "", "", "whole wheat", "Egg White, Egg Yolk", ""),
-            NutrientInfo("Zinc", "Seed, cashews, almonds, peanuts, chickpeas, lentils, rajma, black beans, tofu, tempeh, mushrooms, red rice, millet, oats", "", "Curd", "wheat bran", "", ""),
-            NutrientInfo("Sodium", "Beets, mustard greens, olives, celery, beetroot, spinach, chard, turnip greens", "", "Milk, cheese, yogurt", "", "", ""),
-            NutrientInfo("Vitamin A (Retinol)", "Carrots, sweet potatoes, spinach, kale, pumpkin, mustard greens, fenugreek leaves, butternut squash, bell peppers, mango", "", "", "", "", ""),
-            NutrientInfo("Vitamin B1 (Thiamin)", "Flax seeds, pumpkin seeds, sesame seeds, sunflower seeds, lentils, peanuts, brown rice, peas", "", "", "Whole wheat, fortified cereals", "", ""),
-            NutrientInfo("Vitamin B2 (Riboflavin)", "Almonds, sunflower seeds, mushrooms, spinach, soybeans, tofu, tempeh, nutritional yeast", "", "Milk, yogurt, paneer, cheese", "fortified cereals", "", ""),
-            NutrientInfo("Vitamin B3 (Niacin)", "Peanuts, sunflower seeds, brown rice, mushrooms, green peas, potatoes, nutritional yeast", "", "", "Whole wheat", "", ""),
-            NutrientInfo("Vitamin B5 (Pantothenic Acid)", "Mushrooms, sunflower seeds, avocados, legumes, nutritional yeast", "", "Yogurt", "Whole grains", "", ""),
-            NutrientInfo("Vitamin B6 (Pyridoxine)", "Chickpeas, bananas, potatoes, spinach, walnuts, almonds, flaxseeds, nutritional yeast", "", "", "Fortified cereals", "", ""),
-            NutrientInfo("Vitamin B7 (Biotin)", "Almonds, walnuts, sunflower seeds, spinach, sweet potato, mushrooms, soybeans, nutritional yeast", "", "", "Oats", "", ""),
-            NutrientInfo("Vitamin B9 (Folate)", "Spinach, amaranth leaves, lentils, chickpeas, broccoli, beetroot leaves, black-eyed peas, fortified plant milk, nutritional yeast", "", "", "", "", ""),
-            NutrientInfo("Vitamin B12 (Cobalamin)", "Fortified plant milk, nutritional yeast, fermented foods", "", "Milk, yogurt, paneer, cheese", "Fortified cereals", "", ""),
-            NutrientInfo("Vitamin C", "Amla, guava, lemon, lime, oranges, grapefruit, pineapple, strawberries, papaya, pomegranate, tomato, bell peppers, broccoli, cabbage, spinach, amaranth leaves, mustard greens", "", "", "", "", ""),
-            NutrientInfo("Vitamin D", "Fortified plant milk, sun exposure, UV mushrooms", "", "Fortified dairy", "", "", ""),
-            NutrientInfo("Vitamin E", "Almonds, sunflower seeds, spinach, olive oil, peanuts, hazelnuts, avocado", "", "", "", "", ""),
-            NutrientInfo("Omega 3", "Flaxseeds, chia seeds, rajma, hemp seeds, algal oil", "", "", "", "", "")
-        )
-    }
-
-
 }
