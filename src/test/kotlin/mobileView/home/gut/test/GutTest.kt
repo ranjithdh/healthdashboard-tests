@@ -72,6 +72,12 @@ class GutTest : BaseTest() {
         gutPage.gutListValidation()
     }
 
+    @Test
+    @Order(3)
+    fun gutDetailsVerification() {
+        gutPage.gutDetailsValidation()
+    }
+
 
 
     /*  @Test

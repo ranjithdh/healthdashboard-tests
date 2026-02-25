@@ -35,10 +35,10 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun monitorTraffic() {
-        captureGutData()
+        captureGutListData()
     }
 
-    fun captureGutData() {
+    fun captureGutListData() {
         if (gutDataWrapper == null) {
             try {
                 val response = page.waitForResponse(
@@ -71,16 +71,12 @@ class GutPage(page: Page) : BasePage(page) {
         }
     }
 
+    /**------------Gut List---------------*/
+
     fun gutListValidation() {
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isNotEmpty() == true) {
-            val gutListGroupByName =
-                gutList.groupBy {
-                    it.metric?.group_name
-                        ?.takeIf { it.isNotBlank() }
-                        ?: "Others"
-                }
-
+            val gutListGroupByName = getGutDataByGroup()
             headerValidations(gutListGroupByName)
         }
     }
@@ -98,14 +94,14 @@ class GutPage(page: Page) : BasePage(page) {
             headerUiElement.waitFor()
             markerUiElement.waitFor()
             assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
-            assertEquals("${gutList?.size} Markers".normalizeForUiCompare().uppercase(), markerTextActual.normalizeForUiCompare())
+            assertEquals(
+                "${gutList?.size} Markers".normalizeForUiCompare().uppercase(),
+                markerTextActual.normalizeForUiCompare()
+            )
 
             headerUiElement.click()
             markerListValidations(gutList)
-
         }
-
-
     }
 
     private fun markerListValidations(gutList: List<GutMetricData>?) {
@@ -127,9 +123,99 @@ class GutPage(page: Page) : BasePage(page) {
 
             assertEquals(expectedName, actualName)
             assertEquals(expectedInference, actualInference)
-
         }
+    }
 
+    fun getGutDataByGroup(): Map<String, List<GutMetricData>> {
+        val gutList = gutDataWrapper?.gut?.data
+        val gutListGroupByName =
+            gutList?.groupBy {
+                it.metric?.group_name
+                    ?.takeIf { it.isNotBlank() }
+                    ?: "Others"
+            }
+        return gutListGroupByName ?: emptyMap()
+    }
+
+
+    /**------------Gut Details---------------*/
+    fun gutDetailsValidation() {
+        val gutList = gutDataWrapper?.gut?.data
+        if (gutList?.isNotEmpty() == true) {
+            val gutListGroupByName = getGutDataByGroup()
+            gutListGroupByName.forEach { (groupName, metricsList) ->
+                val metricIds = metricsList.map { it.metric?.metric_id!! }
+                captureGutDetails(metricIds, groupName)
+
+                val id = toKebabCase(groupName)
+                val headerUiElement = page.getByTestId("gut-group-header-$id")
+
+                headerUiElement.waitFor()
+                headerUiElement.click()
+                metricsList.forEach { gutMetricList ->
+                    val metricID = gutMetricList.metric?.metric_id
+                    val nameUiElement = page.getByTestId("gut-item-name-$metricID")
+                    nameUiElement.waitFor()
+                    nameUiElement.scrollIntoViewIfNeeded()
+                    nameUiElement.click()
+
+                    detailsValidation()
+                    page.waitForTimeout(2000.0)
+
+                    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
+                }
+            }
+        }
+    }
+
+    private fun detailsValidation() {
+
+
+    }
+
+
+    fun captureGutDetails(
+        metricIds: List<String>,
+        groupName: String
+    ) {
+        if (gutDataWrapper == null) {
+            try {
+                val encodedGroupName = java.net.URLEncoder.encode(groupName, "UTF-8")
+
+                val metricParams = metricIds.joinToString("&") { "metric_id[]=$it" }
+
+                val apiUrl =
+                    "${TestConfig.APIs.API_GUT}?$metricParams&group_name=$encodedGroupName"
+
+                val response = page.waitForResponse(
+                    { response: Response? ->
+                        response?.url()?.contains(apiUrl) == true &&
+                                response.status() == 200 &&
+                                response.request().method() == "GET"
+                    }, { }
+                )
+
+                if (response.status() != 200) {
+                    logger.error { "API returned error status: ${response.status()}" }
+                    return
+                }
+
+                val responseBody = response.text()
+                if (responseBody.isNullOrBlank()) {
+                    logger.error { "API response body is empty" }
+                    return
+                }
+
+                val responseObj = json.decodeFromString<GutResponse>(responseBody)
+
+                if (responseObj.status == "success") {
+                    gutDataWrapper = responseObj.data
+                }
+
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            }
+        }
     }
 
 
