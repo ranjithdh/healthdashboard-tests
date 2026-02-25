@@ -13,6 +13,7 @@ import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
+import model.baseline.BaselineScoreDetailResponse
 import model.home.BaselineScoreDetails
 import model.home.HomeData
 import model.home.HomeDataResponse
@@ -22,6 +23,7 @@ import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_PROFILE_ICON
+import utils.report.StepHelper.FETCH_BASELINE_DETAIL_DATA
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
@@ -200,20 +202,41 @@ class HomePage(page: Page) : BasePage(page) {
     fun getBaselineScore() = baselineScoreDetails?.score?.roundToInt().toString().plus("\nof 100")
 
     fun getBaseLineScoreFromUI(): String? {
-       return page.locator("h2").filter(Locator.FilterOptions().setHasText("of 100")).first().innerText()
+        return page.locator("h2").filter(Locator.FilterOptions().setHasText("of 100")).first().innerText()
     }
 
-    fun isBaselineScoreStatusMatching(): Boolean {
-        val status = baselineScoreDetails?.inference ?: ""
+    fun clickBaseLineScoreCard(): BaselineScoreDetailResponse? {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()?.contains(TestConfig.APIs.BASELINE_SCORE_API_URL) == true && response.status() == 200
+            },
+            {
+                page.locator("#baselinescore_card").click()
+            }
+        )
 
-        val description = baselineScoreDetails?.ranges?.find {
-            it.display_rating == status
+        val responseBody = response.text()
+        if (responseBody.isNullOrBlank()) {
+            logger.info { "API response body is empty" }
         }
 
-        logger.info { "status...$status" }
-        logger.info { "description...$description" }
+        logger.info { "API response...${response.text()}" }
 
-       return page.getByText(status).isVisible && page.getByText(description?.display_description ?: "").isVisible
+        return try {
+            val responseObj = utils.json.json.decodeFromString<BaselineScoreDetailResponse>(responseBody)
+            logger.error { "responseObj...$responseObj" }
+
+            if (responseObj.data != null) {
+                StepHelper.step(FETCH_BASELINE_DETAIL_DATA)
+                logApiResponse(TestConfig.APIs.BASELINE_SCORE_API_URL, responseObj)
+                responseObj
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response..${e.message}" }
+            null
+        }
     }
 
 

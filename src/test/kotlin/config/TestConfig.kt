@@ -42,7 +42,6 @@ object TestConfig {
 
         val BASELINE_SCORE_URL = "${BASE_URL}baseline-score"
 
-
         const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
         const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
         const val WHAT_WE_TEST: String = "${WEBSITE_BASE_URL}what-we-test"
@@ -97,6 +96,7 @@ object TestConfig {
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
         val API_USERS = "$BASE_URL/v4/human-token/users"
         val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
+        val BASELINE_SCORE_API_URL = "$BASE_URL/v4/human-token/health-data/baseline-score"
     }
 
 
