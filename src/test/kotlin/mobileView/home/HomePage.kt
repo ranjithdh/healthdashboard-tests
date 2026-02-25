@@ -199,6 +199,7 @@ class HomePage(page: Page) : BasePage(page) {
     fun clickDataTab(): GutPage {
         StepHelper.step(CLICK_DATA)
         dataButton.click()
+        page.getByTestId("health-data-tab-gut").click()
         val gutPage = GutPage(page)
         return gutPage
     }

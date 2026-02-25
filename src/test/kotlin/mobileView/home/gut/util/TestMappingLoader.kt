@@ -3,7 +3,7 @@ package mobileView.home.gut.util
 import kotlinx.serialization.json.Json
 import mobileView.home.gut.model.UpSellMapping
 
-object TestDataLoader {
+object TestMappingLoader {
 
     private val json = Json { ignoreUnknownKeys = true }
 

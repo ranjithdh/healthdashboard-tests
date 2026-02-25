@@ -5,31 +5,25 @@ import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
-import mobileView.actionPlan.model.RecommendationData
-import mobileView.actionPlan.page.ActionPlanPage
+import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.home.gut.model.GutDataWrapper
+import mobileView.home.gut.model.GutMetricData
 import mobileView.home.gut.model.GutResponse
-import mobileView.home.gut.util.TestDataLoader
-import model.profile.PreferenceUpdateResponse
+import mobileView.home.gut.util.GutUtility.toKebabCase
+import mobileView.home.gut.util.TestMappingLoader
 import utils.json.json
 import utils.logger.logger
-import utils.report.StepHelper
-import utils.report.StepHelper.logApiResponse
+import kotlin.test.assertEquals
 
 class GutPage(page: Page) : BasePage(page) {
 
-    private val mappings = TestDataLoader.loadGeneGutMappings()
+    private val mappings = TestMappingLoader.loadGeneGutMappings() //data
 
     private val searchView = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in Gut"))
 
-    override val pageUrl = TestConfig.Urls.HEALTH_DATA_URL
+    override val pageUrl = TestConfig.Urls.BIOMARKERS_URL
 
     private var gutDataWrapper: GutDataWrapper? = null
-
-    fun clickGut(): GutPage {
-        page.getByTestId("health-data-tab-gut").click()
-        return this
-    }
 
     fun waitForConfirmation(): GutPage {
         searchView.waitFor()
@@ -45,7 +39,7 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     fun captureGutData() {
-        if (gutDataWrapper != null) {
+        if (gutDataWrapper == null) {
             try {
                 val response = page.waitForResponse(
                     { response: Response? ->
@@ -76,5 +70,67 @@ class GutPage(page: Page) : BasePage(page) {
             }
         }
     }
+
+    fun gutListValidation() {
+        val gutList = gutDataWrapper?.gut?.data
+        if (gutList?.isNotEmpty() == true) {
+            val gutListGroupByName =
+                gutList.groupBy {
+                    it.metric?.group_name
+                        ?.takeIf { it.isNotBlank() }
+                        ?: "Others"
+                }
+
+            headerValidations(gutListGroupByName)
+        }
+    }
+
+    private fun headerValidations(headerList: Map<String, List<GutMetricData>>) {
+        headerList.keys.forEach { headerExpected ->
+            val gutList = headerList[headerExpected]
+            val id = toKebabCase(headerExpected)
+            val headerUiElement = page.getByTestId("gut-group-header-$id")
+            val markerUiElement = page.getByTestId("gut-group-markers-$id")
+
+            val headerTextActual = headerUiElement.innerText()
+            val markerTextActual = markerUiElement.innerText()
+
+            headerUiElement.waitFor()
+            markerUiElement.waitFor()
+            assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
+            assertEquals("${gutList?.size} Markers".normalizeForUiCompare().uppercase(), markerTextActual.normalizeForUiCompare())
+
+            headerUiElement.click()
+            markerListValidations(gutList)
+
+        }
+
+
+    }
+
+    private fun markerListValidations(gutList: List<GutMetricData>?) {
+        gutList?.forEach { gutMetricList ->
+            val expectedName = gutMetricList.metric?.display_name
+            val expectedInference = gutMetricList.inference
+
+            val metricID = gutMetricList.metric?.metric_id
+
+            val nameUiElement = page.getByTestId("gut-item-name-$metricID")
+            val inferenceUiElement = page.getByTestId("gut-item-status-mobile-$metricID")
+
+            listOf(nameUiElement, inferenceUiElement).forEach { it.waitFor() }
+
+            nameUiElement.scrollIntoViewIfNeeded()
+
+            val actualName = nameUiElement.innerText()
+            val actualInference = inferenceUiElement.innerText()
+
+            assertEquals(expectedName, actualName)
+            assertEquals(expectedInference, actualInference)
+
+        }
+
+    }
+
 
 }

@@ -39,6 +39,7 @@ object TestConfig {
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
+        val BIOMARKERS_URL = "${BASE_URL}biomarkers"
 
         val HOME_PAGE_URL = "${BASE_URL}home"
         val WEBSITE_HOME_PAGE_URL =

@@ -54,27 +54,35 @@ class GutTest : BaseTest() {
     private fun performInitialNavigation(): GutPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val gutPage =
-            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage().clickDataTab().clickGut()
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage().clickDataTab()
                 .waitForConfirmation()
 
         return gutPage
     }
 
-    @Test
-    @Order(1)
-    fun gutListEmptyView() {
+    /*  @Test
+      @Order(1)
+      fun gutListEmptyView() {
 
-    }
+      }*/
 
     @Test
     @Order(2)
     fun gutListVerification() {
-
+        gutPage.gutListValidation()
     }
 
-    @Test
-    @Order(3)
-    fun gutListSearchView() {
 
-    }
+
+    /*  @Test
+      @Order(3)
+      fun gutListSearchView() {
+
+      }*/
+
+    /* @Test
+     @Order(4)
+     fun gutListFilter() {
+
+     }*/
 }
