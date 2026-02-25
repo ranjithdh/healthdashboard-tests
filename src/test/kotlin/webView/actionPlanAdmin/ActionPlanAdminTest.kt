@@ -361,7 +361,7 @@ class ActionPlanAdminTest : BaseTest() {
             StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
             // Optionally uncomment heading click if needed, but keeping logic consistent with user requirement
             // page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
-            
+
             lifestyleCategories.forEach { (catKey, uiLabel) ->
             val filteredRecs = recommendationsList.filter {
                 it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true
@@ -751,17 +751,22 @@ class ActionPlanAdminTest : BaseTest() {
 
         // --- PDF Export and Validation ---
         StepHelper.step("Export PDF and cross verify contents")
+        logger.info { "--------------------------------------------------" }
+        logger.info { "PDF VALIDATION: STEP 1 - Starting Download" }
         val download2: Download? = page1.waitForDownload {
             page1.getByTestId("button-export-pdf").click()
         }
         val pdfPath = download2?.path()
         org.junit.jupiter.api.Assertions.assertNotNull(pdfPath, "PDF download failed or path is null")
+        logger.info { "PDF VALIDATION: STEP 2 - Downloaded to $pdfPath (${pdfPath?.toFile()?.length()} bytes)" }
 
+        logger.info { "PDF VALIDATION: STEP 3 - Extracting text via PDFBox" }
         val pdfFile = pdfPath!!.toFile()
         val document = org.apache.pdfbox.pdmodel.PDDocument.load(pdfFile)
         val stripper = org.apache.pdfbox.text.PDFTextStripper()
         val pdfText = stripper.getText(document)
         document.close()
+        logger.info { "Successfully extracted ${pdfText.length} raw characters" }
 
         val normalizeText = { text: String ->
             text.replace("\r\n", " ")
@@ -777,19 +782,40 @@ class ActionPlanAdminTest : BaseTest() {
                 .trim()
         }
 
+        logger.info { "PDF VALIDATION: STEP 4 - Normalizing PDF text" }
         val normalizedPdfText = normalizeText(pdfText)
-        logger.info { "Extracted PDF Text Length (normalized): ${normalizedPdfText.length}" }
 
-        val missingLines = dynamicPdfStrings.map { normalizeText(it) }.filter { !normalizedPdfText.contains(it) }
+        logger.info { "PDF VALIDATION: STEP 5 - Comparing ${dynamicPdfStrings.size} strings from UI" }
+        val foundResults = mutableListOf<Triple<String, String, Boolean>>()
+        
+        dynamicPdfStrings.forEach { original ->
+            val search = normalizeText(original)
+            val found = normalizedPdfText.contains(search)
+            foundResults.add(Triple(original, search, found))
+            if (found) {
+                logger.info { "  [✅ MATCHED] \"$search\"" }
+            } else {
+                logger.error { "  [❌ MISSING] \"$search\"" }
+            }
+        }
+
+        val missingLines = foundResults.filter { !it.third }
+
+        logger.info { "--------------------------------------------------" }
+        logger.info { "PDF VALIDATION SUMMARY" }
+        logger.info { "Strings Verified: ${foundResults.size}" }
+        logger.info { "Matches Found: ${foundResults.size - missingLines.size}" }
+        logger.info { "Discrepancies: ${missingLines.size}" }
+        logger.info { "--------------------------------------------------" }
 
         if (missingLines.isNotEmpty()) {
-            val errorMsg = "PDF Validation Error: The following lines were not found in the exported PDF:\n" + 
-                missingLines.mapIndexed { index, line -> "Line ${index + 1} faced error: $line" }.joinToString("\n")
-            logger.error { errorMsg }
-            logger.info { "Normalized PDF Text for Debugging:\n$normalizedPdfText" }
+            val errorMsg = "PDF Validation Failed. Missing strings:\n" + 
+                missingLines.mapIndexed { idx, item -> "${idx + 1}. ${item.second}" }.joinToString("\n")
+            
+            logger.info { "FULL PDF CONTENT FOR DEBUGGING:\n$normalizedPdfText" }
             org.junit.jupiter.api.Assertions.fail<Unit>(errorMsg)
         } else {
-            logger.info { "All expected data successfully verified in the exported PDF." }
+            logger.info { "✅ PDF Validation Passed: All UI elements were found in the PDF." }
         }
     }
 
