@@ -3,14 +3,22 @@ package mobileView.home.gut.page
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.home.gut.model.GutDataWrapper
 import mobileView.home.gut.model.GutMetricData
+import mobileView.home.gut.model.GutMetricDetails
+import mobileView.home.gut.model.GutMetricItem
+import mobileView.home.gut.model.GutMetricResponse
 import mobileView.home.gut.model.GutResponse
+import mobileView.home.gut.model.MetricDetail
+import mobileView.home.gut.model.ParsedSection
+import mobileView.home.gut.model.ParsedSubSection
 import mobileView.home.gut.util.GutUtility.toKebabCase
 import mobileView.home.gut.util.TestMappingLoader
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import kotlin.test.assertEquals
@@ -24,6 +32,7 @@ class GutPage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.BIOMARKERS_URL
 
     private var gutDataWrapper: GutDataWrapper? = null
+    private var gutMetricDetails: GutMetricDetails? = null
 
     fun waitForConfirmation(): GutPage {
         searchView.waitFor()
@@ -145,78 +154,342 @@ class GutPage(page: Page) : BasePage(page) {
             val gutListGroupByName = getGutDataByGroup()
             gutListGroupByName.forEach { (groupName, metricsList) ->
                 val metricIds = metricsList.map { it.metric?.metric_id!! }
-                captureGutDetails(metricIds, groupName)
+                captureGutDetails(metricIds, groupName) //API call
 
                 val id = toKebabCase(groupName)
                 val headerUiElement = page.getByTestId("gut-group-header-$id")
 
                 headerUiElement.waitFor()
                 headerUiElement.click()
-                metricsList.forEach { gutMetricList ->
-                    val metricID = gutMetricList.metric?.metric_id
-                    val nameUiElement = page.getByTestId("gut-item-name-$metricID")
-                    nameUiElement.waitFor()
-                    nameUiElement.scrollIntoViewIfNeeded()
-                    nameUiElement.click()
 
-                    detailsValidation()
-                    page.waitForTimeout(2000.0)
+                val summaryMetricsList = gutMetricDetails?.metrics //TODO need to change as list
 
-                    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
-                }
+                val gutMetricList = summaryMetricsList?.get(0)
+                val metricID = gutMetricList?.metric?.metricId
+                val nameUiElement = page.getByTestId("gut-item-name-$metricID")
+
+                nameUiElement.waitFor()
+                nameUiElement.scrollIntoViewIfNeeded()
+                nameUiElement.click()
+
+                detailsValidation(groupName, summaryMetricsList)
+
+                page.waitForTimeout(2000.0)
+
+                page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
+
+
+                /*   summaryMetricsList?.forEach { gutMetricList ->
+                       val metricID = gutMetricList.metric?.metricId
+                       val nameUiElement = page.getByTestId("gut-item-name-$metricID")
+                       nameUiElement.waitFor()
+                       nameUiElement.scrollIntoViewIfNeeded()
+                       nameUiElement.click()
+
+                       detailsValidation(groupName, gutMetricList)
+                       page.waitForTimeout(2000.0)
+
+                       page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
+                   }*/
             }
         }
     }
 
-    private fun detailsValidation() {
+    private fun detailsValidation(groupName: String, summaryMetricsList: List<GutMetricItem>?) {
+        detailsHeaderValidations(groupName)
 
+        detailsMetricsValidations(summaryMetricsList)
+
+        tabChecking(summaryMetricsList)
 
     }
 
+    private fun tabChecking(summaryMetricsList: List<GutMetricItem>?) {
+        val isWhyTab = shouldShowWhyTab(summaryMetricsList)
+        val isConnectedTab = shouldShowConnectedTab(summaryMetricsList)
+        if (isWhyTab) {
+            val whatItMeansTab = page.getByTestId("what-it-means-tab")
+            whatItMeansTab.waitFor()
+            whatItMeansTab.click()
+            checkWhatItMean(summaryMetricsList)
+        }
+        if (isConnectedTab) {
+            val connectedTab = page.getByTestId("connected-biomarkers-tab")
+            connectedTab.waitFor()
+            connectedTab.click()
+            checkConnectedBiomarkers()
+        }
+    }
+
+    private fun checkConnectedBiomarkers() {
+
+    }
+
+    private fun checkWhatItMean(summaryMetricsList: List<GutMetricItem>?) {
+        whatItMeanTitleCheck(summaryMetricsList)
+
+        //Todo need know the description
+
+
+        //other factor
+        whatItMeanOtherFactor(summaryMetricsList)
+
+
+        /*  val details=summaryMetricsList?.get(0)?.details
+
+          //section
+          val sections = parseSections(details)
+          logger.info { "List of ..." + sections?.joinToString("\n") }*/
+
+
+        /*sections.forEachIndexed { index, section ->
+            val sectionTitleUi = page.getByTestId("section-title-$index")
+
+            section.mainTitle?.let {
+                sectionTitleUi.waitFor()
+                assertEquals(
+                    it.normalizeForUiCompare(),
+                    sectionTitleUi.innerText().normalizeForUiCompare()
+                )
+            }
+
+            section.subSections?.forEachIndexed { subIndex, sub ->
+                val subTitleUi = page.getByTestId("subsection-title-$index-$subIndex")
+                val subDescUi = page.getByTestId("subsection-description-$index-$subIndex")
+
+                sub.title?.let {
+                    subTitleUi.waitFor()
+                    assertEquals(
+                        it.normalizeForUiCompare(),
+                        subTitleUi.innerText().normalizeForUiCompare()
+                    )
+                }
+
+                sub.description?.let {
+                    subDescUi.waitFor()
+                    assertEquals(
+                        it.normalizeForUiCompare(),
+                        subDescUi.innerText().normalizeForUiCompare()
+                    )
+                }
+            }
+
+            section.plainContent?.let {
+                val contentUi = page.getByTestId("section-content-$index")
+                contentUi.waitFor()
+                assertEquals(
+                    it.normalizeForUiCompare(),
+                    contentUi.innerText().normalizeForUiCompare()
+                )
+            }
+        }*/
+    }
+
+    private fun whatItMeanOtherFactor(summaryMetricsList: List<GutMetricItem>?) {
+        val otherFactors = summaryMetricsList
+            ?.firstOrNull { it.details?.any { d -> d.category == "factors" } == true }
+            ?.details
+            ?.firstOrNull { it.category == "factors" }
+
+        if (otherFactors?.content.isNullOrEmpty()) return
+
+        val factorLines = otherFactors?.content
+            ?.lines()
+            ?.filter { line ->
+                val trimmed = line.trim()
+                trimmed.startsWith("*") || trimmed.startsWith("##")
+            }
+
+        val factorList = factorLines?.map { line ->
+            line
+                .replace(Regex("^##\\s*"), "")          // remove heading ##
+                .replace(Regex("^\\*\\s*"), "")         // remove *
+                .replace(Regex("\\*\\*(.+?)\\*\\*"), "$1") // remove bold **
+        }
+
+        logger.info {
+            "List of factors:\n${factorList?.joinToString("\n") ?: "No factors found"}"
+        }
+
+
+        val otherFactorTitle = page.getByTestId("other-factors-title")
+        otherFactorTitle.waitFor()
+        assertEquals(factorList?.get(0), otherFactorTitle.innerText().normalizeForUiCompare())
+
+        factorList?.drop(1)?.forEachIndexed { index, factor ->
+            val factorUiElement = page.getByTestId("other-factor-text-${index}")
+            factorUiElement.waitFor()
+            factorUiElement.scrollIntoViewIfNeeded()
+            assertEquals(factor.normalizeForUiCompare(), factorUiElement.innerText().normalizeForUiCompare())
+        }
+    }
+
+    private fun whatItMeanTitleCheck(summaryMetricsList: List<GutMetricItem>?) {
+        val groupName = summaryMetricsList?.get(0)?.metric?.groupName
+        val titleUiElement = page.getByTestId("why-tab-title")
+        val actualTitleText = titleUiElement.innerText()
+
+        titleUiElement.waitFor()
+        assertEquals(actualTitleText.normalizeForUiCompare(), groupName?.normalizeForUiCompare())
+    }
+
+    private fun detailsMetricsValidations(summaryMetricsList: List<GutMetricItem>?) {
+        summaryMetricsList?.forEachIndexed { index, metricsList ->
+            val metricName = page.getByTestId("metric-name-$index")
+
+            val metricInference = page.getByTestId("metric-inference-$index")
+
+            val metricDescription = page.getByTestId("metric-description-$index")
+
+
+            listOf(metricName, metricInference, metricDescription).forEach { it.waitFor() }
+
+            val expectedMetricName = metricsList.metric?.displayName
+            val expectedInference = metricsList.summary?.inference
+            val expectedDescription = metricsList.summary?.displayDescription
+
+            assertEquals(expectedMetricName?.normalizeForUiCompare(), metricName.innerText()?.normalizeForUiCompare())
+
+            assertEquals(
+                expectedInference?.normalizeForUiCompare(),
+                metricInference.innerText()?.normalizeForUiCompare()
+            )
+            assertEquals(
+                expectedDescription?.normalizeForUiCompare(),
+                metricDescription.innerText()?.normalizeForUiCompare()
+            )
+
+        }
+    }
+
+    private fun detailsHeaderValidations(groupName: String) {
+        val parameterTitle = page.getByTestId("parameter-title")
+        val actualTitleText = parameterTitle.innerText()
+        //TODO need to add description
+
+        parameterTitle.waitFor()
+        assertEquals(actualTitleText.normalizeForUiCompare(), groupName.normalizeForUiCompare())
+    }
 
     fun captureGutDetails(
         metricIds: List<String>,
         groupName: String
     ) {
-        if (gutDataWrapper == null) {
-            try {
-                val encodedGroupName = java.net.URLEncoder.encode(groupName, "UTF-8")
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
 
-                val metricParams = metricIds.joinToString("&") { "metric_id[]=$it" }
+            val encodedGroupName = java.net.URLEncoder.encode(groupName, "UTF-8")
 
-                val apiUrl =
-                    "${TestConfig.APIs.API_GUT}?$metricParams&group_name=$encodedGroupName"
+            val metricParams = metricIds.joinToString("&") { "metric_id[]=$it" }
 
-                val response = page.waitForResponse(
-                    { response: Response? ->
-                        response?.url()?.contains(apiUrl) == true &&
-                                response.status() == 200 &&
-                                response.request().method() == "GET"
-                    }, { }
-                )
 
-                if (response.status() != 200) {
-                    logger.error { "API returned error status: ${response.status()}" }
-                    return
-                }
+            val apiUrl =
+                "${TestConfig.APIs.API_GUT_DETAILS}?$metricParams&group_name=$encodedGroupName"
 
-                val responseBody = response.text()
-                if (responseBody.isNullOrBlank()) {
-                    logger.error { "API response body is empty" }
-                    return
-                }
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                apiUrl,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
 
-                val responseObj = json.decodeFromString<GutResponse>(responseBody)
 
-                if (responseObj.status == "success") {
-                    gutDataWrapper = responseObj.data
-                }
-
-            } catch (e: Exception) {
-                logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
             }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+
+            val responseObj = json.decodeFromString<GutMetricResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                gutMetricDetails = responseObj.data
+            }
+
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
         }
     }
 
+    fun shouldShowWhyTab(metrics: List<GutMetricItem>?): Boolean {
+        return metrics
+            ?.firstOrNull { !it.details.isNullOrEmpty() }
+            ?.details
+            ?.isNotEmpty() == true
+    }
 
+    fun shouldShowConnectedTab(metrics: List<GutMetricItem>?): Boolean {
+        return metrics
+            ?.flatMap { it.correlations ?: emptyList() }
+            ?.isNotEmpty() == true
+    }
+
+    fun parseSections(details: List<MetricDetail>?): List<ParsedSection> {
+        if (details.isNullOrEmpty()) return emptyList()
+
+        val sections = details
+            .filter { it.category?.startsWith("section") == true }
+            .sortedBy {
+                it.category?.replace("section", "")?.toIntOrNull() ?: 0
+            }
+
+        return sections.map { section ->
+            val content = section.content.orEmpty()
+
+            // 1. Extract ## Main Title
+            val mainTitleRegex = Regex("^##\\s*(.*)", RegexOption.MULTILINE)
+            val mainTitleMatch = mainTitleRegex.find(content)
+            val mainTitle = mainTitleMatch?.groupValues?.get(1)?.trim()
+
+            // 2. Remove main title from content
+            val contentWithoutMain = if (mainTitle != null) {
+                content.replaceFirst(Regex("^##.*\\n?"), "").trim()
+            } else {
+                content.trim()
+            }
+
+            // 3. Check for ### subheadings
+            val hasSubHeadings = Regex("^###", RegexOption.MULTILINE)
+                .containsMatchIn(contentWithoutMain)
+
+            if (hasSubHeadings) {
+                // 4. Split into subsections
+                val subSections = contentWithoutMain
+                    .split(Regex("^###", RegexOption.MULTILINE))
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .map { sub ->
+                        val parts = sub.split(":", limit = 2)
+                        val title = parts.getOrNull(0)?.trim()
+                        val description = parts.getOrNull(1)?.trim()
+
+                        ParsedSubSection(
+                            title = title,
+                            description = description
+                        )
+                    }
+
+                ParsedSection(
+                    mainTitle = mainTitle,
+                    subSections = subSections,
+                    plainContent = null
+                )
+            } else {
+                // No ### headings → plain paragraph
+                ParsedSection(
+                    mainTitle = mainTitle,
+                    subSections = null,
+                    plainContent = contentWithoutMain
+                )
+            }
+        }
+    }
 }
