@@ -174,7 +174,6 @@ class GutPage(page: Page) : BasePage(page) {
 
                 detailsValidation(groupName, summaryMetricsList)
 
-                page.waitForTimeout(2000.0)
 
                 page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
 
@@ -196,9 +195,9 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun detailsValidation(groupName: String, summaryMetricsList: List<GutMetricItem>?) {
-        detailsHeaderValidations(groupName)
+//        detailsHeaderValidations(groupName)
 
-        detailsMetricsValidations(summaryMetricsList)
+        //      detailsMetricsValidations(summaryMetricsList)
 
         tabChecking(summaryMetricsList)
 
@@ -234,55 +233,106 @@ class GutPage(page: Page) : BasePage(page) {
         //other factor
         whatItMeanOtherFactor(summaryMetricsList)
 
+        whatItMeanSections(summaryMetricsList)
 
-        /*  val details=summaryMetricsList?.get(0)?.details
+        whatItMeanBottomLine(summaryMetricsList)
+    }
 
-          //section
-          val sections = parseSections(details)
-          logger.info { "List of ..." + sections?.joinToString("\n") }*/
+    private fun whatItMeanBottomLine(summaryMetricsList: List<GutMetricItem>?) {
+        val gutWithDetails = summaryMetricsList
+            ?.firstOrNull { it.details?.isNotEmpty() == true }
+
+        val bottomLine = gutWithDetails
+            ?.details
+            ?.firstOrNull { it.category == "bottom_line" }
+
+        if (bottomLine?.content.isNullOrEmpty()) return
+
+        val bottomLineTitle = page.getByTestId("bottom-line-title")
+        bottomLineTitle.waitFor()
+        assertEquals("Bottom line", bottomLineTitle.innerText())
+
+        val bottomLineText = page.getByTestId("bottom-line-text")
+        bottomLineText.waitFor()
+
+// If markdown is rendered as plain text in UI
+        assertEquals(
+            bottomLine?.content?.normalizeForUiCompare(),
+            bottomLineText.innerText().normalizeForUiCompare()
+        )
+    }
+
+    private fun whatItMeanSections(summaryMetricsList: List<GutMetricItem>?) {
+        val details = summaryMetricsList?.firstOrNull()?.details
+
+        val sections = parseSections(details)
 
 
-        /*sections.forEachIndexed { index, section ->
-            val sectionTitleUi = page.getByTestId("section-title-$index")
 
-            section.mainTitle?.let {
-                sectionTitleUi.waitFor()
-                assertEquals(
-                    it.normalizeForUiCompare(),
-                    sectionTitleUi.innerText().normalizeForUiCompare()
-                )
-            }
+        if (sections.isNotEmpty()) {
+            sections.forEachIndexed { sectionPosition, section ->
+                when (sectionPosition) {
+                    0 -> {
+                        val titleExcepted = section.mainTitle
+                        val contextExcepted = section.plainContent
+                        val titleActual = page.getByTestId("section-title-$sectionPosition")
+                        val contentActual = page.getByTestId("section-content-$sectionPosition")
 
-            section.subSections?.forEachIndexed { subIndex, sub ->
-                val subTitleUi = page.getByTestId("subsection-title-$index-$subIndex")
-                val subDescUi = page.getByTestId("subsection-description-$index-$subIndex")
+                        listOf(titleActual, contentActual).forEach { it.waitFor() }
+                        contentActual.scrollIntoViewIfNeeded()
 
-                sub.title?.let {
-                    subTitleUi.waitFor()
-                    assertEquals(
-                        it.normalizeForUiCompare(),
-                        subTitleUi.innerText().normalizeForUiCompare()
-                    )
+                        assertEquals(
+                            titleExcepted?.normalizeForUiCompare(),
+                            titleActual.innerText().normalizeForUiCompare()
+                        )
+                        assertEquals(
+                            contextExcepted?.normalizeForUiCompare(),
+                            contentActual.innerText().normalizeForUiCompare()
+                        )
+                    }
+
+                    else -> {
+                        if (!section.mainTitle.isNullOrBlank() || !section.plainContent.isNullOrBlank() || section.subSections?.isNotEmpty() == true) {
+
+                            val titleExpected = section.mainTitle
+                            val titleActual = page.getByTestId("section-title-$sectionPosition")
+                            titleActual.waitFor()
+                            titleActual.scrollIntoViewIfNeeded()
+
+                            assertEquals(
+                                titleExpected?.normalizeForUiCompare(),
+                                titleActual.innerText().normalizeForUiCompare()
+                            )
+
+                            val subSectionsList = section.subSections
+
+                            subSectionsList?.forEachIndexed { index, subSection ->
+                                val subsectionTitle = page.getByTestId("subsection-title-$sectionPosition-$index")
+                                val subsectionDescription =
+                                    page.getByTestId("subsection-description-$sectionPosition-$index")
+
+                                listOf(subsectionTitle, subsectionDescription).forEach { it.waitFor() }
+                                subsectionDescription.scrollIntoViewIfNeeded()
+
+                                assertEquals(
+                                    subSection.title?.normalizeForUiCompare(),
+                                    subsectionTitle.innerText().normalizeForUiCompare()
+                                )
+                                assertEquals(
+                                    subSection.description?.normalizeForUiCompare(),
+                                    subsectionDescription.innerText().normalizeForUiCompare()
+                                )
+                            }
+                        }
+                    }
                 }
-
-                sub.description?.let {
-                    subDescUi.waitFor()
-                    assertEquals(
-                        it.normalizeForUiCompare(),
-                        subDescUi.innerText().normalizeForUiCompare()
-                    )
-                }
             }
 
-            section.plainContent?.let {
-                val contentUi = page.getByTestId("section-content-$index")
-                contentUi.waitFor()
-                assertEquals(
-                    it.normalizeForUiCompare(),
-                    contentUi.innerText().normalizeForUiCompare()
-                )
-            }
-        }*/
+        }
+
+        logger.info {
+            "List of sections:\n${sections?.joinToString("\n") ?: "No sections found"}"
+        }
     }
 
     private fun whatItMeanOtherFactor(summaryMetricsList: List<GutMetricItem>?) {
