@@ -15,6 +15,7 @@ import org.junit.jupiter.api.*
 import utils.logger.logger
 import utils.report.StepHelper
 import java.util.regex.Pattern
+import org.apache.pdfbox.Loader
 import utils.json.json as jsonParser
 
 
@@ -115,7 +116,7 @@ class ActionPlanAdminTest : BaseTest() {
         // Brief wait to ensure TestConfig is updated by the response listener
         page.waitForTimeout(1000.0)
         
-        logger.info { "Tokens captured. ACCESS_TOKEN length: ${TestConfig.ACCESS_TOKEN.length}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
+        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
         assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
 
         // 1b. Fetch all users to find Gowthaman's ID
@@ -801,7 +802,7 @@ class ActionPlanAdminTest : BaseTest() {
 
         logger.info { "PDF VALIDATION: STEP 3 - Extracting text via PDFBox" }
         val pdfFile = pdfPath!!.toFile()
-        val document = org.apache.pdfbox.pdmodel.PDDocument.load(pdfFile)
+        val document = Loader.loadPDF(pdfFile)
         val stripper = org.apache.pdfbox.text.PDFTextStripper()
         val pdfText = stripper.getText(document)
         document.close()

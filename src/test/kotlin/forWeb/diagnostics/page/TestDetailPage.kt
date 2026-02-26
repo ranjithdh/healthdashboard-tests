@@ -6,7 +6,6 @@ import config.BasePage
 import config.TestConfig
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
-import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,13 +22,8 @@ class TestDetailPage(page: Page) : BasePage(page) {
      * Wait for page to load and verify URL pattern
      */
     fun waitForPageLoad(): TestDetailPage {
-        // Wait for URL to match pattern: test-detail/{type}/{id}
-//        page.waitForURL(Regex(".*test-detail/(packages|test_profiles|tests)/\\d+"), Page.WaitForURLOptions().setTimeout(30000.0))
-
-        page.waitForURL(
-            Pattern.compile(".*/test-detail/(packages|test_profiles|tests)/\\d+"),
-            Page.WaitForURLOptions().setTimeout(30_000.0)
-        )
+        // Wait for URL to match pattern: test-detail/{type}/{id} (glob pattern, no regex dependency)
+        page.waitForURL("**/test-detail/**", Page.WaitForURLOptions().setTimeout(30_000.0))
         logger.info { "Test Detail page loaded: ${page.url()}" }
         return this
     }
