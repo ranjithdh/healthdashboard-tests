@@ -393,55 +393,76 @@ class ActionPlanAdminTest : BaseTest() {
             it.jsonObject["approval_status"]?.jsonPrimitive?.contentOrNull == "approved"
         })
 
-        val lifestyleCategories = mapOf(
-            "activity" to "Activity",
-            "sleep" to "Sleep",
-            "stress" to "Stress Management"
-        )
+        val lifestyleCategories = setOf("activity", "sleep", "stress")
 
-        val hasLifestyleRecs = recommendationsList.any { rec ->
+        val lifestyleRecs = recommendationsList.filter { rec ->
             val cat = rec.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.lowercase() ?: ""
-            cat in lifestyleCategories.keys
+            cat in lifestyleCategories
         }
 
-        if (hasLifestyleRecs) {
-            StepHelper.step("Verifying Lifestyle Modifications (Activity, Sleep, Stress)")
-            // Optionally uncomment heading click if needed, but keeping logic consistent with user requirement
-            // page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Lifestyle Modifications")).click()
+        if (lifestyleRecs.isNotEmpty()) {
+            StepHelper.step("Verifying Lifestyle Modifications Section")
+            page1.getByTestId("button-toggle-category-lifestyle").click()
+            page1.waitForTimeout(1000.0)
 
-            lifestyleCategories.forEach { (catKey, uiLabel) ->
-            val filteredRecs = recommendationsList.filter {
-                it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals(catKey, ignoreCase = true) == true
-            }
+            lifestyleRecs.forEach { rec ->
+                val id = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+                val description = rec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
 
-            if (filteredRecs.isNotEmpty()) {
-                StepHelper.step("Verifying Category: $uiLabel")
+                if (id.isEmpty() || displayName.isEmpty()) return@forEach
 
-                // Click the category tab/div
-                page1.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^$uiLabel$"))).click()
+                logger.info { "Verifying Lifestyle Recommendation: $displayName (ID: $id)" }
+                StepHelper.step("Verifying: $displayName")
 
-                filteredRecs.forEach { rec ->
-                    val displayName = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
-                    val description = rec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
+                // Scroll to and click the card to make sure it's in view
+                val recCard = page1.getByTestId("recommendation-$id")
+                recCard.scrollIntoViewIfNeeded()
+                recCard.click()
+                page1.waitForTimeout(300.0)
 
-                    logger.info { "Verifying Recommendation: $displayName" }
+                val checkbox = page1.getByTestId("checkbox-$id")
+                // Use editable-title-{id} — the right-panel element that shows/hides on select/deselect
+                // Using getByText(displayName) causes strict mode violation as it matches 2 elements:
+                // the sidebar card title AND the editable title in the right panel
+                val contentLocator = page1.getByTestId("editable-title-$id")
 
-                    if (displayName.isNotEmpty()) {
-                        page1.getByText(displayName)
-                        logger.info { "Verified displayName: $displayName" }
-                        dynamicPdfStrings.add(displayName)
-//                        displayElem.scrollIntoViewIfNeeded()
-//                        displayElem.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-//                        assert(displayElem.isVisible) { "Display name '$displayName' not found or not visible in $uiLabel" }
+                // Check current visibility state of the content
+                val isCurrentlyVisible = contentLocator.isVisible
+
+                if (isCurrentlyVisible) {
+                    logger.info { "Content is VISIBLE (selected state). Deselecting to verify it hides..." }
+
+                    // Step 1: Deselect → content should disappear
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(!contentLocator.isVisible) {
+                        "❌ Content '$displayName' should be hidden after deselecting checkbox-$id"
                     }
+                    logger.info { "✅ $displayName correctly hidden after deselect" }
 
-                    if (description.isNotEmpty()) {
-                        logger.info { "Verified description: $description" }
-                        page1.getByText(description)
-                        dynamicPdfStrings.add(description)
+                    // Step 2: Re-select → content should reappear
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌ '$displayName' should be visible after re-selecting checkbox-$id"
                     }
+                    logger.info { "✅ $displayName correctly re-appeared after re-select" }
+
+                } else {
+                    logger.info { "$displayName is NOT VISIBLE (deselected state). Selecting to verify it appears..." }
+
+                    // Step 1: Select → content should appear
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌'$displayName' should be visible after selecting checkbox-$id"
+                    }
+                    logger.info { "✅ $displayName correctly appeared after select" }
                 }
-            }
+
+                dynamicPdfStrings.add(displayName)
+                if (description.isNotEmpty()) dynamicPdfStrings.add(description)
             }
         }
         // 6. Supplement Protocol Verification
