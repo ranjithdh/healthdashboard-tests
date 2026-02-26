@@ -248,40 +248,58 @@ class GutPage(page: Page) : BasePage(page) {
 
         val titleUiElement = page.getByTestId("connected-biomarkers-title")
         titleUiElement.waitFor()
-        assertEquals(title, titleUiElement.innerText())
+        val actualTitle = titleUiElement.innerText()
+        logger.info { "Validating Connected Biomarkers Title: Expected='$title', Actual='$actualTitle'" }
+        assertEquals(title, actualTitle)
 
         val subTexUiElement = page.getByTestId("connected-biomarkers-description")
         subTexUiElement.waitFor()
-        assertEquals(subText, subTexUiElement.innerText())
+        val actualSubText = subTexUiElement.innerText()
+        logger.info { "Validating Connected Biomarkers Subtext: Expected='$subText', Actual='$actualSubText'" }
+        assertEquals(subText, actualSubText)
 
 
         allCorrelations?.forEachIndexed { index, correlations ->
+            val biomarkerName = correlations.sourceMetricName
+            logger.info { "Validating Biomarker [$index]: $biomarkerName" }
 
-            val nameUiElement = page.getByTestId("biomarker-name-$index") // {correlations?.sourceMetricName}
-            val typeUiElement = page.getByTestId("biomarker-type-$index") //gutSourceType(correlations.source_type)
+            val nameUiElement = page.getByTestId("biomarker-name-$index")
+            val typeUiElement = page.getByTestId("biomarker-type-$index")
 
 
             listOf(nameUiElement, typeUiElement).forEach { it.waitFor() }
 
-            assertEquals(correlations?.sourceMetricName, nameUiElement.innerText())
-            assertEquals(gutSourceType(correlations?.sourceType), typeUiElement.innerText())
+            val actualName = nameUiElement.innerText()
+            val actualType = typeUiElement.innerText()
+            val expectedType = gutSourceType(correlations.sourceType)
+
+            logger.info { "Validating Name and Type for [$index]: ExpectedName='$biomarkerName', ActualName='$actualName', ExpectedType='$expectedType', ActualType='$actualType'" }
+            assertEquals(biomarkerName, actualName)
+            assertEquals(expectedType, actualType)
 
             nameUiElement.scrollIntoViewIfNeeded()
 
             if (!correlations.sourceInference.isNullOrBlank()) {
-                val inferenceUiElement = page.getByTestId("biomarker-inference-$index")
+                val inferenceUiElement =   if (correlations.sourceType=="gene"){
+                    page.getByTestId("biomarker-gene-inference-$index")
+                }else{
+                    page.getByTestId("biomarker-inference-$index")
+                }
+
                 inferenceUiElement.waitFor()
-                assertEquals(correlations.sourceInference, inferenceUiElement.innerText())
+                val actualInference = inferenceUiElement.innerText()
+                logger.info { "Validating Inference for [$index]: Expected='${correlations.sourceInference}', Actual='$actualInference'" }
+                assertEquals(correlations.sourceInference, actualInference)
             }
 
             if (!correlations.description.isNullOrBlank()) {
                 val desUiElement = page.getByTestId("biomarker-description-$index")
                 desUiElement.waitFor()
-                assertEquals(correlations.description, desUiElement.innerText())
+                val actualDescription = desUiElement.innerText()
+                logger.info { "Validating Description for [$index]: Expected='${correlations.description}', Actual='$actualDescription'" }
+                assertEquals(correlations.description, actualDescription)
             }
         }
-
-
     }
 
     private fun checkWhatItMean(summaryMetricsList: List<GutMetricItem>?) {
