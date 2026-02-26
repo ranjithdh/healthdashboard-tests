@@ -8,7 +8,6 @@ import config.BasePage
 import config.TestConfig
 import config.TestConfig.SECRET_KEY
 import config.TestUser
-import webView.healthdata.page.HealthDataPage
 import kotlinx.serialization.encodeToString
 import mobileView.home.HomePage
 import mobileView.profile.page.ProfilePage
@@ -36,6 +35,7 @@ import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.home.HomePageWebsite
 import webView.diagnostics.page.LabTestsPage
 import webView.diagnostics.symptoms.page.SymptomsPage
+import webView.healthdata.page.HealthDataPage
 
 
 class OtpPage(page: Page) : BasePage(page) {
@@ -154,7 +154,10 @@ class OtpPage(page: Page) : BasePage(page) {
         this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
-        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+
+//        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+
 //        if (isIncorrectOtpMessageVisible()){
 //            byRole(AriaRole.TEXTBOX).fill(TestConfig.STATIC_OTP)
 //        }

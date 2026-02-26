@@ -14,6 +14,9 @@ import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
 import model.baseline.BaselineScoreDetailResponse
+import model.flipboard.FlipBoardArticles
+import model.flipboard.FlipBoardTags
+import model.flipboard.FlipBoardUnreadCount
 import model.home.BaselineScoreDetails
 import model.home.HomeData
 import model.home.HomeDataResponse
@@ -28,6 +31,12 @@ import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
 import kotlin.math.roundToInt
+
+data class FlipBoardResponse(
+    val tags: FlipBoardTags? = null,
+    val articles: FlipBoardArticles? = null,
+    val unreadCount: FlipBoardUnreadCount? = null
+)
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -238,6 +247,73 @@ class HomePage(page: Page) : BasePage(page) {
             null
         }
     }
+
+    fun clickFlipBoardMenu(): FlipBoardResponse? {
+        var flipBoardTags: FlipBoardTags? = null
+        var flipBoardArticles: FlipBoardArticles? = null
+        var flipBoardUnreadCount: FlipBoardUnreadCount? = null
+
+        page.waitForResponse(
+            { response: Response? ->
+                response?.url()?.contains(TestConfig.APIs.FLIP_BOARD_TAGS) == true && response.status() == 200
+            },
+            {
+                page.waitForResponse(
+                    { response: Response? ->
+                        response?.url()?.contains(TestConfig.APIs.FLIP_BOARD_ARTICLES) == true && response.status() == 200
+                    },
+                    {
+                        page.waitForResponse(
+                            { response: Response? ->
+                                response?.url()
+                                    ?.contains(TestConfig.APIs.FLIP_BOARD_UNREAD_COUNT) == true && response.status() == 200
+                            },
+                            {
+                                page.getByText("Flipboard").click()
+                            }
+                        ).let { response ->
+                            val unreadCountResponseBody = response.text()
+                            if (unreadCountResponseBody.isNullOrBlank()) {
+                                logger.info { "UnreadCount API response body is empty" }
+                            }
+                            try {
+                                flipBoardUnreadCount =
+                                    utils.json.json.decodeFromString<FlipBoardUnreadCount>(unreadCountResponseBody)
+                                logger.error { "unreadCount responseObj...$flipBoardUnreadCount" }
+                            } catch (e: Exception) {
+                                logger.error { "Failed to parse unreadCount API response..${e.message}" }
+                            }
+                        }
+                    }
+                ).let { response ->
+                    val articlesResponseBody = response.text()
+                    if (articlesResponseBody.isNullOrBlank()) {
+                        logger.info { "Article API response body is empty" }
+                    }
+                    try {
+                        flipBoardArticles = utils.json.json.decodeFromString<FlipBoardArticles>(articlesResponseBody)
+                        logger.error { "Article responseObj...$flipBoardArticles" }
+                    } catch (e: Exception) {
+                        logger.error { "Failed to parse Article API response..${e.message}" }
+                    }
+                }
+            }
+        ).let { response ->
+            val tagResponseBody = response.text()
+            if (tagResponseBody.isNullOrBlank()) {
+                logger.info { "Tag API response body is empty" }
+            }
+            try {
+                flipBoardTags = utils.json.json.decodeFromString<FlipBoardTags>(tagResponseBody)
+                logger.error { "tag responseObj...$flipBoardTags" }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse tag API response..${e.message}" }
+            }
+        }
+        return FlipBoardResponse(flipBoardTags, flipBoardArticles, flipBoardUnreadCount)
+    }
+
+
 
 
 }
