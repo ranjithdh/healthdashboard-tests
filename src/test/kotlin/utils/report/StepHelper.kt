@@ -258,4 +258,7 @@ object StepHelper {
     const val FETCH_GUT_DETAILS = "Fetch Gut details"
     const val VALIDATING_WHAT_IT_MEANS_TAB = "Validating What it means tab"
     const val VALIDATING_CONNECTED_BIOMARKERS_TAB = "Validating Connected Biomarkers tab"
+
+    //Gene
+    const val FETCH_GENE_DATA = "Fetch Gene data"
 }

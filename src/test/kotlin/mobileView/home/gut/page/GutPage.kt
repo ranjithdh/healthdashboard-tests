@@ -7,6 +7,8 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
+import mobileView.home.gut.model.GeneDataWrapper
+import mobileView.home.gut.model.GeneResponse
 import mobileView.home.gut.model.GutDataWrapper
 import mobileView.home.gut.model.GutMetricData
 import mobileView.home.gut.model.GutMetricDetails
@@ -24,6 +26,7 @@ import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
+import utils.report.StepHelper.FETCH_GENE_DATA
 import utils.report.StepHelper.FETCH_GUT_DATA
 import utils.report.StepHelper.FETCH_GUT_DETAILS
 import utils.report.StepHelper.VALIDATING_CONNECTED_BIOMARKERS_TAB
@@ -44,6 +47,8 @@ class GutPage(page: Page) : BasePage(page) {
     private var gutDataWrapper: GutDataWrapper? = null
     private var gutMetricDetails: GutMetricDetails? = null
 
+    private var geneDataWrapper: GeneDataWrapper? = null
+
     fun waitForConfirmation(): GutPage {
         searchView.waitFor()
         return this
@@ -55,6 +60,42 @@ class GutPage(page: Page) : BasePage(page) {
 
     private fun monitorTraffic() {
         captureGutListData()
+        captureGeneListData()
+    }
+
+    private fun captureGeneListData() {
+        if (geneDataWrapper == null) {
+            StepHelper.step(FETCH_GENE_DATA)
+            try {
+                val response = page.waitForResponse(
+                    { response: Response? ->
+                        response?.url()?.contains(TestConfig.APIs.API_GENE) == true &&
+                                response.status() == 200 &&
+                                response.request().method() == "GET"
+                    }, { }
+                )
+
+                if (response.status() != 200) {
+                    logger.error { "API returned error status: ${response.status()}" }
+                    return
+                }
+
+                val responseBody = response.text()
+                if (responseBody.isNullOrBlank()) {
+                    logger.error { "API response body is empty" }
+                    return
+                }
+
+                val responseObj = json.decodeFromString<GeneResponse>(responseBody)
+
+                if (responseObj.status == "success") {
+                    geneDataWrapper = responseObj.data
+                    logApiResponse(TestConfig.APIs.API_GENE, responseObj)
+                }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            }
+        }
     }
 
     fun captureGutListData() {
