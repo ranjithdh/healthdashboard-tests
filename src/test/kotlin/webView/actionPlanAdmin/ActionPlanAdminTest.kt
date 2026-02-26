@@ -379,10 +379,16 @@ class ActionPlanAdminTest : BaseTest() {
         // NEW: "What's Working Well for You" Verification
         dynamicPdfStrings.add("What's Working Well for You")
         verifyWhatsWorkingWell(page1, userData, dynamicPdfStrings)
+        logger.info { "\n========================================" }
+        logger.info { "✅ SECTION VERIFIED: What's Working Well for You" }
+        logger.info { "========================================\n" }
 
         // NEW: "What Needs Support" Verification
         dynamicPdfStrings.add("What Needs Support")
         verifyWhatNeedsSupport(page1, userData, dynamicPdfStrings)
+        logger.info { "\n========================================" }
+        logger.info { "✅ SECTION VERIFIED: What Needs Support" }
+        logger.info { "========================================\n" }
 
         // Parse recommendations for dynamic verification
         val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
@@ -464,6 +470,9 @@ class ActionPlanAdminTest : BaseTest() {
                 dynamicPdfStrings.add(displayName)
                 if (description.isNotEmpty()) dynamicPdfStrings.add(description)
             }
+            logger.info { "\n========================================" }
+            logger.info { "✅ SECTION VERIFIED: Lifestyle Modifications (${lifestyleRecs.size} recommendations)" }
+            logger.info { "========================================\n" }
         }
         // 5. Nutrition Guidance Verification
         val userDataText = userDataResponse.text()
@@ -833,7 +842,11 @@ class ActionPlanAdminTest : BaseTest() {
                     assert(howElem.isVisible) { "Card description missing for $displayName" }
                     dynamicPdfStrings.add(cardDesc)
                 }
+                logger.info { "✅ Supplement verified: $displayName" }
             }
+            logger.info { "\n========================================" }
+            logger.info { "✅ SECTION VERIFIED: Supplement Protocol (${supplements.size} supplements)" }
+            logger.info { "========================================\n" }
         }
 
         // 7. Diagnostic Testing Verification
@@ -946,7 +959,11 @@ class ActionPlanAdminTest : BaseTest() {
                     assert(descElem.isVisible) { "Test description missing for $displayName" }
                     dynamicPdfStrings.add(description)
                 }
+                logger.info { "✅ Diagnostic test verified: $displayName" }
             }
+            logger.info { "\n========================================" }
+            logger.info { "✅ SECTION VERIFIED: Diagnostic Testing (${tests.size} tests)" }
+            logger.info { "========================================\n" }
         }
         // New Verification Logic for Specific Nutrients based on static data
         StepHelper.step("Verifying specific nutrient food sources based on user preference")
