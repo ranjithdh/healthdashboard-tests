@@ -6,21 +6,10 @@ import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
 import io.qameta.allure.Epic
-import mobileView.actionPlan.page.ActionPlanPage
 import mobileView.home.gut.page.GutPage
 import onboard.page.LoginPage
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.MethodOrderer
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.*
 import utils.report.Modules
-import utils.report.StepHelper
-import utils.report.StepHelper.NAVIGATE_TO
-import utils.report.StepHelper.VALIDATING_GUT_DETAILS
-import utils.report.StepHelper.VALIDATING_GUT_LIST
-import utils.logger.logger
 import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -34,7 +23,6 @@ class GutTest : BaseTest() {
 
     @BeforeAll
     fun setup() {
-        logger.info { "Starting Test Setup" }
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
 
@@ -52,21 +40,17 @@ class GutTest : BaseTest() {
 
     @AfterAll
     fun tearDown() {
-        logger.info { "Starting Test Teardown" }
         context.close()
         browser.close()
         playwright.close()
     }
 
     private fun performInitialNavigation(): GutPage {
-        StepHelper.step("$NAVIGATE_TO Gut Page")
-        logger.info { "Performing initial navigation to Gut Page" }
         val loginPage = LoginPage(page).navigate() as LoginPage
         val gutPage =
             loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage().clickDataTab()
                 .waitForConfirmation()
 
-        logger.info { "Successfully navigated to Gut Page" }
         return gutPage
     }
 
@@ -79,17 +63,13 @@ class GutTest : BaseTest() {
     @Test
     @Order(2)
     fun gutListVerification() {
-        logger.info { "Starting Gut List Verification" }
         gutPage.gutListValidation()
-        logger.info { "Gut List Verification Completed" }
     }
 
     @Test
     @Order(3)
     fun gutDetailsVerification() {
-        logger.info { "Starting Gut Details Verification" }
         gutPage.gutDetailsValidation()
-        logger.info { "Gut Details Verification Completed" }
     }
 
 

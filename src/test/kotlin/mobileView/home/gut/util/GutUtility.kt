@@ -8,4 +8,15 @@ object GutUtility {
             .replace(Regex("[^a-z0-9\\s-()]"), "") // remove special chars except space & -
             .replace(Regex("\\s+"), "-")        // replace spaces with -
     }
+
+    fun gutSourceType(sourceType:String?): String {
+        return when (sourceType) {
+            "gene" -> "Genetic Trait"
+            "gut" -> "Gut Marker"
+            "blood" -> "Blood Biomarker"
+            "wearable" -> "Device Marker"
+            else -> ""
+        }
+    }
 }
+

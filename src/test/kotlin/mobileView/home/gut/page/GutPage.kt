@@ -13,9 +13,11 @@ import mobileView.home.gut.model.GutMetricDetails
 import mobileView.home.gut.model.GutMetricItem
 import mobileView.home.gut.model.GutMetricResponse
 import mobileView.home.gut.model.GutResponse
+import mobileView.home.gut.model.MetricCorrelation
 import mobileView.home.gut.model.MetricDetail
 import mobileView.home.gut.model.ParsedSection
 import mobileView.home.gut.model.ParsedSubSection
+import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
 import mobileView.home.gut.util.TestMappingLoader
 import utils.Normalize.refactorTimeZone
@@ -113,12 +115,18 @@ class GutPage(page: Page) : BasePage(page) {
 
             headerUiElement.waitFor()
             markerUiElement.waitFor()
+
+            logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" }
             assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
+
+            val expectedMarkerCount = "${gutList?.size} Markers".uppercase()
+            logger.info { "Validating Marker Count for '$headerExpected': Expected='$expectedMarkerCount', Actual='${markerTextActual.uppercase()}'" }
             assertEquals(
-                "${gutList?.size} Markers".normalizeForUiCompare().uppercase(),
+                expectedMarkerCount.normalizeForUiCompare(),
                 markerTextActual.normalizeForUiCompare()
             )
 
+            logger.info { "Clicking Header to expand: $headerExpected" }
             headerUiElement.click()
             markerListValidations(gutList)
         }
@@ -141,6 +149,7 @@ class GutPage(page: Page) : BasePage(page) {
             val actualName = nameUiElement.innerText()
             val actualInference = inferenceUiElement.innerText()
 
+            logger.info { "Validating Marker [ID: $metricID]: ExpectedName='$expectedName', ActualName='$actualName', ExpectedInference='$expectedInference', ActualInference='$actualInference'" }
             assertEquals(expectedName, actualName)
             assertEquals(expectedInference, actualInference)
         }
@@ -171,6 +180,7 @@ class GutPage(page: Page) : BasePage(page) {
                 val id = toKebabCase(groupName)
                 val headerUiElement = page.getByTestId("gut-group-header-$id")
 
+                logger.info { "Expanding group for details: $groupName" }
                 headerUiElement.waitFor()
                 headerUiElement.click()
 
@@ -180,39 +190,26 @@ class GutPage(page: Page) : BasePage(page) {
                 val metricID = gutMetricList?.metric?.metricId
                 val nameUiElement = page.getByTestId("gut-item-name-$metricID")
 
+                logger.info { "Navigating to details page for MetricID: $metricID" }
                 nameUiElement.waitFor()
                 nameUiElement.scrollIntoViewIfNeeded()
                 nameUiElement.click()
 
                 detailsValidation(groupName, summaryMetricsList)
 
-
                 page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
-
-
-                /*   summaryMetricsList?.forEach { gutMetricList ->
-                       val metricID = gutMetricList.metric?.metricId
-                       val nameUiElement = page.getByTestId("gut-item-name-$metricID")
-                       nameUiElement.waitFor()
-                       nameUiElement.scrollIntoViewIfNeeded()
-                       nameUiElement.click()
-
-                       detailsValidation(groupName, gutMetricList)
-                       page.waitForTimeout(2000.0)
-
-                       page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
-                   }*/
             }
         }
     }
 
     private fun detailsValidation(groupName: String, summaryMetricsList: List<GutMetricItem>?) {
-//        detailsHeaderValidations(groupName)
+        detailsHeaderValidations(groupName)
 
-        //      detailsMetricsValidations(summaryMetricsList)
+        detailsMetricsValidations(summaryMetricsList)
 
         tabChecking(summaryMetricsList)
 
+        whatItMeanBottomLine(summaryMetricsList)
     }
 
     private fun tabChecking(summaryMetricsList: List<GutMetricItem>?) {
@@ -220,6 +217,7 @@ class GutPage(page: Page) : BasePage(page) {
         val isConnectedTab = shouldShowConnectedTab(summaryMetricsList)
         if (isWhyTab) {
             StepHelper.step(VALIDATING_WHAT_IT_MEANS_TAB)
+            logger.info { "Checking 'What it means' tab" }
             val whatItMeansTab = page.getByTestId("what-it-means-tab")
             whatItMeansTab.waitFor()
             whatItMeansTab.click()
@@ -227,14 +225,62 @@ class GutPage(page: Page) : BasePage(page) {
         }
         if (isConnectedTab) {
             StepHelper.step(VALIDATING_CONNECTED_BIOMARKERS_TAB)
+            logger.info { "Checking 'Connected Biomarkers' tab" }
             val connectedTab = page.getByTestId("connected-biomarkers-tab")
             connectedTab.waitFor()
             connectedTab.click()
-            checkConnectedBiomarkers()
+            checkConnectedBiomarkers(summaryMetricsList)
         }
     }
 
-    private fun checkConnectedBiomarkers() {
+    private fun checkConnectedBiomarkers(summaryMetricsList: List<GutMetricItem>?) {
+        val allCorrelations: List<MetricCorrelation>? =
+            summaryMetricsList
+                ?.flatMap { it.correlations.orEmpty() }
+                ?.filter { !it.description.isNullOrBlank() || !it.sourceInference.isNullOrBlank() }
+                ?.associateBy { it.sourceMetricId }   // dedupe by source_metric_id
+                ?.values
+                ?.toList()
+
+        val subText =
+            "These biomarkers are influenced by your gut parameter status and can help monitor your digestive health."
+        val title = "Connected Biomarkers"
+
+        val titleUiElement = page.getByTestId("connected-biomarkers-title")
+        titleUiElement.waitFor()
+        assertEquals(title, titleUiElement.innerText())
+
+        val subTexUiElement = page.getByTestId("connected-biomarkers-description")
+        subTexUiElement.waitFor()
+        assertEquals(subText, subTexUiElement.innerText())
+
+
+        allCorrelations?.forEachIndexed { index, correlations ->
+
+            val nameUiElement = page.getByTestId("biomarker-name-$index") // {correlations?.sourceMetricName}
+            val typeUiElement = page.getByTestId("biomarker-type-$index") //gutSourceType(correlations.source_type)
+
+
+            listOf(nameUiElement, typeUiElement).forEach { it.waitFor() }
+
+            assertEquals(correlations?.sourceMetricName, nameUiElement.innerText())
+            assertEquals(gutSourceType(correlations?.sourceType), typeUiElement.innerText())
+
+            nameUiElement.scrollIntoViewIfNeeded()
+
+            if (!correlations.sourceInference.isNullOrBlank()) {
+                val inferenceUiElement = page.getByTestId("biomarker-inference-$index")
+                inferenceUiElement.waitFor()
+                assertEquals(correlations.sourceInference, inferenceUiElement.innerText())
+            }
+
+            if (!correlations.description.isNullOrBlank()) {
+                val desUiElement = page.getByTestId("biomarker-description-$index")
+                desUiElement.waitFor()
+                assertEquals(correlations.description, desUiElement.innerText())
+            }
+        }
+
 
     }
 
@@ -249,7 +295,7 @@ class GutPage(page: Page) : BasePage(page) {
 
         whatItMeanSections(summaryMetricsList)
 
-        whatItMeanBottomLine(summaryMetricsList)
+
     }
 
     private fun whatItMeanBottomLine(summaryMetricsList: List<GutMetricItem>?) {
@@ -264,15 +310,19 @@ class GutPage(page: Page) : BasePage(page) {
 
         val bottomLineTitle = page.getByTestId("bottom-line-title")
         bottomLineTitle.waitFor()
-        assertEquals("Bottom line", bottomLineTitle.innerText())
+        val actualBottomLineTitle = bottomLineTitle.innerText()
+        logger.info { "Validating Bottom Line Title: Expected='Bottom line', Actual='$actualBottomLineTitle'" }
+        assertEquals("Bottom line", actualBottomLineTitle)
 
         val bottomLineText = page.getByTestId("bottom-line-text")
         bottomLineText.waitFor()
+        val actualBottomLineText = bottomLineText.innerText()
+        val expectedBottomLine = bottomLine?.content
 
-// If markdown is rendered as plain text in UI
+        logger.info { "Validating Bottom Line Content: Expected='$expectedBottomLine', Actual='$actualBottomLineText'" }
         assertEquals(
-            bottomLine?.content?.normalizeForUiCompare(),
-            bottomLineText.innerText().normalizeForUiCompare()
+            expectedBottomLine?.normalizeForUiCompare(),
+            actualBottomLineText.normalizeForUiCompare()
         )
     }
 
@@ -281,7 +331,7 @@ class GutPage(page: Page) : BasePage(page) {
 
         val sections = parseSections(details)
 
-
+        logger.info { "whatItMeanSections.. ${summaryMetricsList?.get(0)?.metric?.groupName}" }
 
         if (sections.isNotEmpty()) {
             sections.forEachIndexed { sectionPosition, section ->
@@ -295,13 +345,18 @@ class GutPage(page: Page) : BasePage(page) {
                         listOf(titleActual, contentActual).forEach { it.waitFor() }
                         contentActual.scrollIntoViewIfNeeded()
 
+                        val actualTitleText = titleActual.innerText()
+                        val actualContentText = contentActual.innerText()
+
+                        logger.info { "Validating Section $sectionPosition [Title]: Expected='$titleExcepted', Actual='$actualTitleText'" }
                         assertEquals(
                             titleExcepted?.normalizeForUiCompare(),
-                            titleActual.innerText().normalizeForUiCompare()
+                            actualTitleText.normalizeForUiCompare()
                         )
+                        logger.info { "Validating Section $sectionPosition [Content]: Expected='$contextExcepted', Actual='$actualContentText'" }
                         assertEquals(
                             contextExcepted?.normalizeForUiCompare(),
-                            contentActual.innerText().normalizeForUiCompare()
+                            actualContentText.normalizeForUiCompare()
                         )
                     }
 
@@ -321,21 +376,34 @@ class GutPage(page: Page) : BasePage(page) {
                             val subSectionsList = section.subSections
 
                             subSectionsList?.forEachIndexed { index, subSection ->
-                                val subsectionTitle = page.getByTestId("subsection-title-$sectionPosition-$index")
-                                val subsectionDescription =
-                                    page.getByTestId("subsection-description-$sectionPosition-$index")
 
-                                listOf(subsectionTitle, subsectionDescription).forEach { it.waitFor() }
-                                subsectionDescription.scrollIntoViewIfNeeded()
+                                if (!subSection.title.isNullOrBlank()) {
 
-                                assertEquals(
-                                    subSection.title?.normalizeForUiCompare(),
-                                    subsectionTitle.innerText().normalizeForUiCompare()
-                                )
-                                assertEquals(
-                                    subSection.description?.normalizeForUiCompare(),
-                                    subsectionDescription.innerText().normalizeForUiCompare()
-                                )
+                                    val subsectionTitle = page.getByTestId("subsection-title-$sectionPosition-$index")
+                                    subsectionTitle.waitFor()
+                                    subsectionTitle.scrollIntoViewIfNeeded()
+
+                                    val actualSubTitle = subsectionTitle.innerText()
+                                    logger.info { "Validating Subsection $sectionPosition-$index [Title]: Expected='${subSection.title}', Actual='$actualSubTitle'" }
+                                    assertEquals(
+                                        subSection.title.normalizeForUiCompare(),
+                                        actualSubTitle.normalizeForUiCompare()
+                                    )
+                                }
+
+
+                                if (!subSection.description.isNullOrBlank()) {
+                                    val subsectionDescription =
+                                        page.getByTestId("subsection-description-$sectionPosition-$index")
+                                    subsectionDescription.waitFor()
+                                    subsectionDescription.scrollIntoViewIfNeeded()
+                                    val actualSubDesc = subsectionDescription.innerText()
+                                    logger.info { "Validating Subsection $sectionPosition-$index [Description]: Expected='${subSection.description}', Actual='$actualSubDesc'" }
+                                    assertEquals(
+                                        subSection.description.normalizeForUiCompare(),
+                                        actualSubDesc.normalizeForUiCompare()
+                                    )
+                                }
                             }
                         }
                     }
@@ -378,13 +446,18 @@ class GutPage(page: Page) : BasePage(page) {
 
         val otherFactorTitle = page.getByTestId("other-factors-title")
         otherFactorTitle.waitFor()
-        assertEquals(factorList?.get(0), otherFactorTitle.innerText().normalizeForUiCompare())
+        val actualFactorTitle = otherFactorTitle.innerText()
+        val expectedFactorTitle = factorList?.get(0)
+        logger.info { "Validating Other Factors Title: Expected='$expectedFactorTitle', Actual='$actualFactorTitle'" }
+        assertEquals(expectedFactorTitle, actualFactorTitle.normalizeForUiCompare())
 
         factorList?.drop(1)?.forEachIndexed { index, factor ->
             val factorUiElement = page.getByTestId("other-factor-text-${index}")
             factorUiElement.waitFor()
             factorUiElement.scrollIntoViewIfNeeded()
-            assertEquals(factor.normalizeForUiCompare(), factorUiElement.innerText().normalizeForUiCompare())
+            val actualFactorText = factorUiElement.innerText()
+            logger.info { "Validating Other Factor [$index]: Expected='$factor', Actual='$actualFactorText'" }
+            assertEquals(factor.normalizeForUiCompare(), actualFactorText.normalizeForUiCompare())
         }
     }
 
