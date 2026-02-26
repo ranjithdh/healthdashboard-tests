@@ -272,28 +272,29 @@ class ActionPlanAdminTest : BaseTest() {
         var optimalMarkers = 0
         var needsImprovementMarkers = 0
         var atRiskMarkers = 0
-        
-        apiData?.forEach { (key, value) ->
-            if (value is JsonObject ) {
-                val dataArray = value["data"]
-                if (dataArray is JsonArray) {
-                    dataArray.forEach { marker ->
-                        if (marker is JsonObject) {
-                            val rating = marker["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase()?.trim()
-                            if (rating != null) {
-                                when (rating) {
-                                    "optimal", "normal" -> {
-                                        optimalMarkers++
-                                    }
-                                    "low", "high", "very high", "very low", "needs attention", "significantly high", "increased cardiac risk"
-                                        -> {
-                                        atRiskMarkers++
-                                    }
-                                    else -> {
-                                        needsImprovementMarkers++
-                                    }
-                                }
-                            }
+        val bloodArray = apiData
+            ?.get("data")?.jsonObject
+            ?.get("blood")?.jsonObject
+            ?.get("data")?.jsonArray
+        logger.info("bloodArray is $bloodArray")
+        bloodArray?.forEach { marker ->
+            if (marker is JsonObject) {
+                logger.info("marker is $marker")
+                val rating = marker["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase()?.trim()
+                if (rating != null) {
+                    when (rating) {
+                        "optimal", "normal" -> {
+                            optimalMarkers++
+                        }
+                        "high", "elevated",
+                        "very high", "severely elevated", "critically high", "extremely high",
+                        "low", "reduced",
+                        "very low", "severely low", "critically low", "extremely low"
+                            -> {
+                            atRiskMarkers++
+                        }
+                        else -> {
+                            needsImprovementMarkers++
                         }
                     }
                 }
