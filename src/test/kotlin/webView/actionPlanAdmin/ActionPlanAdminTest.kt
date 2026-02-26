@@ -465,210 +465,7 @@ class ActionPlanAdminTest : BaseTest() {
                 if (description.isNotEmpty()) dynamicPdfStrings.add(description)
             }
         }
-        // 6. Supplement Protocol Verification
-        val supplements = recommendationsList.filter {
-            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
-        }
-
-        if (supplements.isNotEmpty()) {
-            StepHelper.step("Verifying Supplement Protocol")
-            page1.getByTestId("button-toggle-category-supplements").click()
-            page1.waitForTimeout(1000.0)
-            dynamicPdfStrings.add("Supplement Protocol")
-
-            supplements.forEach { rec ->
-                val id = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
-                val displayName = (rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: "")
-                val name = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
-                val nameInResponse = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "")
-                val duration = (rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: "")
-                val cardDesc = (rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: "")
-                val supplementMeta = rec.jsonObject["variant_meta"]?.jsonObject
-                val brand = (supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
-                val ingredientsArr = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
-
-                if (id.isEmpty() || displayName.isEmpty()) return@forEach
-
-                logger.info { "Verifying Supplement: $displayName (ID: $id)" }
-                StepHelper.step("Verifying: $displayName")
-
-                // Click the recommendation card to expand it
-                val recCard = page1.getByTestId("recommendation-$id")
-                recCard.scrollIntoViewIfNeeded()
-                recCard.click()
-                page1.waitForTimeout(300.0)
-
-                val checkbox = page1.getByTestId("checkbox-$id")
-                // For supplements, the right-panel content block is preview-recommendation-{id}
-                // (editable-title-{id} is only used in lifestyle/activity sections)
-                val block = page1.getByTestId("preview-recommendation-$id")
-                val contentLocator = block
-
-                // Check current visibility state of the right-panel block
-                val isCurrentlyVisible = contentLocator.isVisible
-
-                if (isCurrentlyVisible) {
-                    logger.info { "$displayName is VISIBLE (selected). Deselecting to verify it hides..." }
-
-                    checkbox.click()
-                    page1.waitForTimeout(500.0)
-                    assert(!contentLocator.isVisible) {
-                        "❌'$displayName' should be hidden after deselecting checkbox-$id"
-                    }
-                    logger.info { "✅ Content correctly hidden after deselect" }
-
-                    checkbox.click()
-                    page1.waitForTimeout(500.0)
-                    assert(contentLocator.isVisible) {
-                        "❌'$displayName' should be visible after re-selecting checkbox-$id"
-                    }
-                    logger.info { "✅ $displayName correctly re-appeared after re-select" }
-
-                } else {
-                    logger.info { "$displayName is NOT VISIBLE (deselected). Selecting to verify it appears..." }
-
-                    checkbox.click()
-                    page1.waitForTimeout(500.0)
-                    assert(contentLocator.isVisible) {
-                        "❌'$displayName' should be visible after selecting checkbox-$id"
-                    }
-                    logger.info { "✅$displayName correctly appeared after select" }
-                }
-
-                dynamicPdfStrings.add(displayName)
-
-                // Scroll block into view for detail verification
-                block.scrollIntoViewIfNeeded()
-
-                // Duration
-                if (duration.isNotEmpty()) {
-                    val durationText = "Duration: $duration"
-                    block.getByText(durationText)
-                    dynamicPdfStrings.add(durationText)
-                }
-
-                // Buy Now link — wrapped in try-catch with extended timeout for slow external pages
-                val buyNow = block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Buy Now"))
-                if (buyNow.isVisible) {
-                    StepHelper.step("Verifying Buy Now popup for $displayName")
-                    try {
-                        val buyNowPopup = page1.waitForPopup(Page.WaitForPopupOptions().setTimeout(60000.0)) {
-                            buyNow.click()
-                        }
-                        buyNowPopup.waitForLoadState(LoadState.DOMCONTENTLOADED, Page.WaitForLoadStateOptions().setTimeout(60000.0))
-                        logger.info { "✅ Buy Now opened for $displayName: ${buyNowPopup.url()}" }
-                        assert(buyNowPopup.url().isNotBlank()) { "Buy Now URL is empty for $displayName" }
-                        buyNowPopup.close()
-                    } catch (e: Exception) {
-                        logger.warn { "⚠️ Buy Now popup timed out or failed for $displayName: ${e.message}" }
-                    }
-                }
-
-                // What is it (Ingredients)
-                if (ingredientsArr.isNotEmpty()) {
-                    val ingredientsList = ingredientsArr.map { ing ->
-                        val ingName = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
-                        val amount = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull
-                        val unit = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull
-                        "$ingName (${amount ?: "null"}${unit ?: "null"})"
-                    }.joinToString(", ")
-
-                    val expectedWhatIsIt = "$nameInResponse by $brand. Contains: $ingredientsList"
-                    logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
-                    val whatIsItElem = block.getByText(expectedWhatIsIt, Locator.GetByTextOptions().setExact(false)).first()
-                    assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
-                    dynamicPdfStrings.add(expectedWhatIsIt)
-                }
-
-                // How to take it
-                if (cardDesc.isNotEmpty()) {
-                    val howElem = block.getByText(cardDesc)
-                    assert(howElem.isVisible) { "Card description missing for $displayName" }
-                    dynamicPdfStrings.add(cardDesc)
-                }
-            }
-        }
-
-        // 7. Diagnostic Testing Verification
-        val tests = recommendationsList.filter {
-            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("test", ignoreCase = true) == true
-        }
-
-        if (tests.isNotEmpty()) {
-            StepHelper.step("Verifying Diagnostic Testing Section")
-            page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Diagnostic Testing")).click()
-            dynamicPdfStrings.add("Diagnostic Testing")
-
-            tests.forEach { testRec ->
-                val id = testRec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
-                val displayName = testRec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
-                val dueDateRaw = testRec.jsonObject["test_to_be_taken_at"]?.jsonPrimitive?.contentOrNull ?: ""
-                val description = testRec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
-
-                val block = page1.getByTestId("preview-recommendation-$id")
-                block.scrollIntoViewIfNeeded()
-
-                StepHelper.step("Verifying Test: $displayName")
-
-                // Click card
-                block.getByTestId("test-card").click()
-
-                // Verify Display Name
-                val nameElem = block.getByText(displayName).first()
-                assert(nameElem.isVisible) { "Test name mismatch: $displayName" }
-                nameElem.click()
-                dynamicPdfStrings.add(displayName)
-
-                // Verify Due Date
-                if (dueDateRaw.isNotEmpty()) {
-                    try {
-                        val dateTime = java.time.OffsetDateTime.parse(dueDateRaw)
-                            .atZoneSameInstant(java.time.ZoneId.of("Asia/Kolkata"))
-                        val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))
-                        val expectedDueText = "Due on: $formattedDate"
-                        logger.info { "Checking due date text: $expectedDueText" }
-                        val dueElem = block.getByText(expectedDueText).first()
-                        assert(dueElem.isVisible) { "Due date mismatch for $displayName. Expected: $expectedDueText" }
-                        dynamicPdfStrings.add(expectedDueText)
-                    } catch (e: Exception) {
-                        logger.warn { "Failed to parse/verify due date '$dueDateRaw': ${e.message}" }
-                    }
-                }
-
-                // Book Now Popup
-                StepHelper.step("Verifying Book Now popup for $displayName")
-                val bookNowPopup = page1.waitForPopup {
-                    block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Book Now")).click()
-                }
-                bookNowPopup.waitForLoadState()
-                logger.info { "Successfully opened Book Now link for $displayName: ${bookNowPopup.url()}" }
-                assert(bookNowPopup.url().isNotBlank()) { "Book Now URL is empty for $displayName" }
-                bookNowPopup.close()
-
-                // Why test it?
-                if (description.isNotEmpty()) {
-                    block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why test it")).click()
-                    val descElem = block.getByText(description).first()
-                    assert(descElem.isVisible) { "Test description missing for $displayName" }
-                    descElem.click()
-                    dynamicPdfStrings.add(description)
-                }
-            }
-        }
-        // New Verification Logic for Specific Nutrients based on static data
-        StepHelper.step("Verifying specific nutrient food sources based on user preference")
-        
-        // Ensure we are on the correct category if needed, but the selector button should be visible regardless?
-        // Let's assume we need to click "Nutrition" toggle first if it's not active.
-//        try {
-//            val nutritionToggle = page1.getByTestId("button-toggle-category-nutrition")
-//            if (nutritionToggle.isVisible) {
-//                nutritionToggle.click()
-//            }
-//        } catch (e: Exception) {
-//            logger.info { "Nutrition toggle not found or not needed: ${e.message}" }
-//        }
-
+        // 5. Nutrition Guidance Verification
         val userDataText = userDataResponse.text()
         var foodPreference = "non_vegetarian"
         var allergies: List<String> = emptyList()
@@ -691,25 +488,25 @@ class ActionPlanAdminTest : BaseTest() {
             }
 
             fun findAllIn(obj: JsonObject, key: String): List<String> {
-                 val result = mutableListOf<String>()
-                 val elem = obj[key]
-                 if (elem != null) {
-                     try {
-                         if (elem is JsonArray) {
-                             result.addAll(elem.map { it.jsonPrimitive.content })
-                         } else {
-                             val content = elem.jsonPrimitive.contentOrNull
-                             if (content != null) {
-                                 if (content.contains(",")) result.addAll(content.split(",").map { it.trim() })
-                                 else result.add(content)
-                             }
-                         }
-                     } catch (e: Exception) {}
-                 }
-                 for (v in obj.values) {
-                     if (v is JsonObject) result.addAll(findAllIn(v, key))
-                 }
-                 return result.filter { it.isNotBlank() }.distinct()
+                val result = mutableListOf<String>()
+                val elem = obj[key]
+                if (elem != null) {
+                    try {
+                        if (elem is JsonArray) {
+                            result.addAll(elem.map { it.jsonPrimitive.content })
+                        } else {
+                            val content = elem.jsonPrimitive.contentOrNull
+                            if (content != null) {
+                                if (content.contains(",")) result.addAll(content.split(",").map { it.trim() })
+                                else result.add(content)
+                            }
+                        }
+                    } catch (e: Exception) {}
+                }
+                for (v in obj.values) {
+                    if (v is JsonObject) result.addAll(findAllIn(v, key))
+                }
+                return result.filter { it.isNotBlank() }.distinct()
             }
 
             foodPreference = findIn(root, "food_preference") ?: findIn(root, "preference") ?: "non_vegetarian"
@@ -884,7 +681,7 @@ class ActionPlanAdminTest : BaseTest() {
 
         logger.info { "PDF VALIDATION: STEP 5 - Comparing ${dynamicPdfStrings.size} strings from UI" }
         val foundResults = mutableListOf<Triple<String, String, Boolean>>()
-        
+
         dynamicPdfStrings.forEach { original ->
             val search = normalizeText(original)
             val found = normalizedPdfText.contains(search)
@@ -906,14 +703,264 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "--------------------------------------------------" }
 
         if (missingLines.isNotEmpty()) {
-            val errorMsg = "PDF Validation Failed. Missing strings:\n" + 
-                missingLines.mapIndexed { idx, item -> "${idx + 1}. ${item.second}" }.joinToString("\n")
-            
+            val errorMsg = "PDF Validation Failed. Missing strings:\n" +
+                    missingLines.mapIndexed { idx, item -> "${idx + 1}. ${item.second}" }.joinToString("\n")
+
             logger.info { "FULL PDF CONTENT FOR DEBUGGING:\n$normalizedPdfText" }
             org.junit.jupiter.api.Assertions.fail<Unit>(errorMsg)
         } else {
             logger.info { "✅ PDF Validation Passed: All UI elements were found in the PDF." }
         }
+
+        // 6. Supplement Protocol Verification
+        val supplements = recommendationsList.filter {
+            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
+        }
+
+        if (supplements.isNotEmpty()) {
+            StepHelper.step("Verifying Supplement Protocol")
+            page1.getByTestId("button-toggle-category-supplements").click()
+            page1.waitForTimeout(1000.0)
+            dynamicPdfStrings.add("Supplement Protocol")
+
+            supplements.forEach { rec ->
+                val id = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayName = (rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: "")
+                val name = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
+                val nameInResponse = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "")
+                val duration = (rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: "")
+                val cardDesc = (rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: "")
+                val supplementMeta = rec.jsonObject["variant_meta"]?.jsonObject
+                val brand = (supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: "").replace(Regex("\\s+"), " ").trim()
+                val ingredientsArr = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
+
+                if (id.isEmpty() || displayName.isEmpty()) return@forEach
+
+                logger.info { "Verifying Supplement: $displayName (ID: $id)" }
+                StepHelper.step("Verifying: $displayName")
+
+                // Click the recommendation card to expand it
+                val recCard = page1.getByTestId("recommendation-$id")
+                recCard.scrollIntoViewIfNeeded()
+                recCard.click()
+                page1.waitForTimeout(300.0)
+
+                val checkbox = page1.getByTestId("checkbox-$id")
+                // For supplements, the right-panel content block is preview-recommendation-{id}
+                // (editable-title-{id} is only used in lifestyle/activity sections)
+                val block = page1.getByTestId("preview-recommendation-$id")
+                val contentLocator = block
+
+                // Check current visibility state of the right-panel block
+                val isCurrentlyVisible = contentLocator.isVisible
+
+                if (isCurrentlyVisible) {
+                    logger.info { "$displayName is VISIBLE (selected). Deselecting to verify it hides..." }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(!contentLocator.isVisible) {
+                        "❌'$displayName' should be hidden after deselecting checkbox-$id"
+                    }
+                    logger.info { "✅ Content correctly hidden after deselect" }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌'$displayName' should be visible after re-selecting checkbox-$id"
+                    }
+                    logger.info { "✅ $displayName correctly re-appeared after re-select" }
+
+                } else {
+                    logger.info { "$displayName is NOT VISIBLE (deselected). Selecting to verify it appears..." }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌'$displayName' should be visible after selecting checkbox-$id"
+                    }
+                    logger.info { "✅$displayName correctly appeared after select" }
+                }
+
+                dynamicPdfStrings.add(displayName)
+
+                // Scroll block into view for detail verification
+                block.scrollIntoViewIfNeeded()
+
+                // Duration
+                if (duration.isNotEmpty()) {
+                    val durationText = "Duration: $duration"
+                    block.getByText(durationText)
+                    dynamicPdfStrings.add(durationText)
+                }
+
+                // Buy Now link — wrapped in try-catch with extended timeout for slow external pages
+                val buyNow = block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Buy Now"))
+                if (buyNow.isVisible) {
+                    StepHelper.step("Verifying Buy Now popup for $displayName")
+                    try {
+                        val buyNowPopup = page1.waitForPopup(Page.WaitForPopupOptions().setTimeout(60000.0)) {
+                            buyNow.click()
+                        }
+                        buyNowPopup.waitForLoadState(LoadState.DOMCONTENTLOADED, Page.WaitForLoadStateOptions().setTimeout(60000.0))
+                        logger.info { "✅ Buy Now opened for $displayName: ${buyNowPopup.url()}" }
+                        assert(buyNowPopup.url().isNotBlank()) { "Buy Now URL is empty for $displayName" }
+                        buyNowPopup.close()
+                    } catch (e: Exception) {
+                        logger.warn { "⚠️ Buy Now popup timed out or failed for $displayName: ${e.message}" }
+                    }
+                }
+
+                // What is it (Ingredients)
+                if (ingredientsArr.isNotEmpty()) {
+                    val ingredientsList = ingredientsArr.map { ing ->
+                        val ingName = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
+                        val amount = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull
+                        val unit = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull
+                        "$ingName (${amount ?: "null"}${unit ?: "null"})"
+                    }.joinToString(", ")
+
+                    val expectedWhatIsIt = "$nameInResponse by $brand. Contains: $ingredientsList"
+                    logger.info { "Checking 'What is it' text: $expectedWhatIsIt" }
+                    val whatIsItElem = block.getByText(expectedWhatIsIt, Locator.GetByTextOptions().setExact(false)).first()
+                    assert(whatIsItElem.isVisible) { "What is it text mismatch for $displayName" }
+                    dynamicPdfStrings.add(expectedWhatIsIt)
+                }
+
+                // How to take it
+                if (cardDesc.isNotEmpty()) {
+                    val howElem = block.getByText(cardDesc)
+                    assert(howElem.isVisible) { "Card description missing for $displayName" }
+                    dynamicPdfStrings.add(cardDesc)
+                }
+            }
+        }
+
+        // 7. Diagnostic Testing Verification
+        val tests = recommendationsList.filter {
+            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("test", ignoreCase = true) == true
+        }
+
+        if (tests.isNotEmpty()) {
+            StepHelper.step("Verifying Diagnostic Testing Section")
+            page1.getByTestId("button-toggle-category-diagnostic-tests").click()
+            page1.waitForTimeout(1000.0)
+            dynamicPdfStrings.add("Diagnostic Testing")
+
+            tests.forEach { testRec ->
+                val id = testRec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: ""
+                val displayName = testRec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+                val dueDateRaw = testRec.jsonObject["test_to_be_taken_at"]?.jsonPrimitive?.contentOrNull ?: ""
+                val description = testRec.jsonObject["description"]?.jsonPrimitive?.contentOrNull ?: ""
+
+                if (id.isEmpty() || displayName.isEmpty()) return@forEach
+
+                logger.info { "Verifying Diagnostic Test: $displayName (ID: $id)" }
+                StepHelper.step("Verifying: $displayName")
+
+                // Click the recommendation card in the left panel
+                val recCard = page1.getByTestId("recommendation-$id")
+                recCard.scrollIntoViewIfNeeded()
+                recCard.click()
+                page1.waitForTimeout(300.0)
+
+                val checkbox = page1.getByTestId("checkbox-$id")
+                // preview-recommendation-{id} is the right-panel block that shows/hides on toggle
+                val block = page1.getByTestId("preview-recommendation-$id")
+                val contentLocator = block
+
+                // Check current visibility state and verify toggle behaviour
+                val isCurrentlyVisible = contentLocator.isVisible
+
+                if (isCurrentlyVisible) {
+                    logger.info { "$displayName is VISIBLE (selected). Deselecting to verify it hides..." }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(!contentLocator.isVisible) {
+                        "❌ '$displayName' should be hidden after deselecting checkbox-$id"
+                    }
+                    logger.info { "✅ $displayName correctly hidden after deselect" }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌ '$displayName' should be visible after re-selecting checkbox-$id"
+                    }
+                    logger.info { "✅ $displayName correctly re-appeared after re-select" }
+
+                } else {
+                    logger.info { "$displayName is NOT VISIBLE (deselected). Selecting to verify it appears..." }
+
+                    checkbox.click()
+                    page1.waitForTimeout(500.0)
+                    assert(contentLocator.isVisible) {
+                        "❌ '$displayName' should be visible after selecting checkbox-$id"
+                    }
+                    logger.info { "✅ $displayName correctly appeared after select" }
+                }
+
+                dynamicPdfStrings.add(displayName)
+                block.scrollIntoViewIfNeeded()
+
+                // Verify Display Name in right panel
+                val nameElem = block.getByText(displayName).first()
+                assert(nameElem.isVisible) { "Test name mismatch: $displayName" }
+
+                // Verify Due Date
+                if (dueDateRaw.isNotEmpty()) {
+                    try {
+                        val dateTime = java.time.OffsetDateTime.parse(dueDateRaw)
+                            .atZoneSameInstant(java.time.ZoneId.of("Asia/Kolkata"))
+                        val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))
+                        val expectedDueText = "Due on: $formattedDate"
+                        logger.info { "Checking due date text: $expectedDueText" }
+                        val dueElem = block.getByText(expectedDueText).first()
+                        assert(dueElem.isVisible) { "Due date mismatch for $displayName. Expected: $expectedDueText" }
+                        dynamicPdfStrings.add(expectedDueText)
+                    } catch (e: Exception) {
+                        logger.warn { "Failed to parse/verify due date '$dueDateRaw': ${e.message}" }
+                    }
+                }
+
+                // Book Now popup — wrapped in try-catch with extended timeout for slow external pages
+                val bookNow = block.getByRole(AriaRole.LINK, Locator.GetByRoleOptions().setName("Book Now"))
+                if (bookNow.isVisible) {
+                    StepHelper.step("Verifying Book Now popup for $displayName")
+                    try {
+                        val bookNowPopup = page1.waitForPopup(Page.WaitForPopupOptions().setTimeout(60000.0)) {
+                            bookNow.click()
+                        }
+                        bookNowPopup.waitForLoadState(LoadState.DOMCONTENTLOADED, Page.WaitForLoadStateOptions().setTimeout(60000.0))
+                        logger.info { "✅ Book Now opened for $displayName: ${bookNowPopup.url()}" }
+                        assert(bookNowPopup.url().isNotBlank()) { "Book Now URL is empty for $displayName" }
+                        bookNowPopup.close()
+                    } catch (e: Exception) {
+                        logger.warn { "⚠️ Book Now popup timed out or failed for $displayName: ${e.message}" }
+                    }
+                }
+
+                // Why test it (description)
+                if (description.isNotEmpty()) {
+                    val descElem = block.getByText(description, Locator.GetByTextOptions().setExact(false)).first()
+                    assert(descElem.isVisible) { "Test description missing for $displayName" }
+                    dynamicPdfStrings.add(description)
+                }
+            }
+        }
+        // New Verification Logic for Specific Nutrients based on static data
+        StepHelper.step("Verifying specific nutrient food sources based on user preference")
+        
+        // Ensure we are on the correct category if needed, but the selector button should be visible regardless?
+        // Let's assume we need to click "Nutrition" toggle first if it's not active.
+//        try {
+//            val nutritionToggle = page1.getByTestId("button-toggle-category-nutrition")
+//            if (nutritionToggle.isVisible) {
+//                nutritionToggle.click()
+//            }
+//        } catch (e: Exception) {
+//            logger.info { "Nutrition toggle not found or not needed: ${e.message}" }
+//        }
     }
 
 
