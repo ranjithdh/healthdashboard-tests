@@ -21,6 +21,14 @@ import mobileView.home.gut.util.TestMappingLoader
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
+import utils.report.StepHelper
+import utils.report.StepHelper.FETCH_GUT_DATA
+import utils.report.StepHelper.FETCH_GUT_DETAILS
+import utils.report.StepHelper.VALIDATING_CONNECTED_BIOMARKERS_TAB
+import utils.report.StepHelper.VALIDATING_GUT_DETAILS
+import utils.report.StepHelper.VALIDATING_GUT_LIST
+import utils.report.StepHelper.VALIDATING_WHAT_IT_MEANS_TAB
+import utils.report.StepHelper.logApiResponse
 import kotlin.test.assertEquals
 
 class GutPage(page: Page) : BasePage(page) {
@@ -49,6 +57,7 @@ class GutPage(page: Page) : BasePage(page) {
 
     fun captureGutListData() {
         if (gutDataWrapper == null) {
+            StepHelper.step(FETCH_GUT_DATA)
             try {
                 val response = page.waitForResponse(
                     { response: Response? ->
@@ -73,6 +82,7 @@ class GutPage(page: Page) : BasePage(page) {
 
                 if (responseObj.status == "success") {
                     gutDataWrapper = responseObj.data
+                    logApiResponse(TestConfig.APIs.API_GUT, responseObj)
                 }
             } catch (e: Exception) {
                 logger.error { "Failed to parse API response or API call failed..${e.message}" }
@@ -83,6 +93,7 @@ class GutPage(page: Page) : BasePage(page) {
     /**------------Gut List---------------*/
 
     fun gutListValidation() {
+        StepHelper.step(VALIDATING_GUT_LIST)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isNotEmpty() == true) {
             val gutListGroupByName = getGutDataByGroup()
@@ -149,6 +160,7 @@ class GutPage(page: Page) : BasePage(page) {
 
     /**------------Gut Details---------------*/
     fun gutDetailsValidation() {
+        StepHelper.step(VALIDATING_GUT_DETAILS)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isNotEmpty() == true) {
             val gutListGroupByName = getGutDataByGroup()
@@ -207,12 +219,14 @@ class GutPage(page: Page) : BasePage(page) {
         val isWhyTab = shouldShowWhyTab(summaryMetricsList)
         val isConnectedTab = shouldShowConnectedTab(summaryMetricsList)
         if (isWhyTab) {
+            StepHelper.step(VALIDATING_WHAT_IT_MEANS_TAB)
             val whatItMeansTab = page.getByTestId("what-it-means-tab")
             whatItMeansTab.waitFor()
             whatItMeansTab.click()
             checkWhatItMean(summaryMetricsList)
         }
         if (isConnectedTab) {
+            StepHelper.step(VALIDATING_CONNECTED_BIOMARKERS_TAB)
             val connectedTab = page.getByTestId("connected-biomarkers-tab")
             connectedTab.waitFor()
             connectedTab.click()
@@ -425,6 +439,7 @@ class GutPage(page: Page) : BasePage(page) {
         metricIds: List<String>,
         groupName: String
     ) {
+        StepHelper.step(FETCH_GUT_DETAILS)
         try {
             val timeZone = java.util.TimeZone.getDefault().id
 
@@ -462,6 +477,7 @@ class GutPage(page: Page) : BasePage(page) {
 
             if (responseObj.status == "success") {
                 gutMetricDetails = responseObj.data
+                logApiResponse(apiUrl, responseObj)
             }
 
         } catch (e: Exception) {

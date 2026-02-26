@@ -250,4 +250,12 @@ object StepHelper {
     const val VALIDATING_CONSULTATION_DIALOG = "Validating Consultation Booking Dialog"
     const val VALIDATING_FREE_CONSULTATION_INFO = "Validating Free Consultation Info"
     const val VALIDATING_REPORT_SYMPTOMS_FLOW = "Validating Report Symptoms Flow"
+
+    // Gut
+    const val FETCH_GUT_DATA = "Fetch Gut data"
+    const val VALIDATING_GUT_LIST = "Validating Gut List"
+    const val VALIDATING_GUT_DETAILS = "Validating Gut Details"
+    const val FETCH_GUT_DETAILS = "Fetch Gut details"
+    const val VALIDATING_WHAT_IT_MEANS_TAB = "Validating What it means tab"
+    const val VALIDATING_CONNECTED_BIOMARKERS_TAB = "Validating Connected Biomarkers tab"
 }
