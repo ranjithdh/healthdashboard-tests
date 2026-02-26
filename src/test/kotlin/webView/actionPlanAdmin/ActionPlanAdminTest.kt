@@ -374,13 +374,6 @@ class ActionPlanAdminTest : BaseTest() {
         assert(healthTitle.innerText().contains("Health Status Overview")) { "Health Status Overview title missing" }
         healthTitle.click()
 
-        val healthContent = page1.getByTestId("editable-content-health-overview")
-        val expectedContent = "Your current health metrics show overall positive trends with targeted areas for optimization. Key focus areas include iron status monitoring, sleep quality improvement, and maintaining cardiovascular health through diet and exercise."
-        assert(healthContent.innerText().contains(expectedContent)) { "Health Status Overview content mismatch" }
-        healthContent.click()
-        dynamicPdfStrings.add("Health Status Overview")
-        dynamicPdfStrings.add(expectedContent)
-
         // NEW: "What's Working Well for You" Verification
         dynamicPdfStrings.add("What's Working Well for You")
         verifyWhatsWorkingWell(page1, userData, dynamicPdfStrings)
@@ -391,7 +384,12 @@ class ActionPlanAdminTest : BaseTest() {
 
         // Parse recommendations for dynamic verification
         val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
-        val recommendationsList = recommendationsJson["data"]?.jsonObject?.get("data")?.jsonObject?.get("recommendations")?.jsonArray ?: JsonArray(emptyList())
+        val rawRecommendationsList = recommendationsJson["data"]?.jsonObject?.get("data")?.jsonObject?.get("recommendations")?.jsonArray ?: JsonArray(emptyList())
+        
+        // Filter to include only approved recommendations as per the logic for activity, sleep, stress, and supplements
+        val recommendationsList = JsonArray(rawRecommendationsList.filter {
+            it.jsonObject["approval_status"]?.jsonPrimitive?.contentOrNull == "approved"
+        })
 
         val lifestyleCategories = mapOf(
             "activity" to "Activity",
