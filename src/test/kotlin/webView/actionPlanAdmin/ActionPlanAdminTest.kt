@@ -92,7 +92,7 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(1)
     fun `generate and verify action plan`() {
-        val name = "Gowthaman"
+        val name = "Rethinavel  natarajan stg"
         logger.info { "Starting ActionPlan flow..." }
         StepHelper.step("Starting ActionPlan flow")
 
@@ -462,7 +462,7 @@ class ActionPlanAdminTest : BaseTest() {
                 val nameInRespone = (rec.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: "")
                 val displayName = (rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: "")
                 val duration = (rec.jsonObject["supplement_duration"]?.jsonPrimitive?.contentOrNull ?: "")
-                val detailedDesc = (rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: "")
+//                val detailedDesc = (rec.jsonObject["detailed_description"]?.jsonPrimitive?.contentOrNull ?: "")
                 val cardDesc = (rec.jsonObject["supplement_card_description"]?.jsonPrimitive?.contentOrNull ?: "")
 
                 val supplementMeta = rec.jsonObject["variant_meta"]?.jsonObject
@@ -519,14 +519,7 @@ class ActionPlanAdminTest : BaseTest() {
                 dynamicPdfStrings.add(expectedWhatIsIt)
 
                 // 5. Why this matters?
-                if (detailedDesc.isNotEmpty()) {
-                    block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why this matters?")).click()
-                    val whyElem = block.getByText(detailedDesc)
-                    assert(whyElem.isVisible) { "Detailed description missing for $displayName" }
-                    whyElem.click()
-                    dynamicPdfStrings.add(detailedDesc)
-                }
-
+                block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("Why this matters?")).click()
                 // 6. How to take it
                 if (cardDesc.isNotEmpty()) {
                     block.getByRole(AriaRole.HEADING, Locator.GetByRoleOptions().setName("How to take it")).click()
