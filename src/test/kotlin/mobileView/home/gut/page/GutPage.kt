@@ -35,7 +35,7 @@ import kotlin.test.assertEquals
 
 class GutPage(page: Page) : BasePage(page) {
 
-    private val mappings = TestMappingLoader.loadGeneGutMappings() //data
+    private val geneGutMappings = TestMappingLoader.loadGeneGutMappings() //data
 
     private val searchView = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in Gut"))
 
