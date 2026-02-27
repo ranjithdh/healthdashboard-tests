@@ -9,7 +9,7 @@ object GutUtility {
             .replace(Regex("\\s+"), "-")        // replace spaces with -
     }
 
-    fun gutSourceType(sourceType:String?): String {
+    fun gutSourceType(sourceType: String?): String {
         return when (sourceType) {
             "gene" -> "Genetic Trait"
             "gut" -> "Gut Marker"
@@ -18,5 +18,9 @@ object GutUtility {
             else -> ""
         }
     }
+
+    fun String.normalizeQuotes(): String =
+        this.replace("’", "'")
+            .replace("‘", "'")
 }
 

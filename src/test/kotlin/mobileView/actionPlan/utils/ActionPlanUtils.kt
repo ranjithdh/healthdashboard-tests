@@ -3,6 +3,7 @@ package mobileView.actionPlan.utils
 import mobileView.actionPlan.model.NutritionCategorySubtext
 import mobileView.actionPlan.model.NutritionFoodType
 import mobileView.actionPlan.model.RecommendationLabTestPackage
+import mobileView.home.gut.util.GutUtility.normalizeQuotes
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
@@ -114,6 +115,8 @@ object ActionPlanUtils {
 
     fun String.normalizeForUiCompare(): String =
         this.replace("\u2028", " ")
+            .replace("**", "")
+            .normalizeQuotes()
             .replace(Regex("\\s+"), " ")
             .trim()
 
