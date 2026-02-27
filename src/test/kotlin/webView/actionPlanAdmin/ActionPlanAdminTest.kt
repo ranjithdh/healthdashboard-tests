@@ -1230,7 +1230,7 @@ class ActionPlanAdminTest : BaseTest() {
     fun `verify health overview prompt output constraints`() {
 
         StepHelper.step("Calling user-data API to verify AI prompt output")
-        val name = "Gowthaman"
+        val name = "Rethinavel  natarajan stg"
         logger.info { "Starting ActionPlan flow..." }
         StepHelper.step("Starting ActionPlan flow")
 
@@ -1358,11 +1358,11 @@ class ActionPlanAdminTest : BaseTest() {
                 .setData(requestBody)
         )
 
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
+//        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
         assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
 
         val userData = userDataResponse.text()
-        logger.info { "Full User Data JSON: $userData" }
+//        logger.info { "Full User Data JSON: $userData" }
         assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
         logger.info { "User data API successfully verified." }
 
@@ -1373,16 +1373,242 @@ class ActionPlanAdminTest : BaseTest() {
                 .setData(requestBody)
         )
 
-        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
+//        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
         assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
 
         val recommendationsData = userRecommendationsResponse.text()
-        logger.info { "Full User Recommendations JSON: $recommendationsData" }
+//        logger.info { "Full User Recommendations JSON: $recommendationsData" }
         assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
         logger.info { "User recommendations API successfully verified." }
 
 
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
-        
+
+        // ── Step 5: Read the actual health overview text from the web UI ──────────────
+        StepHelper.step("Reading health overview text from UI")
+
+        // The overview paragraph sits inside the preview-introduction section.
+        // We try multiple candidate selectors and fall back gracefully.
+        val overviewText: String = run {
+            val candidates = listOf(
+                // Most specific: the editable overview paragraph directly
+                {page1.getByTestId("editable-content-health-overview").innerText()},
+//                { page1.getByTestId("health-overview-text").innerText() },
+                // Fallback: any paragraph inside the summary preview block
+                {
+                    page1.getByTestId("preview-introduction")
+                        .locator("p")
+                        .first()
+                        .innerText()
+                },
+                // Last resort: the whole introduction block text
+                { page1.getByTestId("preview-introduction").innerText() }
+            )
+            var result = ""
+            for (candidate in candidates) {
+                try {
+                    val t = candidate().trim()
+                    if (t.isNotBlank()) {
+                        result = t
+                        break
+                    }
+                } catch (_: Exception) {}
+            }
+            result
+        }
+
+        logger.info { "Health overview text read from UI:\n$overviewText" }
+        assert(overviewText.isNotBlank()) { "Health overview text is empty — cannot validate." }
+
+        // ── Step 6: Structural constraint checks ĸ (word count & no em-dash) ──────────
+        StepHelper.step("Checking structural constraints: word count and em-dash absence")
+
+        val wordCount = overviewText.trim().split(Regex("\\s+")).size
+        logger.info { "Health overview word count: $wordCount" }
+
+        val containsEmDash = overviewText.contains("—") || overviewText.contains("\u2014")
+
+        // ── Step 7: Extract user profile demographics ──────────────────────────────────
+        val userProfile = userDataJson["userProfile"]?.jsonObject
+        val age   = userProfile?.get("age")?.jsonPrimitive?.contentOrNull  ?: "unknown"
+        val gender = userProfile?.get("gender")?.jsonPrimitive?.contentOrNull ?: "unknown"
+        logger.info { "User demographics — age: $age, gender: $gender" }
+
+        // ── Step 8: Collect biomarker list (display_name + display_rating) ─────────────
+        StepHelper.step("Extracting biomarker context from user data API")
+
+        val rootData  = userDataJson["data"]?.jsonObject
+        val innerData = rootData?.get("data")?.jsonObject ?: rootData
+        val biomarkerLines = mutableListOf<String>()
+        innerData?.forEach { (_, sectionValue) ->
+            if (sectionValue is JsonObject) {
+                val dataArray = sectionValue["data"]
+                if (dataArray is JsonArray) {
+                    dataArray.forEach markerLoop@{ marker ->
+                        if (marker is JsonObject) {
+                            val dn = marker["display_name"]?.jsonPrimitive?.contentOrNull ?: return@markerLoop
+                            val dr = marker["display_rating"]?.jsonPrimitive?.contentOrNull ?: "Unknown"
+                            biomarkerLines.add("$dn: $dr")
+                        }
+                    }
+                }
+            }
+        }
+        logger.info { "Biomarkers collected for validation (${biomarkerLines.size} total):\n${biomarkerLines.joinToString("\n")}" }
+
+        // ── Step 9: Build the OpenAI validation prompt ────────────────────────────────
+        StepHelper.step("Sending health overview to OpenAI for meaningfulness validation")
+
+        val biomarkerContext = if (biomarkerLines.isNotEmpty())
+            biomarkerLines.joinToString("\n")
+        else
+            "(No biomarker data available)"
+
+        val validationSystemPrompt = """
+            You are a quality-assurance validator for personalized health report summaries generated by an AI health coach.
+
+            Your task is to evaluate whether a given "Health Status Overview" paragraph meets ALL of the following criteria:
+
+            1. RELEVANCE  – The text must be meaningfully connected to the user's actual biomarker results. It should not be generic filler that could apply to anyone.
+            2. ACCURACY   – Any health-related claims or highlighted areas must be consistent with the biomarker ratings provided.
+            3. TONE       – The tone should be professional yet friendly and motivating, not clinical or fear-inducing.
+            4. NO EM DASH – The text must not contain em dashes (— or \u2014).
+            5. WORD COUNT – The text must be between 90 and 120 words.
+            6. COHERENCE  – The paragraph must be a single coherent piece of writing, not a list, and must make logical sense.
+
+            Respond ONLY in JSON with this exact structure:
+            {
+              "meaningful": true | false,
+              "relevance_score": 1-10,
+              "issues": ["list of problems, empty if none"],
+              "verdict": "PASS" | "FAIL",
+              "explanation": "one short sentence summarising the evaluation"
+            }
+        """.trimIndent()
+
+        val validationUserPrompt = """
+            User Demographics:
+            - Age: $age
+            - Gender: $gender
+
+            User Biomarker Results:
+            $biomarkerContext
+
+            Health Status Overview Text to Validate:
+            \"\"\"
+            $overviewText
+            \"\"\"
+
+            Evaluate the overview text against the criteria and respond in JSON only.
+        """.trimIndent()
+
+        val openAiApiKey = System.getenv("OPENAI_API_KEY")
+            ?: "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"
+
+        val openAiRequestBody = buildJsonObject {
+            put("model", "gpt-4o-mini")
+            put("temperature", 0.0)
+            putJsonArray("messages") {
+                addJsonObject {
+                    put("role", "system")
+                    put("content", validationSystemPrompt)
+                }
+                addJsonObject {
+                    put("role", "user")
+                    put("content", validationUserPrompt)
+                }
+            }
+            putJsonObject("response_format") {
+                put("type", "json_object")
+            }
+        }.toString()
+
+        logger.info { "Calling OpenAI API for validation..." }
+
+        val openAiResponse = page1.context().request().post(
+            "https://api.openai.com/v1/chat/completions",
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setHeader("Authorization", "Bearer $openAiApiKey")
+                .setData(openAiRequestBody)
+        )
+
+        logger.info { "OpenAI API Response Status: ${openAiResponse.status()}" }
+        assert(openAiResponse.status() == 200) {
+            "OpenAI API call failed: ${openAiResponse.status()}. Body: ${openAiResponse.text()}"
+        }
+
+        val openAiResponseText = openAiResponse.text()
+        logger.info { "OpenAI raw response: $openAiResponseText" }
+
+        // ── Step 10: Parse OpenAI response and assert ─────────────────────────────────
+        StepHelper.step("Parsing OpenAI validation result and asserting constraints")
+
+        val openAiJson = jsonParser.decodeFromString<JsonObject>(openAiResponseText)
+        val contentString = openAiJson["choices"]
+            ?.jsonArray
+            ?.firstOrNull()
+            ?.jsonObject
+            ?.get("message")
+            ?.jsonObject
+            ?.get("content")
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?: throw AssertionError("Could not extract content from OpenAI response")
+
+        logger.info { "OpenAI validation content:\n$contentString" }
+
+        val validationResult = jsonParser.decodeFromString<JsonObject>(contentString)
+        val meaningful     = validationResult["meaningful"]?.jsonPrimitive?.booleanOrNull ?: false
+        val relevanceScore = validationResult["relevance_score"]?.jsonPrimitive?.intOrNull ?: 0
+        val verdict        = validationResult["verdict"]?.jsonPrimitive?.contentOrNull ?: "FAIL"
+        val explanation    = validationResult["explanation"]?.jsonPrimitive?.contentOrNull ?: ""
+        val issues         = validationResult["issues"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+
+        logger.info { "═══════════════════════════════════════════════════════════" }
+        logger.info { " HEALTH OVERVIEW VALIDATION REPORT" }
+        logger.info { "═══════════════════════════════════════════════════════════" }
+        logger.info { " Word count      : $wordCount (expected 90–120)" }
+        logger.info { " Contains em-dash: $containsEmDash (expected false)" }
+        logger.info { " AI Meaningful   : $meaningful" }
+        logger.info { " AI Relevance    : $relevanceScore / 10" }
+        logger.info { " AI Verdict      : $verdict" }
+        logger.info { " AI Explanation  : $explanation" }
+        if (issues.isNotEmpty()) {
+            logger.info { " Issues found    :" }
+            issues.forEach { logger.info { "   • $it" } }
+        }
+        logger.info { "═══════════════════════════════════════════════════════════" }
+
+        // Collect all failures and report together
+        val failures = mutableListOf<String>()
+
+        if (wordCount !in 90..120) {
+            failures.add("Word count is $wordCount — must be between 90 and 120.")
+        }
+        if (containsEmDash) {
+            failures.add("Overview text contains an em dash (— or \u2014), which is forbidden.")
+        }
+        if (!meaningful) {
+            failures.add("OpenAI rated the text as NOT meaningful.")
+        }
+        if (relevanceScore < 6) {
+            failures.add("OpenAI relevance score is $relevanceScore/10 — below the minimum threshold of 6.")
+        }
+        if (verdict == "FAIL") {
+            failures.add("OpenAI verdict is FAIL. Explanation: $explanation")
+        }
+        if (issues.isNotEmpty()) {
+            failures.add("OpenAI identified issues: ${issues.joinToString("; ")}")
+        }
+
+        if (failures.isNotEmpty()) {
+            val errorReport = "Health Overview validation FAILED:\n" +
+                    failures.mapIndexed { i, f -> "${i + 1}. $f" }.joinToString("\n")
+            logger.error { errorReport }
+            org.junit.jupiter.api.Assertions.fail<Unit>(errorReport)
+        }
+
+        logger.info { "✅ Health overview text passed ALL validation constraints." }
     }
 }
