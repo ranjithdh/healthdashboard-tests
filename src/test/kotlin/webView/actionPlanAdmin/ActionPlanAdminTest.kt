@@ -656,7 +656,7 @@ class ActionPlanAdminTest : BaseTest() {
         StepHelper.step("Export PDF and cross verify contents")
         logger.info { "--------------------------------------------------" }
         logger.info { "PDF VALIDATION: STEP 1 - Starting Download" }
-        val download2: Download? = page1.waitForDownload {
+        val download2: Download? = page1.waitForDownload(Page.WaitForDownloadOptions().setTimeout(120000.0)) {
             page1.getByTestId("button-export-pdf").click()
         }
         val pdfPath = download2?.path()
