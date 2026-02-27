@@ -154,13 +154,12 @@ class OtpPage(page: Page) : BasePage(page) {
         this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
-        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
 
-//        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
 
-//        if (isIncorrectOtpMessageVisible()){
-//            byRole(AriaRole.TEXTBOX).fill(TestConfig.STATIC_OTP)
-//        }
+        //for flipboard url
+//        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+
         return this
     }
 

@@ -25,7 +25,7 @@ object TestConfig {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
         private const val FLIPBOARD_BASE_URL = "https://human-token-visualizer-gowthaman-stg--developers48.replit.app/"
         private const val PROD_BASE = "https://app.deepholistics.com/"
-        val BASE_URL: String = if (isStaging) FLIPBOARD_BASE_URL else PROD_BASE
+        val BASE_URL: String = if (isStaging) STG_BASE else PROD_BASE
 
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
         val SERVICES_URL = "${BASE_URL}services"
@@ -102,6 +102,7 @@ object TestConfig {
         const val FLIP_BOARD_TAGS = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/tags"
         const val FLIP_BOARD_ARTICLES = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/for-you/"
         const val FLIP_BOARD_UNREAD_COUNT= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/unread-count/"
+        const val FLIP_BOARD_TOPICS= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/topics/"
 
     }
 

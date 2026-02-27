@@ -11,10 +11,15 @@ import onboard.page.LoginPage
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
 import utils.report.Modules
+import kotlin.collections.emptyList
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Epic(Modules.EPIC_HOME)
 class FlipboardPageTest : BaseTest() {
@@ -65,7 +70,9 @@ class FlipboardPageTest : BaseTest() {
         return flipboardPage
     }
 
+
     @Test
+    @Order(1)
     fun `verify articles list headings and tags`() {
         assertTrue(flipboardPage.isForYouTabVisible())
         val articles = flipboardPage.getResponse()?.articles?.flipboards ?: emptyList()
@@ -90,6 +97,7 @@ class FlipboardPageTest : BaseTest() {
     }
 
     @Test
+    @Order(2)
     fun `verify article detail view`() {
         val article = flipboardPage.getResponse()?.articles?.flipboards?.firstOrNull {
             it.title?.isNotEmpty() == true && it.content?.isNotEmpty() == true
@@ -163,6 +171,7 @@ class FlipboardPageTest : BaseTest() {
 
     }
 
+    @Order(3)
     @Test
     fun `verify the unread count`() {
         assertTrue(
@@ -185,6 +194,53 @@ class FlipboardPageTest : BaseTest() {
                 flipboardPage.isUnreadCountVisible(count - 1),
                 "Unread count is not decreased after reading an article"
             )
+        }
+    }
+
+
+    @Test
+    @Order(4)
+    fun `verify tag menu list and related articles`(){
+        assertTrue(
+            flipboardPage.isTagTabVisible(),
+            "Tag tab not visible"
+        )
+
+        flipboardPage.clickTagTab()
+
+        val tagList = flipboardPage.getResponse()?.tags?.tags ?: emptyList()
+        tagList.forEach { name ->
+            assertTrue(
+                flipboardPage.isTagMenuItemVisible(name),
+                "Tag $name is not visible"
+            )
+        }
+
+
+        flipboardPage.clickTagMenuItem(tagList.first())
+
+        if (flipboardPage.getTopics()?.flipboards?.isNotEmpty() == true){
+            val articles = flipboardPage.getTopics()?.flipboards ?: emptyList()
+
+            articles.forEach { article ->
+                val title = article.title ?: ""
+                val tag = article.tag ?: ""
+
+                if (title.isNotEmpty()) {
+                    assertTrue(
+                        flipboardPage.isArticleHeadingVisible(title),
+                        "Article heading not visible: $title"
+                    )
+                }
+                if (tag.isNotEmpty()) {
+                    assertTrue(
+                        flipboardPage.isArticleTagVisible(tag),
+                        "Article tag not visible: $tag for article: $title"
+                    )
+                }
+            }
+        }else{
+            assertTrue(flipboardPage.isNoFlipBoardEmptyStateVisible(tagList.first()),"No flipboards found")
         }
     }
 
