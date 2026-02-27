@@ -1610,5 +1610,16 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         logger.info { "✅ Health overview text passed ALL validation constraints." }
+
+        val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
+        val rawRecommendationsList = recommendationsJson["data"]?.jsonObject?.get("data")?.jsonObject?.get("recommendations")?.jsonArray ?: JsonArray(emptyList())
+        val recommendationsList = JsonArray(rawRecommendationsList.filter {
+            it.jsonObject["approval_status"]?.jsonPrimitive?.contentOrNull == "approved"
+        })
+        // 6. Supplement Protocol Verification
+        val supplements = recommendationsList.filter {
+            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
+        }
+
     }
 }
