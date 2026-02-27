@@ -1785,19 +1785,16 @@ class ActionPlanAdminTest : BaseTest() {
                       "explanation": "one short sentence summarising the evaluation"
                     }
                 """.trimIndent()
-
+                val cleanWhyText = whyItMattersText.trim().replace(Regex("\\s+"), " ")
                 val whyValidationUserPrompt = """
                     Supplement Name: $displayName
                     Brand: ${brand.ifEmpty { "(not provided)" }}
                     Ingredients: $ingredientContext
 
                     "Why this matters" Text to Validate:
-                    """
-                    
-                    """
-
+                    $cleanWhyText
                     Evaluate against all criteria and respond in JSON only.
-                """.trimIndent()
+                    """.trimIndent()
 
                 val openAiApiKey = System.getenv("OPENAI_API_KEY")
                     ?: "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"
