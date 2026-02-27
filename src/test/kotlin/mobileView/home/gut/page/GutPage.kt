@@ -10,6 +10,7 @@ import mobileView.home.gut.model.*
 import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
 import mobileView.home.gut.util.TestMappingLoader
+import model.healthdata.HealthData
 import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
@@ -17,6 +18,7 @@ import utils.report.StepHelper
 import utils.report.StepHelper.FETCH_GENE_DATA
 import utils.report.StepHelper.FETCH_GUT_DATA
 import utils.report.StepHelper.FETCH_GUT_DETAILS
+import utils.report.StepHelper.FETCH_HEALTH_DATA
 import utils.report.StepHelper.VALIDATING_CONNECTED_BIOMARKERS_TAB
 import utils.report.StepHelper.VALIDATING_GUT_DETAILS
 import utils.report.StepHelper.VALIDATING_GUT_LIST
@@ -38,6 +40,9 @@ class GutPage(page: Page) : BasePage(page) {
 
     private var geneDataWrapper: GeneDataWrapper? = null
 
+    private var healthData: HealthData? = null
+
+
     fun waitForConfirmation(): GutPage {
         searchView.waitFor()
         return this
@@ -50,6 +55,46 @@ class GutPage(page: Page) : BasePage(page) {
     private fun monitorTraffic() {
         captureGutListData()
         captureGeneListData()
+        captureBloodData()
+    }
+
+    fun captureBloodData() {
+        if (healthData === null) {
+            StepHelper.step(FETCH_HEALTH_DATA)
+            try {
+                val timeZone = java.util.TimeZone.getDefault().id
+
+                val apiContext = page.context().request()
+                val response = apiContext.get(
+                    TestConfig.APIs.HEALTH_DATA,
+                    RequestOptions.create()
+                        .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                        .setHeader("client_id", TestConfig.CLIENT_ID)
+                        .setHeader("user_timezone", refactorTimeZone(timeZone))
+                )
+
+
+                if (response.status() != 200) {
+                    logger.error { "API returned error status: ${response.status()}" }
+                    return
+                }
+
+                val responseBody = response.text()
+                if (responseBody.isNullOrBlank()) {
+                    logger.error { "API response body is empty" }
+                    return
+                }
+
+                val responseObj = json.decodeFromString<HealthData>(responseBody)
+
+                if (responseObj.status == "success") {
+                    healthData = responseObj
+                    logApiResponse(TestConfig.APIs.HEALTH_DATA, responseObj)
+                }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse API response or API call failed..${e.message}" }
+            }
+        }
     }
 
     fun captureGeneListData() {
@@ -242,7 +287,7 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun detailsValidation(groupName: String, summaryMetricsList: List<GutMetricItem>?) {
-        detailsHeaderValidations(groupName)
+        detailsHeaderValidations(groupName, summaryMetricsList)
 
         detailsMetricsValidations(summaryMetricsList)
 
@@ -337,7 +382,7 @@ class GutPage(page: Page) : BasePage(page) {
                     val targetMetricId = correlations.targetMetricId
                     val gutMapping = geneGutMappings.find { it.gut_metric_id == targetMetricId }
                     if (gutMapping != null) {
-                        assertEquals(gutMapping.gene_upsell,correlations.description)
+                        assertEquals(gutMapping.gene_upsell, correlations.description)
                     }
                 }
 
@@ -353,15 +398,10 @@ class GutPage(page: Page) : BasePage(page) {
     private fun checkWhatItMean(summaryMetricsList: List<GutMetricItem>?) {
         whatItMeanTitleCheck(summaryMetricsList)
 
-        //Todo need know the description
-
-
         //other factor
         whatItMeanOtherFactor(summaryMetricsList)
 
         whatItMeanSections(summaryMetricsList)
-
-
     }
 
     private fun whatItMeanBottomLine(summaryMetricsList: List<GutMetricItem>?) {
@@ -528,12 +568,20 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun whatItMeanTitleCheck(summaryMetricsList: List<GutMetricItem>?) {
+        val descriptionExpected =
+            summaryMetricsList?.getOrNull(0)?.details?.filter { it.category == "description" }?.get(0)?.content
         val groupName = summaryMetricsList?.get(0)?.metric?.groupName
         val titleUiElement = page.getByTestId("why-tab-title")
-        val actualTitleText = titleUiElement.innerText()
+        val descriptionUiElement = page.getByTestId("description-content")
+
 
         titleUiElement.waitFor()
+        val actualTitleText = titleUiElement.innerText()
         assertEquals(actualTitleText.normalizeForUiCompare(), groupName?.normalizeForUiCompare())
+
+        descriptionUiElement.waitFor()
+        val descriptionActual = descriptionUiElement.innerText()
+        assertEquals(descriptionExpected?.normalizeForUiCompare(), descriptionActual?.normalizeForUiCompare())
     }
 
     private fun detailsMetricsValidations(summaryMetricsList: List<GutMetricItem>?) {
@@ -565,13 +613,21 @@ class GutPage(page: Page) : BasePage(page) {
         }
     }
 
-    private fun detailsHeaderValidations(groupName: String) {
+    private fun detailsHeaderValidations(groupName: String, summaryMetricsList: List<GutMetricItem>?) {
+        val descriptionExpected =
+            summaryMetricsList?.getOrNull(0)?.details?.filter { it.category == "short_description" }
+                ?.getOrNull(0)?.content
         val parameterTitle = page.getByTestId("parameter-title")
-        val actualTitleText = parameterTitle.innerText()
-        //TODO need to add description
+        val descriptionUiElement = page.getByTestId("short-description-content")
 
         parameterTitle.waitFor()
+        val actualTitleText = parameterTitle.innerText()
         assertEquals(actualTitleText.normalizeForUiCompare(), groupName.normalizeForUiCompare())
+
+
+        descriptionUiElement.waitFor()
+        val descriptionActual = descriptionUiElement.innerText()
+        assertEquals(descriptionExpected?.normalizeForUiCompare(), descriptionActual.normalizeForUiCompare())
     }
 
     fun captureGutDetails(

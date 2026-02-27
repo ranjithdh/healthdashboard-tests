@@ -1,29 +1,31 @@
 package mobileView.home.gut.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BloodGutCorrleations(
-    @SerializedName("row_number")
+    @SerialName("row_number")
     val rowNumber: Int,
 
-    @SerializedName("gut metric_ids")
+    @SerialName("gut metric_ids")
     val gutMetricIds: String,
 
-    @SerializedName("Gut Metric")
+    @SerialName("Gut Metric")
     val gutMetric: String,
 
-    @SerializedName("blood metric_ids")
-    val bloodMetricIds: String,
+    @SerialName("blood metric_ids")
+    val bloodMetricIds: String?,
 
-    @SerializedName("Blood Marker")
+    @SerialName("Blood Marker")
     val bloodMarker: String,
 
-    @SerializedName("Gut Value")
+    @SerialName("Gut Value")
     val gutValue: String,
 
-    @SerializedName("Blood Level")
+    @SerialName("Blood Level")
     val bloodLevel: String,
 
-    @SerializedName("Description")
-    val description: String
+    @SerialName("Description")
+    val Description: String
 )
