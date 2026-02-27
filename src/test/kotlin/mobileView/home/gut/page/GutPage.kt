@@ -1,24 +1,12 @@
 package mobileView.home.gut.page
 
 import com.microsoft.playwright.Page
-import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
-import mobileView.home.gut.model.GeneDataWrapper
-import mobileView.home.gut.model.GeneResponse
-import mobileView.home.gut.model.GutDataWrapper
-import mobileView.home.gut.model.GutMetricData
-import mobileView.home.gut.model.GutMetricDetails
-import mobileView.home.gut.model.GutMetricItem
-import mobileView.home.gut.model.GutMetricResponse
-import mobileView.home.gut.model.GutResponse
-import mobileView.home.gut.model.MetricCorrelation
-import mobileView.home.gut.model.MetricDetail
-import mobileView.home.gut.model.ParsedSection
-import mobileView.home.gut.model.ParsedSubSection
+import mobileView.home.gut.model.*
 import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
 import mobileView.home.gut.util.TestMappingLoader
@@ -39,6 +27,7 @@ import kotlin.test.assertEquals
 class GutPage(page: Page) : BasePage(page) {
 
     private val geneGutMappings = TestMappingLoader.loadGeneGutMappings() //data
+    private val bloodGutCorrleations = TestMappingLoader.loadBloodGutCorrelationsMappings() //data
 
     private val searchView = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in Gut"))
 
@@ -63,17 +52,21 @@ class GutPage(page: Page) : BasePage(page) {
         captureGeneListData()
     }
 
-    private fun captureGeneListData() {
-        if (geneDataWrapper == null) {
+    fun captureGeneListData() {
+        if (geneDataWrapper === null) {
             StepHelper.step(FETCH_GENE_DATA)
             try {
-                val response = page.waitForResponse(
-                    { response: Response? ->
-                        response?.url()?.contains(TestConfig.APIs.API_GENE) == true &&
-                                response.status() == 200 &&
-                                response.request().method() == "GET"
-                    }, { }
+                val timeZone = java.util.TimeZone.getDefault().id
+
+                val apiContext = page.context().request()
+                val response = apiContext.get(
+                    TestConfig.APIs.API_GENE,
+                    RequestOptions.create()
+                        .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                        .setHeader("client_id", TestConfig.CLIENT_ID)
+                        .setHeader("user_timezone", refactorTimeZone(timeZone))
                 )
+
 
                 if (response.status() != 200) {
                     logger.error { "API returned error status: ${response.status()}" }
@@ -99,16 +92,20 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     fun captureGutListData() {
-        if (gutDataWrapper == null) {
+        if (gutDataWrapper === null) {
             StepHelper.step(FETCH_GUT_DATA)
             try {
-                val response = page.waitForResponse(
-                    { response: Response? ->
-                        response?.url()?.contains(TestConfig.APIs.API_GUT) == true &&
-                                response.status() == 200 &&
-                                response.request().method() == "GET"
-                    }, { }
+                val timeZone = java.util.TimeZone.getDefault().id
+
+                val apiContext = page.context().request()
+                val response = apiContext.get(
+                    TestConfig.APIs.API_GUT,
+                    RequestOptions.create()
+                        .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                        .setHeader("client_id", TestConfig.CLIENT_ID)
+                        .setHeader("user_timezone", refactorTimeZone(timeZone))
                 )
+
 
                 if (response.status() != 200) {
                     logger.error { "API returned error status: ${response.status()}" }
@@ -132,6 +129,7 @@ class GutPage(page: Page) : BasePage(page) {
             }
         }
     }
+
 
     /**------------Gut List---------------*/
 
@@ -321,9 +319,9 @@ class GutPage(page: Page) : BasePage(page) {
             nameUiElement.scrollIntoViewIfNeeded()
 
             if (!correlations.sourceInference.isNullOrBlank()) {
-                val inferenceUiElement =   if (correlations.sourceType=="gene"){
+                val inferenceUiElement = if (correlations.sourceType == "gene") {
                     page.getByTestId("biomarker-gene-inference-$index")
-                }else{
+                } else {
                     page.getByTestId("biomarker-inference-$index")
                 }
 
@@ -334,6 +332,15 @@ class GutPage(page: Page) : BasePage(page) {
             }
 
             if (!correlations.description.isNullOrBlank()) {
+                val isGeneEmpty = geneDataWrapper?.gene?.data
+                if (isGeneEmpty == null) {
+                    val targetMetricId = correlations.targetMetricId
+                    val gutMapping = geneGutMappings.find { it.gut_metric_id == targetMetricId }
+                    if (gutMapping != null) {
+                        assertEquals(gutMapping.gene_upsell,correlations.description)
+                    }
+                }
+
                 val desUiElement = page.getByTestId("biomarker-description-$index")
                 desUiElement.waitFor()
                 val actualDescription = desUiElement.innerText()
