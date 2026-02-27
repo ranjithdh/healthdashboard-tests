@@ -73,16 +73,15 @@ class GutTest : BaseTest() {
     }
 
 
+    @Test
+    @Order(3)
+    fun gutListSearchView() {
+        gutPage.gutSearchViewValidation()
+    }
 
-    /*  @Test
-      @Order(3)
-      fun gutListSearchView() {
-
-      }*/
-
-    /* @Test
+     @Test
      @Order(4)
      fun gutListFilter() {
-
-     }*/
+         gutPage.gutFilterViewValidation()
+     }
 }

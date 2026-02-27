@@ -9,6 +9,7 @@ import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.home.gut.model.*
 import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
+import mobileView.home.gut.util.RiskLevel
 import mobileView.home.gut.util.TestMappingLoader
 import model.healthdata.HealthData
 import utils.Normalize.refactorTimeZone
@@ -182,7 +183,7 @@ class GutPage(page: Page) : BasePage(page) {
         StepHelper.step(VALIDATING_GUT_LIST)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isNotEmpty() == true) {
-            val gutListGroupByName = getGutDataByGroup()
+            val gutListGroupByName = getGutDataByGroup(gutList)
             headerValidations(gutListGroupByName)
         }
     }
@@ -239,8 +240,7 @@ class GutPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun getGutDataByGroup(): Map<String, List<GutMetricData>> {
-        val gutList = gutDataWrapper?.gut?.data
+    fun getGutDataByGroup(gutList: List<GutMetricData>): Map<String, List<GutMetricData>> {
         val gutListGroupByName =
             gutList?.groupBy {
                 it.metric?.group_name
@@ -256,7 +256,7 @@ class GutPage(page: Page) : BasePage(page) {
         StepHelper.step(VALIDATING_GUT_DETAILS)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isNotEmpty() == true) {
-            val gutListGroupByName = getGutDataByGroup()
+            val gutListGroupByName = getGutDataByGroup(gutList)
             gutListGroupByName.forEach { (groupName, metricsList) ->
                 val metricIds = metricsList.map { it.metric?.metric_id!! }
                 captureGutDetails(metricIds, groupName) //API call
@@ -411,7 +411,7 @@ class GutPage(page: Page) : BasePage(page) {
 
                     val gutMapping = geneGutMappings.find { it.gut_metric_id == targetMetricId }
                     if (gutMapping != null) { //TODO need to recomment it
-                       // assertEquals(gutMapping.gene_upsell.normalizeForUiCompare(), correlations.description.normalizeForUiCompare())
+                        // assertEquals(gutMapping.gene_upsell.normalizeForUiCompare(), correlations.description.normalizeForUiCompare())
                     }
                 }
 
@@ -782,4 +782,55 @@ class GutPage(page: Page) : BasePage(page) {
             }
         }
     }
+
+    /**------------------Search View-------------------------*/
+    fun gutSearchViewValidation() {
+        val gutList = gutDataWrapper?.gut?.data
+        if (gutList.isNullOrEmpty()) return
+
+
+        val searchView = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search in Gut"))
+        searchView.waitFor()
+        val inference = gutList.get(0).inference
+
+        val filteredGuList = gutList.filter { it.inference == inference }
+
+        searchView.fill("$inference")
+
+        headerValidations(getGutDataByGroup(filteredGuList))
+
+        searchView.fill("")
+
+        headerValidations(getGutDataByGroup(gutList))
+    }
+
+    /**------------------Filter View-------------------------*/
+    fun gutFilterViewValidation() {
+
+        val gutList = gutDataWrapper?.gut?.data
+        if (gutList.isNullOrEmpty()) return
+
+        val idealsList = gutList.filter { it.inference == RiskLevel.Ideal.value }
+        val nonIdealsList = gutList.filter { it.inference == RiskLevel.NonIdeal.value }
+        val moderateList = gutList.filter { it.inference == RiskLevel.ModerateRisk.value }
+
+        val idealFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Ideal (${idealsList.size})"))
+        val nonIdealFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Non Ideal (${nonIdealsList.size})"))
+        val improvementFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Needs Improvement (${moderateList.size})"))
+
+        listOf(idealFilter,nonIdealFilter,improvementFilter).forEach { it.waitFor() }
+
+        idealFilter.click()
+        headerValidations(getGutDataByGroup(idealsList))
+
+
+        nonIdealFilter.click()
+        headerValidations(getGutDataByGroup(nonIdealsList))
+
+
+        improvementFilter.click()
+        headerValidations(getGutDataByGroup(moderateList))
+
+    }
+
 }
