@@ -476,6 +476,9 @@ class ActionPlanAdminTest : BaseTest() {
             logger.info { "✅ SECTION VERIFIED: Lifestyle Modifications (${lifestyleRecs.size} recommendations)" }
             logger.info { "========================================\n" }
         }
+
+        // New Verification Logic for Specific Nutrients based on static data
+        StepHelper.step("Verifying specific nutrient food sources based on user preference")
         // 5. Nutrition Guidance Verification
         val userDataText = userDataResponse.text()
         var foodPreference = "non_vegetarian"
@@ -651,78 +654,6 @@ class ActionPlanAdminTest : BaseTest() {
                 }
             }
         }
-
-        logger.info { "ActionPlan verification completed. Verified: $verifiedVitamins" }
-
-        // --- PDF Export and Validation ---
-        StepHelper.step("Export PDF and cross verify contents")
-        logger.info { "--------------------------------------------------" }
-        logger.info { "PDF VALIDATION: STEP 1 - Starting Download" }
-        val download2: Download? = page1.waitForDownload(Page.WaitForDownloadOptions().setTimeout(120000.0)) {
-            page1.getByTestId("button-export-pdf").click()
-        }
-        val pdfPath = download2?.path()
-        org.junit.jupiter.api.Assertions.assertNotNull(pdfPath, "PDF download failed or path is null")
-        logger.info { "PDF VALIDATION: STEP 2 - Downloaded to $pdfPath (${pdfPath?.toFile()?.length()} bytes)" }
-
-        logger.info { "PDF VALIDATION: STEP 3 - Extracting text via PDFBox" }
-        val pdfFile = pdfPath!!.toFile()
-        val document = Loader.loadPDF(pdfFile)
-        val stripper = org.apache.pdfbox.text.PDFTextStripper()
-        val pdfText = stripper.getText(document)
-        document.close()
-        logger.info { "Successfully extracted ${pdfText.length} raw characters" }
-
-        val normalizeText = { text: String ->
-            text.replace("\r\n", " ")
-                .replace("\n", " ")
-                .replace("\u2013", "-")
-                .replace("—", "-")
-                .replace("’", "'")
-                .replace("‘", "'")
-                .replace("“", "\"")
-                .replace("”", "\"")
-                .replace("\u00A0", " ")
-                .replace(Regex("\\s+"), " ")
-                .trim()
-        }
-
-        logger.info { "PDF VALIDATION: STEP 4 - Normalizing PDF text" }
-        val normalizedPdfText = normalizeText(pdfText)
-
-        logger.info { "PDF VALIDATION: STEP 5 - Comparing ${dynamicPdfStrings.size} strings from UI" }
-        val foundResults = mutableListOf<Triple<String, String, Boolean>>()
-
-        dynamicPdfStrings.forEach { original ->
-            val search = normalizeText(original)
-            val found = normalizedPdfText.contains(search)
-            foundResults.add(Triple(original, search, found))
-            if (found) {
-                logger.info { "  [✅ MATCHED] \"$search\"" }
-            } else {
-                logger.error { "  [❌ MISSING] \"$search\"" }
-            }
-        }
-
-        val missingLines = foundResults.filter { !it.third }
-
-        logger.info { "--------------------------------------------------" }
-        logger.info { "PDF VALIDATION SUMMARY" }
-        logger.info { "Strings Verified: ${foundResults.size}" }
-        logger.info { "Matches Found: ${foundResults.size - missingLines.size}" }
-        logger.info { "Discrepancies: ${missingLines.size}" }
-        logger.info { "--------------------------------------------------" }
-
-        if (missingLines.isNotEmpty()) {
-            val errorMsg = "PDF Validation Failed. Missing strings:\n" +
-                    missingLines.mapIndexed { idx, item -> "${idx + 1}. ${item.second}" }.joinToString("\n")
-
-            logger.info { "FULL PDF CONTENT FOR DEBUGGING:\n$normalizedPdfText" }
-            org.junit.jupiter.api.Assertions.fail<Unit>(errorMsg)
-        } else {
-            logger.info { "✅ PDF Validation Passed: All UI elements were found in the PDF." }
-        }
-
         // 6. Supplement Protocol Verification
         val supplements = recommendationsList.filter {
             it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
@@ -967,9 +898,78 @@ class ActionPlanAdminTest : BaseTest() {
             logger.info { "✅ SECTION VERIFIED: Diagnostic Testing (${tests.size} tests)" }
             logger.info { "========================================\n" }
         }
-        // New Verification Logic for Specific Nutrients based on static data
-        StepHelper.step("Verifying specific nutrient food sources based on user preference")
-        
+
+
+        logger.info { "ActionPlan verification completed. Verified: $verifiedVitamins" }
+
+        // --- PDF Export and Validation ---
+        StepHelper.step("Export PDF and cross verify contents")
+        logger.info { "--------------------------------------------------" }
+        logger.info { "PDF VALIDATION: STEP 1 - Starting Download" }
+        val download2: Download? = page1.waitForDownload(Page.WaitForDownloadOptions().setTimeout(120000.0)) {
+            page1.getByTestId("button-export-pdf").click()
+        }
+        val pdfPath = download2?.path()
+        org.junit.jupiter.api.Assertions.assertNotNull(pdfPath, "PDF download failed or path is null")
+        logger.info { "PDF VALIDATION: STEP 2 - Downloaded to $pdfPath (${pdfPath?.toFile()?.length()} bytes)" }
+
+        logger.info { "PDF VALIDATION: STEP 3 - Extracting text via PDFBox" }
+        val pdfFile = pdfPath!!.toFile()
+        val document = Loader.loadPDF(pdfFile)
+        val stripper = org.apache.pdfbox.text.PDFTextStripper()
+        val pdfText = stripper.getText(document)
+        document.close()
+        logger.info { "Successfully extracted ${pdfText.length} raw characters" }
+
+        val normalizeText = { text: String ->
+            text.replace("\r\n", " ")
+                .replace("\n", " ")
+                .replace("\u2013", "-")
+                .replace("—", "-")
+                .replace("’", "'")
+                .replace("‘", "'")
+                .replace("“", "\"")
+                .replace("”", "\"")
+                .replace("\u00A0", " ")
+                .replace(Regex("\\s+"), " ")
+                .trim()
+        }
+
+        logger.info { "PDF VALIDATION: STEP 4 - Normalizing PDF text" }
+        val normalizedPdfText = normalizeText(pdfText)
+
+        logger.info { "PDF VALIDATION: STEP 5 - Comparing ${dynamicPdfStrings.size} strings from UI" }
+        val foundResults = mutableListOf<Triple<String, String, Boolean>>()
+
+        dynamicPdfStrings.forEach { original ->
+            val search = normalizeText(original)
+            val found = normalizedPdfText.contains(search)
+            foundResults.add(Triple(original, search, found))
+            if (found) {
+                logger.info { "  [✅ MATCHED] \"$search\"" }
+            } else {
+                logger.error { "  [❌ MISSING] \"$search\"" }
+            }
+        }
+
+        val missingLines = foundResults.filter { !it.third }
+
+        logger.info { "--------------------------------------------------" }
+        logger.info { "PDF VALIDATION SUMMARY" }
+        logger.info { "Strings Verified: ${foundResults.size}" }
+        logger.info { "Matches Found: ${foundResults.size - missingLines.size}" }
+        logger.info { "Discrepancies: ${missingLines.size}" }
+        logger.info { "--------------------------------------------------" }
+
+        if (missingLines.isNotEmpty()) {
+            val errorMsg = "PDF Validation Failed. Missing strings:\n" +
+                    missingLines.mapIndexed { idx, item -> "${idx + 1}. ${item.second}" }.joinToString("\n")
+
+            logger.info { "FULL PDF CONTENT FOR DEBUGGING:\n$normalizedPdfText" }
+            org.junit.jupiter.api.Assertions.fail<Unit>(errorMsg)
+        } else {
+            logger.info { "✅ PDF Validation Passed: All UI elements were found in the PDF." }
+        }
         // Ensure we are on the correct category if needed, but the selector button should be visible regardless?
         // Let's assume we need to click "Nutrition" toggle first if it's not active.
 //        try {
