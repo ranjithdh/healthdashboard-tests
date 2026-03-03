@@ -1865,8 +1865,8 @@ class ActionPlanAdminTest : BaseTest() {
                     // Try the most specific test-id first, then fall back to reading
                     // the sibling paragraph that follows the heading.
                     val candidateGetters = listOf<() -> String>(
-                        { block.getByTestId("why-it-matters-text-$suppId").innerText() },
-                        { block.getByTestId("why-it-matters-content").innerText() },
+                        { block.getByTestId("supplement-why_this_matters-description-$suppId").innerText()},
+//                        { block.getByTestId("why-it-matters-content").innerText() },
                         {
                             // Generic: paragraph that immediately follows the heading
                             block.locator("p").filter(
@@ -1957,7 +1957,7 @@ class ActionPlanAdminTest : BaseTest() {
                     """.trimIndent()
 
                 val openAiApiKey = System.getenv("OPENAI_API_KEY")
-                    ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
+                    ?: "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"
 
                 val openAiRequestBody = buildJsonObject {
                     put("model", "gpt-4o-mini")
