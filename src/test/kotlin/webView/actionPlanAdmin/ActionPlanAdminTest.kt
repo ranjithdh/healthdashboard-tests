@@ -1505,7 +1505,7 @@ class ActionPlanAdminTest : BaseTest() {
         """.trimIndent()
 
         val openAiApiKey = System.getenv("OPENAI_API_KEY")
-            ?: "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"
+            ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
 
         val openAiRequestBody = buildJsonObject {
             put("model", "gpt-4o-mini")
@@ -1957,7 +1957,7 @@ class ActionPlanAdminTest : BaseTest() {
                     """.trimIndent()
 
                 val openAiApiKey = System.getenv("OPENAI_API_KEY")
-                    ?: "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"
+                    ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
 
                 val openAiRequestBody = buildJsonObject {
                     put("model", "gpt-4o-mini")
@@ -2419,7 +2419,7 @@ class ActionPlanAdminTest : BaseTest() {
                     """.trimIndent()
 
                 val openAiApiKey = System.getenv("OPENAI_API_KEY")
-                    ?: "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"
+                    ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
 
                 val openAiRequestBody = buildJsonObject {
                     put("model", "gpt-4o-mini")
