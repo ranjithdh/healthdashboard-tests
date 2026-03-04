@@ -2711,10 +2711,38 @@ class ActionPlanAdminTest : BaseTest() {
 
         page1.getByTestId("category-whats-working-well").getByTestId("button-biomarker-selector").click();
         page1.waitForTimeout(1000.0)
-        page1.getByTestId("checkbox-biomarker-BD10082").click();
+
+        // Step 2: Dynamic verification based on API
+        val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val rootData = userDataJson["data"]?.jsonObject
+        val apiData = rootData?.get("data")?.jsonObject ?: rootData
+        val allBiomarkers = mutableListOf<JsonElement>()
+
+        apiData?.forEach { (_, value) ->
+            if (value is JsonObject) {
+                val dataArray = value["data"]
+                if (dataArray is JsonArray) {
+                    allBiomarkers.addAll(dataArray)
+                }
+            }
+        }
+        val biomarkers = JsonArray(allBiomarkers)
+
+        val workWellMarkers = biomarkers.filter {
+            if (it !is JsonObject) return@filter false
+            val rating = it.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull
+            rating?.equals("Optimal", ignoreCase = true) == true || rating?.equals("Normal", ignoreCase = true) == true
+        }
+
+
+        val randomItem = workWellMarkers.random()
+        logger.info { "randomItem is: $randomItem" }
+        val randomMetricId = randomItem.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull
+        logger.info { "randomMetricId is: $randomMetricId" }
+        page1.getByTestId("checkbox-biomarker-$randomMetricId").click();
         page1.waitForTimeout(1000.0)
         page1.getByTestId("button-create-subsection").click();
-
+        
     }
 
 
