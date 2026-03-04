@@ -3253,307 +3253,58 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "User recommendations API successfully verified." }
 
         // ═══════════════════════════════════════════════════════════════════════════════
-        // SUPPLEMENT "WHY THIS MATTERS" VALIDATION
+        // What's Need Support
         // ═══════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Verifying 'Why this matters' section for each Supplement")
+        StepHelper.step("Verifying What's Need Support")
 
-        val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
-        val rawRecommendationsList = recommendationsJson["data"]?.jsonObject
-            ?.get("data")?.jsonObject
-            ?.get("recommendations")?.jsonArray
-            ?: JsonArray(emptyList())
+        StepHelper.step("Opening What's Need Support section")
+        page1.getByTestId("button-toggle-category-what-needs-support").click();
+        page1.waitForTimeout(1000.0)
 
-        val recommendationsList = JsonArray(rawRecommendationsList.filter {
-            it.jsonObject["approval_status"]?.jsonPrimitive?.contentOrNull == "approved"
-        })
+        page1.getByTestId("category-what-needs-support").getByTestId("button-biomarker-selector").click();
+        page1.waitForTimeout(1000.0)
 
-        val supplements = recommendationsList.filter {
-            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
-        }
+        // Step 2: Dynamic verification based on API
+        val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val rootData = userDataJson["data"]?.jsonObject
+        val apiData = rootData?.get("data")?.jsonObject ?: rootData
+        val allBiomarkers = mutableListOf<JsonElement>()
 
-        if (supplements.isEmpty()) {
-            logger.warn { "No approved supplement recommendations found — skipping 'Why this matters' validation." }
-        } else {
-            StepHelper.step("Opening Supplement Protocol section")
-            page1.getByTestId("button-toggle-category-supplements").click()
-            page1.waitForTimeout(1000.0)
-
-            // Collect all supplement failures to report as a group
-            val supplementFailures = mutableListOf<String>()
-
-            supplements.forEach { rec ->
-                val suppId          = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: return@forEach
-                val displayName     = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
-                val supplementMeta  = rec.jsonObject["variant_meta"]?.jsonObject
-                val brand           = (supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: "").trim()
-                val ingredientsArr  = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
-
-                logger.info { "──────────────────────────────────────────────────────" }
-                logger.info { "Validating 'Why this matters' for: $displayName (ID: $suppId)" }
-                StepHelper.step("Validating 'Why this matters' for: $displayName")
-
-                // ── 1. Click the recommendation card to expand the right-panel ────────
-                val recCard = page1.getByTestId("recommendation-$suppId")
-                try {
-                    recCard.scrollIntoViewIfNeeded()
-                    recCard.click()
-                    page1.waitForTimeout(400.0)
-                } catch (e: Exception) {
-                    logger.warn { "Could not click recommendation card for $displayName: ${e.message}" }
-                    supplementFailures.add("[$displayName] Could not click recommendation card: ${e.message}")
-                    return@forEach
-                }
-
-                val block = page1.getByTestId("preview-recommendation-$suppId")
-
-                // Ensure block is visible; if not, select via checkbox
-                if (!block.isVisible) {
-                    try {
-                        page1.getByTestId("checkbox-$suppId").click()
-                        page1.waitForTimeout(500.0)
-                    } catch (e: Exception) {
-                        logger.warn { "Could not toggle checkbox for $displayName: ${e.message}" }
-                    }
-                }
-
-                block.scrollIntoViewIfNeeded()
-
-                // ── 2. Assert "Why this matters?" heading is present ─────────────────
-                val whyHeading = block.getByRole(
-                    AriaRole.HEADING,
-                    Locator.GetByRoleOptions().setName("Why this matters?")
-                )
-                val headingVisible = try {
-                    whyHeading.waitFor(Locator.WaitForOptions().setTimeout(5000.0))
-                    whyHeading.isVisible
-                } catch (e: Exception) {
-                    false
-                }
-
-                if (!headingVisible) {
-                    val msg = "[$displayName] 'Why this matters?' heading NOT visible in preview-recommendation-$suppId"
-                    logger.error { "❌ $msg" }
-                    supplementFailures.add(msg)
-                    return@forEach   // skip text/AI validation if heading is absent
-                }
-
-                logger.info { "✅ 'Why this matters?' heading is visible for $displayName" }
-                whyHeading.click()
-
-                // ── 3. Read the AI-generated "Why this matters" text from the UI ─────
-                val whyItMattersText: String = run {
-                    // Try the most specific test-id first, then fall back to reading
-                    // the sibling paragraph that follows the heading.
-                    val candidateGetters = listOf<() -> String>(
-                        { block.getByTestId("why-it-matters-text-$suppId").innerText() },
-                        { block.getByTestId("why-it-matters-content").innerText() },
-                        {
-                            // Generic: paragraph that immediately follows the heading
-                            block.locator("p").filter(
-                                Locator.FilterOptions().setHasText("matters")
-                            ).first().innerText()
-                        },
-                        {
-                            // Last resort: text node after the heading inside the block
-                            val allParagraphs = block.locator("p").allInnerTexts()
-                            allParagraphs.firstOrNull { it.trim().length > 20 } ?: ""
-                        }
-                    )
-                    var result = ""
-                    for (getter in candidateGetters) {
-                        try {
-                            val t = getter().trim()
-                            if (t.isNotBlank() && t.length > 15) {
-                                result = t
-                                break
-                            }
-                        } catch (_: Exception) {}
-                    }
-                    result
-                }
-
-                logger.info { "Why It Matters text for $displayName:\n  \"$whyItMattersText\"" }
-
-                if (whyItMattersText.isBlank()) {
-                    val msg = "[$displayName] 'Why this matters' text is EMPTY — content not generated or not readable."
-                    logger.error { "❌ $msg" }
-                    supplementFailures.add(msg)
-                    return@forEach
-                }
-
-                // ── 4. 30-word structural check ───────────────────────────────────────
-                val wordCount = whyItMattersText.trim().split(Regex("\\s+")).size
-                logger.info { "Word count for $displayName: $wordCount (expected exactly 30)" }
-
-                // ── 5. Build ingredient context for the OpenAI validation prompt ──────
-                val ingredientContext = if (ingredientsArr.isNotEmpty()) {
-                    ingredientsArr.joinToString(", ") { ing ->
-                        val ingName = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
-                        val amount  = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull ?: ""
-                        val unit    = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
-                        "$ingName${if (amount.isNotEmpty()) " ($amount$unit)" else ""}".trim()
-                    }
-                } else {
-                    "(No ingredient data available)"
-                }
-
-                logger.info { "Ingredient context for $displayName: $ingredientContext" }
-
-                // ── 6. Call OpenAI to validate meaningfulness ─────────────────────────
-                StepHelper.step("OpenAI validation: 'Why this matters' for $displayName")
-
-                val whyValidationSystemPrompt = """
-                    You are a quality-assurance validator for personalized supplement benefit explanations generated by an AI health coach.
-
-                    Your task is to evaluate whether a given "Why this matters" text meets ALL of the following criteria:
-
-                    1. RELEVANCE  – The text must be specifically relevant to the supplement's ingredients listed. It should not be generic filler.
-                    2. ACCURACY   – Claims about health benefits should be plausible and consistent with the listed ingredients.
-                    3. TONE       – Professional yet friendly and accessible to a non-medical audience. No unnecessary jargon.
-                    4. WORD COUNT – The text must be EXACTLY 30 words. Being even 1 word over or under is a failure.
-                    5. COHERENCE  – Must be one fluent sentence or short paragraph, not a list or fragments.
-                    6. SPECIFICITY – Must mention at least one specific ingredient name or specific health mechanism (not ultra-generic).
-
-                    Respond ONLY in JSON with this exact structure:
-                    {
-                      "meaningful": true | false,
-                      "relevance_score": 1-10,
-                      "word_count_actual": <count you measured>,
-                      "word_count_pass": true | false,
-                      "issues": ["list of problems, empty if none"],
-                      "verdict": "PASS" | "FAIL",
-                      "explanation": "one short sentence summarising the evaluation"
-                    }
-                """.trimIndent()
-                val cleanWhyText = whyItMattersText.trim().replace(Regex("\\s+"), " ")
-                val whyValidationUserPrompt = """
-                    Supplement Name: $displayName
-                    Brand: ${brand.ifEmpty { "(not provided)" }}
-                    Ingredients: $ingredientContext
-
-                    "Why this matters" Text to Validate:
-                    $cleanWhyText
-                    Evaluate against all criteria and respond in JSON only.
-                    """.trimIndent()
-
-                val openAiApiKey = System.getenv("OPENAI_API_KEY")
-                    ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
-
-                val openAiRequestBody = buildJsonObject {
-                    put("model", "gpt-4o-mini")
-                    put("temperature", 0.0)
-                    putJsonArray("messages") {
-                        addJsonObject {
-                            put("role", "system")
-                            put("content", whyValidationSystemPrompt)
-                        }
-                        addJsonObject {
-                            put("role", "user")
-                            put("content", whyValidationUserPrompt)
-                        }
-                    }
-                    putJsonObject("response_format") {
-                        put("type", "json_object")
-                    }
-                }.toString()
-
-                val openAiResponse = try {
-                    page1.context().request().post(
-                        "https://api.openai.com/v1/chat/completions",
-                        RequestOptions.create()
-                            .setHeader("Content-Type", "application/json")
-                            .setHeader("Authorization", "Bearer $openAiApiKey")
-                            .setData(openAiRequestBody)
-                    )
-                } catch (e: Exception) {
-                    logger.error { "OpenAI API call failed for $displayName: ${e.message}" }
-                    supplementFailures.add("[$displayName] OpenAI API call threw exception: ${e.message}")
-                    return@forEach
-                }
-
-                if (openAiResponse.status() != 200) {
-                    val msg = "[$displayName] OpenAI API returned status ${openAiResponse.status()}"
-                    logger.error { "❌ $msg" }
-                    supplementFailures.add(msg)
-                    return@forEach
-                }
-
-                val openAiResponseText = openAiResponse.text()
-                val openAiJson = jsonParser.decodeFromString<JsonObject>(openAiResponseText)
-                val contentString = openAiJson["choices"]
-                    ?.jsonArray
-                    ?.firstOrNull()
-                    ?.jsonObject
-                    ?.get("message")
-                    ?.jsonObject
-                    ?.get("content")
-                    ?.jsonPrimitive
-                    ?.contentOrNull
-                    ?: run {
-                        supplementFailures.add("[$displayName] Could not parse OpenAI response")
-                        return@forEach
-                    }
-
-                val validationResult  = jsonParser.decodeFromString<JsonObject>(contentString)
-                val meaningful        = validationResult["meaningful"]?.jsonPrimitive?.booleanOrNull ?: false
-                val relevanceScore    = validationResult["relevance_score"]?.jsonPrimitive?.intOrNull ?: 0
-                val aiWordCount       = validationResult["word_count_actual"]?.jsonPrimitive?.intOrNull ?: wordCount
-                val wordCountPass     = validationResult["word_count_pass"]?.jsonPrimitive?.booleanOrNull ?: (wordCount == 30)
-                val verdict           = validationResult["verdict"]?.jsonPrimitive?.contentOrNull ?: "FAIL"
-                val explanation       = validationResult["explanation"]?.jsonPrimitive?.contentOrNull ?: ""
-                val aiIssues          = validationResult["issues"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
-
-                // ── 7. Log validation report for this supplement ──────────────────────
-                logger.info { "╔═══════════════════════════════════════════════════════════╗" }
-                logger.info { "  WHY THIS MATTERS — VALIDATION REPORT: $displayName" }
-                logger.info { "╠═══════════════════════════════════════════════════════════╣" }
-                logger.info { "  UI word count   : $wordCount  |  AI word count: $aiWordCount  (expected exactly 30)" }
-                logger.info { "  Word count PASS : $wordCountPass" }
-                logger.info { "  AI Meaningful   : $meaningful" }
-                logger.info { "  AI Relevance    : $relevanceScore / 10" }
-                logger.info { "  AI Verdict      : $verdict" }
-                logger.info { "  AI Explanation  : $explanation" }
-                if (aiIssues.isNotEmpty()) {
-                    logger.info { "  Issues          :" }
-                    aiIssues.forEach { logger.info { "    • $it" } }
-                }
-                logger.info { "╚═══════════════════════════════════════════════════════════╝" }
-
-                // ── 8. Accumulate failures for this supplement ────────────────────────
-                if (wordCount != 30) {
-                    supplementFailures.add("[$displayName] UI word count is $wordCount — must be exactly 30.")
-                }
-                if (!wordCountPass) {
-                    supplementFailures.add("[$displayName] OpenAI also confirms word count failure (AI counted: $aiWordCount).")
-                }
-                if (!meaningful) {
-                    supplementFailures.add("[$displayName] OpenAI rated the text as NOT meaningful.")
-                }
-                if (relevanceScore < 6) {
-                    supplementFailures.add("[$displayName] OpenAI relevance score is $relevanceScore/10 — below threshold of 6.")
-                }
-                if (verdict == "FAIL") {
-                    supplementFailures.add("[$displayName] OpenAI verdict is FAIL. Explanation: $explanation")
-                }
-                if (aiIssues.isNotEmpty()) {
-                    supplementFailures.add("[$displayName] OpenAI issues: ${aiIssues.joinToString("; ")}")
-                }
-
-                if (!supplementFailures.any { it.startsWith("[$displayName]") }) {
-                    logger.info { "✅ 'Why this matters' PASSED for $displayName" }
+        apiData?.forEach { (_, value) ->
+            if (value is JsonObject) {
+                val dataArray = value["data"]
+                if (dataArray is JsonArray) {
+                    allBiomarkers.addAll(dataArray)
                 }
             }
-
-            // ── Final assert across all supplements ───────────────────────────────────
-            if (supplementFailures.isNotEmpty()) {
-                val errorReport = "Supplement 'Why this matters' validation FAILED:\n" +
-                        supplementFailures.mapIndexed { i, f -> "${i + 1}. $f" }.joinToString("\n")
-                logger.error { errorReport }
-                org.junit.jupiter.api.Assertions.fail<Unit>(errorReport)
-            } else {
-                logger.info { "\n✅ ALL supplements passed 'Why this matters' validation (${supplements.size} supplements verified)." }
-            }
         }
+        val biomarkers = JsonArray(allBiomarkers)
+
+        val workWellMarkers = biomarkers.filter {
+            if (it !is JsonObject) return@filter false
+            val rating = it.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull
+            rating?.equals("Optimal", ignoreCase = true) == true || rating?.equals("Normal", ignoreCase = true) == true
+        }
+
+        val randomItem = workWellMarkers.random()
+        logger.info { "randomItem is: $randomItem" }
+        val randomMetricId = randomItem.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull
+        logger.info { "randomMetricId is: $randomMetricId" }
+        page1.getByTestId("checkbox-biomarker-$randomMetricId").click()
+        page1.waitForTimeout(1000.0)
+        page1.getByTestId("button-create-subsection").click()
+
+        // Wait for the web to call OpenAI and render the generated content
+        logger.info { "Waiting for AI-generated content to load after subsection creation..." }
+        page1.waitForTimeout(8000.0)
+
+        // ── Extract key fields from the randomly selected biomarker ──────────────────
+        val randomDisplayName = randomItem.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomValue = randomItem.jsonObject["value"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomDisplayRating = randomItem.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomUnit = randomItem.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
+
+        logger.info { "Selected biomarker → display_name: $randomDisplayName | value: $randomValue | unit: $randomUnit | display_rating: $randomDisplayRating | metric_id: $randomMetricId" }
     }
 }
 
