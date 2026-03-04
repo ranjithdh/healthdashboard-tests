@@ -6,6 +6,8 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
+import mobileView.home.gene.model.GeneDataWrapper
+import mobileView.home.gene.model.GeneResponse
 import mobileView.home.gut.model.*
 import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
@@ -214,6 +216,8 @@ class GutPage(page: Page) : BasePage(page) {
             logger.info { "Clicking Header to expand: $headerExpected" }
             headerUiElement.click()
             markerListValidations(gutList)
+
+            headerUiElement.click()
         }
     }
 

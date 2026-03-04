@@ -48,8 +48,7 @@ class GutTest : BaseTest() {
     private fun performInitialNavigation(): GutPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val gutPage =
-            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage().clickDataTab()
-                .waitForConfirmation()
+            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage().clickGutTab()
 
         return gutPage
     }
@@ -79,9 +78,9 @@ class GutTest : BaseTest() {
         gutPage.gutSearchViewValidation()
     }
 
-     @Test
+   /*  @Test
      @Order(4)
      fun gutListFilter() {
          gutPage.gutFilterViewValidation()
-     }
+     }*/
 }

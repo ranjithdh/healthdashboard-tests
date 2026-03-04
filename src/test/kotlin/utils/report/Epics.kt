@@ -15,6 +15,7 @@ object Modules {
     const val EPIC_ORDERS = "Orders $MOBILE"
     const val EPIC_ACTION_PLAN = "Action Plan $MOBILE"
     const val EPIC_GUT = "Gut $MOBILE"
+    const val EPIC_GENE = "Gene $MOBILE"
 
     const val EPIC_SYMPTOMS = "Symptoms $DESKTOP"
     const val EPIC_WEBSITE = "Website $DESKTOP"

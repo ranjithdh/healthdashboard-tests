@@ -1,4 +1,4 @@
-package mobileView.home.gut.model
+package mobileView.home.gene.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

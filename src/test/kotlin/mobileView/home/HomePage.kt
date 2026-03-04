@@ -12,6 +12,7 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.actionPlan.page.ActionPlanPage
+import mobileView.home.gene.page.GenePage
 import mobileView.home.gut.page.GutPage
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
@@ -196,13 +197,23 @@ class HomePage(page: Page) : BasePage(page) {
         return actionPlan
     }
 
-    fun clickDataTab(): GutPage {
+    fun clickGutTab(): GutPage {
         StepHelper.step(CLICK_DATA)
         dataButton.click()
         page.getByTestId("health-data-tab-gut").click()
         val gutPage = GutPage(page)
         return gutPage
     }
+
+    fun clickGeneTab(): GenePage {
+        StepHelper.step(CLICK_DATA)
+        dataButton.click()
+        page.getByTestId("health-data-tab-gene").click()
+        val genePage = GenePage(page)
+        return genePage
+    }
+
+
 
 
 }
