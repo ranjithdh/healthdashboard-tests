@@ -2742,7 +2742,11 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByTestId("checkbox-biomarker-$randomMetricId").click();
         page1.waitForTimeout(1000.0)
         page1.getByTestId("button-create-subsection").click();
-        
+
+        // here we have to verify the prompt based content
+        // after we create the subsection, in web we're calling the OpenAI to generate the content we need to verify below these
+        // Step 1: we need to check the content is there are not
+        // Step 2: we need to verify the content by calling the Open AI using the prompt which they're actually using in web to generate the content
     }
 
 
