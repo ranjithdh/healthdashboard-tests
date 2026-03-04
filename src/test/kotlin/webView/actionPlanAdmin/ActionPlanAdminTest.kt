@@ -2537,5 +2537,648 @@ class ActionPlanAdminTest : BaseTest() {
             }
         }
     }
+    @Test
+    @Order(4)
+    fun `verify what's working well for you prompt output constraints`() {
+
+        val name = "Rethinavel  natarajan stg"
+        logger.info { "Starting ActionPlan flow..." }
+        StepHelper.step("Starting ActionPlan flow")
+
+        // 1. Login
+        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
+        StepHelper.step("Logging in")
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
+
+        val otpPage = OtpPage(page)
+
+        // Wait for the verify-otp response to be processed and tokens stored
+        page.waitForResponse({ response ->
+            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
+        }) {
+            otpPage.enterOtp(
+                TestConfig.TestUsers.EXISTING_USER.otp,
+                TestConfig.TestUsers.EXISTING_USER.mobileNumber,
+                TestConfig.TestUsers.EXISTING_USER.countryCode
+            )
+            page.keyboard().press("Enter") // Trigger submission if no button is present
+        }
+
+        // Brief wait to ensure TestConfig is updated by the response listener
+        page.waitForTimeout(1000.0)
+
+        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
+        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
+
+        // 1b. Fetch all users to find Gowthaman's ID
+        StepHelper.step("Fetching users list to find target user ID")
+        val usersResponse = page.context().request().get(
+            TestConfig.APIs.API_USERS,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+
+        if (usersResponse.status() != 200) {
+            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
+        }
+        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
+
+        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
+        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
+            ?: throw AssertionError("User '$name' not found in users list")
+
+        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
+        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
+
+        // Wait for the home page to load after login
+//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
+
+        // 2. Navigation steps provided by user
+        StepHelper.step("Navigating to Health Data and through dashboard steps")
+
+        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
+        page.waitForLoadState()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
+
+        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
+        searchBox.click()
+        page.waitForTimeout(5000.0)
+        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
+        searchBox.press("Enter")
+
+        // Wait for search results
+        page.waitForTimeout(2000.0)
+
+        // Try to find the user in the search results and click
+        try {
+            val userBtn = page.locator("button, a, div[role='button']").filter(
+                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
+            ).first()
+            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+            userBtn.click()
+            logger.info { "Successfully selected user $name" }
+        } catch (e: Exception) {
+            logger.warn { "Search result click failed for $name: ${e.message}" }
+            page.locator("tr, div[role='row']").nth(1).click()
+        }
+
+
+        //app.stg.deepholistics.com/recommendations
+        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
+        apLink.waitFor()
+        apLink.click()
+
+        // 3. Click "Go to PDF tool" and capture popup/redirect
+        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
+
+
+        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
+        pdfBtn.waitFor()
+        val page1 = context.waitForPage {
+            pdfBtn.click()
+        }
+        page1.waitForLoadState()
+        // Wait for all background APIs to settle and give a 5s buffer
+        logger.info { "Waiting for Action Plan APIs to settle..." }
+        page1.waitForLoadState(LoadState.NETWORKIDLE)
+        page1.waitForTimeout(5000.0)
+
+        val finalUrl = page1.url()
+        logger.info { "Final URL: $finalUrl" }
+
+        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
+        logger.info { "Verifying final URL components..." }
+        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
+        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
+//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
+        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
+
+        // 4. Call user-data API on the replit app
+        StepHelper.step("Calling user-data API on replit app and verifying response")
+
+        val requestBody = buildJsonObject {
+            put("userId", targetUserId)
+            put("accessToken", TestConfig.ACCESS_TOKEN)
+        }.toString()
+
+        val userDataResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
+        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
+
+        val userData = userDataResponse.text()
+        logger.info { "Full User Data JSON: $userData" }
+        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
+        logger.info { "User data API successfully verified." }
+
+        // 5. Call user-recommendations API
+        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
+
+        val userRecommendationsResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
+        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
+
+        val recommendationsData = userRecommendationsResponse.text()
+        logger.info { "Full User Recommendations JSON: $recommendationsData" }
+        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
+        logger.info { "User recommendations API successfully verified." }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // What's Working well for you
+        // ═══════════════════════════════════════════════════════════════════════════════
+        StepHelper.step("Verifying What's Working well for you")
+
+
+
+        StepHelper.step("Opening What's Working well for you section")
+        page1.getByTestId("button-toggle-category-whats-working-well").click();
+        page1.waitForTimeout(1000.0)
+
+        page1.getByTestId("category-whats-working-well").getByTestId("button-biomarker-selector").click();
+        page1.waitForTimeout(1000.0)
+        page1.getByTestId("checkbox-biomarker-BD10082").click();
+        page1.waitForTimeout(1000.0)
+        page1.getByTestId("button-create-subsection").click();
+
+    }
+
+
+
+    @Test
+    @Order(5)
+    fun `verify what's need support prompt output constraints`() {
+
+        val name = "Rethinavel  natarajan stg"
+        logger.info { "Starting ActionPlan flow..." }
+        StepHelper.step("Starting ActionPlan flow")
+
+        // 1. Login
+        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
+        StepHelper.step("Logging in")
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
+
+        val otpPage = OtpPage(page)
+
+        // Wait for the verify-otp response to be processed and tokens stored
+        page.waitForResponse({ response ->
+            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
+        }) {
+            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
+            page.keyboard().press("Enter") // Trigger submission if no button is present
+        }
+
+        // Brief wait to ensure TestConfig is updated by the response listener
+        page.waitForTimeout(1000.0)
+
+        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
+        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
+
+        // 1b. Fetch all users to find Gowthaman's ID
+        StepHelper.step("Fetching users list to find target user ID")
+        val usersResponse = page.context().request().get(
+            TestConfig.APIs.API_USERS,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+
+        if (usersResponse.status() != 200) {
+            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
+        }
+        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
+
+        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
+        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
+            ?: throw AssertionError("User '$name' not found in users list")
+
+        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
+        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
+
+        // Wait for the home page to load after login
+//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
+
+        // 2. Navigation steps provided by user
+        StepHelper.step("Navigating to Health Data and through dashboard steps")
+
+        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
+        page.waitForLoadState()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
+
+        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
+        searchBox.click()
+        page.waitForTimeout(5000.0)
+        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
+        searchBox.press("Enter")
+
+        // Wait for search results
+        page.waitForTimeout(2000.0)
+
+        // Try to find the user in the search results and click
+        try {
+            val userBtn = page.locator("button, a, div[role='button']").filter(
+                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
+            ).first()
+            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+            userBtn.click()
+            logger.info { "Successfully selected user $name" }
+        } catch (e: Exception) {
+            logger.warn { "Search result click failed for $name: ${e.message}" }
+            page.locator("tr, div[role='row']").nth(1).click()
+        }
+
+
+        //app.stg.deepholistics.com/recommendations
+        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
+        apLink.waitFor()
+        apLink.click()
+
+        // 3. Click "Go to PDF tool" and capture popup/redirect
+        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
+
+
+
+        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
+        pdfBtn.waitFor()
+        val page1 = context.waitForPage {
+            pdfBtn.click()
+        }
+        page1.waitForLoadState()
+        // Wait for all background APIs to settle and give a 5s buffer
+        logger.info { "Waiting for Action Plan APIs to settle..." }
+        page1.waitForLoadState(LoadState.NETWORKIDLE)
+        page1.waitForTimeout(5000.0)
+
+        val finalUrl = page1.url()
+        logger.info { "Final URL: $finalUrl" }
+
+        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
+        logger.info { "Verifying final URL components..." }
+        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
+        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
+//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
+        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
+
+        // 4. Call user-data API on the replit app
+        StepHelper.step("Calling user-data API on replit app and verifying response")
+
+        val requestBody = buildJsonObject {
+            put("userId", targetUserId)
+            put("accessToken", TestConfig.ACCESS_TOKEN)
+        }.toString()
+
+        val userDataResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
+        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
+
+        val userData = userDataResponse.text()
+        logger.info { "Full User Data JSON: $userData" }
+        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
+        logger.info { "User data API successfully verified." }
+
+        // 5. Call user-recommendations API
+        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
+
+        val userRecommendationsResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+
+        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
+        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
+
+        val recommendationsData = userRecommendationsResponse.text()
+        logger.info { "Full User Recommendations JSON: $recommendationsData" }
+        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
+        logger.info { "User recommendations API successfully verified." }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // SUPPLEMENT "WHY THIS MATTERS" VALIDATION
+        // ═══════════════════════════════════════════════════════════════════════════════
+        StepHelper.step("Verifying 'Why this matters' section for each Supplement")
+
+        val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
+        val rawRecommendationsList = recommendationsJson["data"]?.jsonObject
+            ?.get("data")?.jsonObject
+            ?.get("recommendations")?.jsonArray
+            ?: JsonArray(emptyList())
+
+        val recommendationsList = JsonArray(rawRecommendationsList.filter {
+            it.jsonObject["approval_status"]?.jsonPrimitive?.contentOrNull == "approved"
+        })
+
+        val supplements = recommendationsList.filter {
+            it.jsonObject["category"]?.jsonPrimitive?.contentOrNull?.equals("supplement", ignoreCase = true) == true
+        }
+
+        if (supplements.isEmpty()) {
+            logger.warn { "No approved supplement recommendations found — skipping 'Why this matters' validation." }
+        } else {
+            StepHelper.step("Opening Supplement Protocol section")
+            page1.getByTestId("button-toggle-category-supplements").click()
+            page1.waitForTimeout(1000.0)
+
+            // Collect all supplement failures to report as a group
+            val supplementFailures = mutableListOf<String>()
+
+            supplements.forEach { rec ->
+                val suppId          = rec.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                val displayName     = rec.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                val supplementMeta  = rec.jsonObject["variant_meta"]?.jsonObject
+                val brand           = (supplementMeta?.get("brand")?.jsonPrimitive?.contentOrNull ?: "").trim()
+                val ingredientsArr  = supplementMeta?.get("ingredients")?.jsonArray ?: JsonArray(emptyList())
+
+                logger.info { "──────────────────────────────────────────────────────" }
+                logger.info { "Validating 'Why this matters' for: $displayName (ID: $suppId)" }
+                StepHelper.step("Validating 'Why this matters' for: $displayName")
+
+                // ── 1. Click the recommendation card to expand the right-panel ────────
+                val recCard = page1.getByTestId("recommendation-$suppId")
+                try {
+                    recCard.scrollIntoViewIfNeeded()
+                    recCard.click()
+                    page1.waitForTimeout(400.0)
+                } catch (e: Exception) {
+                    logger.warn { "Could not click recommendation card for $displayName: ${e.message}" }
+                    supplementFailures.add("[$displayName] Could not click recommendation card: ${e.message}")
+                    return@forEach
+                }
+
+                val block = page1.getByTestId("preview-recommendation-$suppId")
+
+                // Ensure block is visible; if not, select via checkbox
+                if (!block.isVisible) {
+                    try {
+                        page1.getByTestId("checkbox-$suppId").click()
+                        page1.waitForTimeout(500.0)
+                    } catch (e: Exception) {
+                        logger.warn { "Could not toggle checkbox for $displayName: ${e.message}" }
+                    }
+                }
+
+                block.scrollIntoViewIfNeeded()
+
+                // ── 2. Assert "Why this matters?" heading is present ─────────────────
+                val whyHeading = block.getByRole(
+                    AriaRole.HEADING,
+                    Locator.GetByRoleOptions().setName("Why this matters?")
+                )
+                val headingVisible = try {
+                    whyHeading.waitFor(Locator.WaitForOptions().setTimeout(5000.0))
+                    whyHeading.isVisible
+                } catch (e: Exception) {
+                    false
+                }
+
+                if (!headingVisible) {
+                    val msg = "[$displayName] 'Why this matters?' heading NOT visible in preview-recommendation-$suppId"
+                    logger.error { "❌ $msg" }
+                    supplementFailures.add(msg)
+                    return@forEach   // skip text/AI validation if heading is absent
+                }
+
+                logger.info { "✅ 'Why this matters?' heading is visible for $displayName" }
+                whyHeading.click()
+
+                // ── 3. Read the AI-generated "Why this matters" text from the UI ─────
+                val whyItMattersText: String = run {
+                    // Try the most specific test-id first, then fall back to reading
+                    // the sibling paragraph that follows the heading.
+                    val candidateGetters = listOf<() -> String>(
+                        { block.getByTestId("why-it-matters-text-$suppId").innerText() },
+                        { block.getByTestId("why-it-matters-content").innerText() },
+                        {
+                            // Generic: paragraph that immediately follows the heading
+                            block.locator("p").filter(
+                                Locator.FilterOptions().setHasText("matters")
+                            ).first().innerText()
+                        },
+                        {
+                            // Last resort: text node after the heading inside the block
+                            val allParagraphs = block.locator("p").allInnerTexts()
+                            allParagraphs.firstOrNull { it.trim().length > 20 } ?: ""
+                        }
+                    )
+                    var result = ""
+                    for (getter in candidateGetters) {
+                        try {
+                            val t = getter().trim()
+                            if (t.isNotBlank() && t.length > 15) {
+                                result = t
+                                break
+                            }
+                        } catch (_: Exception) {}
+                    }
+                    result
+                }
+
+                logger.info { "Why It Matters text for $displayName:\n  \"$whyItMattersText\"" }
+
+                if (whyItMattersText.isBlank()) {
+                    val msg = "[$displayName] 'Why this matters' text is EMPTY — content not generated or not readable."
+                    logger.error { "❌ $msg" }
+                    supplementFailures.add(msg)
+                    return@forEach
+                }
+
+                // ── 4. 30-word structural check ───────────────────────────────────────
+                val wordCount = whyItMattersText.trim().split(Regex("\\s+")).size
+                logger.info { "Word count for $displayName: $wordCount (expected exactly 30)" }
+
+                // ── 5. Build ingredient context for the OpenAI validation prompt ──────
+                val ingredientContext = if (ingredientsArr.isNotEmpty()) {
+                    ingredientsArr.joinToString(", ") { ing ->
+                        val ingName = ing.jsonObject["name"]?.jsonPrimitive?.contentOrNull ?: ""
+                        val amount  = ing.jsonObject["amount"]?.jsonPrimitive?.contentOrNull ?: ""
+                        val unit    = ing.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
+                        "$ingName${if (amount.isNotEmpty()) " ($amount$unit)" else ""}".trim()
+                    }
+                } else {
+                    "(No ingredient data available)"
+                }
+
+                logger.info { "Ingredient context for $displayName: $ingredientContext" }
+
+                // ── 6. Call OpenAI to validate meaningfulness ─────────────────────────
+                StepHelper.step("OpenAI validation: 'Why this matters' for $displayName")
+
+                val whyValidationSystemPrompt = """
+                    You are a quality-assurance validator for personalized supplement benefit explanations generated by an AI health coach.
+
+                    Your task is to evaluate whether a given "Why this matters" text meets ALL of the following criteria:
+
+                    1. RELEVANCE  – The text must be specifically relevant to the supplement's ingredients listed. It should not be generic filler.
+                    2. ACCURACY   – Claims about health benefits should be plausible and consistent with the listed ingredients.
+                    3. TONE       – Professional yet friendly and accessible to a non-medical audience. No unnecessary jargon.
+                    4. WORD COUNT – The text must be EXACTLY 30 words. Being even 1 word over or under is a failure.
+                    5. COHERENCE  – Must be one fluent sentence or short paragraph, not a list or fragments.
+                    6. SPECIFICITY – Must mention at least one specific ingredient name or specific health mechanism (not ultra-generic).
+
+                    Respond ONLY in JSON with this exact structure:
+                    {
+                      "meaningful": true | false,
+                      "relevance_score": 1-10,
+                      "word_count_actual": <count you measured>,
+                      "word_count_pass": true | false,
+                      "issues": ["list of problems, empty if none"],
+                      "verdict": "PASS" | "FAIL",
+                      "explanation": "one short sentence summarising the evaluation"
+                    }
+                """.trimIndent()
+                val cleanWhyText = whyItMattersText.trim().replace(Regex("\\s+"), " ")
+                val whyValidationUserPrompt = """
+                    Supplement Name: $displayName
+                    Brand: ${brand.ifEmpty { "(not provided)" }}
+                    Ingredients: $ingredientContext
+
+                    "Why this matters" Text to Validate:
+                    $cleanWhyText
+                    Evaluate against all criteria and respond in JSON only.
+                    """.trimIndent()
+
+                val openAiApiKey = System.getenv("OPENAI_API_KEY")
+                    ?: throw IllegalStateException("OPENAI_API_KEY environment variable is not set. Please configure it before running this test.")
+
+                val openAiRequestBody = buildJsonObject {
+                    put("model", "gpt-4o-mini")
+                    put("temperature", 0.0)
+                    putJsonArray("messages") {
+                        addJsonObject {
+                            put("role", "system")
+                            put("content", whyValidationSystemPrompt)
+                        }
+                        addJsonObject {
+                            put("role", "user")
+                            put("content", whyValidationUserPrompt)
+                        }
+                    }
+                    putJsonObject("response_format") {
+                        put("type", "json_object")
+                    }
+                }.toString()
+
+                val openAiResponse = try {
+                    page1.context().request().post(
+                        "https://api.openai.com/v1/chat/completions",
+                        RequestOptions.create()
+                            .setHeader("Content-Type", "application/json")
+                            .setHeader("Authorization", "Bearer $openAiApiKey")
+                            .setData(openAiRequestBody)
+                    )
+                } catch (e: Exception) {
+                    logger.error { "OpenAI API call failed for $displayName: ${e.message}" }
+                    supplementFailures.add("[$displayName] OpenAI API call threw exception: ${e.message}")
+                    return@forEach
+                }
+
+                if (openAiResponse.status() != 200) {
+                    val msg = "[$displayName] OpenAI API returned status ${openAiResponse.status()}"
+                    logger.error { "❌ $msg" }
+                    supplementFailures.add(msg)
+                    return@forEach
+                }
+
+                val openAiResponseText = openAiResponse.text()
+                val openAiJson = jsonParser.decodeFromString<JsonObject>(openAiResponseText)
+                val contentString = openAiJson["choices"]
+                    ?.jsonArray
+                    ?.firstOrNull()
+                    ?.jsonObject
+                    ?.get("message")
+                    ?.jsonObject
+                    ?.get("content")
+                    ?.jsonPrimitive
+                    ?.contentOrNull
+                    ?: run {
+                        supplementFailures.add("[$displayName] Could not parse OpenAI response")
+                        return@forEach
+                    }
+
+                val validationResult  = jsonParser.decodeFromString<JsonObject>(contentString)
+                val meaningful        = validationResult["meaningful"]?.jsonPrimitive?.booleanOrNull ?: false
+                val relevanceScore    = validationResult["relevance_score"]?.jsonPrimitive?.intOrNull ?: 0
+                val aiWordCount       = validationResult["word_count_actual"]?.jsonPrimitive?.intOrNull ?: wordCount
+                val wordCountPass     = validationResult["word_count_pass"]?.jsonPrimitive?.booleanOrNull ?: (wordCount == 30)
+                val verdict           = validationResult["verdict"]?.jsonPrimitive?.contentOrNull ?: "FAIL"
+                val explanation       = validationResult["explanation"]?.jsonPrimitive?.contentOrNull ?: ""
+                val aiIssues          = validationResult["issues"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+
+                // ── 7. Log validation report for this supplement ──────────────────────
+                logger.info { "╔═══════════════════════════════════════════════════════════╗" }
+                logger.info { "  WHY THIS MATTERS — VALIDATION REPORT: $displayName" }
+                logger.info { "╠═══════════════════════════════════════════════════════════╣" }
+                logger.info { "  UI word count   : $wordCount  |  AI word count: $aiWordCount  (expected exactly 30)" }
+                logger.info { "  Word count PASS : $wordCountPass" }
+                logger.info { "  AI Meaningful   : $meaningful" }
+                logger.info { "  AI Relevance    : $relevanceScore / 10" }
+                logger.info { "  AI Verdict      : $verdict" }
+                logger.info { "  AI Explanation  : $explanation" }
+                if (aiIssues.isNotEmpty()) {
+                    logger.info { "  Issues          :" }
+                    aiIssues.forEach { logger.info { "    • $it" } }
+                }
+                logger.info { "╚═══════════════════════════════════════════════════════════╝" }
+
+                // ── 8. Accumulate failures for this supplement ────────────────────────
+                if (wordCount != 30) {
+                    supplementFailures.add("[$displayName] UI word count is $wordCount — must be exactly 30.")
+                }
+                if (!wordCountPass) {
+                    supplementFailures.add("[$displayName] OpenAI also confirms word count failure (AI counted: $aiWordCount).")
+                }
+                if (!meaningful) {
+                    supplementFailures.add("[$displayName] OpenAI rated the text as NOT meaningful.")
+                }
+                if (relevanceScore < 6) {
+                    supplementFailures.add("[$displayName] OpenAI relevance score is $relevanceScore/10 — below threshold of 6.")
+                }
+                if (verdict == "FAIL") {
+                    supplementFailures.add("[$displayName] OpenAI verdict is FAIL. Explanation: $explanation")
+                }
+                if (aiIssues.isNotEmpty()) {
+                    supplementFailures.add("[$displayName] OpenAI issues: ${aiIssues.joinToString("; ")}")
+                }
+
+                if (!supplementFailures.any { it.startsWith("[$displayName]") }) {
+                    logger.info { "✅ 'Why this matters' PASSED for $displayName" }
+                }
+            }
+
+            // ── Final assert across all supplements ───────────────────────────────────
+            if (supplementFailures.isNotEmpty()) {
+                val errorReport = "Supplement 'Why this matters' validation FAILED:\n" +
+                        supplementFailures.mapIndexed { i, f -> "${i + 1}. $f" }.joinToString("\n")
+                logger.error { errorReport }
+                org.junit.jupiter.api.Assertions.fail<Unit>(errorReport)
+            } else {
+                logger.info { "\n✅ ALL supplements passed 'Why this matters' validation (${supplements.size} supplements verified)." }
+            }
+        }
+    }
 }
 
