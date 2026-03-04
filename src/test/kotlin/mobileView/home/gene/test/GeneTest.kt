@@ -67,4 +67,10 @@ class GeneTest : BaseTest() {
         gutPage.emptyView()
     }
 
+    @Order(2)
+    @Test
+    fun geneListValidation(){
+        gutPage.geneListValidation()
+    }
+
 }

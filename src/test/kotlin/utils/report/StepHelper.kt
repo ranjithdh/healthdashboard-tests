@@ -261,6 +261,7 @@ object StepHelper {
 
     //Gene
     const val FETCH_GENE_DATA = "Fetch Gene data"
+    const val VALIDATING_GENE_LIST = "Validating Gene List"
 
     //Blood
     const val FETCH_BLOOD_DATA = "Fetch Blood data"
