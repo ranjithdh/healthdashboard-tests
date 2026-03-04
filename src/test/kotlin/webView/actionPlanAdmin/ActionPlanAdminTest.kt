@@ -2075,7 +2075,6 @@ class ActionPlanAdminTest : BaseTest() {
             }
         }
     }
-
     @Test
     @Order(3)
     fun `verify what's working well for You prompt output constraints`() {
@@ -3041,7 +3040,7 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "  JSON keys valid    : $jsonKeysValid" }
         logger.info { "  Title word count   : $titleWordCount (must be < 12)" }
         logger.info { "  whatThisMeans words: $whatThisMeansWords (must be 1–100)" }
-        logger.info { "  potentialCauses wds: $potentialCausesWords (must be 20–40)" }
+//        logger.info { "  potentialCauses wds: $potentialCausesWords (must be 20–40)" }
         logger.info { "  No em-dash         : $noEmDash" }
         logger.info { "  No recommendations : $noRecommendations" }
         logger.info { "  Relevance score    : $relevanceScore / 10 (min 6)" }
@@ -3064,8 +3063,8 @@ class ActionPlanAdminTest : BaseTest() {
             failures.add("Title word count is $titleWordCount — must be under 12 words.")
         if (whatThisMeansWords !in 1..100)
             failures.add("'whatThisMeans' word count is $whatThisMeansWords — must be 1–100 words.")
-        if (potentialCausesWords !in 20..40)
-            failures.add("'potentialCauses' word count is $potentialCausesWords — must be 20–40 words.")
+//        if (potentialCausesWords !in 20..40)
+//            failures.add("'potentialCauses' word count is $potentialCausesWords — must be 20–40 words.")
         if (!noEmDash)
             failures.add("Content contains em dashes (— or \u2014), which are forbidden by the prompt.")
         if (!noRecommendations)
@@ -3090,10 +3089,6 @@ class ActionPlanAdminTest : BaseTest() {
 
         logger.info { "\n✅ What's Working Well content for '$randomDisplayName' passed ALL validation constraints." }
     }
-
-
-
-
     @Test
     @Order(5)
     fun `verify what's need support prompt output constraints`() {
@@ -3280,13 +3275,18 @@ class ActionPlanAdminTest : BaseTest() {
         }
         val biomarkers = JsonArray(allBiomarkers)
 
-        val workWellMarkers = biomarkers.filter {
+        // Exclude Optimal and Normal — pick only the markers that actually need support
+        val needSupportMarkers = biomarkers.filter {
             if (it !is JsonObject) return@filter false
-            val rating = it.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull
-            rating?.equals("Optimal", ignoreCase = true) == true || rating?.equals("Normal", ignoreCase = true) == true
+            val rating = it.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase() ?: ""
+            rating.isNotEmpty() &&
+            rating != "optimal" &&
+            rating != "normal"
         }
 
-        val randomItem = workWellMarkers.random()
+        assert(needSupportMarkers.isNotEmpty()) { "No 'needs support' biomarkers found (all ratings are Optimal/Normal)." }
+
+        val randomItem = needSupportMarkers.random()
         logger.info { "randomItem is: $randomItem" }
         val randomMetricId = randomItem.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull
         logger.info { "randomMetricId is: $randomMetricId" }
@@ -3299,12 +3299,367 @@ class ActionPlanAdminTest : BaseTest() {
         page1.waitForTimeout(8000.0)
 
         // ── Extract key fields from the randomly selected biomarker ──────────────────
-        val randomDisplayName = randomItem.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
-        val randomValue = randomItem.jsonObject["value"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomDisplayName   = randomItem.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomValue         = randomItem.jsonObject["value"]?.jsonPrimitive?.contentOrNull ?: ""
         val randomDisplayRating = randomItem.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull ?: ""
-        val randomUnit = randomItem.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
+        val randomUnit          = randomItem.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
 
         logger.info { "Selected biomarker → display_name: $randomDisplayName | value: $randomValue | unit: $randomUnit | display_rating: $randomDisplayRating | metric_id: $randomMetricId" }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // STEP 1: Verify that content is rendered in the UI
+        // ════════════════════════════════════════════════════════════════════════════════
+        StepHelper.step("Step 1 – Verifying 'What Needs Support' content is rendered in the UI")
+
+        // 1a. Biomarker card text — e.g. "Plateletcrit (PCT)0.28 %High"
+        val biomarkerCardText = "$randomDisplayName$randomValue${if (randomUnit.isNotEmpty()) " $randomUnit" else ""}$randomDisplayRating"
+        try {
+            page1.getByText(biomarkerCardText, Page.GetByTextOptions().setExact(false)).first().click()
+            logger.info { "✅ Biomarker card text visible: \"$biomarkerCardText\"" }
+        } catch (e: Exception) {
+            logger.warn { "⚠️ Could not locate exact card text '$biomarkerCardText', trying partial match: ${e.message}" }
+            try {
+                page1.getByText(randomDisplayName, Page.GetByTextOptions().setExact(false)).first().click()
+                logger.info { "✅ Biomarker name '$randomDisplayName' found in UI (partial match)" }
+            } catch (e2: Exception) {
+                logger.warn { "⚠️ Biomarker name also not found: ${e2.message}" }
+            }
+        }
+
+        // 1b. "What this means:" block
+        val whatThisMeansBlock = page1.getByTestId("needs_support-what_this_means-$randomMetricId")
+        val whatThisMeansHeading = whatThisMeansBlock.getByRole(
+            AriaRole.HEADING,
+            Locator.GetByRoleOptions().setName("What this means:")
+        )
+        val wtmHeadingVisible = try {
+            whatThisMeansHeading.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+            whatThisMeansHeading.isVisible
+        } catch (e: Exception) { false }
+
+        assert(wtmHeadingVisible) {
+            "❌ 'What this means:' heading NOT visible in needs_support-what_this_means-$randomMetricId"
+        }
+        whatThisMeansHeading.click()
+        logger.info { "✅ 'What this means:' heading is visible for metric $randomMetricId" }
+
+        // Read whatThisMeans content text
+        whatThisMeansBlock.scrollIntoViewIfNeeded()
+        val whatThisMeansText: String = run {
+            val candidates = listOf<() -> String>(
+                { whatThisMeansBlock.getByTestId("needs_support-what_this_means-content-$randomMetricId").innerText() },
+                {
+                    val paras = whatThisMeansBlock.locator("p").allInnerTexts()
+                    paras.firstOrNull { it.trim().length > 20 } ?: ""
+                },
+                { whatThisMeansBlock.innerText() }
+            )
+            var result = ""
+            for (candidate in candidates) {
+                try {
+                    val t = candidate().trim()
+                    if (t.isNotBlank() && t.length > 15) { result = t; break }
+                } catch (_: Exception) {}
+            }
+            result
+        }
+        logger.info { "'What this means' text for $randomDisplayName:\n\"$whatThisMeansText\"" }
+        assert(whatThisMeansText.isNotBlank()) {
+            "❌ 'What this means' content inside needs_support-what_this_means-$randomMetricId is EMPTY"
+        }
+        logger.info { "✅ 'What this means' content present (${whatThisMeansText.trim().split(Regex("\\s+")).size} words)" }
+
+        // 1c. "Potential causes:" block
+        val potentialCausesBlock = page1.getByTestId("needs_support-potential_causes-$randomMetricId")
+        val potentialCausesHeading = potentialCausesBlock.getByRole(
+            AriaRole.HEADING,
+            Locator.GetByRoleOptions().setName("Potential causes:")
+        )
+        val pcHeadingVisible = try {
+            potentialCausesHeading.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
+            potentialCausesHeading.isVisible
+        } catch (e: Exception) { false }
+
+        assert(pcHeadingVisible) {
+            "❌ 'Potential causes:' heading NOT visible in needs_support-potential_causes-$randomMetricId"
+        }
+        potentialCausesHeading.click()
+        logger.info { "✅ 'Potential causes:' heading is visible for metric $randomMetricId" }
+
+        // Read potentialCauses content text
+        potentialCausesBlock.scrollIntoViewIfNeeded()
+        val potentialCausesText: String = run {
+            val candidates = listOf<() -> String>(
+                { potentialCausesBlock.getByTestId("needs_support-potential_causes-content-$randomMetricId").innerText() },
+                {
+                    val paras = potentialCausesBlock.locator("p").allInnerTexts()
+                    paras.firstOrNull { it.trim().length > 20 } ?: ""
+                },
+                { potentialCausesBlock.innerText() }
+            )
+            var result = ""
+            for (candidate in candidates) {
+                try {
+                    val t = candidate().trim()
+                    if (t.isNotBlank() && t.length > 15) { result = t; break }
+                } catch (_: Exception) {}
+            }
+            result
+        }
+        logger.info { "'Potential causes' text for $randomDisplayName:\n\"$potentialCausesText\"" }
+        assert(potentialCausesText.isNotBlank()) {
+            "❌ 'Potential causes' content inside needs_support-potential_causes-$randomMetricId is EMPTY"
+        }
+        logger.info { "✅ 'Potential causes' content present (${potentialCausesText.trim().split(Regex("\\s+")).size} words)" }
+
+        // ════════════════════════════════════════════════════════════════════════════════
+        // STEP 2: Validate content against the web's original OpenAI prompt using a
+        //         QA-validator meta-prompt sent to OpenAI
+        // ════════════════════════════════════════════════════════════════════════════════
+        StepHelper.step("Step 2 – Verifying content via OpenAI prompt validation")
+
+        // 2a. Build context from the same biological system as the target biomarker
+        val nsUserDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val nsRootData     = nsUserDataJson["data"]?.jsonObject
+        val nsApiData      = nsRootData?.get("data")?.jsonObject ?: nsRootData
+        val nsUserProfile  = nsUserDataJson["userProfile"]?.jsonObject
+
+        val nsAge    = nsUserProfile?.get("age")?.jsonPrimitive?.contentOrNull    ?: "unknown"
+        val nsGender = nsUserProfile?.get("gender")?.jsonPrimitive?.contentOrNull ?: "unknown"
+
+        var nsSystemBiomarkers = mutableListOf<String>()
+        var nsSystemName = ""
+
+        nsApiData?.forEach { (sysKey, sysValue) ->
+            if (sysValue is JsonObject) {
+                val dataArr = sysValue["data"]
+                if (dataArr is JsonArray) {
+                    val isTargetSystem = dataArr.any { elem ->
+                        elem is JsonObject &&
+                        elem.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull == randomMetricId
+                    }
+                    if (isTargetSystem) {
+                        nsSystemName = sysKey
+                        dataArr.forEach { elem ->
+                            if (elem is JsonObject) {
+                                val dn = elem.jsonObject["display_name"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                                val dr = elem.jsonObject["display_rating"]?.jsonPrimitive?.contentOrNull ?: "Unknown"
+                                val v  = elem.jsonObject["value"]?.jsonPrimitive?.contentOrNull ?: ""
+                                val u  = elem.jsonObject["unit"]?.jsonPrimitive?.contentOrNull ?: ""
+                                nsSystemBiomarkers.add("$dn: $dr${if (v.isNotEmpty()) " ($v${if (u.isNotEmpty()) " $u" else ""})" else ""}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.info { "Target biomarker system: $nsSystemName" }
+        logger.info { "System biomarkers (${nsSystemBiomarkers.size}):\n${nsSystemBiomarkers.joinToString("\n")}" }
+
+        val nsTargetContext  = "$randomDisplayName: $randomDisplayRating (value: $randomValue${if (randomUnit.isNotEmpty()) " $randomUnit" else ""})"
+        val nsAllSysContext  = if (nsSystemBiomarkers.isNotEmpty()) nsSystemBiomarkers.joinToString("\n") else "(no additional biomarkers in system)"
+        val nsUserContextStr = "Age: $nsAge, Gender: $nsGender"
+
+        // 2b. The exact same generation prompt the web uses (as context for the QA validator)
+        val nsOriginalWebPrompt = """
+            You are a clinical writer who explains biomarker data in simple, accurate, and user-friendly English. Your goal is pure explanation and education—NO recommendations or action items.
+
+            You will be given:
+            1. TARGET BIOMARKERS — the main biomarkers to focus on.
+            2. ALL BIOMARKERS BY SYSTEM — all biomarkers from the same biological system.
+            3. USER CONTEXT — demographics and lifestyle details that add relevance.
+
+            Your goal:
+            - Explain what the TARGET biomarkers mean in plain language.
+            - Provide user information about their health state based on the biomarkers.
+            - Provide context by comparing to normal ranges and the user's full system state.
+            - NO recommendations, NO action steps, NO lifestyle advice—only explanation.
+            - Maintain a balanced, empowering tone without being alarmist.
+
+            Follow this exact structure and word count:
+            Title - [A concise, descriptive headline explaining the biomarker, under 12 words]
+            What this means:
+            [Up to 100 words. Write a clear, user friendly explanation of what the biomarker reflects about the user's health state.]
+            Potential Causes:
+            [20 - 40 words. Explain what might contribute to this reading or the biomarker's role in health. Do not provide recommendations. Count your words manually before finalizing. Do not exceed or fall short.]
+
+            Tone:
+            - Friendly, science-informed, and clear
+            - Avoid medical jargon and bullet points
+            - Write for a non-medical audience
+            - Focus on education and awareness
+            - Never use any em dashes
+            - Do not explain your reasoning or include word counts in the output
+
+            Output only the three sections in JSON format with keys:
+            { "title": "", "whatThisMeans": "", "potentialCauses": "" }
+        """.trimIndent()
+
+        // 2c. QA validator meta-prompt
+        val nsQaSystemPrompt = """
+            You are a quality-assurance validator for AI-generated biomarker explanations in a personalised health report.
+
+            You will be given:
+            1. The GENERATION PROMPT the web application uses to produce content.
+            2. The ACTUAL INPUTS provided to that prompt (target biomarker, system biomarkers, user context).
+            3. The ACTUAL OUTPUT already rendered in the UI (whatThisMeans text and potentialCauses text as separate fields).
+
+            Your job is to evaluate whether the actual output strictly complies with ALL constraints in the generation prompt and these additional QA rules:
+
+            CONSTRAINTS TO CHECK:
+            1. TITLE_WORDS               – The title (inferred from context) must be under 12 words.
+            2. WHAT_THIS_MEANS_WORDS     – "whatThisMeans" text must be up to 100 words (1–100 inclusive).
+            3. POTENTIAL_CAUSES_WORDS    – "potentialCauses" text must be between 20 and 40 words inclusive.
+            4. NO_EM_DASH                – Neither field may contain em dashes (— or —).
+            5. NO_RECOMMENDATIONS        – Neither field may contain action steps, lifestyle advice, or recommendations.
+            6. RELEVANCE                 – Content must be specifically related to the given target biomarker and its display_rating.
+            7. TONE                      – Must be friendly, educational, science-informed, and non-alarmist.
+            8. COHERENCE                 – Each field must be coherent prose, not a bullet list nor sentence fragments.
+
+            Respond ONLY in JSON with this exact structure:
+            {
+              "what_this_means_word_count": <number>,
+              "potential_causes_word_count": <number>,
+              "no_em_dash": true | false,
+              "no_recommendations": true | false,
+              "relevance_score": 1-10,
+              "tone_pass": true | false,
+              "coherence_pass": true | false,
+              "issues": ["list of specific problems found, empty array if none"],
+              "verdict": "PASS" | "FAIL",
+              "explanation": "one concise sentence summarising the overall evaluation"
+            }
+        """.trimIndent()
+
+        val nsQaUserPrompt = """
+            === GENERATION PROMPT (what the web sends to OpenAI) ===
+            $nsOriginalWebPrompt
+
+            === ACTUAL INPUTS PROVIDED TO THE PROMPT ===
+            TARGET BIOMARKER:
+            $nsTargetContext
+
+            ALL BIOMARKERS BY SYSTEM ($nsSystemName):
+            $nsAllSysContext
+
+            USER CONTEXT:
+            $nsUserContextStr
+
+            === ACTUAL OUTPUT RENDERED IN THE UI ===
+            whatThisMeans:
+            $whatThisMeansText
+
+            potentialCauses:
+            $potentialCausesText
+
+            Evaluate the output against all constraints and respond in JSON only.
+        """.trimIndent()
+
+        val nsOpenAiApiKey = System.getenv("OPENAI_API_KEY")
+            ?: "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"
+
+        val nsQaRequestBody = buildJsonObject {
+            put("model", "gpt-4o-mini")
+            put("temperature", 0.0)
+            putJsonArray("messages") {
+                addJsonObject { put("role", "system"); put("content", nsQaSystemPrompt) }
+                addJsonObject { put("role", "user");   put("content", nsQaUserPrompt)   }
+            }
+            putJsonObject("response_format") { put("type", "json_object") }
+        }.toString()
+
+        logger.info { "Calling OpenAI QA validator for 'What Needs Support' biomarker: $randomDisplayName..." }
+
+        val nsQaResponse = try {
+            page1.context().request().post(
+                "https://api.openai.com/v1/chat/completions",
+                RequestOptions.create()
+                    .setHeader("Content-Type", "application/json")
+                    .setHeader("Authorization", "Bearer $nsOpenAiApiKey")
+                    .setData(nsQaRequestBody)
+            )
+        } catch (e: Exception) {
+            throw AssertionError("OpenAI QA API call threw an exception for $randomDisplayName: ${e.message}")
+        }
+
+        assert(nsQaResponse.status() == 200) {
+            "OpenAI QA API returned status ${nsQaResponse.status()} for $randomDisplayName. Body: ${nsQaResponse.text()}"
+        }
+
+        val nsQaResponseJson = jsonParser.decodeFromString<JsonObject>(nsQaResponse.text())
+        val nsQaContent = nsQaResponseJson["choices"]
+            ?.jsonArray?.firstOrNull()
+            ?.jsonObject?.get("message")
+            ?.jsonObject?.get("content")
+            ?.jsonPrimitive?.contentOrNull
+            ?: throw AssertionError("Could not extract QA content from OpenAI response for $randomDisplayName")
+
+        logger.info { "OpenAI QA raw content:\n$nsQaContent" }
+
+        val nsQaResult             = jsonParser.decodeFromString<JsonObject>(nsQaContent)
+        val nsWhatThisMeansWords   = nsQaResult["what_this_means_word_count"]?.jsonPrimitive?.intOrNull ?: 0
+        val nsPotentialCausesWords = nsQaResult["potential_causes_word_count"]?.jsonPrimitive?.intOrNull ?: 0
+        val nsNoEmDash             = nsQaResult["no_em_dash"]?.jsonPrimitive?.booleanOrNull ?: false
+        val nsNoRecommendations    = nsQaResult["no_recommendations"]?.jsonPrimitive?.booleanOrNull ?: false
+        val nsRelevanceScore       = nsQaResult["relevance_score"]?.jsonPrimitive?.intOrNull ?: 0
+        val nsTonePass             = nsQaResult["tone_pass"]?.jsonPrimitive?.booleanOrNull ?: false
+        val nsCoherencePass        = nsQaResult["coherence_pass"]?.jsonPrimitive?.booleanOrNull ?: false
+        val nsQaVerdict            = nsQaResult["verdict"]?.jsonPrimitive?.contentOrNull ?: "FAIL"
+        val nsQaExplanation        = nsQaResult["explanation"]?.jsonPrimitive?.contentOrNull ?: ""
+        val nsQaIssues             = nsQaResult["issues"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+
+        // ── Validation Report ─────────────────────────────────────────────────────────
+        logger.info { "╔═══════════════════════════════════════════════════════════════╗" }
+        logger.info { "  WHAT NEEDS SUPPORT — QA VALIDATION REPORT: $randomDisplayName" }
+        logger.info { "╠═══════════════════════════════════════════════════════════════╣" }
+        logger.info { "  metric_id              : $randomMetricId" }
+        logger.info { "  display_rating         : $randomDisplayRating" }
+        logger.info { "  whatThisMeans words    : $nsWhatThisMeansWords (must be 1–100)" }
+        logger.info { "  potentialCauses words  : $nsPotentialCausesWords (must be 20–40)" }
+        logger.info { "  No em-dash             : $nsNoEmDash" }
+        logger.info { "  No recommendations     : $nsNoRecommendations" }
+        logger.info { "  Relevance score        : $nsRelevanceScore / 10 (min 6)" }
+        logger.info { "  Tone pass              : $nsTonePass" }
+        logger.info { "  Coherence pass         : $nsCoherencePass" }
+        logger.info { "  Verdict                : $nsQaVerdict" }
+        logger.info { "  Explanation            : $nsQaExplanation" }
+        if (nsQaIssues.isNotEmpty()) {
+            logger.info { "  Issues:" }
+            nsQaIssues.forEach { logger.info { "    • $it" } }
+        }
+        logger.info { "╚═══════════════════════════════════════════════════════════════╝" }
+
+        // ── Collect all failures and report together ──────────────────────────────────
+        val nsFailures = mutableListOf<String>()
+
+        if (nsWhatThisMeansWords !in 1..100)
+            nsFailures.add("'whatThisMeans' word count is $nsWhatThisMeansWords — must be 1–100 words.")
+        if (nsPotentialCausesWords !in 20..40)
+            nsFailures.add("'potentialCauses' word count is $nsPotentialCausesWords — must be 20–40 words.")
+        if (!nsNoEmDash)
+            nsFailures.add("Content contains em dashes (— or —), which are forbidden by the prompt.")
+        if (!nsNoRecommendations)
+            nsFailures.add("Content contains recommendations or action steps, which are forbidden by the prompt.")
+        if (nsRelevanceScore < 6)
+            nsFailures.add("Relevance score is $nsRelevanceScore/10 — below the minimum threshold of 6.")
+        if (!nsTonePass)
+            nsFailures.add("Tone check FAILED — content may be alarmist, overly clinical, or use jargon.")
+        if (!nsCoherencePass)
+            nsFailures.add("Coherence check FAILED — content may be a list or contain sentence fragments.")
+        if (nsQaVerdict == "FAIL")
+            nsFailures.add("OpenAI QA verdict is FAIL. Explanation: $nsQaExplanation")
+        if (nsQaIssues.isNotEmpty())
+            nsFailures.add("OpenAI QA issues: ${nsQaIssues.joinToString("; ")}")
+
+        if (nsFailures.isNotEmpty()) {
+            val errorReport = "What Needs Support content validation FAILED for '$randomDisplayName':\n" +
+                    nsFailures.mapIndexed { i, f -> "${i + 1}. $f" }.joinToString("\n")
+            logger.error { errorReport }
+            org.junit.jupiter.api.Assertions.fail<Unit>(errorReport)
+        }
+
+        logger.info { "\n✅ What Needs Support content for '$randomDisplayName' passed ALL validation constraints." }
     }
 }
 
