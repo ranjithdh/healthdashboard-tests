@@ -13,8 +13,6 @@ import onboard.page.LoginPage
 import onboard.page.OtpPage
 import org.apache.pdfbox.Loader
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Order
-import org.junit.jupiter.api.Test
 import utils.logger.logger
 import utils.report.StepHelper
 import java.util.regex.Pattern
@@ -3317,17 +3315,28 @@ class ActionPlanAdminTest : BaseTest() {
 //        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
         assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
 
-        page1.getByTestId("button-toggle-category-nutrition").click();
-        page1.getByTestId("button-vitamin-selector").click();
+        page1.getByTestId("button-toggle-category-nutrition").click()
+        page1.getByTestId("button-vitamin-selector").click()
 
-        // need to choose any one of the checkbox
-        page1.getByTestId("checkbox-vitamin-vitamin-b6").click();
-        page1.getByTestId("checkbox-vitamin-vitamin-b3").click();
-        page1.getByTestId("checkbox-vitamin-omega-3").click();
-        page1.getByTestId("checkbox-vitamin-vitamin-e").click();
+        // Choosing specific vitamins as requested
+        page1.getByTestId("checkbox-vitamin-vitamin-b6").click()
 
+        page1.getByTestId("button-add-selected").click()
+        
+        // Verify the generated content for Nutrition Guidance
+        page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition Guidance")).click()
 
-        page1.getByTestId("button-add-selected").click();
+        // Verify Vitamin B2 details
+        page1.getByText("Vitamin B2 (Riboflavin)").click()
+        page1.getByText("Food Sources:").click()
+
+        // Verify food sources matching NUTRIENT_DATA
+        page1.getByText("Almonds, sunflower seeds, mushrooms, spinach, soybeans, tofu, tempeh, nutritional yeast, fortified cereals.").click()
+
+        page1.getByText("Why adopt this:").click()
+        
+        // Dynamic test ID for Vitamin B2 description
+        page1.getByTestId("why_abopt_this-vitamin_b2_riboflavin-description").click()
     }
 }
 
