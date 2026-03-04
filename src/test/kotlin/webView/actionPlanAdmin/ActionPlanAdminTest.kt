@@ -3317,9 +3317,17 @@ class ActionPlanAdminTest : BaseTest() {
 //        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
         assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
 
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
+        page1.getByTestId("button-toggle-category-nutrition").click();
+        page1.getByTestId("button-vitamin-selector").click();
 
+        // need to choose any one of the checkbox
+        page1.getByTestId("checkbox-vitamin-vitamin-b6").click();
+        page1.getByTestId("checkbox-vitamin-vitamin-b3").click();
+        page1.getByTestId("checkbox-vitamin-omega-3").click();
+        page1.getByTestId("checkbox-vitamin-vitamin-e").click();
+
+
+        page1.getByTestId("button-add-selected").click();
     }
 }
 
