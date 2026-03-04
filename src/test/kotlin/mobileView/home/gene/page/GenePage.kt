@@ -9,9 +9,11 @@ import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.diagnostics.TestDetailPage
 import mobileView.home.gene.model.GeneDataWrapper
 import mobileView.home.gene.model.GeneItem
+import mobileView.home.gene.model.GeneMetricData
+import mobileView.home.gene.model.GeneMetricItem
+import mobileView.home.gene.model.GeneMetricResponse
 import mobileView.home.gene.model.GeneResponse
 import mobileView.home.gut.model.GutDataWrapper
-import mobileView.home.gut.model.GutMetricDetails
 import mobileView.home.gut.model.GutResponse
 import mobileView.home.gut.util.GutUtility.toKebabCase
 import model.healthdata.HealthData
@@ -31,7 +33,7 @@ class GenePage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.BIOMARKERS_URL
 
     private var gutDataWrapper: GutDataWrapper? = null
-    private var gutMetricDetails: GutMetricDetails? = null
+    private var geneMetricData: GeneMetricData? = null
 
     private var geneDataWrapper: GeneDataWrapper? = null
 
@@ -218,12 +220,12 @@ class GenePage(page: Page) : BasePage(page) {
             //val headerTextActual = headerUiElement.innerText() TODO
             val markerTextActual = markerUiElement.innerText()
 
-          //  headerUiElement.waitFor() TODO
+            //  headerUiElement.waitFor() TODO
             markerUiElement.waitFor()
 
-         /*   logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" } TODO
-            assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
-*/
+            /*   logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" } TODO
+               assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
+   */
             val expectedMarkerCount = "${geneList?.size} Markers".uppercase()
             logger.info { "Validating Marker Count for '$headerExpected': Expected='$expectedMarkerCount', Actual='${markerTextActual.uppercase()}'" }
             assertEquals(
@@ -260,6 +262,143 @@ class GenePage(page: Page) : BasePage(page) {
             logger.info { "Validating Marker [ID: $metricID]: ExpectedName='$expectedName', ActualName='$actualName', ExpectedInference='$expectedDescription', ActualInference='$actualDescription'" }
             assertEquals(expectedName, actualName)
             assertEquals(expectedDescription, actualDescription)
+        }
+    }
+
+
+    /**------------Gene Details---------------*/
+
+    fun geneDetailsValidation() {
+        val geneList = geneDataWrapper?.gene?.data
+        if (geneList?.isNotEmpty() == true) {
+            val geneListGroupByName = getGeneDataByGroup(geneList)
+            geneListGroupByName.keys.forEach { groupName ->
+                val id = toKebabCase(groupName)
+                val markerUiElement = page.getByTestId("gene-group-marker-$id")
+
+                markerUiElement.click()
+
+                val geneItemList = geneListGroupByName[groupName]
+
+                geneItemList?.forEach { geneItem ->
+                    val metricID = geneItem.metric?.metricId
+
+                    val nameUiElement = page.getByTestId("gene-item-name-$metricID")
+                    nameUiElement.click()
+
+                    captureGeneDetails(listOf(metricID)) //API call
+
+                    if (geneMetricData != null) {
+                        validatingGeneDetails(geneMetricData)
+                    }
+
+                    page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back")).click()
+                }
+            }
+        }
+    }
+
+    private fun validatingGeneDetails(geneMetricData: GeneMetricData?) {
+        val metricData = geneMetricData?.metrics?.get(0)
+        geneDetailsHeaderValidation(metricData)
+        bottomLineValidation(metricData)
+    }
+
+    private fun bottomLineValidation(metricData: GeneMetricItem?) {
+        val bottomLine = metricData
+            ?.details
+            ?.firstOrNull { it.category == "bottom_line" }
+
+        if (bottomLine?.content.isNullOrEmpty()) return
+
+        val bottomLineTitle = page.getByTestId("gene-bottom-line-title")
+        bottomLineTitle.waitFor()
+        val actualBottomLineTitle = bottomLineTitle.innerText()
+        logger.info { "Validating Bottom Line Title: Expected='Bottom line', Actual='$actualBottomLineTitle'" }
+        assertEquals("Bottom line", actualBottomLineTitle)
+
+        val bottomLineText = page.getByTestId("gene-bottom-line-text")
+        bottomLineText.waitFor()
+        bottomLineText.scrollIntoViewIfNeeded()
+        val actualBottomLineText = bottomLineText.innerText()
+        val expectedBottomLine = bottomLine?.content
+
+        logger.info { "Validating Bottom Line Content: Expected='$expectedBottomLine', Actual='$actualBottomLineText'" }
+        assertEquals(
+            expectedBottomLine?.normalizeForUiCompare(),
+            actualBottomLineText.normalizeForUiCompare()
+        )
+    }
+
+    private fun geneDetailsHeaderValidation(metricData: GeneMetricItem?) {
+
+
+        val name = metricData?.metric?.displayName?.normalizeForUiCompare()
+        val inference = metricData?.summary?.inference
+        val displayDescription = metricData?.summary?.displayDescription
+
+
+        val titleUiElement = page.getByTestId("gene-title")
+        val badgeUiElement = page.getByTestId("gene-inference-badge")
+        val descriptionUiElement = page.getByTestId("gene-display-description")
+
+
+        titleUiElement.waitFor()
+        assertEquals(name, titleUiElement.innerText().normalizeForUiCompare().replace(inference ?: "", "").trim())//TODO
+
+        if (!inference.isNullOrBlank()) {
+            badgeUiElement.waitFor()
+            assertEquals(metricData.summary.inference, badgeUiElement.innerText())
+        }
+
+
+        if (!displayDescription.isNullOrBlank()) {
+            descriptionUiElement.waitFor()
+            assertEquals(displayDescription, descriptionUiElement.innerText())
+        }
+    }
+
+    private fun captureGeneDetails(metricIds: List<String?>) {
+        try {
+            val timeZone = java.util.TimeZone.getDefault().id
+
+            val metricParams = metricIds.joinToString("&") { "metric_id[]=$it" }
+
+
+            val apiUrl =
+                "${TestConfig.APIs.API_GENE_DETAILS}?$metricParams"
+
+            val apiContext = page.context().request()
+            val response = apiContext.get(
+                apiUrl,
+                RequestOptions.create()
+                    .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                    .setHeader("client_id", TestConfig.CLIENT_ID)
+                    .setHeader("user_timezone", refactorTimeZone(timeZone))
+            )
+
+
+            if (response.status() != 200) {
+                logger.error { "API returned error status: ${response.status()}" }
+                return
+            }
+
+            val responseBody = response.text()
+            if (responseBody.isNullOrBlank()) {
+                logger.error { "API response body is empty" }
+                return
+            }
+
+
+            val responseObj = json.decodeFromString<GeneMetricResponse>(responseBody)
+
+            if (responseObj.status == "success") {
+                geneMetricData = responseObj.data
+                logApiResponse(apiUrl, responseObj)
+            }
+
+        } catch (e: Exception) {
+            logger.error { "Failed to fetch account information: ${e.message}" }
         }
     }
 

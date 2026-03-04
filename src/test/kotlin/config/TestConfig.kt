@@ -115,6 +115,7 @@ object TestConfig {
         val API_GUT = "$BASE_URL/v4/human-token/health-data/gut"
         val API_GENE = "$BASE_URL/v4/human-token/health-data/gene"
         val API_GUT_DETAILS = "$BASE_URL/v4/human-token/health-data/gut/metric"
+        val API_GENE_DETAILS = "$BASE_URL/v4/human-token/health-data/gene/metric"
         const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
         const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
             "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
