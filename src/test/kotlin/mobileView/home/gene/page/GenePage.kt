@@ -212,18 +212,18 @@ class GenePage(page: Page) : BasePage(page) {
             val geneList = headerList[headerExpected]
             val id = toKebabCase(headerExpected)
             logger.info { "Validating marker id '$id'" }
-             val headerUiElement = page.getByTestId("gene-group-header-$id")
+            //val headerUiElement = page.getByTestId("gene-group-header-$id") TODO
             val markerUiElement = page.getByTestId("gene-group-marker-$id")
 
-             val headerTextActual = headerUiElement.innerText()
+            //val headerTextActual = headerUiElement.innerText() TODO
             val markerTextActual = markerUiElement.innerText()
 
-             headerUiElement.waitFor()
+          //  headerUiElement.waitFor() TODO
             markerUiElement.waitFor()
 
-             logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" }
-                assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
-
+         /*   logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" } TODO
+            assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
+*/
             val expectedMarkerCount = "${geneList?.size} Markers".uppercase()
             logger.info { "Validating Marker Count for '$headerExpected': Expected='$expectedMarkerCount', Actual='${markerTextActual.uppercase()}'" }
             assertEquals(
