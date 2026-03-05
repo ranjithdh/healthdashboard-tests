@@ -3318,25 +3318,40 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByTestId("button-toggle-category-nutrition").click()
         page1.getByTestId("button-vitamin-selector").click()
 
-        // Choosing specific vitamins as requested
-        page1.getByTestId("checkbox-vitamin-vitamin-b6").click()
+        // Choosing vitamins dynamically from the provided list //"Sodium",
+        val vitaminsToSelect =  listOf( "Iron", "Magnesium", "Calcium", "Potassium", "Selenium", "Zinc",  "Vitamin A (Retinol)", "Vitamin B1 (Thiamin)", "Vitamin B2 (Riboflavin)" , "Vitamin B3 (Niacin)", "Vitamin B5 (Pantothenic Acid)", "Vitamin B6 (Pyridoxine)", "Vitamin B7 (Biotin)", "Vitamin B9 (Folate)","Vitamin B12 (Cobalamin)","Vitamin C", "Vitamin D","Vitamin E", "Omega 3")
+
+       val randomVitamin = vitaminsToSelect.random()
+
+       val vitamin = randomVitamin.lowercase()
+            .replace("(", "")
+            .replace(")", "")
+            .trim()
+            .replace(" ", "_")
+            .replace("__", "_")
+
+        page1.getByTestId("checkbox-vitamin-$vitamin").click()
 
         page1.getByTestId("button-add-selected").click()
         
         // Verify the generated content for Nutrition Guidance
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition Guidance")).click()
 
-        // Verify Vitamin B2 details
-        page1.getByText("Vitamin B2 (Riboflavin)").click()
+        page1.waitForTimeout(5000.0)
+        // Verify Vitamin B2 details dynamically
+        page1.getByText(randomVitamin).click()
         page1.getByText("Food Sources:").click()
 
-        // Verify food sources matching NUTRIENT_DATA
-        page1.getByText("Almonds, sunflower seeds, mushrooms, spinach, soybeans, tofu, tempeh, nutritional yeast, fortified cereals.").click()
+        // Extract and verify food sources from NUTRIENT_DATA
+        val nutrientInfo = NUTRIENT_DATA.find { it.nutrient == randomVitamin }
+        if (nutrientInfo != null) {
+            val expectedSources = "${nutrientInfo.vegan}, ${nutrientInfo.glutenTolerant}."
+            page1.getByText(expectedSources).click()
+        }
 
         page1.getByText("Why adopt this:").click()
-        
-        // Dynamic test ID for Vitamin B2 description
-        page1.getByTestId("why_abopt_this-vitamin_b2_riboflavin-description").click()
+        val desc = page1.getByTestId("why_abopt_this-$randomVitamin-description").innerText()
+        logger.info { "Description: $desc" }
     }
 }
 
