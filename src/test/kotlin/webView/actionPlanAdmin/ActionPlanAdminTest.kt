@@ -3315,22 +3315,64 @@ class ActionPlanAdminTest : BaseTest() {
 //        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
         assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
 
+        // 4. Call user-data API on the replit app
+        StepHelper.step("Calling user-data API on replit app to fetch health data")
+        
+        val requestBody = buildJsonObject {
+            put("userId", targetUserId)
+            put("accessToken", TestConfig.ACCESS_TOKEN)
+        }.toString()
+
+        val userDataResponse = page1.context().request().post(
+            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setData(requestBody)
+        )
+        
+        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
+        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
+        val userData = userDataResponse.text()
+        val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
+        val apiData = userDataJson["data"]?.jsonObject
+        val userProfile = userDataJson["userProfile"]?.jsonObject
+
+        val age = userProfile?.get("age")?.jsonPrimitive?.contentOrNull ?: "Unknown"
+        val gender = userProfile?.get("gender")?.jsonPrimitive?.contentOrNull ?: "Unknown"
+
+        // Extract food lists for context
+        val eatList = mutableListOf<String>()
+        val avoidList = mutableListOf<String>()
+        val limitList = mutableListOf<String>()
+
+        apiData?.get("food")?.jsonObject?.get("data")?.jsonArray?.forEach { food ->
+            if (food is JsonObject) {
+                val foodName = food["name"]?.jsonPrimitive?.contentOrNull ?: "Unknown"
+                val rating = food["display_rating"]?.jsonPrimitive?.contentOrNull?.lowercase()?.trim() ?: "unknown"
+                when (rating) {
+                    "optimal" -> eatList.add(foodName)
+                    "monitor" -> limitList.add(foodName)
+                    "at risk" -> avoidList.add(foodName)
+                }
+            }
+        }
+
         page1.getByTestId("button-toggle-category-nutrition").click()
         page1.getByTestId("button-vitamin-selector").click()
 
-        // Choosing vitamins dynamically from the provided list //"Sodium",
+        // Choosing vitamins dynamically from the provided list
         val vitaminsToSelect =  listOf( "Iron", "Magnesium", "Calcium", "Potassium", "Selenium", "Zinc",  "Vitamin A (Retinol)", "Vitamin B1 (Thiamin)", "Vitamin B2 (Riboflavin)" , "Vitamin B3 (Niacin)", "Vitamin B5 (Pantothenic Acid)", "Vitamin B6 (Pyridoxine)", "Vitamin B7 (Biotin)", "Vitamin B9 (Folate)","Vitamin B12 (Cobalamin)","Vitamin C", "Vitamin D","Vitamin E", "Omega 3")
 
-       val randomVitamin = vitaminsToSelect.random()
+        val randomVitamin = vitaminsToSelect.random()
 
-       val vitamin = randomVitamin.lowercase()
+        val normalizedVitamin = randomVitamin.lowercase()
             .replace("(", "")
             .replace(")", "")
             .trim()
             .replace(" ", "_")
             .replace("__", "_")
 
-        page1.getByTestId("checkbox-vitamin-$vitamin").click()
+        page1.getByTestId("checkbox-vitamin-$normalizedVitamin").click()
 
         page1.getByTestId("button-add-selected").click()
         
@@ -3338,20 +3380,95 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition Guidance")).click()
 
         page1.waitForTimeout(5000.0)
-        // Verify Vitamin B2 details dynamically
+        // Expand the selected vitamin details
         page1.getByText(randomVitamin).click()
         page1.getByText("Food Sources:").click()
 
         // Extract and verify food sources from NUTRIENT_DATA
-        val nutrientInfo = NUTRIENT_DATA.find { it.nutrient == randomVitamin }
-        if (nutrientInfo != null) {
-            val expectedSources = "${nutrientInfo.vegan}, ${nutrientInfo.glutenTolerant}."
+        val nutrientDataMatch = NUTRIENT_DATA.find { it.nutrient == randomVitamin }
+        if (nutrientDataMatch != null) {
+            val expectedSources = "${nutrientDataMatch.vegan}, ${nutrientDataMatch.glutenTolerant}."
             page1.getByText(expectedSources).click()
         }
 
         page1.getByText("Why adopt this:").click()
-        val desc = page1.getByTestId("why_abopt_this-$randomVitamin-description").innerText()
-        logger.info { "Description: $desc" }
+        val desc = page1.getByTestId("why_abopt_this-$normalizedVitamin-description").innerText()
+        logger.info { "Extracted Description: $desc" }
+
+        // ── OpenAI Validation ──────────────────────────────────────────────────────────
+        StepHelper.step("Calling OpenAI to validate the description for $randomVitamin")
+        
+        val validationSystemPrompt = """
+            You are a quality-assurance validator for personalized nutrition advice.
+            
+            Generation Instructions being validated:
+            - Generate a bullet-point list of 5 food sources rich in [Vitamin Name]
+            - Format each item as: • [Food name (category/detail)] - [Preparation note]
+            - PRIORITIZE foods from the "Foods recommended to EAT" list.
+            - ALWAYS EXCLUDE any foods from the "Foods to AVOID" section.
+            - If EAT list specifies fewer than 3 foods, include "Foods to LIMIT" with "(1-2 times a week in limited quantities)" note.
+            - Must provide at least 3 food recommendations.
+            - Provide a brief benefit statement (2 sentences explaining why it matters).
+
+            Your task is to judge if the provided text follows these rules.
+            Respond ONLY in JSON:
+            {
+              "meaningful": true,
+              "compliance_score": 1,
+              "issues": ["list of instruction violations, empty if none"],
+              "verdict": "PASS" | "FAIL",
+              "explanation": "one sentence summary"
+            }
+        """.trimIndent()
+
+        val validationUserContent = """
+            Nutrient Name: $randomVitamin
+            User Profile: $age, $gender
+            
+            Foods recommended to EAT: ${eatList.joinToString(", ")}
+            Foods to LIMIT: ${limitList.joinToString(", ")}
+            Foods to AVOID: ${avoidList.joinToString(", ")}
+            
+            Text to Validate:
+            \"\"\"
+            $desc
+            \"\"\"
+        """.trimIndent()
+
+        val openAiApiKey = System.getenv("OPENAI_API_KEY")
+            ?: throw IllegalStateException("OPENAI_API_KEY env variable not set")
+
+        val openAiRequestBody = buildJsonObject {
+            put("model", "gpt-4o-mini")
+            put("temperature", 0.0)
+            putJsonArray("messages") {
+                addJsonObject { put("role", "system"); put("content", validationSystemPrompt) }
+                addJsonObject { put("role", "user"); put("content", validationUserContent) }
+            }
+            putJsonObject("response_format") { put("type", "json_object") }
+        }.toString()
+
+        val openAiResponse = page1.context().request().post(
+            "https://api.openai.com/v1/chat/completions",
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/json")
+                .setHeader("Authorization", "Bearer $openAiApiKey")
+                .setData(openAiRequestBody)
+        )
+
+        assert(openAiResponse.status() == 200) { "OpenAI call failed: ${openAiResponse.text()}" }
+        val aiContent = jsonParser.decodeFromString<JsonObject>(openAiResponse.text())["choices"]?.jsonArray?.get(0)?.jsonObject?.get("message")?.jsonObject?.get("content")?.jsonPrimitive?.contentOrNull
+            ?: throw AssertionError("Failed to parse OpenAI response")
+        
+        val result = jsonParser.decodeFromString<JsonObject>(aiContent)
+        val verdict = result["verdict"]?.jsonPrimitive?.contentOrNull ?: "FAIL"
+        val issues = result["issues"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+        val explanation = result["explanation"]?.jsonPrimitive?.contentOrNull ?: ""
+
+        logger.info { "OpenAI Verdict: $verdict ($explanation)" }
+        if (issues.isNotEmpty()) logger.warn { "Issues identified: $issues" }
+
+        assert(verdict == "PASS") { "OpenAI validation failed for $randomVitamin. Reason: $explanation. Issues: $issues" }
     }
 }
 
