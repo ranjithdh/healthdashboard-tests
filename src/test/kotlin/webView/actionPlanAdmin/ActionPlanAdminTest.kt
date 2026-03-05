@@ -3361,7 +3361,7 @@ class ActionPlanAdminTest : BaseTest() {
         page1.getByTestId("button-vitamin-selector").click()
 
         // Choosing vitamins dynamically from the provided list
-        val vitaminsToSelect =  listOf( "Iron", "Magnesium", "Calcium", "Potassium", "Selenium", "Zinc",  "Vitamin A (Retinol)", "Vitamin B1 (Thiamin)", "Vitamin B2 (Riboflavin)" , "Vitamin B3 (Niacin)", "Vitamin B5 (Pantothenic Acid)", "Vitamin B6 (Pyridoxine)", "Vitamin B7 (Biotin)", "Vitamin B9 (Folate)","Vitamin B12 (Cobalamin)","Vitamin C", "Vitamin D","Vitamin E", "Omega 3")
+        val vitaminsToSelect =  listOf("Sodium","Iron", "Magnesium", "Calcium", "Potassium", "Selenium", "Zinc",  "Vitamin A (Retinol)", "Vitamin B1 (Thiamin)", "Vitamin B2 (Riboflavin)" , "Vitamin B3 (Niacin)", "Vitamin B5 (Pantothenic Acid)", "Vitamin B6 (Pyridoxine)", "Vitamin B7 (Biotin)", "Vitamin B9 (Folate)","Vitamin B12 (Cobalamin)","Vitamin C", "Vitamin D","Vitamin E", "Omega 3")
 
         val randomVitamin = vitaminsToSelect.random()
 
