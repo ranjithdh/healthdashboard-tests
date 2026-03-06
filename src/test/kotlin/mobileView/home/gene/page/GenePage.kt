@@ -392,7 +392,7 @@ class GenePage(page: Page) : BasePage(page) {
             nameUiElement.scrollIntoViewIfNeeded()
 
             if (!correlations.sourceInference.isNullOrBlank()) {
-                val inferenceUiElement = if (correlations.sourceType == "gene") { //tODO
+                val inferenceUiElement = if (correlations.sourceType == "gene") {
                     page.getByTestId("gene-biomarker-gene-inference-$index")
                 } else {
                     page.getByTestId("gene-biomarker-inference-$index")
@@ -721,7 +721,7 @@ class GenePage(page: Page) : BasePage(page) {
 
 
         titleUiElement.waitFor()
-        assertEquals(name, titleUiElement.innerText().normalizeForUiCompare().replace(inference ?: "", "").trim())//TODO
+        assertEquals(name, titleUiElement.innerText().normalizeForUiCompare().replace(inference ?: "", "").trim())
 
         if (!inference.isNullOrBlank()) {
             badgeUiElement.waitFor()
