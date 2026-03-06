@@ -1,6 +1,7 @@
 package mobileView.home.gut.util
 
 import kotlinx.serialization.json.Json
+import mobileView.home.gene.model.BloodGeneMapping
 import mobileView.home.gut.model.BloodGutCorrleations
 import mobileView.home.gut.model.UpSellMapping
 
@@ -26,4 +27,16 @@ object TestMappingLoader {
 
         return json.decodeFromString(text)
     }
+
+    fun loadBloodGeneCorrelationsMappings(): List<BloodGeneMapping> {
+        val text = this::class.java
+            .getResource("/file/blood_gene_correlations.json")
+            ?.readText()
+            ?: error("JSON file not found")
+
+        return json.decodeFromString(text)
+    }
+
+
+
 }

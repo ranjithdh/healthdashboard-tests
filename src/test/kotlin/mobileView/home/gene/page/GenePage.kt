@@ -9,13 +9,22 @@ import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
 import mobileView.diagnostics.TestDetailPage
 import mobileView.home.gene.model.GeneDataWrapper
 import mobileView.home.gene.model.GeneItem
+import mobileView.home.gene.model.GeneMetricCorrelation
 import mobileView.home.gene.model.GeneMetricData
+import mobileView.home.gene.model.GeneMetricDetail
 import mobileView.home.gene.model.GeneMetricItem
 import mobileView.home.gene.model.GeneMetricResponse
 import mobileView.home.gene.model.GeneResponse
 import mobileView.home.gut.model.GutDataWrapper
+import mobileView.home.gut.model.GutMetricItem
 import mobileView.home.gut.model.GutResponse
+import mobileView.home.gut.model.MetricCorrelation
+import mobileView.home.gut.model.MetricDetail
+import mobileView.home.gut.model.ParsedSection
+import mobileView.home.gut.model.ParsedSubSection
+import mobileView.home.gut.util.GutUtility.gutSourceType
 import mobileView.home.gut.util.GutUtility.toKebabCase
+import mobileView.home.gut.util.TestMappingLoader
 import model.healthdata.HealthData
 import utils.Normalize.refactorTimeZone
 import utils.json.json
@@ -24,10 +33,15 @@ import utils.report.StepHelper
 import utils.report.StepHelper.FETCH_GENE_DATA
 import utils.report.StepHelper.FETCH_GUT_DATA
 import utils.report.StepHelper.FETCH_HEALTH_DATA
+import utils.report.StepHelper.VALIDATING_CONNECTED_BIOMARKERS_TAB
 import utils.report.StepHelper.VALIDATING_GENE_LIST
+import utils.report.StepHelper.VALIDATING_WHAT_IT_MEANS_TAB
 import utils.report.StepHelper.logApiResponse
+import kotlin.collections.filter
 import kotlin.collections.forEach
 import kotlin.test.assertEquals
+import kotlin.text.replace
+import kotlin.text.startsWith
 
 class GenePage(page: Page) : BasePage(page) {
     override val pageUrl = TestConfig.Urls.BIOMARKERS_URL
@@ -38,6 +52,10 @@ class GenePage(page: Page) : BasePage(page) {
     private var geneDataWrapper: GeneDataWrapper? = null
 
     private var healthData: HealthData? = null
+
+    private val bloodGeneCorrleations = TestMappingLoader.loadBloodGeneCorrelationsMappings() //data
+
+    private val geneGutMappings = TestMappingLoader.loadGeneGutMappings() //data
 
 
     init {
@@ -300,9 +318,366 @@ class GenePage(page: Page) : BasePage(page) {
 
     private fun validatingGeneDetails(geneMetricData: GeneMetricData?) {
         val metricData = geneMetricData?.metrics?.get(0)
+
         geneDetailsHeaderValidation(metricData)
+
+        tabChecking(metricData)
+
+
         bottomLineValidation(metricData)
     }
+
+    private fun tabChecking(summaryMetricsList: GeneMetricItem?) {
+        val isWhyTab = shouldShowWhyTab(summaryMetricsList)
+        val isConnectedTab = shouldShowConnectedTab(summaryMetricsList)
+        if (isWhyTab) {
+            StepHelper.step(VALIDATING_WHAT_IT_MEANS_TAB)
+            logger.info { "Checking 'What it means' tab" }
+            val whatItMeansTab = page.getByTestId("gene-what-it-means-tab")
+            whatItMeansTab.waitFor()
+            whatItMeansTab.click()
+            checkWhatItMean(summaryMetricsList)
+        }
+        if (isConnectedTab) {
+            StepHelper.step(VALIDATING_CONNECTED_BIOMARKERS_TAB)
+            logger.info { "Checking 'Connected Biomarkers' tab" }
+            val connectedTab = page.getByTestId("gene-connected-biomarkers-tab")
+            connectedTab.waitFor()
+            connectedTab.click()
+            checkConnectedBiomarkers(summaryMetricsList)
+        }
+    }
+
+    private fun checkConnectedBiomarkers(summaryMetricsList: GeneMetricItem?) {
+        val allCorrelations: List<GeneMetricCorrelation>? =
+            summaryMetricsList?.correlations?.filter { !it.description.isNullOrBlank() || !it.sourceInference.isNullOrBlank() }
+                ?.associateBy { it.sourceMetricId }?.values
+                ?.toList()
+
+
+        val subText =
+            "These biomarkers are influenced by your genetic profile and can help monitor your health status."
+        val title = "Connected Biomarkers"
+
+        val titleUiElement = page.getByTestId("gene-connected-biomarkers-title")
+        titleUiElement.waitFor()
+        val actualTitle = titleUiElement.innerText()
+        logger.info { "Validating Connected Biomarkers Title: Expected='$title', Actual='$actualTitle'" }
+        assertEquals(title, actualTitle)
+
+        val subTexUiElement = page.getByTestId("gene-connected-biomarkers-description")
+        subTexUiElement.waitFor()
+        val actualSubText = subTexUiElement.innerText()
+        logger.info { "Validating Connected Biomarkers Subtext: Expected='$subText', Actual='$actualSubText'" }
+        assertEquals(subText, actualSubText)
+
+        allCorrelations?.forEachIndexed { index, correlations ->
+            val biomarkerName = correlations.sourceMetricName
+            logger.info { "Validating Biomarker [$index]: $biomarkerName" }
+
+            val nameUiElement = page.getByTestId("gene-biomarker-name-$index")
+            val typeUiElement = page.getByTestId("gene-biomarker-type-$index")
+
+
+            listOf(nameUiElement, typeUiElement).forEach { it.waitFor() }
+
+            val actualName = nameUiElement.innerText()
+            val actualType = typeUiElement.innerText()
+            val expectedType = gutSourceType(correlations.sourceType)
+
+            logger.info { "Validating Name and Type for [$index]: ExpectedName='$biomarkerName', ActualName='$actualName', ExpectedType='$expectedType', ActualType='$actualType'" }
+            assertEquals(biomarkerName, actualName)
+            assertEquals(expectedType, actualType)
+
+            nameUiElement.scrollIntoViewIfNeeded()
+
+            if (!correlations.sourceInference.isNullOrBlank()) {
+                val inferenceUiElement = if (correlations.sourceType == "gene") { //tODO
+                    page.getByTestId("gene-biomarker-gene-inference-$index")
+                } else {
+                    page.getByTestId("gene-biomarker-inference-$index")
+                }
+
+                inferenceUiElement.waitFor()
+                val actualInference = inferenceUiElement.innerText()
+                logger.info { "Validating Inference for [$index]: Expected='${correlations.sourceInference}', Actual='$actualInference'" }
+                assertEquals(correlations.sourceInference, actualInference)
+            }
+
+            if (!correlations.description.isNullOrBlank()) {
+                val isGeneEmpty = geneDataWrapper?.gene?.data
+                val bloodList = healthData?.data?.blood?.data
+
+                val targetMetricId = correlations.targetMetricId
+
+                if (correlations.sourceType == "blood") {
+                    if (bloodList?.isNotEmpty() == true) {
+                        val gutCorrleations = bloodGeneCorrleations.filter { it.geneMetricId == targetMetricId }
+
+                        if (gutCorrleations.isNotEmpty()) {
+                            val bloodMetricId = gutCorrleations[0].bloodMetricId
+
+                            val bloodData = bloodList.filter { it.metric_id == bloodMetricId }
+                            val geneData=summaryMetricsList
+                         //   val gutData = summaryMetricsList.filter { it.metric?.metricId == targetMetricId }
+
+                            if (bloodData.isNotEmpty() && geneData!=null) {
+                                val gutValue = geneData.summary.inference
+                                val bloodLevel = bloodData[0].display_rating
+
+                                val relatedObject =
+                                    gutCorrleations.find { it.revisedRating == gutValue && it.bloodLevel == bloodLevel }
+
+                                if (relatedObject != null) { //TODO need to recomment it
+                                    //assertEquals(relatedObject.Description.normalizeForUiCompare(), correlations.description.normalizeForUiCompare())
+                                }
+                            }
+
+                        }
+                    }
+                }
+                if (correlations.sourceType == "gut") {
+
+                    val gutMapping = geneGutMappings.find { it.gut_metric_id == targetMetricId }
+                    if (gutMapping != null) { //TODO need to recomment it
+                        // assertEquals(gutMapping.gene_upsell.normalizeForUiCompare(), correlations.description.normalizeForUiCompare())
+                    }
+                }
+
+                if (!correlations.description.isNullOrBlank()) {
+                    val desUiElement = page.getByTestId("gene-biomarker-description-$index")
+                    desUiElement.waitFor()
+                    val actualDescription = desUiElement.innerText()
+                    logger.info { "Validating Description for [$index]: Expected='${correlations.description}', Actual='$actualDescription'" }
+                    assertEquals(correlations.description.normalizeForUiCompare(), actualDescription.normalizeForUiCompare())
+                }
+            }
+        }
+    }
+
+    private fun checkWhatItMean(summaryMetricsList: GeneMetricItem?) {
+        whatItMeanTitleCheck(summaryMetricsList)
+
+        //other factor
+        whatItMeanOtherFactor(summaryMetricsList)
+
+        whatItMeanSections(summaryMetricsList)
+    }
+
+    private fun whatItMeanTitleCheck(summaryMetricsList: GeneMetricItem?) {
+        val descriptionExpected =
+            summaryMetricsList?.details?.filter { it.category == "impact_of_your_genes" }?.get(0)?.content
+        val groupName = "Impact of your genes"
+        val titleUiElement = page.getByTestId("gene-impact-title")
+        val descriptionUiElement = page.getByTestId("gene-impact-content")
+
+
+        titleUiElement.waitFor()
+        val actualTitleText = titleUiElement.innerText()
+        assertEquals(actualTitleText.normalizeForUiCompare(), groupName.normalizeForUiCompare())
+
+        descriptionUiElement.waitFor()
+        val descriptionActual = descriptionUiElement.innerText()
+        assertEquals(descriptionExpected?.normalizeForUiCompare(), descriptionActual?.normalizeForUiCompare())
+    }
+
+    private fun whatItMeanOtherFactor(summaryMetricsList: GeneMetricItem?) {
+
+
+        val otherFactors = summaryMetricsList?.details?.find { it.category == "factors" }
+
+        if (otherFactors?.content.isNullOrEmpty()) return
+
+        val factorLines = otherFactors?.content
+            ?.lines()
+            ?.filter { line ->
+                val trimmed = line.trim()
+                trimmed.startsWith("*") || trimmed.startsWith("##")
+            }
+
+        val factorList = factorLines?.map { line ->
+            line
+                .replace(Regex("^##\\s*"), "")          // remove heading ##
+                .replace(Regex("^\\*\\s*"), "")         // remove *
+                .replace(Regex("\\*\\*(.+?)\\*\\*"), "$1") // remove bold **
+        }
+
+        logger.info {
+            "List of factors:\n${factorList?.joinToString("\n") ?: "No factors found"}"
+        }
+
+
+        val otherFactorTitle = page.getByTestId("gene-other-factors-title")
+        otherFactorTitle.waitFor()
+
+        val actualFactorTitle = otherFactorTitle.innerText()
+        val expectedFactorTitle = factorList?.get(0)
+        logger.info { "Validating Other Factors Title: Expected='$expectedFactorTitle', Actual='$actualFactorTitle'" }
+        assertEquals(expectedFactorTitle, actualFactorTitle.normalizeForUiCompare())
+
+        factorList?.drop(1)?.forEachIndexed { index, factor ->
+            val factorUiElement = page.getByTestId("gene-other-factor-text-${index}")
+            factorUiElement.waitFor()
+            factorUiElement.scrollIntoViewIfNeeded()
+            val actualFactorText = factorUiElement.innerText()
+            logger.info { "Validating Other Factor [$index]: Expected='$factor', Actual='$actualFactorText'" }
+            assertEquals(factor.normalizeForUiCompare(), actualFactorText.normalizeForUiCompare())
+        }
+    }
+
+    private fun whatItMeanSections(summaryMetricsList: GeneMetricItem?) {
+        val details = summaryMetricsList?.details
+
+        val sections = parseSections(details)
+
+        logger.info { "whatItMeanSections.. ${summaryMetricsList?.metric?.groupName}" }
+
+        if (sections.isNotEmpty()) {
+            sections.forEachIndexed { sectionPosition, section ->
+                val titleExcepted = section.mainTitle
+                val contextExcepted = section.plainContent
+                val titleActual = page.getByTestId("gene-section-title-$sectionPosition")
+                val contentActual = page.getByTestId("gene-section-content-$sectionPosition")
+
+                listOf(titleActual, contentActual).forEach { it.waitFor() }
+                contentActual.scrollIntoViewIfNeeded()
+
+                val actualTitleText = titleActual.innerText()
+                val actualContentText = contentActual.innerText()
+
+                logger.info { "Validating Section $sectionPosition [Title]: Expected='$titleExcepted', Actual='$actualTitleText'" }
+                assertEquals(
+                    titleExcepted?.normalizeForUiCompare(),
+                    actualTitleText.normalizeForUiCompare()
+                )
+                logger.info { "Validating Section $sectionPosition [Content]: Expected='$contextExcepted', Actual='$actualContentText'" }
+                assertEquals(
+                    contextExcepted?.normalizeForUiCompare(),
+                    actualContentText.normalizeForUiCompare()
+                )
+                /*when (sectionPosition) {
+                    0 -> {
+
+                    }
+
+                    else -> {
+                        if (!section.mainTitle.isNullOrBlank() || !section.plainContent.isNullOrBlank() || section.subSections?.isNotEmpty() == true) {
+
+                            val titleExpected = section.mainTitle
+                            val titleActual = page.getByTestId("section-title-$sectionPosition")
+                            titleActual.waitFor()
+                            titleActual.scrollIntoViewIfNeeded()
+
+                            assertEquals(
+                                titleExpected?.normalizeForUiCompare(),
+                                titleActual.innerText().normalizeForUiCompare()
+                            )
+
+                            val subSectionsList = section.subSections
+
+                            subSectionsList?.forEachIndexed { index, subSection ->
+
+                                if (!subSection.title.isNullOrBlank()) {
+
+                                    val subsectionTitle = page.getByTestId("subsection-title-$sectionPosition-$index")
+                                    subsectionTitle.waitFor()
+                                    subsectionTitle.scrollIntoViewIfNeeded()
+
+                                    val actualSubTitle = subsectionTitle.innerText()
+                                    logger.info { "Validating Subsection $sectionPosition-$index [Title]: Expected='${subSection.title}', Actual='$actualSubTitle'" }
+                                    assertEquals(
+                                        subSection.title.normalizeForUiCompare(),
+                                        actualSubTitle.normalizeForUiCompare()
+                                    )
+                                }
+
+
+                                if (!subSection.description.isNullOrBlank()) {
+                                    val subsectionDescription =
+                                        page.getByTestId("subsection-description-$sectionPosition-$index")
+                                    subsectionDescription.waitFor()
+                                    subsectionDescription.scrollIntoViewIfNeeded()
+                                    val actualSubDesc = subsectionDescription.innerText()
+                                    logger.info { "Validating Subsection $sectionPosition-$index [Description]: Expected='${subSection.description}', Actual='$actualSubDesc'" }
+                                    assertEquals(
+                                        subSection.description.normalizeForUiCompare(),
+                                        actualSubDesc.normalizeForUiCompare()
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }*/
+            }
+
+        }
+
+        logger.info {
+            "List of sections:\n${sections?.joinToString("\n") ?: "No sections found"}"
+        }
+    }
+
+    fun parseSections(details: List<GeneMetricDetail>?): List<ParsedSection> {
+        if (details.isNullOrEmpty()) return emptyList()
+
+        val sections = details
+            .filter { it.category?.startsWith("section") == true }
+            .sortedBy {
+                it.category?.replace("section", "")?.toIntOrNull() ?: 0
+            }
+
+        return sections.map { section ->
+            val content = section.content.orEmpty()
+
+            // 1. Extract ## Main Title
+            val mainTitleRegex = Regex("^##\\s*(.*)", RegexOption.MULTILINE)
+            val mainTitleMatch = mainTitleRegex.find(content)
+            val mainTitle = mainTitleMatch?.groupValues?.get(1)?.trim()
+
+            // 2. Remove main title from content
+            val contentWithoutMain = if (mainTitle != null) {
+                content.replaceFirst(Regex("^##.*\\n?"), "").trim()
+            } else {
+                content.trim()
+            }
+
+            // 3. Check for ### subheadings
+            val hasSubHeadings = Regex("^###", RegexOption.MULTILINE)
+                .containsMatchIn(contentWithoutMain)
+
+            if (hasSubHeadings) {
+                // 4. Split into subsections
+                val subSections = contentWithoutMain
+                    .split(Regex("^###", RegexOption.MULTILINE))
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .map { sub ->
+                        val parts = sub.split(":", limit = 2)
+                        val title = parts.getOrNull(0)?.trim()
+                        val description = parts.getOrNull(1)?.trim()
+
+                        ParsedSubSection(
+                            title = title,
+                            description = description
+                        )
+                    }
+
+                ParsedSection(
+                    mainTitle = mainTitle,
+                    subSections = subSections,
+                    plainContent = null
+                )
+            } else {
+                // No ### headings → plain paragraph
+                ParsedSection(
+                    mainTitle = mainTitle,
+                    subSections = null,
+                    plainContent = contentWithoutMain
+                )
+            }
+        }
+    }
+
 
     private fun bottomLineValidation(metricData: GeneMetricItem?) {
 
@@ -412,6 +787,17 @@ class GenePage(page: Page) : BasePage(page) {
                     ?: "Others"
             }
         return gutListGroupByName ?: emptyMap()
+    }
+
+
+    fun shouldShowWhyTab(metrics: GeneMetricItem?): Boolean {
+        return metrics
+            ?.details
+            ?.isNotEmpty() == true
+    }
+
+    fun shouldShowConnectedTab(metrics: GeneMetricItem?): Boolean {
+        return metrics?.correlations?.isNotEmpty() == true
     }
 
 }

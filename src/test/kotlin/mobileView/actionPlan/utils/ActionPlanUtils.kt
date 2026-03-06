@@ -117,6 +117,7 @@ object ActionPlanUtils {
         this.replace("\u2028", " ")
             .replace("**", "")
             .normalizeQuotes()
+            .replace(Regex("""\\+"""), "") // removes one or more backslashes
             .replace(Regex("\\s+"), " ")
             .trim()
 

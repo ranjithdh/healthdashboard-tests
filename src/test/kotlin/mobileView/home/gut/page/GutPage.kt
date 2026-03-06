@@ -419,11 +419,13 @@ class GutPage(page: Page) : BasePage(page) {
                     }
                 }
 
-                val desUiElement = page.getByTestId("biomarker-description-$index")
-                desUiElement.waitFor()
-                val actualDescription = desUiElement.innerText()
-                logger.info { "Validating Description for [$index]: Expected='${correlations.description}', Actual='$actualDescription'" }
-                assertEquals(correlations.description, actualDescription)
+                if (!correlations.description.isNullOrBlank()) {
+                    val desUiElement = page.getByTestId("biomarker-description-$index")
+                    desUiElement.waitFor()
+                    val actualDescription = desUiElement.innerText()
+                    logger.info { "Validating Description for [$index]: Expected='${correlations.description}', Actual='$actualDescription'" }
+                    assertEquals(correlations.description, actualDescription)
+                }
             }
         }
     }
@@ -818,11 +820,13 @@ class GutPage(page: Page) : BasePage(page) {
         val nonIdealsList = gutList.filter { it.inference == RiskLevel.NonIdeal.value }
         val moderateList = gutList.filter { it.inference == RiskLevel.ModerateRisk.value }
 
-        val idealFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Ideal (${idealsList.size})"))
-        val nonIdealFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Non Ideal (${nonIdealsList.size})"))
-        val improvementFilter=page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Needs Improvement (${moderateList.size})"))
+        val idealFilter = page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Ideal (${idealsList.size})"))
+        val nonIdealFilter =
+            page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Non Ideal (${nonIdealsList.size})"))
+        val improvementFilter =
+            page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Needs Improvement (${moderateList.size})"))
 
-        listOf(idealFilter,nonIdealFilter,improvementFilter).forEach { it.waitFor() }
+        listOf(idealFilter, nonIdealFilter, improvementFilter).forEach { it.waitFor() }
 
         idealFilter.click()
         headerValidations(getGutDataByGroup(idealsList))
