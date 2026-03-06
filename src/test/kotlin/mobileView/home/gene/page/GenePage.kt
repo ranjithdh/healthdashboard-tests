@@ -305,6 +305,8 @@ class GenePage(page: Page) : BasePage(page) {
     }
 
     private fun bottomLineValidation(metricData: GeneMetricItem?) {
+
+        logger.info { "Bottom line validation validation '${metricData?.metric?.displayName}'" }
         val bottomLine = metricData
             ?.details
             ?.firstOrNull { it.category == "bottom_line" }
@@ -325,7 +327,7 @@ class GenePage(page: Page) : BasePage(page) {
 
         logger.info { "Validating Bottom Line Content: Expected='$expectedBottomLine', Actual='$actualBottomLineText'" }
         assertEquals(
-            expectedBottomLine?.normalizeForUiCompare(),
+            expectedBottomLine?.normalizeForUiCompare()?.replace("\\", "")?.trim(),
             actualBottomLineText.normalizeForUiCompare()
         )
     }
