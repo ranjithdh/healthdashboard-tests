@@ -56,7 +56,7 @@ class GutTest : BaseTest() {
     @Test
     @Order(1)
     fun gutListEmptyView() {
-
+        gutPage.emptyView()
     }
 
     @Test

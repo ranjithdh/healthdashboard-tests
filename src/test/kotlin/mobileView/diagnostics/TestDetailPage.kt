@@ -25,6 +25,12 @@ class TestDetailPage(page: Page) : BasePage(page) {
         return this
     }
 
+    fun waitGutTabLoad(): TestDetailPage {
+        page.waitForURL("**/diagnostics?tab=gut-microbiome**")
+        backButton.waitFor()
+        return this
+    }
+
     fun clickBackButton(): ActionPlanPage {
         StepHelper.step("Clicking Back button on Test Detail page")
         backButton.click()

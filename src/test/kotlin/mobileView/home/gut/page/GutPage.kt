@@ -6,6 +6,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.utils.ActionPlanUtils.normalizeForUiCompare
+import mobileView.diagnostics.TestDetailPage
 import mobileView.home.gene.model.GeneDataWrapper
 import mobileView.home.gene.model.GeneResponse
 import mobileView.home.gut.model.*
@@ -839,6 +840,36 @@ class GutPage(page: Page) : BasePage(page) {
         improvementFilter.click()
         headerValidations(getGutDataByGroup(moderateList))
 
+    }
+
+    fun emptyView() {
+        val gutList = gutDataWrapper?.gut?.data
+        if (gutList?.isEmpty() == true) {
+            val dnaHelixImg =
+                page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("Gut microbiome"))
+
+            val gutInsightsHeading =
+                page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Meet your Gut Microbiome"))
+
+            val discoverGenesText =
+                page.getByText("Understand digestion,")
+
+            val gutEmptyStateButton =
+                page.getByTestId("gut-empty-state-view-test-button")
+
+            listOf(
+                dnaHelixImg,
+                gutInsightsHeading,
+                discoverGenesText,
+                gutEmptyStateButton
+            ).forEach { it.waitFor() }
+
+            gutEmptyStateButton.click()
+
+            TestDetailPage(page)
+                .waitGutTabLoad()
+                .clickBackButtonToHome()
+        }
     }
 
 }
