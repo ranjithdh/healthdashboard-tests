@@ -86,6 +86,8 @@ class DhPointsTest : BaseTest() {
             .fillPersonalDetails()
             .fillAddressDetails()
             .selectSlotsAndContinue()
+            .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
+            .clickApplyCoupon()
             .clickCheckout()
 
         checkBloodTestBookedCardStatus(homePage)
@@ -105,6 +107,6 @@ class DhPointsTest : BaseTest() {
             .enterOtpAndContinueToMobileHomePage(testUser)
 
         // Continue DH points assertions ...
-        loggedInHomePage.takeScreenshot("login-successful-dh-points")
+//        loggedInHomePage.takeScreenshot("login-successful-dh-points")
     }
 }
