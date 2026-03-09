@@ -231,4 +231,10 @@ class HomePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next")).click()
         return profilePage
     }
+    fun consulationWithExpertCard(): HomePage {
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Consultation with Longevity")).click()
+        page.getByText("Personalized consultation").click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Maybe later")).click()
+        return HomePage(page)
+    }
 }

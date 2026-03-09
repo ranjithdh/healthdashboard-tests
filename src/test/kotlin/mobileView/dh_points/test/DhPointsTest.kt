@@ -11,12 +11,12 @@ import mobileView.home.checkBloodTestBookedCardStatus
 import onboard.page.LoginPage
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
+import mobileView.home.HomePage
+import mobileView.profile.page.ProfilePage
 import org.junit.jupiter.api.*
 import utils.logger.logger
 import java.nio.file.Paths
 import model.profile.QuestionerMealType
-import mobileView.profile.page.ProfilePage
-import model.profile.Question
 
 @Epic("DH Points")
 @Feature("DH Points E2E Flow")
@@ -114,7 +114,7 @@ class DhPointsTest : BaseTest() {
     }
 
     @Test
-    fun `dh points verification`() {
+    fun `dh points verification until Questionnaire`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.EXISTING_USER
         loginPage
@@ -123,5 +123,22 @@ class DhPointsTest : BaseTest() {
             .claimYourConsultCard()
             .consultationConfirmationCard()
             .question_1_veg(type = QuestionerMealType.VEGAN)
+             page.waitForTimeout(3000.0)
+
+        val homePage = HomePage(page).navigate() as HomePage
+        homePage.claimYourConsultCard()
+        .consulationWithExpertCard()
+    }
+
+    @Test
+    fun `dh points verification`() {
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        loginPage
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToMobileHomePage(testUser)
+
+        val profilePage = ProfilePage(page).navigate() as ProfilePage
+        profilePage.
     }
 }
