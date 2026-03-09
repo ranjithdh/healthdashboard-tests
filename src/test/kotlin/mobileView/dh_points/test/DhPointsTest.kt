@@ -84,6 +84,7 @@ class DhPointsTest : BaseTest() {
         val testUser = TestConfig.TestUsers.NEW_USER.copy(mobileNumber = dynamicMobileNumber)
         logger.info("Dynamic Mobile Number: $dynamicMobileNumber")
         // Step 1: Sign up new user flow
+        TestConfig.TestUsers.EXISTING_USER = testUser
         val homePage = loginPage
             .clickSignUp()
             .enterMobileAndContinue(testUser)
@@ -116,7 +117,7 @@ class DhPointsTest : BaseTest() {
             .enterOtpAndContinueToMobileHomePage(testUser)
 
         triggerDataPipeline(TestConfig.USER_ID)
-        // Continue DH points assertions ...
+        // Need to do DB action. using our latest credentials need to call dh points verification until Questionnaire
 //        loggedInHomePage.takeScreenshot("login-successful-dh-points")
     }
 
