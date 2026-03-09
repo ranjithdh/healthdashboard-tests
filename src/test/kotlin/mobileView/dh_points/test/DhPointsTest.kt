@@ -145,9 +145,7 @@ class DhPointsTest : BaseTest() {
         val homePage = loginPage
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
-        
-        triggerDataPipeline(TestConfig.USER_ID)
-        homePage.rewardPointsValidation()
+            .rewardPointsValidation()
     }
 
     private fun triggerDataPipeline(userid: String) {
