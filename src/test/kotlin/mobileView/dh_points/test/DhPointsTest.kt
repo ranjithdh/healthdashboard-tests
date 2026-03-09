@@ -16,6 +16,10 @@ import org.junit.jupiter.api.*
 import utils.logger.logger
 import java.nio.file.Paths
 import model.profile.QuestionerMealType
+import com.microsoft.playwright.options.RequestOptions
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import utils.json.json
 
 @Epic("DH Points")
 @Feature("DH Points E2E Flow")
@@ -93,6 +97,8 @@ class DhPointsTest : BaseTest() {
             .checkTotalAmount()
             .clickCheckout()
 
+        triggerDataPipeline()
+
         checkBloodTestBookedCardStatus(homePage)
 
 //        homePage.takeScreenshot("signup-order-placed-dh-points")
@@ -138,5 +144,41 @@ class DhPointsTest : BaseTest() {
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
             .rewardPointsValidation()
+    }
+
+    private fun triggerDataPipeline() {
+        logger.info { "Triggering Data Pipeline..." }
+
+        // Step 1: Get Access Token
+        val tokenResponse = page.context().request().post(
+            "https://human-token.auth.ap-south-1.amazoncognito.com/oauth2/token",
+            RequestOptions.create()
+                .setHeader("Content-Type", "application/x-www-form-urlencoded")
+                .setHeader("Authorization", "Basic M3R1YmN0NW5rYTBma2FiaGU0MWZpMWpnbGQ6MWJqNDZoazJlYTJkMXZ2bmkxYWdnazEwcTkybmY2ZHV1OTA0MGNwZDBycDhxMWZoM2FzNA==")
+                .setData("grant_type=client_credentials&scope=auth/dh-read-dev")
+        )
+
+        if (tokenResponse.status() != 200) {
+            logger.error { "Failed to get access token for pipeline: ${tokenResponse.status()} - ${tokenResponse.text()}" }
+            return
+        }
+
+        val tokenJson = json.decodeFromString<JsonObject>(tokenResponse.text())
+        val accessToken = tokenJson["access_token"]?.jsonPrimitive?.content ?: ""
+
+        logger.info { "Access Token obtained for Pipeline." }
+
+        // Step 2: Call Pipeline API
+        val pipelineResponse = page.context().request().fetch(
+            "https://465ifncp63.execute-api.ap-south-1.amazonaws.com/stg/user_1783/execute-data-pipeline?source_prd_user_id=145",
+            RequestOptions.create()
+                .setMethod("GET")
+                .setHeader("Content-Type", "application/json")
+                .setHeader("Authorization", accessToken)
+                .setData("{}")
+        )
+
+        logger.info { "Pipeline Trigger Response Status: ${pipelineResponse.status()}" }
+        logger.info { "Pipeline Trigger Response Body: ${pipelineResponse.text()}" }
     }
 }
