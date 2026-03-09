@@ -237,4 +237,11 @@ class HomePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Maybe later")).click()
         return HomePage(page)
     }
+    fun rewardPointsValidation() {
+        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
+        page.getByTestId("profile-referrals-tab").click()
+        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points4999$"))).first().click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Total points")).click()
+        page.locator("h2").filter(Locator.FilterOptions().setHasText("4999")).click()
+    }
 }

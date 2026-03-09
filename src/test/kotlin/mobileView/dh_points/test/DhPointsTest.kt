@@ -137,8 +137,6 @@ class DhPointsTest : BaseTest() {
         loginPage
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
-
-        val profilePage = ProfilePage(page).navigate() as ProfilePage
-        profilePage.
+            .rewardPointsValidation()
     }
 }
