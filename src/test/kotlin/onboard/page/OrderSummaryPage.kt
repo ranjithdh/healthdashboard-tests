@@ -9,6 +9,7 @@ import kotlinx.serialization.json.*
 import mobileView.home.HomePage
 import utils.DateHelper
 import utils.SignupDataStore
+import java.util.regex.Pattern
 import utils.json.json
 import utils.logger.logger
 import java.time.ZoneId
@@ -72,6 +73,22 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     fun clearCouponCode(): OrderSummaryPage {
         logger.info { "clearCouponCode()" }
         byRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter code")).clear()
+        return this
+    }
+
+    @Step("Check Total Amount")
+    fun checkTotalAmount(): OrderSummaryPage {
+        logger.info { "checkTotalAmount()" }
+        // Capture total amount, it might look like "Total₹8,999" or "Total₹9,999"
+        val totalElement = page.getByText(Pattern.compile("Total₹[0-9,]+"))
+        val totalText = totalElement.innerText()
+        val numericAmount = totalText.replace(Regex("[^0-9]"), "")
+        
+        logger.info { "Captured dynamic total amount: $numericAmount" }
+        SignupDataStore.update { totalAmount = numericAmount }
+        
+        // Simulating the user's click requirement
+        totalElement.click()
         return this
     }
 
