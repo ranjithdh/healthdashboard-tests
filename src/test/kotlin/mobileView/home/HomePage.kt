@@ -202,7 +202,8 @@ class HomePage(page: Page) : BasePage(page) {
         return HomePage(page)
     }
 
-    fun consultationConfirmationCard() {
+    fun consultationConfirmationCard(): ProfilePage {
+        val profilePage = ProfilePage(page)
         page.getByText("Book a consultationwith our expert30min video call with a longevity expertWhat'").first()
             .click()
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Book a consultation")).click()
@@ -228,5 +229,6 @@ class HomePage(page: Page) : BasePage(page) {
         page.locator("div:nth-child(6) > .box-border > .content-stretch").first().click()
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Note: Consultations will not")).click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next")).click()
+        return profilePage
     }
 }

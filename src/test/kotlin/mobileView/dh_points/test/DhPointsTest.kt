@@ -14,6 +14,9 @@ import io.qameta.allure.Feature
 import org.junit.jupiter.api.*
 import utils.logger.logger
 import java.nio.file.Paths
+import model.profile.QuestionerMealType
+import mobileView.profile.page.ProfilePage
+import model.profile.Question
 
 @Epic("DH Points")
 @Feature("DH Points E2E Flow")
@@ -114,10 +117,11 @@ class DhPointsTest : BaseTest() {
     fun `dh points verification`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.EXISTING_USER
-        val loggedInHomePage = loginPage
+        loginPage
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
             .claimYourConsultCard()
             .consultationConfirmationCard()
+            .question_1_veg(type = QuestionerMealType.VEGAN)
     }
 }
