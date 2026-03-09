@@ -97,7 +97,7 @@ class DhPointsTest : BaseTest() {
             .checkTotalAmount()
             .clickCheckout()
 
-        triggerDataPipeline()
+
 
         checkBloodTestBookedCardStatus(homePage)
 
@@ -115,6 +115,7 @@ class DhPointsTest : BaseTest() {
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
 
+        triggerDataPipeline(TestConfig.USER_ID)
         // Continue DH points assertions ...
 //        loggedInHomePage.takeScreenshot("login-successful-dh-points")
     }
@@ -140,13 +141,15 @@ class DhPointsTest : BaseTest() {
     fun `dh points verification`() {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.EXISTING_USER
-        loginPage
+        val homePage = loginPage
             .enterMobileAndContinue(testUser)
             .enterOtpAndContinueToMobileHomePage(testUser)
-            .rewardPointsValidation()
+        
+        triggerDataPipeline(TestConfig.USER_ID)
+        homePage.rewardPointsValidation()
     }
 
-    private fun triggerDataPipeline() {
+    private fun triggerDataPipeline(userid: String) {
         logger.info { "Triggering Data Pipeline..." }
 
         // Step 1: Get Access Token
@@ -170,7 +173,7 @@ class DhPointsTest : BaseTest() {
 
         // Step 2: Call Pipeline API
         val pipelineResponse = page.context().request().fetch(
-            "https://465ifncp63.execute-api.ap-south-1.amazonaws.com/stg/user_1783/execute-data-pipeline?source_prd_user_id=145",
+            "https://465ifncp63.execute-api.ap-south-1.amazonaws.com/stg/user_${userid}/execute-data-pipeline?source_prd_user_id=145",
             RequestOptions.create()
                 .setMethod("GET")
                 .setHeader("Content-Type", "application/json")
