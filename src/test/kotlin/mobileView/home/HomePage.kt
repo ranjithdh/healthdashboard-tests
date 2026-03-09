@@ -231,17 +231,22 @@ class HomePage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next")).click()
         return profilePage
     }
-    fun consulationWithExpertCard(): HomePage {
+    fun consultationWithExpertCard(): HomePage {
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Consultation with Longevity")).click()
         page.getByText("Personalized consultation").click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Maybe later")).click()
         return HomePage(page)
     }
     fun rewardPointsValidation() {
+        val signupData = SignupDataStore.get()
+        val totalAmount = signupData.totalAmount ?: "4999"
+        logger.info { "Validating dynamic reward points: $totalAmount" }
+        
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         page.getByTestId("profile-referrals-tab").click()
-        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points4999$"))).first().click()
+        
+        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points$totalAmount$"))).first().click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Total points")).click()
-        page.locator("h2").filter(Locator.FilterOptions().setHasText("4999")).click()
+        page.locator("h2").filter(Locator.FilterOptions().setHasText(totalAmount)).click()
     }
 }
