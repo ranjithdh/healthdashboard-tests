@@ -12,7 +12,6 @@ import onboard.page.LoginPage
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
 import mobileView.home.HomePage
-import mobileView.profile.page.ProfilePage
 import org.junit.jupiter.api.*
 import utils.logger.logger
 import java.nio.file.Paths
@@ -91,6 +90,7 @@ class DhPointsTest : BaseTest() {
             .selectSlotsAndContinue()
             .enterCouponCode(TestConfig.Coupons.VALID_COUPON)
             .clickApplyCoupon()
+            .checkTotalAmount()
             .clickCheckout()
 
         checkBloodTestBookedCardStatus(homePage)
@@ -127,7 +127,7 @@ class DhPointsTest : BaseTest() {
 
         val homePage = HomePage(page).navigate() as HomePage
         homePage.claimYourConsultCard()
-        .consulationWithExpertCard()
+        .consultationWithExpertCard()
     }
 
     @Test
