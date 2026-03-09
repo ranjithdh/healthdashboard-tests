@@ -232,18 +232,18 @@ class GenePage(page: Page) : BasePage(page) {
             val geneList = headerList[headerExpected]
             val id = toKebabCase(headerExpected)
             logger.info { "Validating marker id '$id'" }
-            //val headerUiElement = page.getByTestId("gene-group-header-$id") TODO
+            val headerUiElement = page.getByTestId("gene-group-header-$id")
             val markerUiElement = page.getByTestId("gene-group-marker-$id")
 
-            //val headerTextActual = headerUiElement.innerText() TODO
+            val headerTextActual = headerUiElement.innerText()
             val markerTextActual = markerUiElement.innerText()
 
-            //  headerUiElement.waitFor() TODO
+            headerUiElement.waitFor()
             markerUiElement.waitFor()
 
-            /*   logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" } TODO
-               assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
-   */
+            logger.info { "Validating Header: Expected='$headerExpected', Actual='$headerTextActual'" }
+            assertEquals(headerExpected.normalizeForUiCompare(), headerTextActual.normalizeForUiCompare())
+
             val expectedMarkerCount = "${geneList?.size} Markers".uppercase()
             logger.info { "Validating Marker Count for '$headerExpected': Expected='$expectedMarkerCount', Actual='${markerTextActual.uppercase()}'" }
             assertEquals(
@@ -418,10 +418,10 @@ class GenePage(page: Page) : BasePage(page) {
                             val bloodMetricId = gutCorrleations[0].bloodMetricId
 
                             val bloodData = bloodList.filter { it.metric_id == bloodMetricId }
-                            val geneData=summaryMetricsList
-                         //   val gutData = summaryMetricsList.filter { it.metric?.metricId == targetMetricId }
+                            val geneData = summaryMetricsList
+                            //   val gutData = summaryMetricsList.filter { it.metric?.metricId == targetMetricId }
 
-                            if (bloodData.isNotEmpty() && geneData!=null) {
+                            if (bloodData.isNotEmpty() && geneData != null) {
                                 val gutValue = geneData.summary.inference
                                 val bloodLevel = bloodData[0].display_rating
 
@@ -449,7 +449,10 @@ class GenePage(page: Page) : BasePage(page) {
                     desUiElement.waitFor()
                     val actualDescription = desUiElement.innerText()
                     logger.info { "Validating Description for [$index]: Expected='${correlations.description}', Actual='$actualDescription'" }
-                    assertEquals(correlations.description.normalizeForUiCompare(), actualDescription.normalizeForUiCompare())
+                    assertEquals(
+                        correlations.description.normalizeForUiCompare(),
+                        actualDescription.normalizeForUiCompare()
+                    )
                 }
             }
         }
