@@ -243,6 +243,7 @@ class HomePage(page: Page) : BasePage(page) {
     fun rewardPointsValidation() {
         val signupData = SignupDataStore.get()
         val totalAmount = signupData.totalAmount ?: "4999"
+        logger.info { "Validating sign up reward points: ${signupData.totalAmount}" }
         logger.info { "Validating dynamic reward points: $totalAmount" }
         
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
