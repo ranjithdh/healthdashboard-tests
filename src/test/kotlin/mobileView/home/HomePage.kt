@@ -1,6 +1,7 @@
 package mobileView.home
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -26,6 +27,7 @@ import utils.report.StepHelper.CLICK_PROFILE_ICON
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
+import java.util.regex.Pattern
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -192,6 +194,39 @@ class HomePage(page: Page) : BasePage(page) {
         val actionPlan = ActionPlanPage(page)
         return actionPlan
     }
+    fun claimYourConsultCard(): HomePage  {
+//        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("free-consultation")).first().click()
+        page.getByText("Claim your Consult").click()
+        page.getByText("1-on-1 consult with our").click()
+        page.getByTestId("button-book-consultation").click()
+        return HomePage(page)
+    }
 
-
+    fun consultationConfirmationCard() {
+        page.getByText("Book a consultationwith our expert30min video call with a longevity expertWhat'").first()
+            .click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Book a consultation")).click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText(Pattern.compile("^with our expert$")))
+            .click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("30min video call with a")).click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("What's included")).click()
+        page.locator("div")
+            .filter(FilterOptions().setHasText(Pattern.compile("^Quick overview of dashboard and results$"))).nth(2)
+            .click()
+        page.locator("div")
+            .filter(FilterOptions().setHasText(Pattern.compile("^Symptoms check-in and mapping results$"))).nth(2)
+            .click()
+        page.locator("div")
+            .filter(FilterOptions().setHasText(Pattern.compile("^State of existing medical conditions \\(if any reported\\)$")))
+            .nth(2).click()
+        page.locator("div")
+            .filter(FilterOptions().setHasText(Pattern.compile("^Highlight any urgent or clinically significant flags$")))
+            .nth(2).click()
+        page.locator("div")
+            .filter(FilterOptions().setHasText(Pattern.compile("^Suggest further medical diagnosis if any required$")))
+            .nth(2).click()
+        page.locator("div:nth-child(6) > .box-border > .content-stretch").first().click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Note: Consultations will not")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next")).click()
+    }
 }

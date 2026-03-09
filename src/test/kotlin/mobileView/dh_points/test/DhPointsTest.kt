@@ -109,4 +109,15 @@ class DhPointsTest : BaseTest() {
         // Continue DH points assertions ...
 //        loggedInHomePage.takeScreenshot("login-successful-dh-points")
     }
+
+    @Test
+    fun `dh points verification`() {
+        val loginPage = LoginPage(page).navigate() as LoginPage
+        val testUser = TestConfig.TestUsers.EXISTING_USER
+        val loggedInHomePage = loginPage
+            .enterMobileAndContinue(testUser)
+            .enterOtpAndContinueToMobileHomePage(testUser)
+            .claimYourConsultCard()
+            .consultationConfirmationCard()
+    }
 }

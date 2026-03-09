@@ -1,6 +1,7 @@
 package mobileView.dh_points.page
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.options.AriaRole
 import config.BasePage
 import config.TestConfig
 
