@@ -8,6 +8,9 @@ object TestConfig {
     var ACCESS_TOKEN = ""
     var USER_ID = ""
     var USER_NAME = ""
+    var TOTAL_AMOUNT = ""
+    var COUPON_CODE = ""
+    var DISCOUNT_AMOUNT = ""
 
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
@@ -66,11 +69,17 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val SIGNUP_VIA_WEBSITE =
+            "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
         val TRACK_RESULT = "${BASE_URL}order/"
+        val RECOMMENDATIONS_URL = "${BASE_URL}recommendations"
+
+        val TEST_DETAIL_URL = "${BASE_URL}test-detail"
+
+
     }
 
     object APIs {
@@ -80,7 +89,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_SLOTS_AVAILABILITY = "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
+        const val API_SLOTS_AVAILABILITY =
+            "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
         val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
         val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
@@ -93,10 +103,13 @@ object TestConfig {
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
         val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
+        val PROFILE_LIST = "$BASE_URL/v4/human-token/lead/profiles"
+        val PROFILE_DETAIL = "$BASE_URL/v4/human-token/lead/profile/"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
+        val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
+        val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
         val API_USERS = "$BASE_URL/v4/human-token/users"
-        val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
         val BASELINE_SCORE_API_URL = "$BASE_URL/v4/human-token/health-data/baseline-score"
 
         const val FLIP_BOARD_TAGS = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/tags"
@@ -104,6 +117,9 @@ object TestConfig {
         const val FLIP_BOARD_UNREAD_COUNT= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/unread-count/"
         const val FLIP_BOARD_TOPICS= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/topics/"
 
+        val API_WALLET = "$BASE_URL/v4/human-token/user/wallet"
+        const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
+        const val API_ACTION_PLAN_USER_RECOMMENDATIONS = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
     }
 
 
@@ -136,7 +152,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "573583690",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998368",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -161,7 +177,7 @@ object TestConfig {
                     otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
                     country = "India"
                 )*/
-        val EXISTING_USER = TestUser(
+        var EXISTING_USER = TestUser(
             mobileNumber = "9159439327",
             otp = "678901",
             country = "India",

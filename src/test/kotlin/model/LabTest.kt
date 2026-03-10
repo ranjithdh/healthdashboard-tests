@@ -38,7 +38,8 @@ data class LabTestPackage(
     val type: String? = null,
     val product: LabTestProduct? = null,
     val tests: List<LabTestItem>? = null,
-    val di_kit: LabTestDiKit? = null
+    val di_kit: LabTestDiKit? = null,
+    val di_order: LabTestDiOrder? = null
 )
 
 @Serializable
@@ -57,6 +58,7 @@ data class LabTestProfile(
     val type: String? = null,
     val product: LabTestProduct? = null,
     val tests: List<LabTestItem>? = null,
+    val di_order: LabTestDiOrder? = null,
     val di_kit: LabTestDiKit? = null
 )
 
@@ -74,7 +76,8 @@ data class LabTestItem(
     val report_generation_hr: String? = null,
     val type: String? = null,
     val product: LabTestProduct? = null,
-    val di_kit: LabTestDiKit? = null
+    val di_kit: LabTestDiKit? = null,
+    val di_order: LabTestDiOrder? = null
 )
 
 @Serializable
@@ -126,6 +129,16 @@ data class LabTestDiKit(
     val updated_at: String? = null
 )
 
+
+@Serializable
+data class LabTestDiOrder(
+    val id: String? = null,
+    val order_id: String? = null,
+    val product_id: String? = null,
+
+
+    )
+
 @Serializable
 data class LabTestProduct(
     val id: String? = null,
@@ -157,3 +170,27 @@ data class LabTestVendor(
     val admin_api_access_token: String? = null
 )
 
+@Serializable
+data class ProfileListResponse(
+    val status: String? = null,
+    val message: String? = null,
+    val data: ProfileListData? = null
+)
+
+@Serializable
+data class ProfileListData(
+    val profiles: List<UserProfile>? = null
+)
+
+@Serializable
+data class UserProfile(
+    val id: String? = null,
+    val lead_id: String? = null,
+    val user_id: String? = null,
+    val name: String? = null,
+    val email: String? = null,
+    val mobile_number: String? = null,
+    val country_code: String? = null,
+    val gender: String? = null,
+    val dob: String? = null
+)
