@@ -8,6 +8,9 @@ object TestConfig {
     var ACCESS_TOKEN = ""
     var USER_ID = ""
     var USER_NAME = ""
+    var TOTAL_AMOUNT = ""
+    var COUPON_CODE = ""
+    var DISCOUNT_AMOUNT = ""
 
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
@@ -90,7 +93,7 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_SLOTS_AVAILABILITY =
+        const val API_SLOTS_AVAILABILITY =
             "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
         val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
         val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"

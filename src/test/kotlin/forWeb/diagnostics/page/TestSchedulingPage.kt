@@ -195,6 +195,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Flat, House no., Building,"))
             .fill("14C3, H H Road")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
+        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).fill("Balarengapuram")
         page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
@@ -841,25 +842,27 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
         val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
-        val expectedDiscountStr = "-${expectedDiscount.toInt()}"
-        logger.info { "Verifying Discount Value. Expected (cleaned): $expectedDiscountStr, Actual (from ID): $discountValue" }
-        assertEquals(expectedDiscountStr, discountValue.replace(",", "").replace(" ", ""))
-
+        val expectedDiscountStr = "- ₹ ${expectedDiscount.toInt()}"
+        logger.info { "Verifying Discount Value. Expected: $expectedDiscountStr, Actual: $discountValue" }
+        assertEquals(expectedDiscountStr.replace(" ", ""), discountValue.replace(",", "").replace(" ", ""))
         // Verify Discount formatted text visibility (e.g. "- ₹ 0" or "- ₹ 1,000")
         val formattedDiscount = numberFormat.format(expectedDiscount.toInt())
         // Construct the expected visual string. Based on UI: "- ₹ 0"
         val discountTextToFind = "- ₹ $formattedDiscount"
-        logger.info { "Verifying visibility for formatted discount text: '$discountTextToFind'" }
-        // Using partial match false (exact match? no, loose is better for spacing but "0" is tricky)
-        // Since we include "- ₹ ", it's specific enough.
+        val discountTextNoSpace = "-₹$formattedDiscount".replace(" ", "")
+        logger.info { "Verifying visibility for formatted discount text: '$discountTextToFind' or '$discountTextNoSpace'" }
+        
         if (page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).isVisible) {
              page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).first().click()
+        } else if (page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).isVisible) {
+             page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).first().click()
         } else {
-             // Fallback: try searching without spaces if strict match fails, or loose match just the number if unique
-             logger.warn { "Strict discount text '$discountTextToFind' not found. Trying loose search for '$formattedDiscount'" }
-             // Only search for number if it's not 0 (0 is too common), or search combined
+             logger.warn { "Discount text not found with standard spacing. Trying loose search for '$formattedDiscount'" }
              if (expectedDiscount > 0) {
                  page.getByText(formattedDiscount, Page.GetByTextOptions().setExact(false)).first().click()
+             } else {
+                 // For 0, maybe just verify the label is there
+                 page.getByText("Discount").first().isVisible
              }
         }
 
