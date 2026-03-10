@@ -1,0 +1,2288 @@
+[
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your have an increased cardiovascular risk with unfavourable genes for LDL (bad cholesterol) regulation and a high ApoB/ApoA1 ratio which indicates more harmful than protective cholesterol particles. We recommend consulting a health expert and staying proactive with your diet and lifestyle habits to protect your heart health. "
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your have an increased cardiovascular risk with slightly unfavourable genes for LDL (bad cholesterol) regulation and a high ApoB/ApoA1 ratio which indicates more harmful than protective cholesterol particles. We recommend consulting a health expert and staying proactive with your diet and lifestyle habits to protect your heart health. "
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high ApoB/ApoA1 ratio indicates more harmful than protective cholesterol particles. Given your favourable genetics for LDL (bad cholesterol) regulation, the elevation is likely driven by non-genetic influences, such as nutrition, physical activity, and metabolic stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Despite a genetic tendency toward higher HDL (good cholesterol) levels, your ApoB/ApoA1 ratio is high which indicates more harmful than protective cholesterol particles. This elevation is most likely driven by modifiable factors such as dietary fat intake, metabolic status, and lifestyle habits. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal ApoB/ApoA1 ratio indicates a healthy balance between 'good' and 'bad' cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should stay proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal ApoB/ApoA1 ratio indicates a healthy balance between 'good' and 'bad' cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should stay proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your cardiovascular health is well supported with favourable genetics for LDL (bad cholesterol) regulation and a normal ApoB/ApoA1 ratio which indicates a healthy balance between 'good' and 'bad' cholesterol particles."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your cardiovascular health is well supported with a genetic tendency toward higher HDL (good cholesterol) levels, and a normal ApoB/ApoA1 ratio which indicates a healthy balance between 'good' and 'bad' cholesterol particles. "
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low ApoB/ApoA1 ratio indicates more protective than harmful cholesterol particles, but unfavourable genes for LDL (bad cholesterol) regulation mean you should stay proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low ApoB/ApoA1 ratio indicates more protective than harmful cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should stay proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your cardiovascular health is well supported with favourable genetics for LDL (bad cholesterol) regulation and a low ApoB/ApoA1 ratio which indicates more protective than harmful cholesterol particles. "
+  },
+  {
+    "blood_metric_id": "BD10004",
+    "Blood Marker": "ApoB/ApoA1 Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your cardiovascular health is well supported with a genetic tendency toward higher HDL (good cholesterol) levels, and a low ApoB/ApoA1 ratio which shows the presence of more protective than harmful cholesterol particles in the blood."
+  },
+  {
+    "blood_metric_id": "BD10005",
+    "Blood Marker": "ApoA1",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your cardiovascular health is well supported with a genetic tendency toward higher HDL (good cholesterol) levels, and high levels of ApoA1, or protective cholesterol particles."
+  },
+  {
+    "blood_metric_id": "BD10005",
+    "Blood Marker": "ApoA1",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your cardiovascular health is well supported with a genetic tendency toward higher HDL (good cholesterol) levels, and optimal levels of ApoA1, or protective cholesterol particles."
+  },
+  {
+    "blood_metric_id": "BD10005",
+    "Blood Marker": "ApoA1",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low levels of ApoA1, or protective cholesterol particles, despite a genetic tendency toward higher HDL (good cholesterol) levels, suggest that factors such as lifestyle or metabolic influences may be driving cardiovascular risk. Please consult an expert and take proactive steps to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "You have an increased cardiovascular risk with borderline high levels of ApoB, or harmful cholesterol particles, and unfavourable genes for LDL (bad cholesterol) regulation. This suggests the need for timely, proactive diet and lifestyle interventions. Seeking guidance from a health expert can help reduce long-term cardiovascular risk."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have an increased cardiovascular risk with high levels of ApoB, or harmful cholesterol particles, and unfavourable genes for LDL (bad cholesterol) regulation. This suggests the need for timely, proactive diet and lifestyle interventions. Seeking guidance from a health expert can help reduce long-term cardiovascular risk."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "You have an increased cardiovascular risk with borderline high levels of ApoB, or harmful cholesterol particles, and slightly unfavourable genes for LDL (bad cholesterol) regulation. This suggests the need for timely, proactive diet and lifestyle interventions. Seeking guidance from a health expert can help reduce long-term cardiovascular risk."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have an increased cardiovascular risk with high levels of ApoB, or harmful cholesterol particles, and slightly unfavourable genes for LDL (bad cholesterol) regulation. This suggests the need for timely, proactive diet and lifestyle interventions. Seeking guidance from a health expert can help reduce long-term cardiovascular risk."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high levels of ApoB, or harmful cholesterol particles, despite favourable genes for LDL (bad cholesterol) regulation, suggest that non-genetic factors such as lifestyle or metabolic influences are driving your cardiovascular risk. Please consult an expert and take proactive steps to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "High levels of ApoB, or harmful cholesterol particles, despite favourable genes for LDL (bad cholesterol) regulation, suggest that non-genetic factors such as lifestyle or metabolic influences are driving your cardiovascular risk. Please consult an expert and take proactive steps to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have normal levels of ApoB or harmful cholesterol particles, but unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "You have optimal levels of ApoB or harmful cholesterol particles, but unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have normal levels of ApoB or harmful cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "You have optimal levels of ApoB or harmful cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have normal levels of ApoB or harmful cholesterol particles, and favourable genetics for LDL (bad cholesterol) regulation. This combination strongly supports your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have optimal levels of ApoB or harmful cholesterol particles, and favourable genetics for LDL (bad cholesterol) regulation. This combination strongly supports your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have low levels of ApoB or harmful cholesterol particles, but unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have low levels of ApoB or harmful cholesterol particles, but slightly unfavourable genes for LDL (bad cholesterol) regulation mean you should be proactive with your diet and lifestyle habits to support your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10006",
+    "Blood Marker": "ApoB",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have low levels of ApoB or harmful cholesterol particles, and favourable genetics for LDL (bad cholesterol) regulation. This combination strongly supports your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of average blood glucose alongside a high genetic risk for Type 2 diabetes indicates metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "High average blood glucose despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of average blood glucose alongside a slightly increased genetic risk for Type 2 diabetes indicates metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your average blood glucose is normal but a high genetic risk for Type 2 diabetes means you should be proactive with your diet and lifestyle habits to support your metabolic health. "
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "With normal levels of average blood glucose and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your average blood glucose is normal but a slightly high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health. "
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low average blood glucose can be positive or concerning based on your complete metabolic health panel. Given your high genetic risk for Type 2 diabetes, we recommend monitoring glucose balance and staying proactive with your diet and lifestyle habits to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low average blood glucose can be positive or concerning based on your complete metabolic health panel. Despite a normal genetic risk for Type 2 diabetes, we recommend monitoring glucose balance and staying proactive with your diet and lifestyle habits to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10008",
+    "Blood Marker": "Average Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low average blood glucose can be positive or concerning based on your complete metabolic health panel. Given your slightly high genetic risk for Type 2 diabetes, we recommend monitoring glucose balance and staying proactive with your diet and lifestyle habits to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "High blood calcium doesn\u2019t always indicate strong bones; sometimes it reflects that calcium isn\u2019t being effectively incorporated into the bone matrix. Unfavourable genes for bone mineral density further increase your risk for weaker bones. Consult a health expert to understand why calcium is high and take steps to support your bone health. "
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "High blood calcium doesn\u2019t always indicate strong bones; sometimes it reflects that calcium isn\u2019t being effectively incorporated into the bone matrix. Slightly unfavourable genes for bone mineral density further increase your risk for weaker bones. Consult a health expert to understand why calcium is high and take steps to support your bone health."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "High blood calcium doesn\u2019t always indicate strong bones; sometimes it reflects that calcium isn\u2019t being effectively incorporated into the bone matrix. Even with favourable genes that support a strong bone mineral density, it\u2019s important to consult a health expert to understand why calcium is high and ensure your bone health is supported."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your calcium levels are normal, but unfavourable genes for bone mineral density suggest you should be proactive with your diet and lifestyle habits to support your bone health."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your calcium levels are normal, but slightly unfavourable genes for bone mineral density suggest you should stay proactive with your diet and lifestyle habits to support your bone health."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your calcium levels are normal and you have favourable genes that support a strong bone mineral density. This combination supports robust bone strength."
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low calcium levels, along with unfavourable genes for bone mineral density, indicate an increased risk of weaker bones and reduced bone strength over time.This calls for timely invervention and proactive measures to support your bone health with guidance from a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low calcium levels, along with slightly unfavourable genes for bone mineral density, indicate an increased risk of weaker bones and reduced bone strength over time. This calls for timely invervention and proactive measures to support your bone health with guidance from a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10014",
+    "Blood Marker": "calcium",
+    "gene_metric_id": "GN10047",
+    "Gene": "Bone Mineral Density",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low calcium levels despite favourable genes for bone mineral density suggest that non-genetic factors such a diet or lifestyle habits may raise the risk of poor bone health. This suggests the need for timely intervention and proactive measures to support your bone health with guidance from a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high fasting blood glucose combined with a high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely invervention and proactive measures to support your metabolic health with guidance from a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting blood glucose alongside a high genetic risk for Type 2 diabetes indicates a significant metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high fasting blood glucose despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting blood glucose despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high fasting blood glucose combined with a slightly increased genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting blood glucose alongside a slightly increased genetic risk for Type 2 diabetes indicates metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your fasting blood glucose is optimal but a high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your fasting blood glucose is normal but a high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your fasting blood glucose is optimal but a high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "With normal levels of fasting blood glucose and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "With optimal levels of fasting blood glucose and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your fasting blood glucose is normal but a slightly increased genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting blood glucose can be positive or concerning based on your complete metabolic health panel. Given your high genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting blood glucose can be positive or concerning based on your complete metabolic health panel. Despite a normal genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10023",
+    "Blood Marker": "Fasting Blood Glucose",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting blood glucose can be positive or concerning based on your complete metabolic health panel. Given your slightly increased genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting insulin alongside a high genetic risk for Type 2 diabetes indicates significant metabolic imbalances influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting insulin despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "Elevated levels of fasting insulin combined with a slightly high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your fasting insulin is normal but a high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "With normal levels of fasting insulin and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your fasting insulin is normal but a slightly high genetic risk for Type 2 diabetes means you should stay proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting insulin can be positive or concerning based on your complete metabolic health panel. Given your high genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting insulin can be positive or concerning based on your complete metabolic health panel. Despite a normal genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10024",
+    "Blood Marker": "Fasting Insulin",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Low fasting insulin can be positive or concerning based on your complete metabolic health panel. Given your slightly high genetic risk for Type 2 diabetes, we recommend monitoring glucose balance to support long-term metabolic resilience."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels, and a high HDL/LDL ratio indicating more protective than harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high HDL/LDL ratio indicates more protective than harmful cholesterol in the body. But unfavourable genes for LDL (bad cholesterol) regulation highlight the need to stay proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high HDL/LDL ratio indicates more protective than harmful cholesterol in the body. But slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to stay proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation, and a high HDL/LDL ratio indicating more protective than harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels, and a normal HDL/LDL ratio indicating a fine balance between protective and harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal HDL/LDL ratio indicates a fine balance between protective and harmful cholesterol in your body. But unfavourable genes for LDL (bad cholesterol) regulation highlight the need to stay proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal HDL/LDL ratio indicates a fine balance between protective and harmful cholesterol in your body. But slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to stay proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation, and a normal HDL/LDL ratio indicating a fine balance between protective and harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Despite a genetic tendency toward higher HDL (good cholesterol) levels, you have a low HDL/LDL ratio which indicates more harmful than protective cholesterol in the body. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low HDL/LDL ratio indicates more harmful than protective cholesterol in the body. When combined with unfavourable genes for LDL (bad cholesterol) regulation, it suggests the need to be especially proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low HDL/LDL ratio indicates more harmful than protective cholesterol in the body. When combined with slightly unfavourable genes for LDL (bad cholesterol) regulation, it suggests the need to be proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10029",
+    "Blood Marker": "HDL/LDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have a low HDL/LDL ratio which indicates more harmful than protective cholesterol in the body. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "High",
+    "New Descriptions": "High hemoglobin A1C (HbA1c) combined with a high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "High hemoglobin A1C (HbA1c)  despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "High hemoglobin A1C (HbA1c) combined with a slightly increased genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your hemoglobin A1C (HbA1c) is optimal but a high genetic risk for Type 2 diabetes suggests the need to be proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "With optimal levels of hemoglobin A1C (HbA1c) and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your hemoglobin A1C (HbA1c) is optimal but a slightly increased genetic risk for Type 2 diabetes suggests the need to be proactive with your diet and lifestyle habits to support your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high hemoglobin A1C (HbA1c) combined with a high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high hemoglobin A1C (HbA1c)  despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10032",
+    "Blood Marker": "Hemoglobin A1C (HbA1c)",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high hemoglobin A1C (HbA1c) combined with a slightly increased genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. This calls for timely intervention and proactive measures to support your metabolic health with guidance from a health expert."
+  },
+  {
+    "blood_metric_id": "BD10034",
+    "Blood Marker": "HDL",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have low levels of HDL or good cholesterol despite a genetic tendency toward higher HDL levels. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10034",
+    "Blood Marker": "HDL",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Borderline Low",
+    "New Descriptions": "You have borderline low levels of HDL or good cholesterol despite a genetic tendency toward higher HDL levels. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10034",
+    "Blood Marker": "HDL",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels, and normal levels of HDL in the blood, indicating a fair amount of protective cholesterol in the body."
+  },
+  {
+    "blood_metric_id": "BD10034",
+    "Blood Marker": "HDL",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels, and optimal levels of HDL in the blood, indicating an abundance of protective cholesterol in the body."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Low levels are usually not a problem and are generally considered protective. Given that you have slightly unfavourable genes for homocysteine metabolism, we recommend consulting a health expert to check if these levels reflect some imbalances in the body."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Low levels are usually not a problem and are generally considered protective. Despite having favourable genes for homocysteine metabolism,  we recommend consulting a health expert to check if these levels reflect some imbalances in the body."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Low levels are usually not a problem and are generally considered protective. Given that you have unfavourable genes for homocysteine metabolism, we recommend consulting a health expert to check if these levels reflect some imbalances in the body."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently normal, but you have slightly unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently normal, and you have favourable genes for its metabolism. This suggests your body is well-equipped to keep homocysteine in a healthy range."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently normal, but you have unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently optimal, but you have slightly unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently optimal, and you have favourable genes for its metabolism. This suggests your body is well-equipped to keep homocysteine in a healthy range."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are currently optimal, but you have unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Mildly High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are mildly high, and you have slightly unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Mildly High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are mildly high, despite having favourable genes for its metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Mildly High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. Your homocysteine levels are mildly high, and you have unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. You have high levels of homocysteine, and you have slightly unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. You have high levels of homocysteine, despite having favourable genes for its metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10035",
+    "Blood Marker": "Homocysteine",
+    "gene_metric_id": "GN10366",
+    "Gene": "Homocysteine",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Homocysteine is an amino acid that can harm heart and brain health when levels are too high. You have high levels of homocysteine, and you have unfavourable genes for homocysteine metabolism. This suggests the need to be proactive to help keep it in a healthy range through adequate intake of vitamins such as B12, B6, and B9, while also supporting the body\u2019s antioxidant defenses through diet and lifestyle measures under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high LDL/HDL ratio indicates more harmful than protective cholesterol in the body. When combined with unfavourable genes for LDL (bad cholesterol) regulation, it suggests the need to be especially proactive with diet and lifestyle habits to support cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high LDL/HDL ratio indicates more harmful than protective cholesterol in the body. When combined with slightly unfavourable genes for LDL (bad cholesterol) regulation, it suggests the need to be especially proactive with diet and lifestyle to support cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have a high LDL/HDL ratio which indicates more harmful than protective cholesterol in the body. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Despite a genetic tendency toward higher HDL (good cholesterol) levels, you have a high LDL/HDL ratio which indicates more harmful than protective cholesterol in the body. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal LDL/HDL ratio indicates a fine balance between protective and harmful cholesterol in your body. But unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal LDL/HDL ratio  indicates a fine balance between protective and harmful cholesterol in your body. But slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation, and a normal LDL/HDL ratio  indicating a fine balance between protective and harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels and a normal LDL/HDL ratio indicating a fine balance between protective and harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low LDL/HDL ratio indicates more protective than harmful cholesterol in the body. But unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low LDL/HDL ratio indicates more protective than harmful cholesterol in the body. But slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation, and a low LDL/HDL ratio indicating more protective than harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10038",
+    "Blood Marker": "LDL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "You have strong cardiovascular protection with a genetic tendency toward higher HDL (good cholesterol) levels and a low LDL/HDL ratio indicating more protective than harmful cholesterol in your body."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "You have very high levels of LDL or bad cholesterol in the blood along with unfavourable genes for LDL regulation. This suggests an urgent need to be proactive and support your cardiovascular health with diet and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "You have very high levels of LDL or bad cholesterol in the blood along with slightly unfavourable genes for LDL regulation. This suggests an urgent need to be proactive and support your cardiovascular health with diet and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have very high levels of LDL in the blood. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have high levels of LDL or bad cholesterol in the blood along with unfavourable genes for LDL regulation. This suggests the need to be especially proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have high levels of LDL or bad cholesterol in the blood along with slightly unfavourable genes for LDL regulation. This suggests the need to be especially proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have a high levels of LDL in the blood. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "You have borderline high levels of LDL or bad cholesterol in the blood along with unfavourable genes for LDL regulation. This suggests the need to be proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "You have borderline high levels of LDL or bad cholesterol in the blood along with slightly unfavourable genes for LDL regulation. This suggests the need to be proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have borderline high levels of LDL in the blood. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your blood LDL (bad cholesterol) levels are normal, but unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your blood LDL (bad cholesterol) levels are normal, but slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation and normal LDL levels in the blood."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Whether or not very low LDL or bad cholesterol is healthy depends on your full lipid and metabolic profile. Given your unfavourable genes for LDL regulation, you should consult an expert and stay proactive about your lipid health."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Whether or not very low LDL or bad cholesterol is healthy depends on your full lipid and metabolic profile. Given your slightly unfavourable genes for LDL regulation, you should consult an expert and stay proactive about your lipid health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10040",
+    "Blood Marker": "LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Despite having favourable genes for LDL or bad cholesterol regulation, your LDL levels are very low. This may or may not be healtly depending on your full lipid and metabolic profile. You should consult an expert and stay proactive about your lipid health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10046",
+    "Blood Marker": "MCV",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high MCV means your red blood cells are larger than normal. This can be a sign of vitamin B12 deficiency, as B12 is needed for proper red blood cell formation. Given your unfavourable genes for vitamin B12 metabolism, it may be helpful to check and monitor your B12 levels and overall intake under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10046",
+    "Blood Marker": "MCV",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high MCV means your red blood cells are larger than normal. This can be a sign of vitamin B12 deficiency, as B12 is needed for proper red blood cell formation. Given your slightly unfavourable genes for vitamin B12 metabolism, it may be helpful to check and monitor your B12 levels and overall intake under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Your non-HDL cholesterol is high along with unfavourable genes for LDL regulation. This suggests the need to be proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Your non-HDL cholesterol is high along with slightly unfavourable genes for LDL regulation. This suggests the need to be proactive with your diet and lifestyle habits to support your cardiovascular health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Despite favourable genes for LDL regulation, you have high levels of non-HDL cholesterol. This suggests lipid imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Your non-HDL is in the normal range, but unfavourable genes for LDL regulation highlight the need to be proactive with your diet and lifestyle to support your lipid health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Your non-HDL is in the normal range, but slightly unfavourable genes for LDL regulation highlight the need to be proactive with your diet and lifestyle to support your lipid health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. You have strong cardiovascular protection with favourable genetics for LDL regulation and normal non-HDL levels in the blood."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Although your non-HDL levels are low, unfavourable genes for LDL (bad cholesterol) regulation mean it\u2019s important to review your full lipid and metabolic profile with an expert and be proactive with your diet and lifestyle to support your lipid health."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Although your non-HDL levels are low, slightly unfavourable genes for LDL (bad cholesterol) regulation mean it\u2019s important to review your full lipid and metabolic profile with an expert and be proactive with your diet and lifestyle to support your lipid health."
+  },
+  {
+    "blood_metric_id": "BD10052",
+    "Blood Marker": "Non-HDL Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Non-HDL cholesterol includes all harmful cholesterol particles that can affect artery health. They are influenced by LDL-pathway genes as they regulate the total bad cholesterol load in the body. Despite having favourable genes for LDL regulation, your non-HDL levels are low: this may or may not be healthy depending on your full lipid and metabolic profile. A periodic review of your lipid profile along with proactive care can help maintain and optimise long-term lipid health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10073",
+    "Blood Marker": "TSH",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "Your TSH levels are high, despite a normal genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10073",
+    "Blood Marker": "TSH",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "Your TSH levels are high, and you have a slightly increased genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10073",
+    "Blood Marker": "TSH",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your thyroid health is well supported with a normal genetic risk for hypothyroidism and normal levels of TSH. "
+  },
+  {
+    "blood_metric_id": "BD10073",
+    "Blood Marker": "TSH",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your TSH levels are normal, but you have a slightly increased genetic risk for hypothyroidism. This suggests the need to be proactive with your diet and lifestyle habits to support long-term thyroid health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. Unfavourable genes affecting LDL regulation can lead to higher LDL levels, which in turn can raise total cholesterol. Please consult an expert to review your full lipid profile and be proactive with your diet and lifestyle habits to protect your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. Slightly unfavourable genes affecting LDL regulation can lead to higher LDL levels, which in turn can raise total cholesterol. Please consult an expert to review your full lipid profile and be proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. Your total cholesterol is high despite favourable genes for LDL regulation, so blood LDL may or may not be behind it. Please consult an expert to review your full lipid profile and be proactive with your diet and lifestyle habits to protect your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. Even though your total cholesterol is normal, unfavourable genes for LDL regulation increase your risk of lipid imbalance and highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. Even though your total cholesterol is normal, slightly unfavourable genes for LDL regulation increase your risk of lipid imbalance and highlight the need to be proactive with your diet and lifestyle habits to support your cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "LDL or bad cholesterol makes up a large portion of total cholesterol. You have strong cardiovascular protection with normal levels of total cholesterol and favourable genes for LDL regulation. "
+  },
+  {
+    "blood_metric_id": "BD10075",
+    "Blood Marker": "Total Cholesterol",
+    "gene_metric_id": "GN10364",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "HDL (good cholesterol) contributes significantly to total cholesterol. Despite a genetic tendency toward higher HDL levels, lifestyle factors can lower HDL levels and, in turn, reduce total cholesterol. Reviewing your full lipid profile with an expert can help uncover the underlying cause and support long-term cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10153",
+    "Blood Marker": "Free thyroxine (FT4)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your T4 levels are normal, but you have a slightly increased genetic risk for hypothyroidism. This suggests the need to be proactive with your diet and lifestyle habits to support long-term thyroid health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10153",
+    "Blood Marker": "Free thyroxine (FT4)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your thyroid health is well supported with a normal genetic risk for hypothyroidism and normal levels of T4. "
+  },
+  {
+    "blood_metric_id": "BD10153",
+    "Blood Marker": "Free thyroxine (FT4)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your T4 levels are low, despite a normal genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10153",
+    "Blood Marker": "Free thyroxine (FT4)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your T4 levels are low, and you have a slightly increased genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10152",
+    "Blood Marker": "Free Triiodothyronine (FT3)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your T3 levels are normal, but you have a slightly increased genetic risk for hypothyroidism. This suggests the need to be proactive with your diet and lifestyle habits to support long-term thyroid health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10152",
+    "Blood Marker": "Free Triiodothyronine (FT3)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your thyroid health is well supported with a normal genetic risk for hypothyroidism and normal levels of T3. "
+  },
+  {
+    "blood_metric_id": "BD10152",
+    "Blood Marker": "Free Triiodothyronine (FT3)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your T3 levels are low, despite a normal genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10152",
+    "Blood Marker": "Free Triiodothyronine (FT3)",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your T3 levels are low, and you have a slightly increased genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your triglyceride levels are high despite a favourable genetic progfile that supports triglyceride metabolism. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifetsyle interventions. "
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your triglyceride levels are high and you have unfavourable genes for triglyceride metabolism. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your triglyceride levels are high and you have slightly unfavourable genes for triglyceride metabolism. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your triglyceride levels are optimal and you have favourable genes for triglyceride metabolism. This suggests your triglyceride metabolism is working smoothly\u2014from production to clearance\u2014supporting healthy lipid balance and cardiovascular function."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your triglyceride levels are optimal but you have unfavourable genes for triglyceride metabolism. This means your body may be less efficient at processing them over time. Regular monitoring of your triglyceride levels and being mindful of your lifestyle is important to support long-term metabolic health. "
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your triglyceride levels are optimal but you have slightly unfavourable genes for triglyceride metabolism. This means your body may be less efficient at processing triglycerides over time, so regular monitoring of your triglyceride levels and being mindful of your lifestyle is important to support long-term metabolic health. "
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low levels of triglycerides combined with unfavourable genes for triglyceride metabolism suggest your body may not be processing them optimally. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Low levels of triglycerides combined with slightly unfavourable genes for triglyceride metabolism suggest your body may not be processing them optimally. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10085",
+    "Blood Marker": "Triglycerides",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your triglyceride levels are low despite a favourable genetic progfile that supports triglyceride metabolism. Reviewing your full metabolic profile with an expert can help uncover the underlying cause and support long-term metabolic health with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high TGL/HDL ratio means fat build up in the blood outweighs the protective cleanup capacity of HDL or good cholesterol. Given your unfavourable genes for triglyceride metabolism, this suggests an increased metabolic and cardiovascular risk due to genetic and non-genetic causes such a diet and lifestyle habits. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high TGL/HDL ratio means fat build up in the blood outweighs the protective cleanup capacity of HDL or good cholesterol. Given your slightly unfavourable genes for triglyceride metabolism, this suggests an increased metabolic and cardiovascular risk due to genetic and non-genetic causes such a diet and lifestyle habits. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high TGL/HDL ratio means fat build up in the blood outweighs the protective cleanup capacity of HDL or good cholesterol. This is despite a favourable genetic profile that supports triglyceride metabolism. Consulting an expert may help identify the underlying cause and make the neccesary diet and lifestyle changes to support metabolic and cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "A high TGL/HDL ratio means fat build up in the blood outweighs the protective cleanup capacity of HDL or good cholesterol. This is despite a genetic tendency toward higher HDL (good cholesterol) levels. Consulting an expert may help identify the underlying cause and make the neccesary diet and lifestyle changes to support metabolic and cardiovascular health. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal TG/HDL ratio means your body handles fats efficiently and HDL is providing strong protection against cholesterol buildup. But you have unfavourable genes for triglyceride metabolism. This suggests the need to be proactive with diet and lifestyle habits to support your long-term metabolic health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "A normal TG/HDL ratio means your body handles fats efficiently and HDL is providing strong protection against cholesterol buildup. But you have slightly unfavourable genes for triglyceride metabolism. This suggests the need to be proactive with diet and lifestyle habits to support your long-term metabolic health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your cardiovascular and metabolic health is well supported with a normal TG/HDL ratio and favourable genes for triglycerides metabolism. This means your body handles fats well, and HDL is effectively clearing excess cholesterol from the bloodstream."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your cardiovascular and metabolic health is well supported with a normal TG/HDL ratio and a genetic tendency toward higher HDL (good cholesterol) levels. This means your body handles fats well, and HDL is effectively clearing excess cholesterol from the bloodstream."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low TG/HDL ratio means your body handles fats efficiently and HDL is providing strong protection against cholesterol buildup. But you have unfavourable genes for triglyceride metabolism. This suggests the need to be proactive with diet and lifestyle habits to support your long-term metabolic health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "A low TG/HDL ratio means your body handles fats efficiently and HDL is providing strong protection against cholesterol buildup. But you have slightly unfavourable genes for triglyceride metabolism. This suggests the need to be proactive with diet and lifestyle habits to support your long-term metabolic health under the guidance of a health expert. "
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10316",
+    "Gene": "TGL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your cardiovascular and metabolic health is well supported with a low TG/HDL ratio and favourable genes for triglyceride metabolism. This means your body handles fats well, and HDL is effectively clearing excess cholesterol from the bloodstream."
+  },
+  {
+    "blood_metric_id": "BD10086",
+    "Blood Marker": "TGL/HDL Ratio",
+    "gene_metric_id": "GN10365",
+    "Gene": "HDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your cardiovascular and metabolic health is well supported with a low TG/HDL ratio and a genetic tendency toward higher HDL (good cholesterol) levels. This means your body handles fats well, and HDL is effectively clearing excess cholesterol from the bloodstream."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your vitamin B12 levels are high despite a favourable genetic profile that supports B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your vitamin B12 levels are high and you have unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your vitamin B12 levels are high and you have slightly unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin B12 levels are optimal and you have favourable genes for B12 metabolism. This suggests sufficient intake and smooth absorption the vitamin which supports healthy red blood cell formation, nerve function, and methylation."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin B12 levels are optimal but you have unfavourable genes for vitamin B12 metabolism. This means your body may be less efficient at absorbing or using B12 over time, so regular monitoring of your B12 levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin B12 levels are optimal but you have slightly unfavourable genes for vitamin B12 metabolism. This means your body may be less efficient at absorbing or using B12 over time, so regular monitoring of your B12 levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Very low",
+    "New Descriptions": "Your vitamin B12 levels are very low despite a favourable genetic profile for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Very low",
+    "New Descriptions": "Your vitamin B12 levels are very low and you have unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Very low",
+    "New Descriptions": "Your vitamin B12 levels are very low and you have slightly unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin B12 levels are very low despite a favourable genetic profile for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin B12 levels are low and you have unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin B12 levels are low and you have slightly unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Borderline Low",
+    "New Descriptions": "Your vitamin B12 levels are borderline low despite a favourable genetic profile for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Borderline Low",
+    "New Descriptions": "Your vitamin B12 levels are borderline low and you have unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10093",
+    "Blood Marker": "Vitamin B12",
+    "gene_metric_id": "GN10330",
+    "Gene": "Vitamin B12 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Borderline Low",
+    "New Descriptions": "Your vitamin B12 levels are borderline low and you have slightly unfavourable genes for B12 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B12 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are high despite a favourable genetic profile for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are high and you have unfavourable genes for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are high and you have slightly unfavourable genes for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are optimal and you have favourable genes for B9 metabolism. This suggests sufficient intake and smooth absorption of the vitamin which supports healthy red blood cell formation, DNA synthesis, and methylation."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are optimal but you have unfavourable genes for B9 metabolism. This means your body may be less efficient at absorbing or using B12 over time, so regular monitoring of your B12 levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are optimal but you have slightly unfavourable genes for B9 metabolism. This suggests sufficient intake and smooth absorption the vitamin which supports healthy red blood cell formation, DNA synthesis, and methylation."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are low despite favourable genes for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are low and you have unfavourable genes for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10099",
+    "Blood Marker": "folic acid",
+    "gene_metric_id": "GN10332",
+    "Gene": "Vitamin B9 Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your folic acid (vitamin B9) levels are low and you have slightly unfavourable genes for B9 metabolism. Consulting an expert may help identify the underlying cause and maintain optimal B9 levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "Your vitamin D levels are very high despite favourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "Your vitamin D levels are very high and you have unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Very High",
+    "New Descriptions": "Your vitamin D levels are very high and you have slightly unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your vitamin D levels are normal and you have favourable genes for vitamin D metabolism. This suggests sufficient intake and smooth absorption the vitamin which supports bone health, immune function, and hormone regulation."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your vitamin D levels are normal but you have unfavourable genes for vitamin D metabolism. This means your body may be less efficient at absorbing or using vitamin D over time, so regular monitoring of your vitamin D levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your vitamin D levels are normal but you have slightly unfavourable genes for vitamin D metabolism. This means your body may be less efficient at absorbing or using vitamin D over time, so regular monitoring of your vitamin D levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin D levels are optimal and you have favourable genes for vitamin D metabolism. This suggests sufficient intake and smooth absorption the vitamin which supports bone health, immune function, and hormone regulation."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin D levels are optimal but you have unfavourable genes for vitamin D metabolism. This means your body may be less efficient at absorbing or using vitamin D over time. Regular monitoring of your vitamin D levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your vitamin D levels are optimal but you have slightly unfavourable genes for vitamin D metabolism. This means your body may be less efficient at absorbing or using vitamin D over time. Regular monitoring of your vitamin D levels and being mindful of your intake is important."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin D levels are low despite favourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin D levels are low and you have unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Your vitamin D levels are low and you have slightly unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Your vitamin D levels are very low despite favourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Your vitamin D levels are very low and you have unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10100",
+    "Blood Marker": "Vitamin D",
+    "gene_metric_id": "GN10334",
+    "Gene": "Vitamin D Metabolism",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Very Low",
+    "New Descriptions": "Your vitamin D levels are very low and you have slightly unfavourable genes for vitamin D metabolism. Consulting an expert may help identify the underlying cause and maintain optimal vitamin D levels with dietary and lifestyle interventions."
+  },
+  {
+    "blood_metric_id": "BD10107",
+    "Blood Marker": "Free T3 / Free T4 Ratio",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your Free T3 / Free T4 ratio is low, despite a normal genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function."
+  },
+  {
+    "blood_metric_id": "BD10107",
+    "Blood Marker": "Free T3 / Free T4 Ratio",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Low",
+    "New Descriptions": "Your Free T3 / Free T4 ratio is low, and you have a slightly increased genetic risk for hypothyroidism. This suggests your thyroid may benefit from timely dietary and lifestyle interventions to help protect and maintain healthy thyroid function."
+  },
+  {
+    "blood_metric_id": "BD10107",
+    "Blood Marker": "Free T3 / Free T4 Ratio",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your Free T3 / Free T4 ratio is optimal, but you have a slightly increased genetic risk for hypothyroidism. This suggests the need to be proactive with your diet and lifestyle habits to support long-term thyroid health."
+  },
+  {
+    "blood_metric_id": "BD10107",
+    "Blood Marker": "Free T3 / Free T4 Ratio",
+    "gene_metric_id": "GN10150",
+    "Gene": "Hypothyroidism",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your thyroid health is well supported with a normal genetic risk for hypothyroidism and a optimal Free T3 / Free T4 ratio.  "
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high HOMA-IR combined with a high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high HOMA-IR  despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Borderline High",
+    "New Descriptions": "Borderline high HOMA-IR combined with a slightly increased genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "High",
+    "New Descriptions": "HOMA-IR combined with a high genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "High",
+    "New Descriptions": "High HOMA-IR  despite a normal genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "High",
+    "New Descriptions": "High HOMA-IR combined with a slightly increased genetic risk for Type 2 diabetes suggests metabolic imbalance influenced by both genetic and lifestyle factors such as diet, physical activity or environmental stressors. We recommend consulting a health expert and being proactive about your metabolic health."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your HOMA-IR is normal but a high genetic risk for Type 2 diabetes suggests the need to stay proactive with your diet and lifestyle habits to support long-term metabolic health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "With normal levels of HOMA-IR and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Normal",
+    "New Descriptions": "Your HOMA-IR is normal but a slightly increased genetic risk for Type 2 diabetes suggests the need to stay proactive with your diet and lifestyle habits to support long-term metabolic health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "High risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your HOMA-IR is optimal but a high genetic risk for Type 2 diabetes suggests the need to stay proactive with your diet and lifestyle habits to support long-term metabolic health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Normal risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "With optimal levels of HOMA-IR and a normal genetic risk for Type 2 diabetes, your metabolic health is well supported."
+  },
+  {
+    "blood_metric_id": "BD10150",
+    "Blood Marker": "HOMA-IR",
+    "gene_metric_id": "GN10320",
+    "Gene": "Type 2 Diabetes Mellitus",
+    "Revised Rating": "Slightly increased risk",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your HOMA-IR is optimal but a slightly increased genetic risk for Type 2 diabetes suggests the need to stay proactive with your diet and lifestyle habits to support long-term metabolic health under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have high levels of sdLDL (a subtype of LDL or bad cholesterol) in the blood along with unfavourable genes for LDL regulation. This suggests the need to be especially proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "High",
+    "New Descriptions": "You have high levels sdLDL (a subtype of LDL or bad cholesterol) in the blood along with slightly unfavourable genes for LDL regulation. This suggests the need to be especially proactive and support your cardiovascular health with diet and lifestyle interventions under the guidance of a health expert."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "High",
+    "New Descriptions": "Despite favourable genes for LDL (bad cholesterol) regulation, you have a high levels of sdLDL (a subtype of LDL or bad cholesterol) in the blood. This suggests cholesterol imbalance caused by non-genetic factors such as diet, lifestyle habits or environmental stressors. We recommend consulting a health expert and being proactive about your cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your levels of sdLDL (a subtype of LDL or bad cholesterol) levels are optimal, but unfavourable genes for LDL (bad cholesterol) regulation highlight the need to consult an expert and take proactive steps with your diet and lifestyle habits to support cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "Your levels of sdLDL (a subtype of LDL or bad cholesterol) levels are optimal, but slightly unfavourable genes for LDL (bad cholesterol) regulation highlight the need to consult an expert and take proactive steps with your diet and lifestyle habits to support cardiovascular health."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Optimal",
+    "New Descriptions": "You have strong cardiovascular protection with favourable genetics for LDL (bad cholesterol) regulation and optimal levels of sdLDL (a subtype of LDL or bad cholesterol) in the blood."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Whether or not low sdLDL (a subtype of LDL or bad cholesterol) is healthy depends on your full lipid and metabolic profile. Given your unfavourable genes for LDL regulation, you should consult an expert and take proactive steps with your diet and lifestyle habits to support lipid health."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Slightly unfavourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Whether or not low sdLDL (a subtype of LDL or bad cholesterol) is healthy depends on your full lipid and metabolic profile. Given your slightly unfavourable genes for LDL regulation, you should consult an expert and take proactive steps with your diet and lifestyle habits to support lipid health."
+  },
+  {
+    "blood_metric_id": "BD10154",
+    "Blood Marker": "Small LDL",
+    "gene_metric_id": "GN10364",
+    "Gene": "LDL",
+    "Revised Rating": "Favourable",
+    "Blood Level": "Low",
+    "New Descriptions": "Despite a favourable genetic profile for LDL or bad cholesterol regulation, your sdLDL (a subtype of LDL) levels are low. This may or may not be healtly depending on your full lipid and metabolic profile. You should consult an expert and take proactive steps with your diet and lifestyle habits to support lipid health."
+  }
+]

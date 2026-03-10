@@ -19,10 +19,27 @@ class TestDetailPage(page: Page) : BasePage(page) {
         return this
     }
 
+    fun waitGeneTabLoad(): TestDetailPage {
+        page.waitForURL("**/diagnostics?tab=genetics**")
+        backButton.waitFor()
+        return this
+    }
+
+    fun waitGutTabLoad(): TestDetailPage {
+        page.waitForURL("**/diagnostics?tab=gut-microbiome**")
+        backButton.waitFor()
+        return this
+    }
+
     fun clickBackButton(): ActionPlanPage {
         StepHelper.step("Clicking Back button on Test Detail page")
         backButton.click()
         return ActionPlanPage(page).waitForConfirmation()
+    }
+
+    fun clickBackButtonToHome() {
+        StepHelper.step("Clicking Back button on Test Detail page")
+        backButton.click()
     }
 
     fun verifyHowItWorksSection() {

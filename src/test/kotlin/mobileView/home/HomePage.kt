@@ -13,6 +13,8 @@ import mobileView.LabTestDateHelper.getDashBoardReadyToViewDate
 import mobileView.LabTestDateHelper.getPhlebotomistAssignedDate
 import mobileView.LabTestDateHelper.getSampleCollectionDate
 import mobileView.actionPlan.page.ActionPlanPage
+import mobileView.home.gene.page.GenePage
+import mobileView.home.gut.page.GutPage
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
 import model.home.HomeData
@@ -24,6 +26,7 @@ import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_ACTION_PLAN
+import utils.report.StepHelper.CLICK_DATA
 import utils.report.StepHelper.CLICK_PROFILE_ICON
 import utils.report.StepHelper.DH_POINTS_CLAIM_CONSULT_CARD
 import utils.report.StepHelper.DH_POINTS_CONFIRM_CONSULT
@@ -39,6 +42,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     val profileImage: Locator = page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile"))
     val actionButtonPlan = page.getByText("Action Plan")
+    val dataButton = page.getByText("Data")
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
@@ -257,7 +261,7 @@ class HomePage(page: Page) : BasePage(page) {
         val totalAmount = DhPointsStore.totalAmount
         val discountAmount = DhPointsStore.discountAmount
         val couponCode = DhPointsStore.couponCode
-        
+
         logger.info { "[RETRIEVAL] Data from DhPointsStore (file):" }
         logger.info { " - Coupon Code: $couponCode" }
         logger.info { " - Discount Amount: $discountAmount" }
@@ -270,12 +274,32 @@ class HomePage(page: Page) : BasePage(page) {
         }
 
         logger.info { "[VALIDATION] Calculated Expected Points: $expectedPoints" }
-        
+
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         page.getByTestId("profile-referrals-tab").click()
-        
+
         page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points$expectedPoints$"))).first().click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Total points")).click()
         page.locator("h2").filter(Locator.FilterOptions().setHasText(expectedPoints)).click()
     }
+
+    fun clickGutTab(): GutPage {
+        StepHelper.step(CLICK_DATA)
+        dataButton.click()
+        page.getByTestId("health-data-tab-gut").click()
+        val gutPage = GutPage(page)
+        return gutPage
+    }
+
+    fun clickGeneTab(): GenePage {
+        StepHelper.step(CLICK_DATA)
+        dataButton.click()
+        page.getByTestId("health-data-tab-gene").click()
+        val genePage = GenePage(page)
+        return genePage
+    }
+
+
+
+
 }
