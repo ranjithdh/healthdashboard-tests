@@ -8,6 +8,9 @@ object TestConfig {
     var ACCESS_TOKEN = ""
     var USER_ID = ""
     var USER_NAME = ""
+    var TOTAL_AMOUNT = ""
+    var COUPON_CODE = ""
+    var DISCOUNT_AMOUNT = ""
 
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
