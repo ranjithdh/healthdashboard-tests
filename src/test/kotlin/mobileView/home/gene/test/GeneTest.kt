@@ -63,13 +63,13 @@ class GeneTest : BaseTest() {
 
     @Order(1)
     @Test
-    fun geneEmptyValidation(){
+    fun geneEmptyValidation() {
         gutPage.emptyView()
     }
 
     @Order(2)
     @Test
-    fun geneListValidation(){
+    fun geneListValidation() {
         gutPage.geneListValidation()
     }
 
@@ -77,6 +77,13 @@ class GeneTest : BaseTest() {
     @Order(3)
     fun gutDetailsVerification() {
         gutPage.geneDetailsValidation()
+    }
+
+
+    @Test
+    @Order(4)
+    fun geneFilterOptions() {
+        gutPage.filterOptions()
     }
 
 

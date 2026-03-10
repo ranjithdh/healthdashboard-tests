@@ -803,4 +803,76 @@ class GenePage(page: Page) : BasePage(page) {
         return metrics?.correlations?.isNotEmpty() == true
     }
 
+
+   fun filterOptions() {
+        val geneList = geneDataWrapper?.gene?.data
+
+        if (geneList?.isNotEmpty() == true) {
+            val geneBadgeItems = buildGeneBadges(geneList)
+
+            geneBadgeItems.keys.forEach { id ->
+                val filterId = page.getByTestId("gene-filter-text-$id")
+
+                filterId.waitFor()
+
+                filterId.click()
+
+                page.waitForTimeout(2000.0)
+
+                val expectedRatingRank = geneBadgeItems[id]
+
+                val filterList = geneList.filter { it.ratingRank == expectedRatingRank }
+
+                val genListGroupByName = getGeneDataByGroup(filterList)
+
+                headerValidations(genListGroupByName)
+
+                filterId.click()
+
+            }
+
+        }
+    }
+
+    private fun buildGeneBadges(geneList: List<GeneItem>): MutableMap<String, Int> {
+        val geneRatingMap = mapOf(
+            "favourable" to 4,
+            "unfavourable" to 2,
+            "slightly_unfavourable" to 3,
+            "normal_risk" to 0
+        )
+
+        val favourable = geneList.filter { it.ratingRank == geneRatingMap["favourable"] }
+
+        val unfavourable = geneList.filter { it.ratingRank == geneRatingMap["unfavourable"] }
+
+        val slightlyUnfavourable = geneList.filter { it.ratingRank == geneRatingMap["slightly_unfavourable"] }
+
+        val normalRisk = geneList.filter { it.ratingRank == geneRatingMap["normal_risk"] }
+
+
+        val tempRatingMap = mutableMapOf<String, Int>()
+
+        if (favourable.isNotEmpty()) {
+            tempRatingMap["favourable"] = 4
+        }
+
+        if (unfavourable.isNotEmpty()) {
+            tempRatingMap["unfavourable"] = 2
+        }
+
+        if (slightlyUnfavourable.isNotEmpty()) {
+            tempRatingMap["slightly_unfavourable"] = 3
+        }
+
+        if (normalRisk.isNotEmpty()) {
+            tempRatingMap["normal_risk"] = 4
+
+        }
+
+        return tempRatingMap
+
+    }
+
+
 }
