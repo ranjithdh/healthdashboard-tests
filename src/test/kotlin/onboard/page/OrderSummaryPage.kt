@@ -93,7 +93,7 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     fun clickGooglePayUPI(): HomePage {
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
         page.locator("iframe").contentFrame().getByTestId("contactNumber").click()
-        page.locator("iframe").contentFrame().getByTestId("contactNumber").fill("7010165836")
+        page.locator("iframe").contentFrame().getByTestId("contactNumber").fill("9797675737")
         page.locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, FrameLocator.GetByRoleOptions().setName("Continue")).click()
         page.locator("iframe").contentFrame().getByTestId("UPI - Google Pay").click()
 
