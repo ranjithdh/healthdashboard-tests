@@ -178,7 +178,7 @@ object TestConfig {
                     otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
                     country = "India"
                 )*/
-        val EXISTING_USER = TestUser(
+        var EXISTING_USER = TestUser(
             mobileNumber = "7092424997",
             otp = "678901",
             country = "India",
