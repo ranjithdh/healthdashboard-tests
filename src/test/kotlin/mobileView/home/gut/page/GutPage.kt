@@ -872,4 +872,67 @@ class GutPage(page: Page) : BasePage(page) {
         }
     }
 
+
+    fun filterOptions() {
+        val gutList = gutDataWrapper?.gut?.data
+
+        if (gutList?.isNotEmpty() == true) {
+            val geneBadgeItems = buildGutBadges(gutList)
+
+            geneBadgeItems.keys.forEach { id ->
+                val filterId = page.getByTestId("gut-filter-text-$id")
+
+                filterId.waitFor()
+
+                filterId.click()
+
+                val expectedRatingRank = geneBadgeItems[id]
+
+                val filterList = gutList.filter { it.rating_rank in expectedRatingRank.orEmpty() }
+
+                val genListGroupByName = getGutDataByGroup(filterList)
+
+                headerValidations(genListGroupByName)
+
+                filterId.click()
+            }
+
+        }
+    }
+
+    private fun buildGutBadges(geneList: List<GutMetricData>): MutableMap<String, List<Int>> {
+        val gutRatingMap = mapOf(
+            "ideal" to listOf(0, 4, 5),
+            "non_ideal" to listOf(1, 2),
+            "needs_improvement" to listOf(3)
+        )
+
+        val ideal = geneList.filter { it.rating_rank in gutRatingMap["ideal"].orEmpty() }
+
+        val nonIdeal = geneList.filter { it.rating_rank in gutRatingMap["non_ideal"].orEmpty() }
+
+        val needsImprovement = geneList.filter { it.rating_rank in gutRatingMap["needs_improvement"].orEmpty() }
+
+
+        val tempRatingMap = mutableMapOf<String, List<Int>>()
+
+        if (ideal.isNotEmpty()) {
+            tempRatingMap["ideal"] = listOf(0, 4, 5)
+        }
+
+        if (nonIdeal.isNotEmpty()) {
+            tempRatingMap["non_ideal"] = listOf(1, 2)
+        }
+
+        if (needsImprovement.isNotEmpty()) {
+            tempRatingMap["needs_improvement"] = listOf(3)
+        }
+
+
+
+        return tempRatingMap
+
+    }
+
+
 }

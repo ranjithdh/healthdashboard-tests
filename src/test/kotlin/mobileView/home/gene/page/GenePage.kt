@@ -868,7 +868,7 @@ class GenePage(page: Page) : BasePage(page) {
         }
 
         if (normalRisk.isNotEmpty()) {
-            tempRatingMap["normal_risk"] = 4
+            tempRatingMap["normal_risk"] = 0
 
         }
 

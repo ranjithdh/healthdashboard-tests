@@ -78,4 +78,10 @@ class GutTest : BaseTest() {
         gutPage.gutSearchViewValidation()
     }
 
+    @Test
+    @Order(4)
+    fun gutFilterOptions() {
+        gutPage.filterOptions()
+    }
+
 }
