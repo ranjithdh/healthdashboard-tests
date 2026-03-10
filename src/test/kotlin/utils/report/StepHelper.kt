@@ -152,6 +152,7 @@ object StepHelper {
     const val WAIT_MOBILE_HOME_CONFIRMATION = "Wait for Mobile Home Page confirmation"
     const val CLICK_PROFILE_ICON = "Click Profile icon"
     const val FETCH_HOME_DATA = "Fetch Home data from API"
+    const val FETCH_BASELINE_DETAIL_DATA = "Fetch Baseline Detail Data"
 
     // mobileView - LabTestsPage
     const val NAVIGATE_TO_DIAGNOSTICS = "Navigate to Diagnostics"

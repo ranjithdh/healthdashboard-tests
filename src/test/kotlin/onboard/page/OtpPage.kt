@@ -7,9 +7,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import config.TestConfig.SECRET_KEY
-import config.TestConfig.TestUsers.EXISTING_USER
 import config.TestUser
-import healthdata.page.HealthDataPage
 import kotlinx.serialization.encodeToString
 import mobileView.home.HomePage
 import mobileView.profile.page.ProfilePage
@@ -37,6 +35,7 @@ import utils.report.StepHelper.WAIT_CONFIRM_SCREEN
 import webView.diagnostics.home.HomePageWebsite
 import webView.diagnostics.page.LabTestsPage
 import webView.diagnostics.symptoms.page.SymptomsPage
+import webView.healthdata.page.HealthDataPage
 
 
 class OtpPage(page: Page) : BasePage(page) {
@@ -155,7 +154,12 @@ class OtpPage(page: Page) : BasePage(page) {
         this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
+
         byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+
+        //for flipboard url
+//        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+
         return this
     }
 
@@ -301,7 +305,7 @@ class OtpPage(page: Page) : BasePage(page) {
         return page.getByText("Incorrect OTP").isVisible
     }
 
-    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): healthdata.page.HealthDataPage {
+    fun enterOtpAndContinueToWebViewHealthData(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): webView.healthdata.page.HealthDataPage {
         StepHelper.step(ENTER_OTP_HEALTH_DATA)
         enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
 
