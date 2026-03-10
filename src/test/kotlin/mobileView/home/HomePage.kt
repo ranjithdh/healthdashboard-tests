@@ -25,6 +25,9 @@ import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_ACTION_PLAN
 import utils.report.StepHelper.CLICK_PROFILE_ICON
+import utils.report.StepHelper.DH_POINTS_CLAIM_CONSULT_CARD
+import utils.report.StepHelper.DH_POINTS_CONFIRM_CONSULT
+import utils.report.StepHelper.DH_POINTS_VERIFY_REWARD_POINTS
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
@@ -196,6 +199,8 @@ class HomePage(page: Page) : BasePage(page) {
         return actionPlan
     }
     fun claimYourConsultCard(): HomePage  {
+        StepHelper.step(DH_POINTS_CLAIM_CONSULT_CARD)
+        logger.info { "[STEP] Clicking 'Claim Your Consultation' card..." }
 //        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("free-consultation")).first().click()
         page.getByText("Claim your Consult").click()
         page.getByText("1-on-1 consult with our").click()
@@ -204,6 +209,9 @@ class HomePage(page: Page) : BasePage(page) {
     }
 
     fun consultationConfirmationCard(): ProfilePage {
+        // Step 3: Confirm consultation
+        StepHelper.step(DH_POINTS_CONFIRM_CONSULT)
+        logger.info { "[STEP] Confirming consultation card..." }
         val profilePage = ProfilePage(page)
         page.getByText("Book a consultationwith our expert30min video call with a longevity expertWhat'").first()
             .click()
@@ -242,6 +250,9 @@ class HomePage(page: Page) : BasePage(page) {
         return HomePage(page)
     }
     fun rewardPointsValidation() {
+        // Step 2: Validate reward points
+        StepHelper.step(DH_POINTS_VERIFY_REWARD_POINTS)
+        logger.info { "[STEP] Navigating to profile and validating reward points..." }
         // Read from file-persisted store – survives across separate @Test methods
         val totalAmount = DhPointsStore.totalAmount
         val discountAmount = DhPointsStore.discountAmount
