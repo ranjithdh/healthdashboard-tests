@@ -26,28 +26,26 @@ object TestConfig {
 
     object Urls {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
+        private const val FLIPBOARD_BASE_URL = "https://human-token-visualizer-gowthaman-stg--developers48.replit.app/"
         private const val PROD_BASE = "https://app.deepholistics.com/"
-
         val BASE_URL: String = if (isStaging) STG_BASE else PROD_BASE
 
-        // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
-
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-
         val SERVICES_URL = "${BASE_URL}services"
-
 
         val LOGIN_URL = "${BASE_URL}login?utm_source=testing_internal"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
+        val BIOMARKERS_URL = "${BASE_URL}biomarkers"
 
         val HOME_PAGE_URL = "${BASE_URL}home"
         val WEBSITE_HOME_PAGE_URL =
             if (isStaging) "https://app.stg.deepholistics.com" else "https://app.deepholistics.com"
         val PROFILE_URL = "${BASE_URL}profile"
 
+        val BASELINE_SCORE_URL = "${BASE_URL}baseline-score"
 
         const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
         const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
@@ -113,9 +111,21 @@ object TestConfig {
         val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
         val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
         val API_USERS = "$BASE_URL/v4/human-token/users"
+        val BASELINE_SCORE_API_URL = "$BASE_URL/v4/human-token/health-data/baseline-score"
+
+        const val FLIP_BOARD_TAGS = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/tags"
+        const val FLIP_BOARD_ARTICLES = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/for-you/"
+        const val FLIP_BOARD_UNREAD_COUNT= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/unread-count/"
+        const val FLIP_BOARD_TOPICS= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/topics/"
+
         val API_WALLET = "$BASE_URL/v4/human-token/user/wallet"
+        val API_GUT = "$BASE_URL/v4/human-token/health-data/gut"
+        val API_GENE = "$BASE_URL/v4/human-token/health-data/gene"
+        val API_GUT_DETAILS = "$BASE_URL/v4/human-token/health-data/gut/metric"
+        val API_GENE_DETAILS = "$BASE_URL/v4/human-token/health-data/gene/metric"
         const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
-        const val API_ACTION_PLAN_USER_RECOMMENDATIONS = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
+        const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
+            "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
     }
 
 
@@ -131,20 +141,15 @@ object TestConfig {
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)
-                .setArgs(listOf("--start-maximized", "--no-sandbox"))
         }
     }
 
     object Viewports {
-        // Mobile devices
         val MOBILE_PORTRAIT = Viewport(390, 844, "iPhone 13", true)
-        val MOBILE_LANDSCAPE = Viewport(844, 390, "iPhone 13 Landscape", true)
         val ANDROID = Viewport(412, 915, "Pixel 5", true)
 
-        // Tablets
         val TABLET_PORTRAIT = Viewport(768, 1024, "iPad", true)
 
-        // Desktop
         val DESKTOP_HD = Viewport(1280, 720, "Desktop HD", false)
         val DESKTOP_FHD = Viewport(1920, 1080, "Desktop Full HD", false)
 
@@ -153,7 +158,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998368",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998394",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -168,8 +173,8 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Finland",
-            countryCode = "+358"
+            country = "Poland",
+            countryCode = "+48"
         )
 
 
@@ -179,10 +184,10 @@ object TestConfig {
                     country = "India"
                 )*/
         var EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",
+            mobileNumber = "4573998384",//4573998394
             otp = "678901",
-            country = "India",
-            countryCode = "+91"
+            country = "Finland",
+            countryCode = "+354"
         )
 
     }
@@ -200,6 +205,7 @@ object TestConfig {
 
     object Coupons {
         const val VALID_COUPON = "D261C0"
+        const val FREE_COUPON = "NASH100"
         const val INVALID_COUPON = "INVALID123"
         const val DISCOUNT_AMOUNT = 1000f
     }

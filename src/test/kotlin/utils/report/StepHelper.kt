@@ -134,6 +134,7 @@ object StepHelper {
     const val EDIT_SLOT_SUMMARY = "Click Edit Slot from Summary Page"
     const val CLICK_ACCOUNT_PROFILE = "Click Account Profile"
     const val CLICK_ACTION_PLAN = "Click Action Plan"
+    const val CLICK_DATA = "Click Data"
 
     // ProfilePage - Preference
     const val FETCH_PREFERENCE = "Fetch communication preference"
@@ -151,6 +152,7 @@ object StepHelper {
     const val WAIT_MOBILE_HOME_CONFIRMATION = "Wait for Mobile Home Page confirmation"
     const val CLICK_PROFILE_ICON = "Click Profile icon"
     const val FETCH_HOME_DATA = "Fetch Home data from API"
+    const val FETCH_BASELINE_DETAIL_DATA = "Fetch Baseline Detail Data"
 
     // mobileView - LabTestsPage
     const val NAVIGATE_TO_DIAGNOSTICS = "Navigate to Diagnostics"
@@ -249,6 +251,28 @@ object StepHelper {
     const val VALIDATING_CONSULTATION_DIALOG = "Validating Consultation Booking Dialog"
     const val VALIDATING_FREE_CONSULTATION_INFO = "Validating Free Consultation Info"
     const val VALIDATING_REPORT_SYMPTOMS_FLOW = "Validating Report Symptoms Flow"
+
+    // Gut
+    const val FETCH_GUT_DATA = "Fetch Gut data"
+    const val VALIDATING_GUT_LIST = "Validating Gut List"
+    const val VALIDATING_GUT_DETAILS = "Validating Gut Details"
+    const val FETCH_GUT_DETAILS = "Fetch Gut details"
+    const val VALIDATING_WHAT_IT_MEANS_TAB = "Validating What it means tab"
+    const val VALIDATING_CONNECTED_BIOMARKERS_TAB = "Validating Connected Biomarkers tab"
+    const val VALIDATING_GUT_SEARCH = "Validating Gut Search"
+    const val VALIDATING_GUT_FILTER_VIEW = "Validating Gut Filter View"
+    const val VALIDATING_GUT_FILTER_OPTIONS = "Validating Gut Filter Options"
+    const val VALIDATING_GUT_EMPTY_VIEW = "Validating Gut Empty View"
+
+    //Gene
+    const val FETCH_GENE_DATA = "Fetch Gene data"
+    const val VALIDATING_GENE_LIST = "Validating Gene List"
+    const val VALIDATING_GENE_FILTER_OPTIONS = "Validating Gene Filter Options"
+    const val VALIDATING_GENE_DETAILS = "Validating Gene Details"
+    const val VALIDATING_GENE_EMPTY_VIEW = "Validating Gene Empty View"
+
+    //Blood
+    const val FETCH_BLOOD_DATA = "Fetch Blood data"
 
     // DH Points
     const val DH_POINTS_GENERATE_USER = "DH Points: Generate dynamic test user"
