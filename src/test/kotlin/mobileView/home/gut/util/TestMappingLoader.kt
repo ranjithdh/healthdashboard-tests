@@ -1,0 +1,42 @@
+package mobileView.home.gut.util
+
+import kotlinx.serialization.json.Json
+import mobileView.home.gene.model.BloodGeneMapping
+import mobileView.home.gut.model.BloodGutCorrleations
+import mobileView.home.gut.model.UpSellMapping
+
+object TestMappingLoader {
+
+    private val json = Json { ignoreUnknownKeys = true }
+
+    fun loadGeneGutMappings(): List<UpSellMapping> {
+        val text = this::class.java
+            .getResource("/file/gene_gut_upsell_mapping.json")
+            ?.readText()
+            ?: error("JSON file not found")
+
+        return json.decodeFromString(text)
+    }
+
+
+    fun loadBloodGutCorrelationsMappings(): List<BloodGutCorrleations> {
+        val text = this::class.java
+            .getResource("/file/blood_gut_correlations.json")
+            ?.readText()
+            ?: error("JSON file not found")
+
+        return json.decodeFromString(text)
+    }
+
+    fun loadBloodGeneCorrelationsMappings(): List<BloodGeneMapping> {
+        val text = this::class.java
+            .getResource("/file/blood_gene_correlations.json")
+            ?.readText()
+            ?: error("JSON file not found")
+
+        return json.decodeFromString(text)
+    }
+
+
+
+}

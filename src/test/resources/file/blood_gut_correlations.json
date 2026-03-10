@@ -1,0 +1,1712 @@
+[
+    {
+        "row_number": 1,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "B7 in your gut looks fine, but blood levels are high, possibly from excess intake or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 2,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Your B7 levels in blood and gut metabolism are optimal! Keep it up and monitor."
+    },
+    {
+        "row_number": 3,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "B7 in your gut looks fine, but blood levels are low, possibly from poor absorption or increased use. Check with an expert."
+    },
+    {
+        "row_number": 4,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "B7 in your gut is off, and blood levels are high, possibly from overproduction or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 5,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "B7 in your gut is off, but blood levels are normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 6,
+        "gut metric_ids": "GT10023",
+        "Gut Metric": "B7",
+        "blood metric_ids": "BD10098",
+        "Blood Marker": "B7",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "B7 in your gut is off, and blood levels are low, suggesting absorption and production issues. Consult an expert."
+    },
+    {
+        "row_number": 7,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "B12 in your gut looks fine, but blood levels are high, possibly from excess intake or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 8,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Your B12 levels in blood and gut metabolism are optimal! Keep it up and monitor."
+    },
+    {
+        "row_number": 9,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "B12 in your gut looks fine, but blood levels are low, possibly from poor absorption or increased demand. Check with an expert."
+    },
+    {
+        "row_number": 10,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "B12 in your gut is off, and blood levels are high, possibly from supplements or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 11,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "B12 in your gut is off, but blood levels are normal. Blood is stable, gut needs support."
+    },
+    {
+        "row_number": 12,
+        "gut metric_ids": "GT10018",
+        "Gut Metric": "B12",
+        "blood metric_ids": "BD10093",
+        "Blood Marker": "B12",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "B12 in your gut is off, and blood levels are low, suggesting absorption and microbial production issues. Consult an expert."
+    },
+    {
+        "row_number": 13,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "B2 in your gut looks fine, but blood levels are high, possibly from excess intake or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 14,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Your B2 levels in blood and gut metabolism are optimal! Keep it up and monitor."
+    },
+    {
+        "row_number": 15,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "B2 in your gut looks fine, but blood levels are low, possibly from poor absorption or use. Check with an expert."
+    },
+    {
+        "row_number": 16,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "B2 in your gut is off, and blood levels are high, possibly from slow removal or excess intake. Check with an expert."
+    },
+    {
+        "row_number": 17,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "B2 in your gut is off, but blood levels are normal. Blood is stable, gut needs care."
+    },
+    {
+        "row_number": 18,
+        "gut metric_ids": "GT10019",
+        "Gut Metric": "B2",
+        "blood metric_ids": "BD10094",
+        "Blood Marker": "B2",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "B2 in your gut is off, and blood levels are low, suggesting absorption and production issues. Consult an expert."
+    },
+    {
+        "row_number": 19,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Vitamin A in your gut looks fine, but blood levels are high, possibly from excess intake or slow removal. Check with an expert."
+    },
+    {
+        "row_number": 20,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Your vitamin A levels in blood and gut metabolism are optimal! Keep it up and monitor. Check with an expert."
+    },
+    {
+        "row_number": 21,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Vitamin A in your gut looks fine, but blood levels are low, possibly from poor absorption or increased demand. Check with an expert."
+    },
+    {
+        "row_number": 22,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Vitamin A in your gut is off, and blood levels are high, possibly from excess intake combined with absorption issues. Check with an expert."
+    },
+    {
+        "row_number": 23,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Vitamin A in your gut is off, but blood levels are normal. Blood is fine, gut needs attention."
+    },
+    {
+        "row_number": 24,
+        "gut metric_ids": "GT10103",
+        "Gut Metric": "Vitamin A",
+        "blood metric_ids": "BD10091",
+        "Blood Marker": "Vitamin A",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Vitamin A in your gut is off, and blood levels are low, suggesting absorption and metabolism issues. Consult an expert."
+    },
+    {
+        "row_number": 25,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood hs-CRP levels are high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 26,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood hs-CRP are normal. Keep it up monitoring."
+    },
+    {
+        "row_number": 27,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Low hs-CRP with ideal gut butyrate suggests very low inflammation and good immune balance. Maintain current habits."
+    },
+    {
+        "row_number": 28,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood hs-CRP levels are high, possibly from gut-driven inflammation. See an expert."
+    },
+    {
+        "row_number": 29,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood hs-CRP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 30,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Butyrate in your gut is off, and blood hs-CRP levels are low, suggesting minimal inflammation but possible gut immune imbalance. See an expert."
+    },
+    {
+        "row_number": 31,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood IL-6 levels are high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 32,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood IL-6 are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 33,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Butyrate in your gut looks fine, but blood IL-6 levels are low, suggesting very low inflammation. In some cases, this may mean reduced immune activity. See an expert."
+    },
+    {
+        "row_number": 34,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood IL-6 levels are high, possibly from gut-driven inflammation. See an expert."
+    },
+    {
+        "row_number": 35,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood IL-6 is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 36,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Butyrate in your gut is off, and blood IL-6 levels are low, suggesting minimal inflammation but possible immune underactivity. See an expert."
+    },
+    {
+        "row_number": 37,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood RA Factor is high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 38,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood RA Factor are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 39,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood RA Factor is high, possibly from gut-driven inflammation. See an expert."
+    },
+    {
+        "row_number": 40,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood RA Factor is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 41,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood anti-CCP is high, possibly from immune activity unrelated to butyrate. See an expert."
+    },
+    {
+        "row_number": 42,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood anti-CCP are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 43,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood anti-CCP is high, possibly from gut-related immune imbalance. See an expert."
+    },
+    {
+        "row_number": 44,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood anti-CCP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 45,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood ANA is high, possibly from immune activity unrelated to butyrate. See an expert."
+    },
+    {
+        "row_number": 46,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood ANA are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 47,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood ANA is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 48,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood ANA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 49,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut looks fine, but blood dsDNA is high, possibly from immune activity unrelated to butyrate. See an expert."
+    },
+    {
+        "row_number": 50,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut and blood dsDNA are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 51,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Butyrate in your gut is off, and blood dsDNA is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 52,
+        "gut metric_ids": "GT10006",
+        "Gut Metric": "Butyrate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Butyrate in your gut is off, but blood dsDNA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 53,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but blood hsCRP is high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 54,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut and blood hsCRP are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 55,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Propionate in your gut looks fine, and blood hsCRP is low, showing minimal inflammation. Keep it up and monitor."
+    },
+    {
+        "row_number": 56,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and blood hsCRP is high, your gut could be contributing to inflammation. See an expert."
+    },
+    {
+        "row_number": 57,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but blood hsCRP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 58,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Propionate in your gut is off, and blood hsCRP is low, showing minimal inflammation but gut health needs attention."
+    },
+    {
+        "row_number": 59,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but blood IL-6 is high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 60,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut and blood IL-6 are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 61,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Propionate in your gut looks fine, and blood IL-6 is low, showing minimal inflammation. In some cases, very low IL-6 might mean weaker immune response. See an expert."
+    },
+    {
+        "row_number": 62,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and blood IL-6 is high, your gut could be contributing to inflammation. See an expert."
+    },
+    {
+        "row_number": 63,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but blood IL-6 is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 64,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Propionate in your gut is off, and blood IL-6 is low, showing minimal inflammation but gut health needs attention. In some cases, very low IL-6 might mean weaker immune response. See an expert."
+    },
+    {
+        "row_number": 65,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but RA Factor is high, possibly from immune activity elsewhere. See an expert."
+    },
+    {
+        "row_number": 66,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut looks fine, and RA Factor is normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 67,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and RA Factor is high — your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 68,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but RA Factor is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 69,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but anti-CCP is high, suggesting autoimmune activity from sources other than the gut. See an expert."
+    },
+    {
+        "row_number": 70,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut looks fine, and anti-CCP is normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 71,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and anti-CCP is high — your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 72,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but anti-CCP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 73,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but ANA is high, possibly from autoimmune activity elsewhere. See an expert."
+    },
+    {
+        "row_number": 74,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut looks fine, and ANA is normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 75,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and ANA is high — your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 76,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but ANA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 77,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut looks fine, but dsDNA is high, possibly from autoimmune activity elsewhere. See an expert."
+    },
+    {
+        "row_number": 78,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut looks fine, and dsDNA is normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 79,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Propionate in your gut is off, and dsDNA is high — your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 80,
+        "gut metric_ids": "GT10101",
+        "Gut Metric": "Propionate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Propionate in your gut is off, but dsDNA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 81,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but blood hs-CRP levels are high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 82,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood hs-CRP are normal. Keep it up monitoring."
+    },
+    {
+        "row_number": 83,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Low hs-CRP with ideal gut acetate suggests very low inflammation and good immune balance. Maintain current habits."
+    },
+    {
+        "row_number": 84,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and blood hs-CRP levels are high, possibly from gut-driven inflammation. See an expert."
+    },
+    {
+        "row_number": 85,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but blood hs-CRP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 86,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10033",
+        "Blood Marker": "hsCRP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Acetate in your gut is off, and blood hs-CRP levels are low, suggesting minimal inflammation but possible gut immune imbalance. See an expert."
+    },
+    {
+        "row_number": 87,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but blood IL-6 is high, possibly from inflammation elsewhere. See an expert."
+    },
+    {
+        "row_number": 88,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood IL-6 are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 89,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Ideal",
+        "Blood Level": "Low",
+        "Description": "Acetate in your gut looks fine, and blood IL-6 is low, showing minimal inflammation. In some cases, very low IL-6 might mean weaker immune response. See an expert."
+    },
+    {
+        "row_number": 90,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and blood IL-6 is high, your gut could be contributing to inflammation. See an expert."
+    },
+    {
+        "row_number": 91,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but blood IL-6 is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 92,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10108",
+        "Blood Marker": "IL-6",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Low",
+        "Description": "Acetate in your gut is off, and blood IL-6 is low, showing minimal inflammation but gut health needs attention. In some cases, very low IL-6 might mean weaker immune response. See an expert."
+    },
+    {
+        "row_number": 93,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but RA Factor is high, possibly from immune activity unrelated to acetate. See an expert."
+    },
+    {
+        "row_number": 94,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood RA Factor are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 95,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and RA Factor is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 96,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10117",
+        "Blood Marker": "RA Factor",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but RA Factor is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 97,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but anti-CCP is high, possibly from immune activity unrelated to acetate. See an expert."
+    },
+    {
+        "row_number": 98,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood anti-CCP are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 99,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and anti-CCP is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 100,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10118",
+        "Blood Marker": "anti CCP",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but anti-CCP is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 101,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but ANA is high, possibly from immune activity unrelated to acetate. See an expert."
+    },
+    {
+        "row_number": 102,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood ANA are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 103,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and ANA is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 104,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": "BD10115",
+        "Blood Marker": "ANA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but ANA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 105,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut looks fine, but dsDNA is high, possibly from immune activity unrelated to acetate. See an expert."
+    },
+    {
+        "row_number": 106,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut and blood dsDNA are normal. Keep it up and monitor."
+    },
+    {
+        "row_number": 107,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "High",
+        "Description": "Acetate in your gut is off, and dsDNA is high, your gut could be contributing to immune imbalance. See an expert."
+    },
+    {
+        "row_number": 108,
+        "gut metric_ids": "GT10100",
+        "Gut Metric": "Acetate",
+        "blood metric_ids": null,
+        "Blood Marker": "dsDNA",
+        "Gut Value": "Non-Ideal",
+        "Blood Level": "Normal",
+        "Description": "Acetate in your gut is off, but dsDNA is normal. Blood is okay, gut needs attention."
+    },
+    {
+        "row_number": 109,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is favourable, but free testosterone is high, possibly from excess production or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 110,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is fair, and free testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 111,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, and free testosterone is low, both together may limit muscle strength. Check with an expert."
+    },
+    {
+        "row_number": 112,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is favourable, but free testosterone is low, possibly from reduced production or higher use. Check with an expert."
+    },
+    {
+        "row_number": 113,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is fair, but free testosterone is high, possibly from excess production or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 114,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, but free testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 115,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is favourable, and free testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 116,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is fair, but free testosterone is low, possibly from reduced production or higher use. Check with an expert."
+    },
+    {
+        "row_number": 117,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Free testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, but free testosterone is high, possibly from external factors or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 118,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is favourable, and total testosterone is high, possibly from excess production or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 119,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is fair, and total testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 120,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10027",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, and total testosterone is low, both together may limit muscle strength. Check with an expert."
+    },
+    {
+        "row_number": 121,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is favourable, but total testosterone is low, possibly from reduced production or higher use. Check with an expert."
+    },
+    {
+        "row_number": 122,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is fair, but total testosterone is high, possibly from excess production or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 123,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, but total testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 124,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Favourable",
+        "Blood Level": "Normal",
+        "Description": "Your gut’s contribution to muscle strength is favourable, and total testosterone is normal. Keep it up and regularly monitor your testosterone."
+    },
+    {
+        "row_number": 125,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Fair",
+        "Blood Level": "Low",
+        "Description": "Your gut’s contribution to muscle strength is fair, but total testosterone is low, possibly from reduced production or higher use. Check with an expert."
+    },
+    {
+        "row_number": 126,
+        "gut metric_ids": "GT10122",
+        "Gut Metric": "Muscle Strength",
+        "blood metric_ids": "BD10080",
+        "Blood Marker": "Total Testosterone",
+        "Gut Value": "Unfavourable",
+        "Blood Level": "High",
+        "Description": "Your gut’s contribution to muscle strength is unfavourable, but total testosterone is high, possibly from external factors or slower clearance. Check with an expert."
+    },
+    {
+        "row_number": 127,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is low, but your fasting blood sugar is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 128,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is moderate, and your fasting blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 129,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is high, but your fasting blood sugar is low, possibly from overcompensation or other factors. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 130,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is low, but your fasting blood sugar is low. Your blood levels need attention.Check with an expert."
+    },
+    {
+        "row_number": 131,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your fasting blood sugar is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 132,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is high, but your fasting blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 133,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is low, and your fasting blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 134,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your fasting blood sugar is low, possibly from overcompensation or other factors. Check with an expert."
+    },
+    {
+        "row_number": 135,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10023",
+        "Blood Marker": "FBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is high, and your fasting blood sugar is high, both may be affecting your glucose profile. Check with an expert."
+    },
+    {
+        "row_number": 136,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is low, but your post-prandial blood sugar is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 137,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is moderate, and your post-prandial blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 138,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is high, but your post-prandial blood sugar is low, possibly from overcompensation or other factors. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 139,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is low, but your post-prandial blood sugar is low. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 140,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your post-prandial blood sugar is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 141,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is high, but your post-prandial blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 142,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is low, and your post-prandial blood sugar is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 143,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your post-prandial blood sugar is low, possibly from overcompensation or other factors. Check with an expert."
+    },
+    {
+        "row_number": 144,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10061",
+        "Blood Marker": "PPBS",
+        "Gut Value": "High Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is high, and your post-prandial blood sugar is high, both may be affecting your glucose profile. Check with an expert."
+    },
+    {
+        "row_number": 145,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Low Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is low, but your HbA1c is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 146,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is moderate, and your HbA1c is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 147,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "High Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is high, but your HbA1c is low, possibly from overcompensation or other factors. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 148,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is low, but your HbA1c is low. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 149,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your HbA1c is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 150,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "High Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is high, but your HbA1c is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 151,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is low, and your HbA1c is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 152,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your HbA1c is low, possibly from overcompensation or other factors. Check with an expert."
+    },
+    {
+        "row_number": 153,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10032",
+        "Blood Marker": "HbA1c",
+        "Gut Value": "High Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is high, and your HbA1c is high, both may be affecting your glucose profile. Check with an expert."
+    },
+    {
+        "row_number": 154,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is low, but your fasting insulin is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 155,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is moderate, and your fasting insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 156,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is high, but your fasting insulin is low, possibly from overcompensation or other factors. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 157,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is low, but your fasting insulin is low. Your blood levels need attention.. Check with an expert."
+    },
+    {
+        "row_number": 158,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your fasting insulin is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 159,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is high, but your fasting insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 160,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is low, and your fasting insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 161,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your fasting insulin is low, possibly from overcompensation or other factors. Check with an expert."
+    },
+    {
+        "row_number": 162,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10024",
+        "Blood Marker": "Fasting Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is high, and your fasting insulin is high, both may be affecting your insulin profile. Check with an expert."
+    },
+    {
+        "row_number": 163,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is low, but your post-prandial insulin is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 164,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is moderate, and your post-prandial insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 165,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is high, but your post-prandial insulin is low, possibly from overcompensation or other factors. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 166,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is low, but your post-prandial insulin is low. Your blood levels need attention. Check with an expert."
+    },
+    {
+        "row_number": 167,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your post-prandial insulin is high, possibly due to other underlying factors. Check with an expert."
+    },
+    {
+        "row_number": 168,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is high, but your post-prandial insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 169,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Low Risk",
+        "Blood Level": "Normal",
+        "Description": "Your gut risk for type 2 diabetes is low, and your post-prandial insulin is normal. Keep it up and regularly monitor your levels."
+    },
+    {
+        "row_number": 170,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "Moderate Risk",
+        "Blood Level": "Low",
+        "Description": "Your gut risk for type 2 diabetes is moderate, but your post-prandial insulin is low, possibly from overcompensation or other factors. Check with an expert."
+    },
+    {
+        "row_number": 171,
+        "gut metric_ids": "GT10126",
+        "Gut Metric": "Diabetes Mellitus Type 2",
+        "blood metric_ids": "BD10060",
+        "Blood Marker": "PP Insulin",
+        "Gut Value": "High Risk",
+        "Blood Level": "High",
+        "Description": "Your gut risk for type 2 diabetes is high, and your post-prandial insulin is high, both may be affecting your insulin profile. Check with an expert."
+    }
+]

@@ -38,6 +38,7 @@ object TestConfig {
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
+        val BIOMARKERS_URL = "${BASE_URL}biomarkers"
 
         val HOME_PAGE_URL = "${BASE_URL}home"
         val WEBSITE_HOME_PAGE_URL =
@@ -118,8 +119,13 @@ object TestConfig {
         const val FLIP_BOARD_TOPICS= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/topics/"
 
         val API_WALLET = "$BASE_URL/v4/human-token/user/wallet"
+        val API_GUT = "$BASE_URL/v4/human-token/health-data/gut"
+        val API_GENE = "$BASE_URL/v4/human-token/health-data/gene"
+        val API_GUT_DETAILS = "$BASE_URL/v4/human-token/health-data/gut/metric"
+        val API_GENE_DETAILS = "$BASE_URL/v4/human-token/health-data/gene/metric"
         const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
-        const val API_ACTION_PLAN_USER_RECOMMENDATIONS = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
+        const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
+            "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
     }
 
 
@@ -152,7 +158,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998368",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998394",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -178,10 +184,10 @@ object TestConfig {
                     country = "India"
                 )*/
         var EXISTING_USER = TestUser(
-            mobileNumber = "9159439327",
+            mobileNumber = "4573998384",//4573998394
             otp = "678901",
-            country = "India",
-            countryCode = "+91"
+            country = "Finland",
+            countryCode = "+354"
         )
 
     }
