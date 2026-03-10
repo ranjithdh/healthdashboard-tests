@@ -6544,7 +6544,6 @@ class ProfilePage(page: Page) : BasePage(page) {
         logAnswer(subType, question, value)
         nextAction()
     }
-
 }
 
 
