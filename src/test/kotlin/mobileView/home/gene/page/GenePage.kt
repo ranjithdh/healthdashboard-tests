@@ -188,6 +188,7 @@ class GenePage(page: Page) : BasePage(page) {
 
     /**------------Empty View---------------*/
     fun emptyView() {
+        StepHelper.step(StepHelper.VALIDATING_GENE_EMPTY_VIEW)
         val geneList = geneDataWrapper?.gene?.data
         if (geneList?.isEmpty() == true) {
             val dnaHelixImg =
@@ -287,6 +288,7 @@ class GenePage(page: Page) : BasePage(page) {
     /**------------Gene Details---------------*/
 
     fun geneDetailsValidation() {
+        StepHelper.step(StepHelper.VALIDATING_GENE_DETAILS)
         val geneList = geneDataWrapper?.gene?.data
         if (geneList?.isNotEmpty() == true) {
             val geneListGroupByName = getGeneDataByGroup(geneList)
@@ -300,6 +302,7 @@ class GenePage(page: Page) : BasePage(page) {
 
                 geneItemList?.forEach { geneItem ->
                     val metricID = geneItem.metric?.metricId
+                    logger.info { "Validating details for Gene: ${geneItem.metric?.displayName} (ID: $metricID)" }
 
                     val nameUiElement = page.getByTestId("gene-item-name-$metricID")
                     nameUiElement.click()

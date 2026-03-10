@@ -792,6 +792,7 @@ class GutPage(page: Page) : BasePage(page) {
 
     /**------------------Search View-------------------------*/
     fun gutSearchViewValidation() {
+        StepHelper.step(StepHelper.VALIDATING_GUT_SEARCH)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList.isNullOrEmpty()) return
 
@@ -802,6 +803,7 @@ class GutPage(page: Page) : BasePage(page) {
 
         val filteredGuList = gutList.filter { it.inference == inference }
 
+        logger.info { "Searching for: $inference" }
         searchView.fill("$inference")
 
         headerValidations(getGutDataByGroup(filteredGuList))
@@ -813,6 +815,7 @@ class GutPage(page: Page) : BasePage(page) {
 
     /**------------------Filter View-------------------------*/
     fun gutFilterViewValidation() {
+        StepHelper.step(StepHelper.VALIDATING_GUT_FILTER_VIEW)
 
         val gutList = gutDataWrapper?.gut?.data
         if (gutList.isNullOrEmpty()) return
@@ -830,19 +833,23 @@ class GutPage(page: Page) : BasePage(page) {
         listOf(idealFilter, nonIdealFilter, improvementFilter).forEach { it.waitFor() }
 
         idealFilter.click()
+        logger.info { "Applying filter: Ideal" }
         headerValidations(getGutDataByGroup(idealsList))
 
 
         nonIdealFilter.click()
+        logger.info { "Applying filter: Non Ideal" }
         headerValidations(getGutDataByGroup(nonIdealsList))
 
 
         improvementFilter.click()
+        logger.info { "Applying filter: Needs Improvement" }
         headerValidations(getGutDataByGroup(moderateList))
 
     }
 
     fun emptyView() {
+        StepHelper.step(StepHelper.VALIDATING_GUT_EMPTY_VIEW)
         val gutList = gutDataWrapper?.gut?.data
         if (gutList?.isEmpty() == true) {
             val dnaHelixImg =
@@ -874,6 +881,7 @@ class GutPage(page: Page) : BasePage(page) {
 
 
     fun filterOptions() {
+        StepHelper.step(StepHelper.VALIDATING_GUT_FILTER_OPTIONS)
         val gutList = gutDataWrapper?.gut?.data
 
         if (gutList?.isNotEmpty() == true) {
@@ -884,6 +892,8 @@ class GutPage(page: Page) : BasePage(page) {
 
                 filterId.waitFor()
 
+                logger.info { "Applying gut filter badge: $id" }
+                StepHelper.step("${StepHelper.CLICK_FILTER}$id")
                 filterId.click()
 
                 val expectedRatingRank = geneBadgeItems[id]
@@ -894,6 +904,7 @@ class GutPage(page: Page) : BasePage(page) {
 
                 headerValidations(genListGroupByName)
 
+                logger.info { "Clearing gut filter badge: $id" }
                 filterId.click()
             }
 

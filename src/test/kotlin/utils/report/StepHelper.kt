@@ -258,11 +258,17 @@ object StepHelper {
     const val FETCH_GUT_DETAILS = "Fetch Gut details"
     const val VALIDATING_WHAT_IT_MEANS_TAB = "Validating What it means tab"
     const val VALIDATING_CONNECTED_BIOMARKERS_TAB = "Validating Connected Biomarkers tab"
+    const val VALIDATING_GUT_SEARCH = "Validating Gut Search"
+    const val VALIDATING_GUT_FILTER_VIEW = "Validating Gut Filter View"
+    const val VALIDATING_GUT_FILTER_OPTIONS = "Validating Gut Filter Options"
+    const val VALIDATING_GUT_EMPTY_VIEW = "Validating Gut Empty View"
 
     //Gene
     const val FETCH_GENE_DATA = "Fetch Gene data"
     const val VALIDATING_GENE_LIST = "Validating Gene List"
     const val VALIDATING_GENE_FILTER_OPTIONS = "Validating Gene Filter Options"
+    const val VALIDATING_GENE_DETAILS = "Validating Gene Details"
+    const val VALIDATING_GENE_EMPTY_VIEW = "Validating Gene Empty View"
 
     //Blood
     const val FETCH_BLOOD_DATA = "Fetch Blood data"
