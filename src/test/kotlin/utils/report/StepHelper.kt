@@ -272,4 +272,25 @@ object StepHelper {
 
     //Blood
     const val FETCH_BLOOD_DATA = "Fetch Blood data"
+
+    // DH Points
+    const val DH_POINTS_GENERATE_USER = "DH Points: Generate dynamic test user"
+    const val DH_POINTS_SIGNUP = "DH Points: Sign up new user"
+    const val DH_POINTS_ENTER_COUPON = "DH Points: Enter coupon code"
+    const val DH_POINTS_APPLY_COUPON = "DH Points: Apply coupon and wait for discount"
+    const val DH_POINTS_CAPTURE_TOTAL = "DH Points: Capture total and discount amount"
+    const val DH_POINTS_CHECKOUT = "DH Points: Complete checkout"
+    const val DH_POINTS_VERIFY_BLOOD_TEST_CARD = "DH Points: Verify blood test booked card"
+    const val DH_POINTS_LOGOUT = "DH Points: Clear session (simulate logout)"
+    const val DH_POINTS_LOGIN = "DH Points: Login with newly created user"
+    const val DH_POINTS_TRIGGER_PIPELINE = "DH Points: Trigger data pipeline"
+    const val DH_POINTS_QUESTIONNAIRE_LOGIN = "DH Points Questionnaire: Login with existing user"
+    const val DH_POINTS_CLAIM_CONSULT_CARD = "DH Points Questionnaire: Claim consultation card"
+    const val DH_POINTS_CONFIRM_CONSULT = "DH Points Questionnaire: Confirm consultation"
+    const val DH_POINTS_ANSWER_QUESTIONNAIRE = "DH Points Questionnaire: Answer questionnaire (Non-Veg)"
+    const val DH_POINTS_CONSULT_WITH_EXPERT = "DH Points Questionnaire: Proceed to consult with expert"
+    const val DH_POINTS_VERIFY_LOGIN = "DH Points Verification: Login with existing user"
+    const val DH_POINTS_VERIFY_REWARD_POINTS = "DH Points Verification: Validate reward points on profile"
+    const val DH_POINTS_TOKEN_FETCH = "DH Points Pipeline: Fetch access token"
+    const val DH_POINTS_PIPELINE_CALL = "DH Points Pipeline: Execute data pipeline for user"
 }
