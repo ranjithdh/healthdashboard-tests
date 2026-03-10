@@ -19,6 +19,7 @@ import model.home.HomeData
 import model.home.HomeDataResponse
 import utils.DateHelper
 import utils.SignupDataStore
+import utils.DhPointsStore
 import utils.logger.logger
 import utils.report.StepHelper
 import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
@@ -241,16 +242,29 @@ class HomePage(page: Page) : BasePage(page) {
         return HomePage(page)
     }
     fun rewardPointsValidation() {
-        val signupData = SignupDataStore.get()
-        val totalAmount = signupData.totalAmount ?: "4999"
-        logger.info { "Validating sign up reward points: ${signupData.totalAmount}" }
-        logger.info { "Validating dynamic reward points: $totalAmount" }
+        // Read from file-persisted store – survives across separate @Test methods
+        val totalAmount = DhPointsStore.totalAmount
+        val discountAmount = DhPointsStore.discountAmount
+        val couponCode = DhPointsStore.couponCode
+        
+        logger.info { "[RETRIEVAL] Data from DhPointsStore (file):" }
+        logger.info { " - Coupon Code: $couponCode" }
+        logger.info { " - Discount Amount: $discountAmount" }
+        logger.info { " - Paid Amount (Total): $totalAmount" }
+
+        val expectedPoints = if (couponCode.startsWith("IMPL", ignoreCase = true) && discountAmount == "5999") {
+            "25000"
+        } else {
+            totalAmount.ifEmpty { "4999" }
+        }
+
+        logger.info { "[VALIDATION] Calculated Expected Points: $expectedPoints" }
         
         page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("profile")).click()
         page.getByTestId("profile-referrals-tab").click()
         
-        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points$totalAmount$"))).first().click()
+        page.locator("div").filter(Locator.FilterOptions().setHasText(Pattern.compile("^Total points$expectedPoints$"))).first().click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Total points")).click()
-        page.locator("h2").filter(Locator.FilterOptions().setHasText(totalAmount)).click()
+        page.locator("h2").filter(Locator.FilterOptions().setHasText(expectedPoints)).click()
     }
 }
