@@ -31,6 +31,7 @@ class ActionPlanTest : BaseTest() {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
+            .setAcceptDownloads(true) // ✅ Added
 
         context = browser.newContext(contextOptions)
         page = context.newPage()

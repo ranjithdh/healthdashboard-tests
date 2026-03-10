@@ -2040,7 +2040,37 @@ class ActionPlanPage(page: Page) : BasePage(page) {
     }
 
     /**---------------Download Report Test-------------------*/
+
     fun downloadPdf() {
+        val testList = recommendationData?.recommendations
+        val foodList = recommendationData?.food_recommendations
+
+        if (testList?.isNotEmpty() == true || foodList?.isNotEmpty() == true) {
+            StepHelper.step(DOWNLOAD_ACTION_PLAN_REPORT)
+            val download = downloadReport()
+            val suggestedFilename = download.suggestedFilename()
+            logger.info { "suggestedFilename.... $suggestedFilename" }
+            assertTrue(suggestedFilename.endsWith(".pdf"), "File should be a PDF")
+
+            val tempDir = System.getProperty("java.io.tmpdir")
+            val downloadPath = Paths.get(tempDir, suggestedFilename)
+
+            Files.deleteIfExists(downloadPath)
+            download.saveAs(downloadPath)
+
+            // ✅ Replace $pdfPath with $downloadPath
+            assertTrue(Files.exists(downloadPath), "Downloaded file should exist at $downloadPath")
+            assertTrue(Files.size(downloadPath) > 0, "Downloaded file should not be empty")
+
+            println("Download successful: $downloadPath")
+
+        } else {
+            logger.warn("No stress recommendations found")
+        }
+    }
+
+
+   /* fun downloadPdf() {
         val testList = recommendationData?.recommendations
         val foodList = recommendationData?.food_recommendations
 
@@ -2069,7 +2099,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         } else {
             logger.warn("No stress recommendations found")
         }
-    }
+    }*/
 
     fun downloadReport(): Download {
         val download = page.waitForDownload {
