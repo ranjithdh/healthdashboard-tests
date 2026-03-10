@@ -805,19 +805,20 @@ class GenePage(page: Page) : BasePage(page) {
 
 
    fun filterOptions() {
+        StepHelper.step(StepHelper.VALIDATING_GENE_FILTER_OPTIONS)
         val geneList = geneDataWrapper?.gene?.data
 
         if (geneList?.isNotEmpty() == true) {
             val geneBadgeItems = buildGeneBadges(geneList)
 
             geneBadgeItems.keys.forEach { id ->
+                logger.info { "Applying gene filter: $id" }
+                StepHelper.step("${StepHelper.CLICK_FILTER}$id")
                 val filterId = page.getByTestId("gene-filter-text-$id")
 
                 filterId.waitFor()
 
                 filterId.click()
-
-                page.waitForTimeout(2000.0)
 
                 val expectedRatingRank = geneBadgeItems[id]
 
@@ -827,6 +828,7 @@ class GenePage(page: Page) : BasePage(page) {
 
                 headerValidations(genListGroupByName)
 
+                logger.info { "Clearing gene filter: $id" }
                 filterId.click()
 
             }
