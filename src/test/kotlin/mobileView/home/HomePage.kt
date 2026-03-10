@@ -20,7 +20,6 @@ import model.flipboard.FlipBoardArticles
 import model.flipboard.FlipBoardTags
 import model.flipboard.FlipBoardUnreadCount
 import model.home.BaselineScoreDetails
-import mobileView.profile.page.ProfilePage
 import model.home.HomeData
 import model.home.HomeDataResponse
 import utils.DateHelper
@@ -39,13 +38,15 @@ import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
 import kotlin.math.roundToInt
+import java.util.regex.Pattern
+
 
 data class FlipBoardResponse(
     val tags: FlipBoardTags? = null,
     val articles: FlipBoardArticles? = null,
     val unreadCount: FlipBoardUnreadCount? = null
 )
-import java.util.regex.Pattern
+
 
 class HomePage(page: Page) : BasePage(page) {
 

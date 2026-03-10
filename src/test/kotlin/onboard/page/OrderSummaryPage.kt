@@ -10,12 +10,14 @@ import io.qameta.allure.Step
 import kotlinx.serialization.json.*
 import mobileView.home.HomePage
 import utils.DateHelper
+import utils.DhPointsStore
 import utils.SignupDataStore
 import utils.json.json
 import utils.logger.logger
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.regex.Pattern
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
@@ -384,5 +386,51 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
         return homePage
+    }
+
+    fun checkTotalAmount(): OrderSummaryPage {
+        logger.info { "[PROCESS] Starting checkTotalAmount" }
+        // Give the UI more time to finish calculations after Apply Coupon
+        page.waitForTimeout(3000.0)
+
+        // Capture referral discount if present
+        try {
+            val discountText = page.locator("p, span, div")
+                .filter(com.microsoft.playwright.Locator.FilterOptions().setHasText(Pattern.compile("Referral discount.*₹[0-9,]+")))
+                .last()
+                .innerText()
+
+            val discountNumeric = discountText.replace(Regex("[^0-9]"), "")
+            logger.info { "!!! [SUCCESS] Captured dynamic discount: $discountNumeric from text: $discountText" }
+            TestConfig.DISCOUNT_AMOUNT = discountNumeric
+            // Persist to file so it survives across @Test methods
+            DhPointsStore.save(discountAmount = discountNumeric)
+        } catch (e: Exception) {
+            logger.info { "??? [INFO] Referral discount not found or could not be parsed: ${e.message}" }
+        }
+
+        // Capture total amount
+        try {
+            val totalLocator = page.locator("p, span, div, h1, h2, h3")
+                .filter(com.microsoft.playwright.Locator.FilterOptions().setHasText(Pattern.compile("Total.*₹[0-9,]+")))
+                .last()
+
+            val totalText = totalLocator.innerText()
+            val numericAmount = totalText.replace(Regex("[^0-9]"), "")
+
+            logger.info { "!!! [SUCCESS] Captured dynamic total amount: $numericAmount from text: $totalText" }
+            TestConfig.TOTAL_AMOUNT = numericAmount
+            // Persist to file so it survives across @Test methods
+            DhPointsStore.save(totalAmount = numericAmount)
+
+            totalLocator.click()
+        } catch (e: Exception) {
+            logger.error { "### [ERROR] Failed to capture total amount: ${e.message}" }
+        }
+
+        // Verify what was written to the file
+        logger.info { "[FILE-PERSISTED] Total: ${DhPointsStore.totalAmount}, Discount: ${DhPointsStore.discountAmount}, Coupon: ${DhPointsStore.couponCode}" }
+
+        return this
     }
 }
