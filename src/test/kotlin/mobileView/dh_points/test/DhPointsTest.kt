@@ -29,6 +29,7 @@ import utils.report.StepHelper.DH_POINTS_ENTER_COUPON
 import utils.report.StepHelper.DH_POINTS_GENERATE_USER
 import utils.report.StepHelper.DH_POINTS_LOGIN
 import utils.report.StepHelper.DH_POINTS_LOGOUT
+import utils.report.StepHelper.DH_POINTS_PAYMENT
 import utils.report.StepHelper.DH_POINTS_PIPELINE_CALL
 import utils.report.StepHelper.DH_POINTS_SIGNUP
 import utils.report.StepHelper.DH_POINTS_TOKEN_FETCH
@@ -137,10 +138,14 @@ class DhPointsTest : BaseTest() {
         logger.info { "[STEP] Captured - Total: ${DhPointsStore.totalAmount}, Discount: ${DhPointsStore.discountAmount}, Coupon: ${DhPointsStore.couponCode}" }
 
         // Step 5: Checkout
-        StepHelper.step(DH_POINTS_CHECKOUT)
-        logger.info { "[STEP] Proceeding to checkout..." }
+//        StepHelper.step(DH_POINTS_CHECKOUT)
+//        logger.info { "[STEP] Proceeding to checkout..." }
         val homePage = orderSummaryPage.clickCheckout()
 
+        // Step 6: Payment
+        StepHelper.step(DH_POINTS_PAYMENT)
+        logger.info { "[STEP] Proceed to payment" }
+        orderSummaryPage.clickGooglePayUPI()
         // Step 6: Verify blood test card
         StepHelper.step(DH_POINTS_VERIFY_BLOOD_TEST_CARD)
         logger.info { "[STEP] Verifying blood test booked card status..." }
