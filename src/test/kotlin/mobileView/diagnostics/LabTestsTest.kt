@@ -694,7 +694,11 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode)
         
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+
+        var isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
+                || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
+        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+//        testSchedulingPage.clickGooglePayUPI()
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
