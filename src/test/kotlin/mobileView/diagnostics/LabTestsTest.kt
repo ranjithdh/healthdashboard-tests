@@ -701,7 +701,7 @@ class LabTestsTest : BaseTest() {
         
         // Finalize the order automation by calling the workflow API
 
-        var isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
+        val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
         testSchedulingPage.proceedPayment(isKit = isKit)
