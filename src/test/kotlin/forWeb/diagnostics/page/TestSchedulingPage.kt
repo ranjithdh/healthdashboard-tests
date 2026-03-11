@@ -1,6 +1,5 @@
 package forWeb.diagnostics.page
 
-import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
@@ -9,7 +8,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.json.*
-import mobileView.home.HomePage
+import kotlinx.serialization.json.put
 import mobileView.profile.utils.ProfileUtils.buildAddressText
 import model.ProfileListData
 import model.profile.PiiUserResponse
@@ -849,28 +848,27 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
         val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
-        val expectedDiscountStr = "- ₹ ${expectedDiscount.toInt()}"
-        logger.info { "Verifying Discount Value. Expected: $expectedDiscountStr, Actual: $discountValue" }
-        assertEquals(expectedDiscountStr.replace(" ", ""), discountValue.replace(",", "").replace(" ", ""))
-        // Verify Discount formatted text visibility (e.g. "- ₹ 0" or "- ₹ 1,000")
-        val formattedDiscount = numberFormat.format(expectedDiscount.toInt())
-        // Construct the expected visual string. Based on UI: "- ₹ 0"
-        val discountTextToFind = "- ₹ $formattedDiscount"
-        val discountTextNoSpace = "-₹$formattedDiscount".replace(" ", "")
-        logger.info { "Verifying visibility for formatted discount text: '$discountTextToFind' or '$discountTextNoSpace'" }
+        val expectedValInt = expectedDiscount.toInt()
+        val expectedDiscountClean = "-$expectedValInt"
+        val actualDiscountClean = discountValue.replace(Regex("[^0-9-]"), "")
         
-        if (page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).isVisible) {
-             page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).first().click()
-        } else if (page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).isVisible) {
-             page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).first().click()
-        } else {
-             logger.warn { "Discount text not found with standard spacing. Trying loose search for '$formattedDiscount'" }
-             if (expectedDiscount > 0) {
-                 page.getByText(formattedDiscount, Page.GetByTextOptions().setExact(false)).first().click()
-             } else {
-                 // For 0, maybe just verify the label is there
-                 page.getByText("Discount").first().isVisible
-             }
+        logger.info { "Verifying Discount Value. Expected (normalized): $expectedDiscountClean, Actual (normalized): $actualDiscountClean (Raw: $discountValue)" }
+        assertEquals(expectedDiscountClean, actualDiscountClean)
+        // Verify Discount formatted text visibility using a flexible Pattern
+        val rawDiscount = expectedDiscount.toInt().toString()
+        val regexSafeDiscount = rawDiscount.replace("(\\d)(?=(\\d{3})+$)".toRegex(), "$1,?")
+        val discountPattern = Pattern.compile("-\\s*.*$regexSafeDiscount") 
+        
+        logger.info { "Verifying visibility for discount value: $rawDiscount with pattern: $discountPattern" }
+        
+        try {
+            page.getByText(discountPattern).first().click()
+            logger.info { "✅ Discount value visibility verified." }
+        } catch (e: Exception) {
+            logger.warn { "Pattern match failed. Falling back to numeric search for: $regexSafeDiscount" }
+            if (expectedDiscount > 0) {
+                page.getByText(Pattern.compile(regexSafeDiscount)).first().click()
+            }
         }
         }
         // Grand Total Verification
@@ -1069,6 +1067,77 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun proceedPayment(isKit: Boolean) {
         logger.info { "Proceeding Payment." }
+
+        val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val piiResponse = page.request().get(
+            piiUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+        )
+        val piiObj = json.decodeFromString<kotlinx.serialization.json.JsonObject>(piiResponse.text())
+        val piiData = piiObj["data"]?.jsonObject?.get("piiData")?.jsonObject
+
+        var mobile = piiData?.get("mobile")?.jsonPrimitive?.content
+        if (mobile.isNullOrBlank()) {
+            mobile = utils.SignupDataStore.get().mobileNumber
+            logger.info { "Mobile from PII is empty, using SignupDataStore: $mobile" }
+        }
+        if (mobile.isNullOrBlank()) {
+            mobile = TestConfig.TestUsers.EXISTING_USER.mobileNumber
+            logger.info { "Mobile from SignupDataStore is empty, using TestConfig: $mobile" }
+        }
+
+        var countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content
+        if (countryCode.isNullOrBlank()) {
+            countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
+        }
+
+        val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
+
+        val appointmentDate = capturedAppointmentDate ?: ""
+        val createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val orderNo = capturedOrderNo ?: ""
+        val productId = capturedProductId ?: 0
+        val thyrocareProductId = capturedThyrocareProductId ?: ""
+        val randomNum = (1000..9999).random()
+        val paymentId = "Order_$randomNum"
+
+        val payload = buildJsonObject {
+            put("appointment_date", appointmentDate)
+            put("country_code", countryCode)
+            put("created_at", createdAt)
+            put("is_combine_order", false)
+            put("is_free_user", false)
+            put("is_kit", isKit)
+            put("is_restrict_whatsapp", buildJsonObject {})
+            put("is_user_present", true)
+            put("mobile", mobile)
+            put("order_id", orderNo)
+            put("payment_amount_inr", "0.00")
+            put("payment_date", createdAt)
+            put("payment_fee", "0.00")
+            put("payment_id", paymentId)
+            put("product_id", productId)
+            put("status", "YET_TO_ASSIGN")
+            put("thyrocare_product_id", thyrocareProductId)
+        }
+
+        logger.info { "Automating workflow for Order: $orderNo Payload: $payload" }
+
+        val postRes = page.request().post(
+            automateUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("Content-Type", "application/json")
+                .setData(payload.toString())
+        )
+
+        logger.info { "Automate Workflow Response: ${postRes.status()} ${postRes.text()}" }
+        if (postRes.status() != 200 && postRes.status() != 201) {
+            logger.error { "Automate workflow API failed" }
+        }
     }
     fun callAutomateOrderWorkflow(isKit: Boolean = true) {
         logger.info { "Calling Automate Order Workflow API..." }
@@ -1112,24 +1181,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
         }
 
-        val paymentId = "order_RJURFxbJ6TYlyLM"
-// this RJURFxbJ6TYlyB will be dynamic
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
-        // appointmentDate is User choosing one
-        // Crea DAte()
-        // dalse
-        // false
-//        is_user_present  true
-// "order_id" -> B means VLR(Ran 4 num)  else-> UUID
-        //pay date  DAte()
-        // product_id -> lab test id
-        //payment_id is Order_1234
-        // user id man
+        val randomNum = (1000..9999).random()
+        val paymentId = "Order_$randomNum"
+        val currentTimestamp = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+
         val payload = buildJsonObject {
-            put("appointment_date", appointmentDate)
+            put("appointment_date", appointmentDate ?: "")
             put("country_code", countryCode)
-            put("created_at", createdAt)
+            put("created_at", createdAt ?: currentTimestamp)
             put("is_combine_order", false)
             put("is_free_user", false)
             put("is_kit", isKit)
@@ -1138,12 +1199,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             put("mobile", mobile)
             put("order_id", orderNo)
             put("payment_amount_inr", "0.00")
-            put("payment_date", paymentDate)
+            put("payment_date", paymentDate ?: currentTimestamp)
             put("payment_fee", "0.00")
             put("payment_id", paymentId)
-            put("product_id", productId)
+            put("product_id", productId ?: 0)
             put("status", "YET_TO_ASSIGN")
-            put("thyrocare_product_id", thyrocareProductId)
+            put("thyrocare_product_id", thyrocareProductId ?: "")
         }
 
         logger.info { "Automating workflow for Order: $orderNo Payload: $payload" }
