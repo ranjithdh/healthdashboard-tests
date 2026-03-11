@@ -35,8 +35,10 @@ import utils.report.StepHelper.VERIFY_PRICE_DETAILS
 import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlin.test.assertEquals
 import java.util.regex.Pattern
+import kotlin.random.Random
 
 //import kotlinx.serialization.json.content
 
@@ -54,12 +56,14 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     private var selectedDateSummary: String = ""
     private var selectedTimeSummary: String = ""
     private var product_id: String? = null
+    private var capturedCode: String? = null
 
     // Properties to store order details from callBloodDataReports
     private var capturedOrderNo: String? = null
     private var capturedProductId: Int? = null
     private var capturedThyrocareProductId: String? = null
     private var capturedAppointmentDate: String? = null
+    private var capturedSlotTime: String? = null    // Raw ISO slot start time (appointment_date)
     private var capturedCreatedAt: String? = null
     private var capturedPaymentDate: String? = null
     // Properties for Metabolic Panel (Dual Slots)
@@ -594,6 +598,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun verifySlotSelectionPage(code: String, productId: String?) {
         logger.info { "Verifying Slot Selection Page with product ID: $productId" }
+        this.capturedCode = code
         page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
 
         val leadId = getLeadId()
@@ -639,11 +644,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         val randomDateSlots = getSlots(randomDateStr, leadId, addressId)
         val availableSlots = randomDateSlots.filter { it.is_available == true && it.start_time != null }
-
         if (availableSlots.isNotEmpty()) {
             val randomSlot = availableSlots.random()
             logger.info { "Selecting slot: ${randomSlot.start_time}" }
             page.getByTestId("diagnostics-booking-step2-slot-${randomSlot.start_time}").click()
+            capturedSlotTime = randomSlot.start_time  // Capture raw ISO time as appointment_date
+
             captureSlotForSummary(randomSlot.start_time!!, summaryDateFormatter)
         } else {
             logger.warn { "No available slots found for random date $randomDateStr" }
@@ -1056,18 +1062,84 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         //appoint
         capturedOrderNo = diOrder["order_id"]?.jsonPrimitive?.content
-        capturedProductId = diOrder["meta_data"]?.jsonObject?.get("product_id")?.jsonPrimitive?.int
-        capturedThyrocareProductId = diOrder["product_id"]?.jsonPrimitive?.content
+        
         capturedAppointmentDate = diOrder["appointment_date"]?.jsonPrimitive?.content
         capturedCreatedAt = diOrder["created_at"]?.jsonPrimitive?.content
         capturedPaymentDate = order["created_at"]?.jsonPrimitive?.content
 
-        logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, ProductId=$capturedProductId" }
+        logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, SlotTime=$capturedSlotTime" }
+    }
+
+    fun captureLabTestDetails(code: String? = null) {
+        val codeToUse = code ?: capturedCode ?: return
+        logger.info { "Fetching Lab Test details for code: $codeToUse" }
+        
+        val response = page.request().get(
+            TestConfig.APIs.LAB_TEST_API_URL,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+
+        if (response.status() != 200) {
+            logger.error { "Failed to fetch lab tests: ${response.status()} ${response.text()}" }
+            return
+        }
+
+        val responseObj = json.decodeFromString<model.LabTestResponse>(response.text())
+        val productList = responseObj.data?.diagnostic_product_list ?: return
+        
+        val allItems = sequenceOf(
+            productList.packages,
+            productList.test_profiles,
+            productList.tests
+        ).filterNotNull().flatten()
+
+        // Find the item by code
+        val targetItem = allItems.find { item ->
+            when (item) {
+                is model.LabTestPackage -> item.code == codeToUse
+                is model.LabTestProfile -> item.code == codeToUse
+                is model.LabTestItem -> item.code == codeToUse
+                else -> false
+            }
+        }
+
+        val product = when (targetItem) {
+            is model.LabTestPackage -> targetItem.product
+            is model.LabTestProfile -> targetItem.product
+            is model.LabTestItem -> targetItem.product
+            else -> null
+        }
+
+        if (product?.category?.any {
+                it.contains("gut", true) || it.contains("gene", true)
+            } == true) {
+
+            val randomNumber = (1000..9999).random()
+            capturedOrderNo = "VLR$randomNumber"
+
+        } else {
+            capturedOrderNo = UUID.randomUUID().toString()
+        }
+
+        if (product != null) {
+            capturedProductId = product.id?.toIntOrNull()
+            capturedThyrocareProductId = product.vendor_product_id
+            logger.info { "Captured details from Lab Test Response: id=$capturedProductId, vendorId=$capturedThyrocareProductId" }
+        } else {
+            logger.warn { "Product with code $codeToUse not found in API response" }
+        }
     }
 
     fun proceedPayment(isKit: Boolean) {
         logger.info { "Proceeding Payment." }
-
+        
+        // Ensure product details are captured from Lab Test response
+        if (capturedProductId == null || capturedThyrocareProductId == null) {
+            captureLabTestDetails()
+        }
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
         val piiResponse = page.request().get(
             piiUrl,
@@ -1095,13 +1167,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
-        val appointmentDate = capturedAppointmentDate ?: ""
+        // appointment_date = the slot start time selected by user (raw ISO string)
+        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate ?: ""
         val createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
         val orderNo = capturedOrderNo ?: ""
-        val productId = capturedProductId ?: 0
+        val productId = capturedProductId ?: 0  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId ?: ""
         val randomNum = (1000..9999).random()
         val paymentId = "Order_$randomNum"
+
+        logger.info { "proceedPayment → appointment_date: $appointmentDate, product_id: $productId" }
 
         val payload = buildJsonObject {
             put("appointment_date", appointmentDate)
@@ -1118,7 +1193,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             put("payment_date", createdAt)
             put("payment_fee", "0.00")
             put("payment_id", paymentId)
-            put("product_id", productId)
+            put("product_id", productId as Int)
             put("status", "YET_TO_ASSIGN")
             put("thyrocare_product_id", thyrocareProductId)
         }
@@ -1148,10 +1223,17 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              callBloodDataReports()
         }
 
-        val orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
-        val productId = capturedProductId
+        var orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
+        
+        // Ensure product details are captured from Lab Test response
+        if (capturedProductId == null || capturedThyrocareProductId == null) {
+            captureLabTestDetails()
+        }
+
+        val productId = capturedProductId  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId
-        val appointmentDate = capturedAppointmentDate
+        // appointment_date = the slot start time selected by user (raw ISO string)
+        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate
         val createdAt = capturedCreatedAt
         val paymentDate = capturedPaymentDate
 
@@ -1187,10 +1269,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val paymentId = "Order_$randomNum"
         val currentTimestamp = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
 
+        logger.info { "callAutomateOrderWorkflow → appointment_date: $appointmentDate, product_id: $productId" }
+
         val payload = buildJsonObject {
             put("appointment_date", appointmentDate ?: "")
             put("country_code", countryCode)
-            put("created_at", createdAt ?: currentTimestamp)
+            put("created_at", currentTimestamp)
             put("is_combine_order", false)
             put("is_free_user", false)
             put("is_kit", isKit)
@@ -1199,7 +1283,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             put("mobile", mobile)
             put("order_id", orderNo)
             put("payment_amount_inr", "0.00")
-            put("payment_date", paymentDate ?: currentTimestamp)
+            put("payment_date", currentTimestamp)
             put("payment_fee", "0.00")
             put("payment_id", paymentId)
             put("product_id", productId ?: 0)
