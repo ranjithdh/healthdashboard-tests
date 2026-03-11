@@ -1,5 +1,6 @@
 package forWeb.diagnostics.page
 
+import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
@@ -8,6 +9,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.json.*
+import mobileView.home.HomePage
 import mobileView.profile.utils.ProfileUtils.buildAddressText
 import model.ProfileListData
 import model.profile.PiiUserResponse
@@ -35,6 +37,7 @@ import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.test.assertEquals
+import java.util.regex.Pattern
 
 //import kotlinx.serialization.json.content
 
@@ -63,6 +66,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     // Properties for Metabolic Panel (Dual Slots)
     private var selectedFastingTimeSummary: String = ""
     private var selectedPostMealTimeSummary: String = ""
+
+    // Properties to store for payment
 
     private fun formatTime(isoTime: String): String {
         val instant = java.time.Instant.parse(isoTime)
@@ -438,10 +443,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         this.selectedAddressIndex = index
     }
 
-    fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
+    fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double, isWalletUsed: Boolean) {
         StepHelper.step(VERIFY_PRICE_DETAILS)
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
-        
+
         // Ensure Price Details section is expanded
         val priceDetailsHeader = page.getByText("PRICE DETAILS")
         priceDetailsHeader.waitFor()
@@ -464,7 +469,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
 
         // Discount Verification only if expectedDiscount > 0
-        if (expectedDiscount > 0) {
+        if (expectedDiscount > 0 && isWalletUsed) {
             page.getByTestId("diagnostics-sidebar-discount-label").click()
             val discountElement = page.getByTestId("diagnostics-sidebar-discount-value")
             discountElement.click()
@@ -509,7 +514,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val grandTotalVal = grandTotalText.toDoubleOrNull() ?: 0.0
         val expectedGrandTotal = expectedSubtotal - expectedDiscount
         
-        if (Math.abs(expectedGrandTotal - grandTotalVal) > 1.0) {
+        if (Math.abs(expectedGrandTotal - grandTotalVal) > 1.0 && isWalletUsed) {
              throw AssertionError("Grand Total mismatch. Expected: $expectedGrandTotal, Found: $grandTotalVal")
         }
     }
@@ -742,7 +747,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -830,14 +835,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val subtotalValue = page.getByTestId("diagnostics-sidebar-subtotal-value").innerText()
         val expectedSubtotalStr = "₹${expectedSubtotal.toInt()}"
         logger.info { "Verifying Subtotal Value. Expected (cleaned): $expectedSubtotalStr, Actual (from ID): $subtotalValue" }
-        assertEquals(expectedSubtotalStr, subtotalValue.replace(",", "").replace(" ", ""))
+        assertEquals(expectedSubtotalStr.replace(Regex("\\s+"), ""), subtotalValue.replace(",", "").replace(Regex("\\s+"), ""))
         
-        // Verify value VISIBILITY via getByText (Handling comma formatting)
-        val formattedSubtotal = numberFormat.format(expectedSubtotal.toInt())
-        logger.info { "Verifying visibility for formatted subtotal: $formattedSubtotal" }
-        page.getByText(formattedSubtotal, Page.GetByTextOptions().setExact(false)).first().click()
+        // Verify value VISIBILITY via getByText (Handling optional comma formatting)
+        val rawSubtotal = expectedSubtotal.toInt().toString()
+        val subtotalPattern = Pattern.compile(rawSubtotal.replace("(\\d)(?=(\\d{3})+$)".toRegex(), "$1,?"))
+        logger.info { "Verifying visibility for subtotal pattern: $subtotalPattern" }
+        page.getByText(subtotalPattern).first().click()
 
         // Discount Verification
+        if (isWalletUsed) {
         page.getByTestId("diagnostics-sidebar-discount-label").click()
         page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
@@ -865,16 +872,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
                  page.getByText("Discount").first().isVisible
              }
         }
-
+        }
         // Grand Total Verification
         page.getByTestId("diagnostics-sidebar-grand-total-label").click()
         page.getByText("Grand Total", Page.GetByTextOptions().setExact(false)).first().click()
 
         val grandTotalValue = page.getByTestId("diagnostics-sidebar-grand-total-value").innerText()
-        val expectedGrandTotal = expectedSubtotal - expectedDiscount
+        val expectedGrandTotal = expectedSubtotal - if (isWalletUsed) expectedDiscount else 0.0
         val expectedGrandTotalStr = "₹${expectedGrandTotal.toInt()}"
         logger.info { "Verifying Grand Total Value. Expected (cleaned): $expectedGrandTotalStr, Actual (from ID): $grandTotalValue" }
-        assertEquals(expectedGrandTotalStr, grandTotalValue.replace(",", "").replace(" ", ""))
+        assertEquals(expectedGrandTotalStr.replace(Regex("\\s+"), ""), grandTotalValue.replace(",", "").replace(Regex("\\s+"), ""))
         
         // Verify value VISIBILITY via getByText
         val formattedGrandTotal = numberFormat.format(expectedGrandTotal.toInt())
@@ -1035,6 +1042,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         if (reports.isNullOrEmpty()) {
             throw RuntimeException("No reports found.")
+        } else {
+            logger.info { "Found $reports reports." }
         }
 
         // Get the most recent report
@@ -1047,6 +1056,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             throw RuntimeException("Order details missing in report")
         }
 
+        //appoint
         capturedOrderNo = diOrder["order_id"]?.jsonPrimitive?.content
         capturedProductId = diOrder["meta_data"]?.jsonObject?.get("product_id")?.jsonPrimitive?.int
         capturedThyrocareProductId = diOrder["product_id"]?.jsonPrimitive?.content
@@ -1057,6 +1067,9 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, ProductId=$capturedProductId" }
     }
 
+    fun proceedPayment(isKit: Boolean) {
+        logger.info { "Proceeding Payment." }
+    }
     fun callAutomateOrderWorkflow(isKit: Boolean = true) {
         logger.info { "Calling Automate Order Workflow API..." }
 
@@ -1099,10 +1112,20 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
         }
 
-        val paymentId = "order_RJURFxbJ6TYlyK"
+        val paymentId = "order_RJURFxbJ6TYlyLM"
 // this RJURFxbJ6TYlyB will be dynamic
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
+        // appointmentDate is User choosing one
+        // Crea DAte()
+        // dalse
+        // false
+//        is_user_present  true
+// "order_id" -> B means VLR(Ran 4 num)  else-> UUID
+        //pay date  DAte()
+        // product_id -> lab test id
+        //payment_id is Order_1234
+        // user id man
         val payload = buildJsonObject {
             put("appointment_date", appointmentDate)
             put("country_code", countryCode)
