@@ -703,7 +703,8 @@ class LabTestsTest : BaseTest() {
 
         var isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit)
 //        testSchedulingPage.clickGooglePayUPI()
 
         logger.info { "Test completed successfully." }
