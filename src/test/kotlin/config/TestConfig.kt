@@ -184,10 +184,10 @@ object TestConfig {
                     country = "India"
                 )*/
         var EXISTING_USER = TestUser(
-            mobileNumber = "4573998384",//4573998394
+            mobileNumber = "7092424997",//4573998394
             otp = "678901",
-            country = "Finland",
-            countryCode = "+354"
+            country = "India",
+            countryCode = "+91"
         )
 
     }
