@@ -281,6 +281,7 @@ object StepHelper {
     const val DH_POINTS_APPLY_COUPON = "DH Points: Apply coupon and wait for discount"
     const val DH_POINTS_CAPTURE_TOTAL = "DH Points: Capture total and discount amount"
     const val DH_POINTS_CHECKOUT = "DH Points: Complete checkout"
+    const val DH_POINTS_PAYMENT = "DH Points: Complete payment"
     const val DH_POINTS_VERIFY_BLOOD_TEST_CARD = "DH Points: Verify blood test booked card"
     const val DH_POINTS_LOGOUT = "DH Points: Clear session (simulate logout)"
     const val DH_POINTS_LOGIN = "DH Points: Login with newly created user"
