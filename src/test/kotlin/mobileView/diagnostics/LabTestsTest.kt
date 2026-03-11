@@ -870,8 +870,8 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
 
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
-
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+        testSchedulingPage.proceedPayment(false)
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
