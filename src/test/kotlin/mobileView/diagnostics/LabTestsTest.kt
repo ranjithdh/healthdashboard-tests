@@ -705,7 +705,6 @@ class LabTestsTest : BaseTest() {
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
         testSchedulingPage.proceedPayment(isKit = isKit)
-//        testSchedulingPage.clickGooglePayUPI()
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
