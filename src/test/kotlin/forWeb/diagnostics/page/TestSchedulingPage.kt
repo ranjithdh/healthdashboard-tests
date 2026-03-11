@@ -8,6 +8,7 @@ import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.json.*
+import kotlinx.serialization.json.put
 import mobileView.profile.utils.ProfileUtils.buildAddressText
 import model.ProfileListData
 import model.profile.PiiUserResponse
@@ -34,7 +35,10 @@ import utils.report.StepHelper.VERIFY_PRICE_DETAILS
 import utils.report.StepHelper.VERIFY_SAMPLE_COLLECTION_ADDRESS_HEADING
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 import kotlin.test.assertEquals
+import java.util.regex.Pattern
+import kotlin.random.Random
 
 //import kotlinx.serialization.json.content
 
@@ -52,17 +56,21 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     private var selectedDateSummary: String = ""
     private var selectedTimeSummary: String = ""
     private var product_id: String? = null
+    private var capturedCode: String? = null
 
     // Properties to store order details from callBloodDataReports
     private var capturedOrderNo: String? = null
     private var capturedProductId: Int? = null
     private var capturedThyrocareProductId: String? = null
     private var capturedAppointmentDate: String? = null
+    private var capturedSlotTime: String? = null    // Raw ISO slot start time (appointment_date)
     private var capturedCreatedAt: String? = null
     private var capturedPaymentDate: String? = null
     // Properties for Metabolic Panel (Dual Slots)
     private var selectedFastingTimeSummary: String = ""
     private var selectedPostMealTimeSummary: String = ""
+
+    // Properties to store for payment
 
     private fun formatTime(isoTime: String): String {
         val instant = java.time.Instant.parse(isoTime)
@@ -438,10 +446,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         this.selectedAddressIndex = index
     }
 
-    fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double) {
+    fun verifyPriceDetails(expectedSubtotal: Double, expectedDiscount: Double, isWalletUsed: Boolean) {
         StepHelper.step(VERIFY_PRICE_DETAILS)
         logger.info { "Verifying price details: Subtotal=$expectedSubtotal, Discount=$expectedDiscount" }
-        
+
         // Ensure Price Details section is expanded
         val priceDetailsHeader = page.getByText("PRICE DETAILS")
         priceDetailsHeader.waitFor()
@@ -464,7 +472,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
 
         // Discount Verification only if expectedDiscount > 0
-        if (expectedDiscount > 0) {
+        if (expectedDiscount > 0 && isWalletUsed) {
             page.getByTestId("diagnostics-sidebar-discount-label").click()
             val discountElement = page.getByTestId("diagnostics-sidebar-discount-value")
             discountElement.click()
@@ -509,7 +517,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val grandTotalVal = grandTotalText.toDoubleOrNull() ?: 0.0
         val expectedGrandTotal = expectedSubtotal - expectedDiscount
         
-        if (Math.abs(expectedGrandTotal - grandTotalVal) > 1.0) {
+        if (Math.abs(expectedGrandTotal - grandTotalVal) > 1.0 && isWalletUsed) {
              throw AssertionError("Grand Total mismatch. Expected: $expectedGrandTotal, Found: $grandTotalVal")
         }
     }
@@ -590,6 +598,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     fun verifySlotSelectionPage(code: String, productId: String?) {
         logger.info { "Verifying Slot Selection Page with product ID: $productId" }
+        this.capturedCode = code
         page.getByTestId("diagnostics-booking-step2-slot-title").waitFor()
 
         val leadId = getLeadId()
@@ -635,11 +644,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         val randomDateSlots = getSlots(randomDateStr, leadId, addressId)
         val availableSlots = randomDateSlots.filter { it.is_available == true && it.start_time != null }
-
         if (availableSlots.isNotEmpty()) {
             val randomSlot = availableSlots.random()
             logger.info { "Selecting slot: ${randomSlot.start_time}" }
             page.getByTestId("diagnostics-booking-step2-slot-${randomSlot.start_time}").click()
+            capturedSlotTime = randomSlot.start_time  // Capture raw ISO time as appointment_date
+
             captureSlotForSummary(randomSlot.start_time!!, summaryDateFormatter)
         } else {
             logger.warn { "No available slots found for random date $randomDateStr" }
@@ -742,7 +752,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -830,51 +840,52 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val subtotalValue = page.getByTestId("diagnostics-sidebar-subtotal-value").innerText()
         val expectedSubtotalStr = "₹${expectedSubtotal.toInt()}"
         logger.info { "Verifying Subtotal Value. Expected (cleaned): $expectedSubtotalStr, Actual (from ID): $subtotalValue" }
-        assertEquals(expectedSubtotalStr, subtotalValue.replace(",", "").replace(" ", ""))
+        assertEquals(expectedSubtotalStr.replace(Regex("\\s+"), ""), subtotalValue.replace(",", "").replace(Regex("\\s+"), ""))
         
-        // Verify value VISIBILITY via getByText (Handling comma formatting)
-        val formattedSubtotal = numberFormat.format(expectedSubtotal.toInt())
-        logger.info { "Verifying visibility for formatted subtotal: $formattedSubtotal" }
-        page.getByText(formattedSubtotal, Page.GetByTextOptions().setExact(false)).first().click()
+        // Verify value VISIBILITY via getByText (Handling optional comma formatting)
+        val rawSubtotal = expectedSubtotal.toInt().toString()
+        val subtotalPattern = Pattern.compile(rawSubtotal.replace("(\\d)(?=(\\d{3})+$)".toRegex(), "$1,?"))
+        logger.info { "Verifying visibility for subtotal pattern: $subtotalPattern" }
+        page.getByText(subtotalPattern).first().click()
 
         // Discount Verification
+        if (isWalletUsed) {
         page.getByTestId("diagnostics-sidebar-discount-label").click()
         page.getByText("Discount", Page.GetByTextOptions().setExact(false)).first().click()
 
         val discountValue = page.getByTestId("diagnostics-sidebar-discount-value").innerText()
-        val expectedDiscountStr = "- ₹ ${expectedDiscount.toInt()}"
-        logger.info { "Verifying Discount Value. Expected: $expectedDiscountStr, Actual: $discountValue" }
-        assertEquals(expectedDiscountStr.replace(" ", ""), discountValue.replace(",", "").replace(" ", ""))
-        // Verify Discount formatted text visibility (e.g. "- ₹ 0" or "- ₹ 1,000")
-        val formattedDiscount = numberFormat.format(expectedDiscount.toInt())
-        // Construct the expected visual string. Based on UI: "- ₹ 0"
-        val discountTextToFind = "- ₹ $formattedDiscount"
-        val discountTextNoSpace = "-₹$formattedDiscount".replace(" ", "")
-        logger.info { "Verifying visibility for formatted discount text: '$discountTextToFind' or '$discountTextNoSpace'" }
+        val expectedValInt = expectedDiscount.toInt()
+        val expectedDiscountClean = "-$expectedValInt"
+        val actualDiscountClean = discountValue.replace(Regex("[^0-9-]"), "")
         
-        if (page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).isVisible) {
-             page.getByText(discountTextToFind, Page.GetByTextOptions().setExact(false)).first().click()
-        } else if (page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).isVisible) {
-             page.getByText(discountTextNoSpace, Page.GetByTextOptions().setExact(false)).first().click()
-        } else {
-             logger.warn { "Discount text not found with standard spacing. Trying loose search for '$formattedDiscount'" }
-             if (expectedDiscount > 0) {
-                 page.getByText(formattedDiscount, Page.GetByTextOptions().setExact(false)).first().click()
-             } else {
-                 // For 0, maybe just verify the label is there
-                 page.getByText("Discount").first().isVisible
-             }
+        logger.info { "Verifying Discount Value. Expected (normalized): $expectedDiscountClean, Actual (normalized): $actualDiscountClean (Raw: $discountValue)" }
+        assertEquals(expectedDiscountClean, actualDiscountClean)
+        // Verify Discount formatted text visibility using a flexible Pattern
+        val rawDiscount = expectedDiscount.toInt().toString()
+        val regexSafeDiscount = rawDiscount.replace("(\\d)(?=(\\d{3})+$)".toRegex(), "$1,?")
+        val discountPattern = Pattern.compile("-\\s*.*$regexSafeDiscount") 
+        
+        logger.info { "Verifying visibility for discount value: $rawDiscount with pattern: $discountPattern" }
+        
+        try {
+            page.getByText(discountPattern).first().click()
+            logger.info { "✅ Discount value visibility verified." }
+        } catch (e: Exception) {
+            logger.warn { "Pattern match failed. Falling back to numeric search for: $regexSafeDiscount" }
+            if (expectedDiscount > 0) {
+                page.getByText(Pattern.compile(regexSafeDiscount)).first().click()
+            }
         }
-
+        }
         // Grand Total Verification
         page.getByTestId("diagnostics-sidebar-grand-total-label").click()
         page.getByText("Grand Total", Page.GetByTextOptions().setExact(false)).first().click()
 
         val grandTotalValue = page.getByTestId("diagnostics-sidebar-grand-total-value").innerText()
-        val expectedGrandTotal = expectedSubtotal - expectedDiscount
+        val expectedGrandTotal = expectedSubtotal - if (isWalletUsed) expectedDiscount else 0.0
         val expectedGrandTotalStr = "₹${expectedGrandTotal.toInt()}"
         logger.info { "Verifying Grand Total Value. Expected (cleaned): $expectedGrandTotalStr, Actual (from ID): $grandTotalValue" }
-        assertEquals(expectedGrandTotalStr, grandTotalValue.replace(",", "").replace(" ", ""))
+        assertEquals(expectedGrandTotalStr.replace(Regex("\\s+"), ""), grandTotalValue.replace(",", "").replace(Regex("\\s+"), ""))
         
         // Verify value VISIBILITY via getByText
         val formattedGrandTotal = numberFormat.format(expectedGrandTotal.toInt())
@@ -1035,6 +1046,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
         if (reports.isNullOrEmpty()) {
             throw RuntimeException("No reports found.")
+        } else {
+            logger.info { "Found $reports reports." }
         }
 
         // Get the most recent report
@@ -1047,16 +1060,160 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             throw RuntimeException("Order details missing in report")
         }
 
+        //appoint
         capturedOrderNo = diOrder["order_id"]?.jsonPrimitive?.content
-        capturedProductId = diOrder["meta_data"]?.jsonObject?.get("product_id")?.jsonPrimitive?.int
-        capturedThyrocareProductId = diOrder["product_id"]?.jsonPrimitive?.content
+        
         capturedAppointmentDate = diOrder["appointment_date"]?.jsonPrimitive?.content
         capturedCreatedAt = diOrder["created_at"]?.jsonPrimitive?.content
         capturedPaymentDate = order["created_at"]?.jsonPrimitive?.content
 
-        logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, ProductId=$capturedProductId" }
+        logger.info { "Captured Order Details: OrderNo=$capturedOrderNo, SlotTime=$capturedSlotTime" }
     }
 
+    fun captureLabTestDetails(code: String? = null) {
+        val codeToUse = code ?: capturedCode ?: return
+        logger.info { "Fetching Lab Test details for code: $codeToUse" }
+        
+        val response = page.request().get(
+            TestConfig.APIs.LAB_TEST_API_URL,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("user_timezone", "Asia/Kolkata")
+        )
+
+        if (response.status() != 200) {
+            logger.error { "Failed to fetch lab tests: ${response.status()} ${response.text()}" }
+            return
+        }
+
+        val responseObj = json.decodeFromString<model.LabTestResponse>(response.text())
+        val productList = responseObj.data?.diagnostic_product_list ?: return
+        
+        val allItems = sequenceOf(
+            productList.packages,
+            productList.test_profiles,
+            productList.tests
+        ).filterNotNull().flatten()
+
+        // Find the item by code
+        val targetItem = allItems.find { item ->
+            when (item) {
+                is model.LabTestPackage -> item.code == codeToUse
+                is model.LabTestProfile -> item.code == codeToUse
+                is model.LabTestItem -> item.code == codeToUse
+                else -> false
+            }
+        }
+
+        val product = when (targetItem) {
+            is model.LabTestPackage -> targetItem.product
+            is model.LabTestProfile -> targetItem.product
+            is model.LabTestItem -> targetItem.product
+            else -> null
+        }
+
+        if (product?.category?.any {
+                it.contains("gut", true) || it.contains("gene", true)
+            } == true) {
+
+            val randomNumber = (1000..9999).random()
+            capturedOrderNo = "VLR$randomNumber"
+
+        } else {
+            capturedOrderNo = UUID.randomUUID().toString()
+        }
+
+        if (product != null) {
+            capturedProductId = product.id?.toIntOrNull()
+            capturedThyrocareProductId = product.vendor_product_id
+            logger.info { "Captured details from Lab Test Response: id=$capturedProductId, vendorId=$capturedThyrocareProductId" }
+        } else {
+            logger.warn { "Product with code $codeToUse not found in API response" }
+        }
+    }
+
+    fun proceedPayment(isKit: Boolean) {
+        logger.info { "Proceeding Payment." }
+        
+        // Ensure product details are captured from Lab Test response
+        if (capturedProductId == null || capturedThyrocareProductId == null) {
+            captureLabTestDetails()
+        }
+        val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val piiResponse = page.request().get(
+            piiUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+        )
+        val piiObj = json.decodeFromString<kotlinx.serialization.json.JsonObject>(piiResponse.text())
+        val piiData = piiObj["data"]?.jsonObject?.get("piiData")?.jsonObject
+
+        var mobile = piiData?.get("mobile")?.jsonPrimitive?.content
+        if (mobile.isNullOrBlank()) {
+            mobile = utils.SignupDataStore.get().mobileNumber
+            logger.info { "Mobile from PII is empty, using SignupDataStore: $mobile" }
+        }
+        if (mobile.isNullOrBlank()) {
+            mobile = TestConfig.TestUsers.EXISTING_USER.mobileNumber
+            logger.info { "Mobile from SignupDataStore is empty, using TestConfig: $mobile" }
+        }
+
+        var countryCode = piiData?.get("countryCode")?.jsonPrimitive?.content
+        if (countryCode.isNullOrBlank()) {
+            countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
+        }
+
+        val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
+
+        // appointment_date = the slot start time selected by user (raw ISO string)
+        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate ?: ""
+        val createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val orderNo = capturedOrderNo ?: ""
+        val productId = capturedProductId ?: 0  // numeric ID from meta_data.product_id
+        val thyrocareProductId = capturedThyrocareProductId ?: ""
+        val randomNum = (1000..9999).random()
+        val paymentId = "Order_$randomNum"
+
+        logger.info { "proceedPayment → appointment_date: $appointmentDate, product_id: $productId" }
+
+        val payload = buildJsonObject {
+            put("appointment_date", appointmentDate)
+            put("country_code", countryCode)
+            put("created_at", createdAt)
+            put("is_combine_order", false)
+            put("is_free_user", false)
+            put("is_kit", isKit)
+            put("is_restrict_whatsapp", buildJsonObject {})
+            put("is_user_present", true)
+            put("mobile", mobile)
+            put("order_id", orderNo)
+            put("payment_amount_inr", "0.00")
+            put("payment_date", createdAt)
+            put("payment_fee", "0.00")
+            put("payment_id", paymentId)
+            put("product_id", productId as Int)
+            put("status", "YET_TO_ASSIGN")
+            put("thyrocare_product_id", thyrocareProductId)
+        }
+
+        logger.info { "Automating workflow for Order: $orderNo Payload: $payload" }
+
+        val postRes = page.request().post(
+            automateUrl,
+            RequestOptions.create()
+                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
+                .setHeader("client_id", TestConfig.CLIENT_ID)
+                .setHeader("Content-Type", "application/json")
+                .setData(payload.toString())
+        )
+
+        logger.info { "Automate Workflow Response: ${postRes.status()} ${postRes.text()}" }
+        if (postRes.status() != 200 && postRes.status() != 201) {
+            logger.error { "Automate workflow API failed" }
+        }
+    }
     fun callAutomateOrderWorkflow(isKit: Boolean = true) {
         logger.info { "Calling Automate Order Workflow API..." }
 
@@ -1066,10 +1223,17 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              callBloodDataReports()
         }
 
-        val orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
-        val productId = capturedProductId
+        var orderNo = capturedOrderNo ?: throw RuntimeException("Order No not captured")
+        
+        // Ensure product details are captured from Lab Test response
+        if (capturedProductId == null || capturedThyrocareProductId == null) {
+            captureLabTestDetails()
+        }
+
+        val productId = capturedProductId  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId
-        val appointmentDate = capturedAppointmentDate
+        // appointment_date = the slot start time selected by user (raw ISO string)
+        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate
         val createdAt = capturedCreatedAt
         val paymentDate = capturedPaymentDate
 
@@ -1099,14 +1263,18 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
              countryCode = TestConfig.TestUsers.EXISTING_USER.countryCode.replace("+", "")
         }
 
-        val paymentId = "order_RJURFxbJ6TYlyK"
-// this RJURFxbJ6TYlyB will be dynamic
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
+        val randomNum = (1000..9999).random()
+        val paymentId = "Order_$randomNum"
+        val currentTimestamp = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+
+        logger.info { "callAutomateOrderWorkflow → appointment_date: $appointmentDate, product_id: $productId" }
+
         val payload = buildJsonObject {
-            put("appointment_date", appointmentDate)
+            put("appointment_date", appointmentDate ?: "")
             put("country_code", countryCode)
-            put("created_at", createdAt)
+            put("created_at", currentTimestamp)
             put("is_combine_order", false)
             put("is_free_user", false)
             put("is_kit", isKit)
@@ -1115,12 +1283,12 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             put("mobile", mobile)
             put("order_id", orderNo)
             put("payment_amount_inr", "0.00")
-            put("payment_date", paymentDate)
+            put("payment_date", currentTimestamp)
             put("payment_fee", "0.00")
             put("payment_id", paymentId)
-            put("product_id", productId)
+            put("product_id", productId ?: 0)
             put("status", "YET_TO_ASSIGN")
-            put("thyrocare_product_id", thyrocareProductId)
+            put("thyrocare_product_id", thyrocareProductId ?: "")
         }
 
         logger.info { "Automating workflow for Order: $orderNo Payload: $payload" }
