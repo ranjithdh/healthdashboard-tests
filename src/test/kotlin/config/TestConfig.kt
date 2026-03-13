@@ -173,8 +173,8 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Poland",
-            countryCode = "+48"
+            country = "Finland",
+            countryCode = "+46"
         )
 
 
