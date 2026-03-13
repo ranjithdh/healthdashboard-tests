@@ -174,7 +174,7 @@ object TestConfig {
             state = "TamilNadu",
             pinCode = "641005",
             country = "Finland",
-            countryCode = "+48"
+            countryCode = "+46"
         )
 
 
