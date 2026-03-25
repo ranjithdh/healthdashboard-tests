@@ -77,6 +77,7 @@ class HomePage(page: Page) : BasePage(page) {
         StepHelper.step(WAIT_MOBILE_HOME_CONFIRMATION)
         logger.info("Waiting for mobileView.home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE) //TODO 
         return this
     }
 
@@ -426,7 +427,9 @@ class HomePage(page: Page) : BasePage(page) {
     fun clickGeneTab(): GenePage {
         StepHelper.step(CLICK_DATA)
         dataButton.click()
-        page.getByTestId("health-data-tab-gene").click()
+        val geneTab = page.getByTestId("health-data-tab-gene")
+        geneTab.waitFor()
+        geneTab.click()
         val genePage = GenePage(page)
         return genePage
     }
