@@ -112,6 +112,7 @@ allure {
 }
 
 tasks.register<Exec>("allure3Report") {
+
     group = "verification"
     description = "Generates Allure Report v3"
 
