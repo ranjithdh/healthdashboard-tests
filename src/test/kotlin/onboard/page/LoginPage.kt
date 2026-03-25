@@ -65,7 +65,7 @@ class LoginPage(page: Page) : BasePage(page) {
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
         StepHelper.step(LOGIN_WITH_MOBILE_AND_CONTINUE)
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
-       // page.waitForTimeout(5000.0) TODO
+        page.waitForTimeout(5000.0)
         selectCountryCode(testUser.country)
         enterMobileNumber(testUser.mobileNumber)
         clickContinue()

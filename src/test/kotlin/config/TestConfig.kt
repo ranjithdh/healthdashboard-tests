@@ -189,13 +189,6 @@ object TestConfig {
             country = "India",
             countryCode = "+91"
         )
-      /*  var EXISTING_USER = TestUser(
-            mobileNumber = "4573998384",//4573998394
-            otp = "678901",
-            country = "Finland",
-            countryCode = "+354"
-        )*/
-
     }
 
     object Artifacts {
