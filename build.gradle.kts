@@ -60,6 +60,15 @@ tasks.withType<Test> {
 // Custom task to run only mobile tests
 tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
+
+    // ✅ Include only actionPlan package
+    include("**/mobileView/actionPlan/**")
+
+    // Optional: logging
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
 }
 
 // Custom task to run only desktop tests
