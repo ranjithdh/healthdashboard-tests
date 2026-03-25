@@ -53,7 +53,7 @@ class ActionPlanTest : BaseTest() {
         return actionPage
     }
 
-   /* @Test
+    @Test
     @Order(1)
     fun recommendationsEmpty() {
         actionPlanPage.captureRecommendationData()
@@ -105,7 +105,7 @@ class ActionPlanTest : BaseTest() {
     fun recommendationsTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.testCards()
-    }*/
+    }
 
     @Test
     @Order(8)
@@ -113,7 +113,6 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.downloadPdf()
     }
-
 
 
 }
