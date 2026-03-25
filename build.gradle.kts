@@ -70,9 +70,6 @@ tasks.withType<Test> {
 
 tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
-    jvmArgs("-javaagent:${agent.singleFile}")
-    systemProperty("junit.jupiter.execution.parallel.enabled", "true")
-    systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
     filter {
         includeTestsMatching("mobileView.*")
     }
