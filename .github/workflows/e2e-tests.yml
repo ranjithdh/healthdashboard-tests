@@ -60,9 +60,10 @@ jobs:
 
       - name: Run mobile tests
         run: ./gradlew mobileTests
+            -Djunit.jupiter.execution.parallel.config.strategy=fixed
+            -Djunit.jupiter.execution.parallel.config.fixed.parallelism=2
         env:
-          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
+          HEADLESS: true
 
       - name: Generate Allure report
         if: always()
@@ -229,8 +230,7 @@ jobs:
       - name: Run onboard tests
         run: ./gradlew onboardTests
         env:
-          TEST_USER_MOBILE: ${{ secrets.TEST_USER_MOBILE }}
-          TEST_USER_OTP: ${{ secrets.TEST_USER_OTP }}
+          HEADLESS: true
 
       - name: Generate Allure report
         if: always()
