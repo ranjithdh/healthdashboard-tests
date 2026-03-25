@@ -77,7 +77,6 @@ class HomePage(page: Page) : BasePage(page) {
         StepHelper.step(WAIT_MOBILE_HOME_CONFIRMATION)
         logger.info("Waiting for mobileView.home page confirmation...")
         page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
-        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE) //TODO 
         return this
     }
 
