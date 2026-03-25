@@ -5,43 +5,39 @@ import com.microsoft.playwright.BrowserContext
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Tracing.StartOptions
 import com.microsoft.playwright.Tracing.StopOptions
+import com.microsoft.playwright.options.RequestOptions
 import config.BaseTest
 import config.TestConfig
-import mobileView.home.checkBloodTestBookedCardStatus
-import onboard.page.LoginPage
 import io.qameta.allure.Epic
 import io.qameta.allure.Feature
 import io.qameta.allure.Story
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import mobileView.home.HomePage
+import model.profile.QuestionerMealType
+import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.DhPointsStore
+import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
-import utils.report.StepHelper.DH_POINTS_ANSWER_QUESTIONNAIRE
 import utils.report.StepHelper.DH_POINTS_APPLY_COUPON
 import utils.report.StepHelper.DH_POINTS_CAPTURE_TOTAL
 import utils.report.StepHelper.DH_POINTS_CHECKOUT
-import utils.report.StepHelper.DH_POINTS_CLAIM_CONSULT_CARD
-import utils.report.StepHelper.DH_POINTS_CONFIRM_CONSULT
 import utils.report.StepHelper.DH_POINTS_CONSULT_WITH_EXPERT
 import utils.report.StepHelper.DH_POINTS_ENTER_COUPON
 import utils.report.StepHelper.DH_POINTS_GENERATE_USER
 import utils.report.StepHelper.DH_POINTS_LOGIN
 import utils.report.StepHelper.DH_POINTS_LOGOUT
+import utils.report.StepHelper.DH_POINTS_PAYMENT
 import utils.report.StepHelper.DH_POINTS_PIPELINE_CALL
-import utils.report.StepHelper.DH_POINTS_QUESTIONNAIRE_LOGIN
 import utils.report.StepHelper.DH_POINTS_SIGNUP
 import utils.report.StepHelper.DH_POINTS_TOKEN_FETCH
 import utils.report.StepHelper.DH_POINTS_TRIGGER_PIPELINE
 import utils.report.StepHelper.DH_POINTS_VERIFY_BLOOD_TEST_CARD
 import utils.report.StepHelper.DH_POINTS_VERIFY_LOGIN
-import utils.report.StepHelper.DH_POINTS_VERIFY_REWARD_POINTS
 import java.nio.file.Paths
-import model.profile.QuestionerMealType
-import com.microsoft.playwright.options.RequestOptions
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import utils.json.json
+import kotlin.test.assertTrue
 
 @Epic("DH Points")
 @Feature("DH Points E2E Flow")
@@ -142,10 +138,14 @@ class DhPointsTest : BaseTest() {
         logger.info { "[STEP] Captured - Total: ${DhPointsStore.totalAmount}, Discount: ${DhPointsStore.discountAmount}, Coupon: ${DhPointsStore.couponCode}" }
 
         // Step 5: Checkout
-        StepHelper.step(DH_POINTS_CHECKOUT)
-        logger.info { "[STEP] Proceeding to checkout..." }
+//        StepHelper.step(DH_POINTS_CHECKOUT)
+//        logger.info { "[STEP] Proceeding to checkout..." }
         val homePage = orderSummaryPage.clickCheckout()
 
+        // Step 6: Payment
+        StepHelper.step(DH_POINTS_PAYMENT)
+        logger.info { "[STEP] Proceed to payment" }
+        orderSummaryPage.clickGooglePayUPI()
         // Step 6: Verify blood test card
         StepHelper.step(DH_POINTS_VERIFY_BLOOD_TEST_CARD)
         logger.info { "[STEP] Verifying blood test booked card status..." }
@@ -272,5 +272,20 @@ class DhPointsTest : BaseTest() {
 
         logger.info { "[PIPELINE] Response Status: ${pipelineResponse.status()}" }
         logger.info { "[PIPELINE] Response Body:   ${pipelineResponse.text()}" }
+    }
+
+    private fun checkBloodTestBookedCardStatus(homePage: HomePage) {
+        homePage.waitForBloodTestCardToLoad()
+        assertTrue(homePage.isPhlebotomistAssignedTitleVisible())
+        assertTrue(homePage.isPhlebotomistAssignedDateVisible())
+
+        assertTrue(homePage.isSampleCollectionTitleVisible())
+        assertTrue(homePage.isSampleCollectionDateVisible())
+
+        assertTrue(homePage.isLabProcessingTitleVisible())
+        assertTrue(homePage.isLabProcessingTimeVisible())
+
+        assertTrue(homePage.isDashBoardReadyToViewTitleVisible())
+        assertTrue(homePage.isDashBoardReadyToViewDateVisible())
     }
 }

@@ -17,6 +17,11 @@ import mobileView.home.gene.page.GenePage
 import mobileView.home.gut.page.GutPage
 import mobileView.orders.OrdersPage
 import mobileView.profile.page.ProfilePage
+import model.baseline.BaselineScoreDetailResponse
+import model.flipboard.FlipBoardArticles
+import model.flipboard.FlipBoardTags
+import model.flipboard.FlipBoardUnreadCount
+import model.home.BaselineScoreDetails
 import model.home.HomeData
 import model.home.HomeDataResponse
 import utils.DateHelper
@@ -28,13 +33,23 @@ import utils.report.StepHelper.CLICK_ACCOUNT_PROFILE
 import utils.report.StepHelper.CLICK_ACTION_PLAN
 import utils.report.StepHelper.CLICK_DATA
 import utils.report.StepHelper.CLICK_PROFILE_ICON
+import utils.report.StepHelper.FETCH_BASELINE_DETAIL_DATA
 import utils.report.StepHelper.DH_POINTS_CLAIM_CONSULT_CARD
 import utils.report.StepHelper.DH_POINTS_CONFIRM_CONSULT
 import utils.report.StepHelper.DH_POINTS_VERIFY_REWARD_POINTS
 import utils.report.StepHelper.FETCH_HOME_DATA
 import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
+import kotlin.math.roundToInt
 import java.util.regex.Pattern
+
+
+data class FlipBoardResponse(
+    val tags: FlipBoardTags? = null,
+    val articles: FlipBoardArticles? = null,
+    val unreadCount: FlipBoardUnreadCount? = null
+)
+
 
 class HomePage(page: Page) : BasePage(page) {
 
@@ -46,6 +61,7 @@ class HomePage(page: Page) : BasePage(page) {
 
     private var homeData: HomeData? = HomeData()
     private var appointmentDate: String? = null
+    private var baselineScoreDetails: BaselineScoreDetails? = null
 
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -107,6 +123,7 @@ class HomePage(page: Page) : BasePage(page) {
                 logApiResponse(TestConfig.APIs.API_HOME, responseObj)
                 val diagnostic = homeData?.diagnostics?.firstOrNull { it.blood_test_appointment_date != null }
                 appointmentDate = diagnostic?.blood_test_appointment_date
+                baselineScoreDetails = homeData?.baseline_score_details
             }
         } catch (e: Exception) {
             logger.error { "Failed to parse API response..${e.message}" }
@@ -194,6 +211,121 @@ class HomePage(page: Page) : BasePage(page) {
         }
         profilePage.waitForConfirmation()
         return profilePage
+    }
+
+    fun isBaselineScoreTitleVisible(): Boolean {
+        val locator = page.locator("p").filter(Locator.FilterOptions().setHasText("Baseline Score")).first()
+        locator.waitFor()
+        return locator.isVisible
+    }
+
+    fun isBetaTagVisible(): Boolean {
+        return page.getByText("Beta").isVisible
+    }
+
+    fun getBaselineScore() = baselineScoreDetails?.score?.roundToInt().toString().plus("\nof 100")
+
+    fun getBaseLineScoreFromUI(): String? {
+        return page.locator("h2").filter(Locator.FilterOptions().setHasText("of 100")).first().innerText()
+    }
+
+    fun clickBaseLineScoreCard(): BaselineScoreDetailResponse? {
+        val response = page.waitForResponse(
+            { response: Response? ->
+                response?.url()?.contains(TestConfig.APIs.BASELINE_SCORE_API_URL) == true && response.status() == 200
+            },
+            {
+                page.locator("#baselinescore_card").click()
+            }
+        )
+
+        val responseBody = response.text()
+        if (responseBody.isNullOrBlank()) {
+            logger.info { "API response body is empty" }
+        }
+
+        logger.info { "API response...${response.text()}" }
+
+        return try {
+            val responseObj = utils.json.json.decodeFromString<BaselineScoreDetailResponse>(responseBody)
+            logger.error { "responseObj...$responseObj" }
+
+            if (responseObj.data != null) {
+                StepHelper.step(FETCH_BASELINE_DETAIL_DATA)
+                logApiResponse(TestConfig.APIs.BASELINE_SCORE_API_URL, responseObj)
+                responseObj
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            logger.error { "Failed to parse API response..${e.message}" }
+            null
+        }
+    }
+
+    fun clickFlipBoardMenu(): FlipBoardResponse? {
+        var flipBoardTags: FlipBoardTags? = null
+        var flipBoardArticles: FlipBoardArticles? = null
+        var flipBoardUnreadCount: FlipBoardUnreadCount? = null
+
+        page.waitForResponse(
+            { response: Response? ->
+                response?.url()?.contains(TestConfig.APIs.FLIP_BOARD_TAGS) == true && response.status() == 200
+            },
+            {
+                page.waitForResponse(
+                    { response: Response? ->
+                        response?.url()?.contains(TestConfig.APIs.FLIP_BOARD_ARTICLES) == true && response.status() == 200
+                    },
+                    {
+                        page.waitForResponse(
+                            { response: Response? ->
+                                response?.url()
+                                    ?.contains(TestConfig.APIs.FLIP_BOARD_UNREAD_COUNT) == true && response.status() == 200
+                            },
+                            {
+                                page.getByText("Flipboard").click()
+                            }
+                        ).let { response ->
+                            val unreadCountResponseBody = response.text()
+                            if (unreadCountResponseBody.isNullOrBlank()) {
+                                logger.info { "UnreadCount API response body is empty" }
+                            }
+                            try {
+                                flipBoardUnreadCount =
+                                    utils.json.json.decodeFromString<FlipBoardUnreadCount>(unreadCountResponseBody)
+                                logger.error { "unreadCount responseObj...$flipBoardUnreadCount" }
+                            } catch (e: Exception) {
+                                logger.error { "Failed to parse unreadCount API response..${e.message}" }
+                            }
+                        }
+                    }
+                ).let { response ->
+                    val articlesResponseBody = response.text()
+                    if (articlesResponseBody.isNullOrBlank()) {
+                        logger.info { "Article API response body is empty" }
+                    }
+                    try {
+                        flipBoardArticles = utils.json.json.decodeFromString<FlipBoardArticles>(articlesResponseBody)
+                        logger.error { "Article responseObj...$flipBoardArticles" }
+                    } catch (e: Exception) {
+                        logger.error { "Failed to parse Article API response..${e.message}" }
+                    }
+                }
+            }
+        ).let { response ->
+            val tagResponseBody = response.text()
+            if (tagResponseBody.isNullOrBlank()) {
+                logger.info { "Tag API response body is empty" }
+            }
+            try {
+                flipBoardTags = utils.json.json.decodeFromString<FlipBoardTags>(tagResponseBody)
+                logger.error { "tag responseObj...$flipBoardTags" }
+            } catch (e: Exception) {
+                logger.error { "Failed to parse tag API response..${e.message}" }
+            }
+        }
+        return FlipBoardResponse(flipBoardTags, flipBoardArticles, flipBoardUnreadCount)
     }
 
     fun clickActionPlan(): ActionPlanPage {

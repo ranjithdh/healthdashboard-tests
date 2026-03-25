@@ -8,9 +8,6 @@ import config.BaseTest
 import config.TestConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
-import model.UsersResponse
-import onboard.page.LoginPage
-import onboard.page.OtpPage
 import org.apache.pdfbox.Loader
 import org.junit.jupiter.api.*
 import utils.logger.logger
@@ -93,166 +90,25 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(1)
     fun `generate and verify action plan`() {
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
-        
-        val otpPage = OtpPage(page)
-        
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response -> 
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200 
-        }) {
-            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-        
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-        
-        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val targetUserId = setup.targetUserId
+        val userData = setup.userData
+        val recommendationsData = setup.recommendationsData
 
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-        
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-        
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-        
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-        
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-        
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-        
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-        
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-        
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-        
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
-        
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-        
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-        
-        val userData = userDataResponse.text()
-        logger.info { "Full User Data JSON: $userData" }
-        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
-        logger.info { "User data API successfully verified." }
-
-        // 5. Call user-recommendations API
-        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
-
-        val userRecommendationsResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
-        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
-
-        val recommendationsData = userRecommendationsResponse.text()
-        logger.info { "Full User Recommendations JSON: $recommendationsData" }
-        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
-        logger.info { "User recommendations API successfully verified." }
+        val name = ActionPlanAdminPage.TARGET_USER_NAME
 
         // Static verification requested by User
-        StepHelper.step("Verifying Action Plan Header and Overview Section")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_HEADER)
         val dynamicPdfStrings = mutableListOf<String>()
 
         // User Information Section (Dynamic)
-        StepHelper.step("Verifying User Information Section")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_USER_INFO)
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
         val apiData = userDataJson["data"]?.jsonObject
         val userProfile = userDataJson["userProfile"]?.jsonObject
@@ -357,7 +213,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // Summary Section
-        StepHelper.step("Verifying Summary and Biomarker Overview Section")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_SUMMARY)
 
         // 1. Click Summary Heading
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Summary")).click()
@@ -476,9 +332,9 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // New Verification Logic for Specific Nutrients based on static data
-        StepHelper.step("Verifying specific nutrient food sources based on user preference")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NUTRITION)
         // 5. Nutrition Guidance Verification
-        val userDataText = userDataResponse.text()
+        val userDataText = userData
         var foodPreference = "non_vegetarian"
         var allergies: List<String> = emptyList()
         var intolerances: List<String> = emptyList()
@@ -540,7 +396,7 @@ class ActionPlanAdminTest : BaseTest() {
         foodPreference = foodPreference.lowercase().replace(" ", "_")
 
         // 1. Open Selector Dialog
-        StepHelper.step("Opening Vitamin/Nutrient Selector Dialog")
+        StepHelper.step(StepHelper.AP_ADMIN_VITAMIN_SELECTOR)
         page1.getByTestId("button-toggle-category-nutrition").click()
         page1.getByTestId("button-vitamin-selector").click()
 
@@ -582,7 +438,7 @@ class ActionPlanAdminTest : BaseTest() {
         assert(btnText.contains("${selectedVitamins.size}")) { "Selected count mismatch in button" }
 
         // 3. Click Add Selected
-        StepHelper.step("Clicking Add Selected and waiting for API Call")
+        StepHelper.step(StepHelper.AP_ADMIN_ADD_SELECTED)
         try {
             page1.waitForResponse({ response ->
                 response.url().contains("replit.app") && response.status() == 200
@@ -600,7 +456,7 @@ class ActionPlanAdminTest : BaseTest() {
         page1.waitForTimeout(1000.0)
 
         // 4. Verify on main page using user's interaction pattern
-        StepHelper.step("Verifying all added vitamins using the interaction pattern")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NUTRITION)
 
         val verifiedVitamins = mutableSetOf<String>()
         val recommendationBlocks = page1.locator("[data-testid^='preview-recommendation-vitamin-']")
@@ -658,7 +514,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         if (supplements.isNotEmpty()) {
-            StepHelper.step("Verifying Supplement Protocol")
+            StepHelper.step(StepHelper.AP_ADMIN_VERIFY_SUPPLEMENTS)
             page1.getByTestId("button-toggle-category-supplements").click()
             page1.waitForTimeout(1000.0)
             dynamicPdfStrings.add("Supplement Protocol")
@@ -786,7 +642,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         if (tests.isNotEmpty()) {
-            StepHelper.step("Verifying Diagnostic Testing Section")
+            StepHelper.step(StepHelper.AP_ADMIN_VERIFY_DIAGNOSTICS)
             page1.getByTestId("button-toggle-category-diagnostic-tests").click()
             page1.waitForTimeout(1000.0)
             dynamicPdfStrings.add("Diagnostic Testing")
@@ -901,7 +757,7 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "ActionPlan verification completed. Verified: $verifiedVitamins" }
 
         // --- PDF Export and Validation ---
-        StepHelper.step("Export PDF and cross verify contents")
+        StepHelper.step(StepHelper.AP_ADMIN_EXPORT_PDF)
         logger.info { "--------------------------------------------------" }
         logger.info { "PDF VALIDATION: STEP 1 - Starting Download" }
         val download2: Download? = page1.waitForDownload(Page.WaitForDownloadOptions().setTimeout(120000.0)) {
@@ -982,7 +838,7 @@ class ActionPlanAdminTest : BaseTest() {
 
 
     private fun verifyWhatsWorkingWell(page1: Page, userData: String, dynamicPdfStrings: MutableList<String>) {
-        StepHelper.step("Verifying 'What's Working Well' section and selector")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_WHATS_WORKING)
         
         // Step 1: Navigate to selector
         page1.getByTestId("button-toggle-category-whats-working-well").click()
@@ -1064,7 +920,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // Step 3: Select random ones (selecting 4 as per user example)
-        StepHelper.step("Selecting random biomarkers")
+        StepHelper.step(StepHelper.AP_ADMIN_BIOMARKER_SELECTOR)
         val randomSelection = workWellMarkers.shuffled().take(4)
         randomSelection.forEach { marker ->
             val metricId = marker.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull ?: ""
@@ -1073,7 +929,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // Step 4: Create subsection
-        StepHelper.step("Clicking Create Subsection")
+        StepHelper.step(StepHelper.AP_ADMIN_CREATE_SUBSECTION)
         page1.getByTestId("button-create-subsection").click()
         logger.info { "Subsection 'What's Working Well' created successfully" }
         
@@ -1081,7 +937,7 @@ class ActionPlanAdminTest : BaseTest() {
     }
 
     private fun verifyWhatNeedsSupport(page1: Page, userData: String, dynamicPdfStrings: MutableList<String>) {
-        StepHelper.step("Verifying 'What Needs Support' section and selector")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NEEDS_SUPPORT)
         
         // Step 1: Navigate to selector
         page1.getByTestId("button-toggle-category-what-needs-support").click()
@@ -1164,7 +1020,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // Step 3: Select random ones
-        StepHelper.step("Selecting random biomarkers for 'What Needs Support'")
+        StepHelper.step(StepHelper.AP_ADMIN_BIOMARKER_SELECTOR)
         val randomSelection = needsSupportMarkers.shuffled().take(3) // Selecting 3 as an example
         randomSelection.forEach { marker ->
             val metricId = marker.jsonObject["metric_id"]?.jsonPrimitive?.contentOrNull ?: ""
@@ -1173,7 +1029,7 @@ class ActionPlanAdminTest : BaseTest() {
         }
 
         // Step 4: Create subsection
-        StepHelper.step("Clicking Create Subsection")
+        StepHelper.step(StepHelper.AP_ADMIN_CREATE_SUBSECTION)
         page1.getByTestId("button-create-subsection").click()
         logger.info { "Subsection 'What Needs Support' created successfully" }
 
@@ -1229,163 +1085,19 @@ class ActionPlanAdminTest : BaseTest() {
     @Order(2)
     fun `verify health overview prompt output constraints`() {
 
-        StepHelper.step("Calling user-data API to verify AI prompt output")
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
-
-        val otpPage = OtpPage(page)
-
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response ->
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
-        }) {
-            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-
-        logger.info { "Tokens captured. ACCESS_TOKEN length: ${TestConfig.ACCESS_TOKEN.length}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
-
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
-
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-//        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-
-        val userData = userDataResponse.text()
-//        logger.info { "Full User Data JSON: $userData" }
-        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
-        logger.info { "User data API successfully verified." }
-
-        val userRecommendationsResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-//        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
-        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
-
-        val recommendationsData = userRecommendationsResponse.text()
-//        logger.info { "Full User Recommendations JSON: $recommendationsData" }
-        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
-        logger.info { "User recommendations API successfully verified." }
-
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val userData = setup.userData
 
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
 
         // ── Step 5: Read the actual health overview text from the web UI ──────────────
-        StepHelper.step("Reading health overview text from UI")
+        StepHelper.step(StepHelper.AP_ADMIN_VALIDATE_HEALTH_OVERVIEW)
 
         // The overview paragraph sits inside the preview-introduction section.
         // We try multiple candidate selectors and fall back gracefully.
@@ -1616,164 +1328,17 @@ class ActionPlanAdminTest : BaseTest() {
     @Order(3)
     fun `verify why it matters prompt output constraints`() {
 
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val recommendationsData = setup.recommendationsData
 
-        val otpPage = OtpPage(page)
-
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response ->
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
-        }) {
-            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-
-        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
-
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
-
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-
-        val userData = userDataResponse.text()
-        logger.info { "Full User Data JSON: $userData" }
-        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
-        logger.info { "User data API successfully verified." }
-
-        // 5. Call user-recommendations API
-        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
-
-        val userRecommendationsResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
-        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
-
-        val recommendationsData = userRecommendationsResponse.text()
-        logger.info { "Full User Recommendations JSON: $recommendationsData" }
-        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
-        logger.info { "User recommendations API successfully verified." }
-
-        // ═══════════════════════════════════════════════════════════════════════════════
-        // SUPPLEMENT "WHY THIS MATTERS" VALIDATION
-        // ═══════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Verifying 'Why this matters' section for each Supplement")
+        // ── SUPPLEMENT "WHY THIS MATTERS" VALIDATION ──────────────────────────────────
+        StepHelper.step(StepHelper.AP_ADMIN_VALIDATE_WHY_MATTERS)
 
         val recommendationsJson = jsonParser.decodeFromString<JsonObject>(recommendationsData)
         val rawRecommendationsList = recommendationsJson["data"]?.jsonObject
@@ -2034,26 +1599,6 @@ class ActionPlanAdminTest : BaseTest() {
                 if (aiIssues.isNotEmpty()) {
                     logger.info { "  Issues          :" }
                     aiIssues.forEach { logger.info { "    • $it" } }
-                }
-                logger.info { "╚═══════════════════════════════════════════════════════════╝" }
-
-                // ── 8. Accumulate failures for this supplement ────────────────────────
-                if (wordCount != 30) {
-                    supplementFailures.add("[$displayName] UI word count is $wordCount — must be exactly 30.")
-                }
-                if (!wordCountPass) {
-                    supplementFailures.add("[$displayName] OpenAI also confirms word count failure (AI counted: $aiWordCount).")
-                }
-                if (!meaningful) {
-                    supplementFailures.add("[$displayName] OpenAI rated the text as NOT meaningful.")
-                }
-                if (relevanceScore < 6) {
-                    supplementFailures.add("[$displayName] OpenAI relevance score is $relevanceScore/10 — below threshold of 6.")
-                }
-                if (verdict == "FAIL") {
-                    supplementFailures.add("[$displayName] OpenAI verdict is FAIL. Explanation: $explanation")
-                }
-                if (aiIssues.isNotEmpty()) {
                     supplementFailures.add("[$displayName] OpenAI issues: ${aiIssues.joinToString("; ")}")
                 }
 
@@ -2075,177 +1620,25 @@ class ActionPlanAdminTest : BaseTest() {
     }
     @Test
     @Order(4)
-    fun `verify what's working well for you prompt output constraints`() {
+    fun `verify what's working well prompt output constraints`() {
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
-
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
-
-        val otpPage = OtpPage(page)
-
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response ->
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
-        }) {
-            otpPage.enterOtp(
-                TestConfig.TestUsers.EXISTING_USER.otp,
-                TestConfig.TestUsers.EXISTING_USER.mobileNumber,
-                TestConfig.TestUsers.EXISTING_USER.countryCode
-            )
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-
-        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
-
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
-
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-
-        val userData = userDataResponse.text()
-        logger.info { "Full User Data JSON: $userData" }
-        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
-        logger.info { "User data API successfully verified." }
-
-        // 5. Call user-recommendations API
-        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
-
-        val userRecommendationsResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
-        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
-
-        val recommendationsData = userRecommendationsResponse.text()
-        logger.info { "Full User Recommendations JSON: $recommendationsData" }
-        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
-        logger.info { "User recommendations API successfully verified." }
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val userData = setup.userData
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // What's Working well for you
         // ═══════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Verifying What's Working well for you")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_WHATS_WORKING)
 
-
-
-        StepHelper.step("Opening What's Working well for you section")
-        page1.getByTestId("button-toggle-category-whats-working-well").click();
+        page1.getByTestId("button-toggle-category-whats-working-well").click()
         page1.waitForTimeout(1000.0)
 
-        page1.getByTestId("category-whats-working-well").getByTestId("button-biomarker-selector").click();
+        page1.getByTestId("category-whats-working-well").getByTestId("button-biomarker-selector").click()
         page1.waitForTimeout(1000.0)
 
         // Step 2: Dynamic verification based on API
@@ -2277,6 +1670,7 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "randomMetricId is: $randomMetricId" }
         page1.getByTestId("checkbox-biomarker-$randomMetricId").click()
         page1.waitForTimeout(1000.0)
+        StepHelper.step(StepHelper.AP_ADMIN_CREATE_SUBSECTION)
         page1.getByTestId("button-create-subsection").click()
 
         // Wait for the web to call OpenAI and render the generated content
@@ -2294,7 +1688,7 @@ class ActionPlanAdminTest : BaseTest() {
         // ════════════════════════════════════════════════════════════════════════════════
         // STEP 1: Verify that content is rendered in the UI
         // ════════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Step 1 – Verifying 'What's Working Well' content is rendered in the UI")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_WHATS_WORKING)
 
         // 1a. Top-level section heading
         val workingWellHeading = page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What's Working Well for You"))
@@ -2369,7 +1763,7 @@ class ActionPlanAdminTest : BaseTest() {
         // STEP 2: Validate content against the web's original OpenAI prompt using a
         //         QA-validator meta-prompt sent to OpenAI
         // ════════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Step 2 – Verifying content via OpenAI prompt validation")
+        StepHelper.step(StepHelper.AP_ADMIN_VALIDATE_WORKING_WELL)
 
         // 2a. Build biomarker context: all biomarkers from the same biological system
         val userDataJson2 = jsonParser.decodeFromString<JsonObject>(userData)
@@ -2629,171 +2023,24 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(5)
     fun `verify what's need support prompt output constraints`() {
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
-
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
-
-        val otpPage = OtpPage(page)
-
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response ->
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
-        }) {
-            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-
-        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
-
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app and verifying response")
-
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-
-        val userData = userDataResponse.text()
-        logger.info { "Full User Data JSON: $userData" }
-        assert(userData.contains("\"success\":true")) { "User data API response unsuccessful: $userData" }
-        logger.info { "User data API successfully verified." }
-
-        // 5. Call user-recommendations API
-        StepHelper.step("Calling user-recommendations API on replit app and verifying response")
-
-        val userRecommendationsResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_RECOMMENDATIONS,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-
-        logger.info { "User Recommendations API Response Status: ${userRecommendationsResponse.status()}" }
-        assert(userRecommendationsResponse.status() == 200) { "User recommendations API failed: ${userRecommendationsResponse.status()}. Body: ${userRecommendationsResponse.text()}" }
-
-        val recommendationsData = userRecommendationsResponse.text()
-        logger.info { "Full User Recommendations JSON: $recommendationsData" }
-        assert(recommendationsData.contains("\"success\":true")) { "User recommendations API response unsuccessful: $recommendationsData" }
-        logger.info { "User recommendations API successfully verified." }
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val userData = setup.userData
 
         // ═══════════════════════════════════════════════════════════════════════════════
         // What's Need Support
         // ═══════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Verifying What's Need Support")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NEEDS_SUPPORT)
 
-        StepHelper.step("Opening What's Need Support section")
-        page1.getByTestId("button-toggle-category-what-needs-support").click();
+        page1.getByTestId("button-toggle-category-what-needs-support").click()
         page1.waitForTimeout(1000.0)
 
-        page1.getByTestId("category-what-needs-support").getByTestId("button-biomarker-selector").click();
+        page1.getByTestId("category-what-needs-support").getByTestId("button-biomarker-selector").click()
         page1.waitForTimeout(1000.0)
 
         // Step 2: Dynamic verification based on API
@@ -2829,6 +2076,8 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "randomMetricId is: $randomMetricId" }
         page1.getByTestId("checkbox-biomarker-$randomMetricId").click()
         page1.waitForTimeout(1000.0)
+        
+        StepHelper.step(StepHelper.AP_ADMIN_CREATE_SUBSECTION)
         page1.getByTestId("button-create-subsection").click()
 
         // Wait for the web to call OpenAI and render the generated content
@@ -2846,7 +2095,7 @@ class ActionPlanAdminTest : BaseTest() {
         // ════════════════════════════════════════════════════════════════════════════════
         // STEP 1: Verify that content is rendered in the UI
         // ════════════════════════════════════════════════════════════════════════════════
-        StepHelper.step("Step 1 – Verifying 'What Needs Support' content is rendered in the UI")
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NEEDS_SUPPORT)
 
         // 1a. Biomarker card text — e.g. "Plateletcrit (PCT)0.28 %High"
         val biomarkerCardText = "$randomDisplayName$randomValue${if (randomUnit.isNotEmpty()) " $randomUnit" else ""}$randomDisplayRating"
@@ -3202,137 +2451,15 @@ class ActionPlanAdminTest : BaseTest() {
     @Test
     @Order(6)
     fun `verify nutrition guidance prompt output constraints`() {
-        val name = "Rethinavel  natarajan stg"
-        logger.info { "Starting ActionPlan flow..." }
-        StepHelper.step("Starting ActionPlan flow")
+        logger.info { "Starting ActionPlan Admin flow..." }
+        StepHelper.step(StepHelper.AP_ADMIN_LOGIN)
 
-        // 1. Login
-        logger.info { "Logging in with mobile: ${TestConfig.TestUsers.EXISTING_USER.mobileNumber}" }
-        StepHelper.step("Logging in")
-        val loginPage = LoginPage(page).navigate() as LoginPage
-        loginPage.enterMobileAndContinue(TestConfig.TestUsers.EXISTING_USER)
+        // ── Shared setup: login → fetch user → navigate → open PDF tool → fetch APIs ──
+        val adminPage = ActionPlanAdminPage(page)
+        val setup = adminPage.setupTestSession(context)
+        val page1 = setup.pdfPage
+        val userData = setup.userData
 
-        val otpPage = OtpPage(page)
-
-        // Wait for the verify-otp response to be processed and tokens stored
-        page.waitForResponse({ response ->
-            response.url().contains(TestConfig.APIs.API_VERIFY_OTP) && response.status() == 200
-        }) {
-            otpPage.enterOtp(TestConfig.TestUsers.EXISTING_USER.otp, TestConfig.TestUsers.EXISTING_USER.mobileNumber, TestConfig.TestUsers.EXISTING_USER.countryCode)
-            page.keyboard().press("Enter") // Trigger submission if no button is present
-        }
-
-        // Brief wait to ensure TestConfig is updated by the response listener
-        page.waitForTimeout(1000.0)
-
-        logger.info { "Tokens captured. ACCESS_TOKEN is: ${TestConfig.ACCESS_TOKEN}, USER_ID: ${TestConfig.USER_ID}, USER_NAME: ${TestConfig.USER_NAME}" }
-        assert(TestConfig.ACCESS_TOKEN.isNotEmpty()) { "Access token was not captured after login" }
-
-        // 1b. Fetch all users to find Gowthaman's ID
-        StepHelper.step("Fetching users list to find target user ID")
-        val usersResponse = page.context().request().get(
-            TestConfig.APIs.API_USERS,
-            RequestOptions.create()
-                .setHeader("access_token", TestConfig.ACCESS_TOKEN)
-                .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
-        )
-
-        if (usersResponse.status() != 200) {
-            logger.error { "Failed to fetch users list. Status: ${usersResponse.status()}, Body: ${usersResponse.text()}" }
-        }
-        assert(usersResponse.status() == 200) { "Failed to fetch users list: ${usersResponse.status()}" }
-
-        val usersList = jsonParser.decodeFromString<UsersResponse>(usersResponse.text())
-        val targetUser = usersList.data.users.find { it.name.contains(name, ignoreCase = true) }
-            ?: throw AssertionError("User '$name' not found in users list")
-
-        val targetUserId = targetUser.id ?: throw AssertionError("User '$name' does not have an ID")
-        logger.info { "Found target user: ${targetUser.name} with ID: $targetUserId" }
-
-        // Wait for the home page to load after login
-//        page.waitForURL("${TestConfig.Urls.BASE_URL}")
-
-        // 2. Navigation steps provided by user
-        StepHelper.step("Navigating to Health Data and through dashboard steps")
-
-        page.navigate(TestConfig.Urls.HEALTH_DATA_URL)
-        page.waitForLoadState()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Switch to Admin")).click()
-        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("User Management")).click()
-
-        val searchBox = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Search for user..."))
-        searchBox.click()
-        page.waitForTimeout(5000.0)
-        searchBox.pressSequentially(name, Locator.PressSequentiallyOptions().setDelay(200.0))
-        searchBox.press("Enter")
-
-        // Wait for search results
-        page.waitForTimeout(2000.0)
-
-        // Try to find the user in the search results and click
-        try {
-            val userBtn = page.locator("button, a, div[role='button']").filter(
-                Locator.FilterOptions().setHasText(Pattern.compile(".*$name.*", Pattern.CASE_INSENSITIVE))
-            ).first()
-            userBtn.waitFor(Locator.WaitForOptions().setTimeout(10000.0))
-            userBtn.click()
-            logger.info { "Successfully selected user $name" }
-        } catch (e: Exception) {
-            logger.warn { "Search result click failed for $name: ${e.message}" }
-            page.locator("tr, div[role='row']").nth(1).click()
-        }
-
-
-        //app.stg.deepholistics.com/recommendations
-        val apLink = page.getByRole(AriaRole.LINK, Page.GetByRoleOptions().setName("Action Plan"))
-        apLink.waitFor()
-        apLink.click()
-
-        // 3. Click "Go to PDF tool" and capture popup/redirect
-        StepHelper.step("Clicking 'Go to PDF tool' and verifying final URL")
-
-
-
-        val pdfBtn = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Go to PDF tool"))
-        pdfBtn.waitFor()
-        val page1 = context.waitForPage {
-            pdfBtn.click()
-        }
-        page1.waitForLoadState()
-        // Wait for all background APIs to settle and give a 5s buffer
-        logger.info { "Waiting for Action Plan APIs to settle..." }
-        page1.waitForLoadState(LoadState.NETWORKIDLE)
-        page1.waitForTimeout(5000.0)
-
-        val finalUrl = page1.url()
-        logger.info { "Final URL: $finalUrl" }
-
-        val expectedBase = "https://dh-stg-action-plan-generator.replit.app/"
-        logger.info { "Verifying final URL components..." }
-        assert(finalUrl.contains(expectedBase)) { "Final URL does not contain expected base: $expectedBase. Actual: $finalUrl" }
-        assert(finalUrl.contains("user_id=$targetUserId")) { "Final URL missing correct user_id. Expected: $targetUserId, Actual: $finalUrl" }
-//        assert(finalUrl.contains("user_name=${targetUser.name}")) { "Final URL missing correct user_name. Expected: ${targetUser.name}, Actual: $finalUrl" }
-        assert(finalUrl.contains("access_token=${TestConfig.ACCESS_TOKEN}")) { "Final URL missing correct access_token. Actual: $finalUrl" }
-
-        // 4. Call user-data API on the replit app
-        StepHelper.step("Calling user-data API on replit app to fetch health data")
-        
-        val requestBody = buildJsonObject {
-            put("userId", targetUserId)
-            put("accessToken", TestConfig.ACCESS_TOKEN)
-        }.toString()
-
-        val userDataResponse = page1.context().request().post(
-            TestConfig.APIs.API_ACTION_PLAN_USER_DATA,
-            RequestOptions.create()
-                .setHeader("Content-Type", "application/json")
-                .setData(requestBody)
-        )
-        
-        logger.info { "User Data API Response Status: ${userDataResponse.status()}" }
-        assert(userDataResponse.status() == 200) { "User data API failed: ${userDataResponse.status()}. Body: ${userDataResponse.text()}" }
-        val userData = userDataResponse.text()
         val userDataJson = jsonParser.decodeFromString<JsonObject>(userData)
         val apiData = userDataJson["data"]?.jsonObject
         val userProfile = userDataJson["userProfile"]?.jsonObject
@@ -3357,6 +2484,7 @@ class ActionPlanAdminTest : BaseTest() {
             }
         }
 
+        StepHelper.step(StepHelper.AP_ADMIN_VITAMIN_SELECTOR)
         page1.getByTestId("button-toggle-category-nutrition").click()
         page1.getByTestId("button-vitamin-selector").click()
 
@@ -3374,9 +2502,11 @@ class ActionPlanAdminTest : BaseTest() {
 
         page1.getByTestId("checkbox-vitamin-$normalizedVitamin").click()
 
+        StepHelper.step(StepHelper.AP_ADMIN_ADD_SELECTED)
         page1.getByTestId("button-add-selected").click()
         
         // Verify the generated content for Nutrition Guidance
+        StepHelper.step(StepHelper.AP_ADMIN_VERIFY_NUTRITION)
         page1.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Nutrition Guidance")).click()
 
         page1.waitForTimeout(5000.0)
@@ -3396,7 +2526,7 @@ class ActionPlanAdminTest : BaseTest() {
         logger.info { "Extracted Description: $desc" }
 
         // ── OpenAI Validation ──────────────────────────────────────────────────────────
-        StepHelper.step("Calling OpenAI to validate the description for $randomVitamin")
+        StepHelper.step(StepHelper.AP_ADMIN_VALIDATE_NUTRITION)
         
         val validationSystemPrompt = """
             You are a quality-assurance validator for personalized nutrition advice.

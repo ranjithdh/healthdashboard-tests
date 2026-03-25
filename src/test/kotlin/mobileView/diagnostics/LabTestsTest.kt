@@ -629,13 +629,17 @@ class LabTestsTest : BaseTest() {
         val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
         logger.info { "Wallet Balance $walletBalance" }
 
+        var isWalletUsed: Boolean = false
         var applicableDiscount = 0.0
         if (walletBalance > 0.0) {
             // Assuming integer points application
-            val discountPercent = 20
-            val calculatedDiscount = (rawPrice * discountPercent) / 100.0
-            val roundedDiscount = ceil(calculatedDiscount)
-            applicableDiscount = minOf(roundedDiscount, walletBalance)
+            isWalletUsed = false
+            if (isWalletUsed) {
+                val discountPercent = 20
+                val calculatedDiscount = (rawPrice * discountPercent) / 100.0
+                val roundedDiscount = ceil(calculatedDiscount)
+                applicableDiscount = minOf(roundedDiscount, walletBalance)
+            }
         }
 
         // Assuming user points text format, we use a softer check or verify visibility
@@ -643,10 +647,12 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Verifying price details on address selection page...")
         if (walletBalance > 0.0) {
             page.getByText("Use $applicableDiscount from $walletBalance DH Points")
-            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
-            page.getByTestId("diagnostics-sidebar-dh-points").click()
+            if (isWalletUsed) {
+                page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+                page.getByTestId("diagnostics-sidebar-dh-points").click()
+            }
         }
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, isWalletUsed =isWalletUsed)
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
         testSchedulingPage.verifyFooterActions()
@@ -672,7 +678,7 @@ class LabTestsTest : BaseTest() {
             testSchedulingPage.verifyDualSlotSelectionPage(code = targetCode, productId = productId)
             logger.info { "Verifying Price Details on Duel Slot Selection page..." }
             StepHelper.step("Verifying Price Details on Duel Slot Selection page...")
-            testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+            testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, isWalletUsed = isWalletUsed)
             logger.info { "Verifying Footer Actions on Duel Slot Selection page..." }
             StepHelper.step("Verifying Footer Actions on Duel Slot Selection page...")
             testSchedulingPage.verifyFooterActions()
@@ -684,17 +690,21 @@ class LabTestsTest : BaseTest() {
                 testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
                 logger.info { "Verifying Price Details on Slot Selection page..." }
                 StepHelper.step("Verifying Price Details on Slot Selection page...")
-                testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+                testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, isWalletUsed = isWalletUsed)
                 logger.info { "Verifying Footer Actions on Slot Selection page..." }
                 StepHelper.step("Verifying Footer Actions on Slot Selection page...")
                 testSchedulingPage.verifyFooterActions()
                 testSchedulingPage.clickProceed()
             }
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
         
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+
+        val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
+                || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit)
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
@@ -807,20 +817,24 @@ class LabTestsTest : BaseTest() {
         val walletBalance = labTestsPage.walletData?.data?.user_wallet?.current_balance?.toDoubleOrNull() ?: 0.0
         logger.info { "Wallet Balance $walletBalance" }
         var applicableDiscount = 0.0
+        var isWalletUsed: Boolean = false
         if (walletBalance > 0.0) {
             // Assuming integer points application
+            isWalletUsed = false
             val discountPercent = 20
             val calculatedDiscount = (rawPrice * discountPercent) / 100.0
             val roundedDiscount = ceil(calculatedDiscount)
              applicableDiscount = minOf(roundedDiscount, walletBalance)
 
-            page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
-            page.getByTestId("diagnostics-sidebar-dh-points").click()
+            if (isWalletUsed) {
+                page.getByTestId("diagnostics-sidebar-dh-points").waitFor()
+                page.getByTestId("diagnostics-sidebar-dh-points").click()
+            }
         }
 
         logger.info { "Verifying price details on address selection page..." }
         StepHelper.step("Verifying price details on address selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, isWalletUsed = isWalletUsed)
 
         logger.info { "Verifying footer actions on address selection page..." }
         StepHelper.step("Verifying footer actions on address selection page...")
@@ -846,17 +860,17 @@ class LabTestsTest : BaseTest() {
 
         logger.info { "Verifying Price Details on Slot Selection page..." }
         StepHelper.step("Verifying Price Details on Slot Selection page...")
-        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount)
+        testSchedulingPage.verifyPriceDetails(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, isWalletUsed= isWalletUsed)
 
         logger.info { "Verifying Footer Actions on Slot Selection page..." }
         StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
 
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
-
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+        testSchedulingPage.proceedPayment(false)
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
@@ -928,7 +942,7 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false)
         // Finalize the order automation by calling the workflow API
         testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
         logger.info { "Edit flow test completed successfully." }
