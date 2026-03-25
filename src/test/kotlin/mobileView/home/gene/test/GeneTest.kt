@@ -16,6 +16,8 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import utils.report.Modules
 import utils.report.StepHelper
 import kotlin.test.Test
@@ -23,6 +25,7 @@ import kotlin.test.Test
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@Execution(ExecutionMode.SAME_THREAD)
 @Epic(Modules.EPIC_GENE)
 class GeneTest : BaseTest() {
     private lateinit var playwright: Playwright
