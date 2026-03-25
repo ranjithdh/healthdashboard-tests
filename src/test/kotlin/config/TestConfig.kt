@@ -173,22 +173,23 @@ object TestConfig {
             city = "Coimbatore",
             state = "TamilNadu",
             pinCode = "641005",
-            country = "Poland",
-            countryCode = "+48"
+            country = "Finland",
+            countryCode = "+358"
         )
 
 
-        /*val EXISTING_USER = TestUser(
-                    mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9677004512",
-                    otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
-                    country = "India"
-                )*/
         var EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",//4573998394
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India",
             countryCode = "+91"
         )
+      /*  var EXISTING_USER = TestUser(
+            mobileNumber = "4573998384",//4573998394
+            otp = "678901",
+            country = "Finland",
+            countryCode = "+354"
+        )*/
 
     }
 
