@@ -271,6 +271,29 @@ object StepHelper {
     const val VALIDATING_GENE_DETAILS = "Validating Gene Details"
     const val VALIDATING_GENE_EMPTY_VIEW = "Validating Gene Empty View"
 
+    // Gene - Setup & Navigation
+    const val GENE_SETUP_START = "GeneTest: Starting browser setup"
+    const val GENE_BROWSER_LAUNCHED = "GeneTest: Browser launched"
+    const val GENE_PAGE_CREATED = "GeneTest: Page created with default timeout"
+    const val GENE_NAVIGATION_START = "GeneTest: Starting navigation → Login → OTP → Home → Gene Tab"
+    const val GENE_SETUP_COMPLETE = "GeneTest: Setup complete"
+    const val GENE_STEP_1_START = "GeneTest Step 1 → Navigating to Login page"
+    const val GENE_STEP_1_DONE = "GeneTest Step 1 → Login page loaded"
+    const val GENE_STEP_2_START = "GeneTest Step 2 → Entering mobile number and continuing"
+    const val GENE_STEP_2_DONE = "GeneTest Step 2 → OTP page reached"
+    const val GENE_STEP_3_START = "GeneTest Step 3 → Entering OTP and navigating to Home page"
+    const val GENE_STEP_3_DONE = "GeneTest Step 3 → Home page reached"
+    const val GENE_STEP_4_START = "GeneTest Step 4 → Clicking Gene tab"
+    const val GENE_STEP_4_DONE = "GeneTest Step 4 → Gene tab opened"
+
+    // Gene - Errors & Teardown
+    const val GENE_SETUP_TIMEOUT_ERROR = "GeneTest: ❌ TimeoutError during setup"
+    const val GENE_SETUP_UNEXPECTED_ERROR = "GeneTest: ❌ Unexpected error during setup"
+    const val GENE_SCREENSHOT_SAVED = "GeneTest: Screenshot saved on failure"
+    const val GENE_SCREENSHOT_FAILED = "GeneTest: Could not capture screenshot"
+    const val GENE_TEARDOWN_AFTER_FAILURE = "GeneTest: TearDown called after setup failure"
+    const val GENE_TEARDOWN_COMPLETE = "GeneTest: Browser resources released"
+
     //Blood
     const val FETCH_BLOOD_DATA = "Fetch Blood data"
 
