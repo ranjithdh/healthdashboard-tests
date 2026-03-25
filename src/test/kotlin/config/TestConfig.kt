@@ -130,14 +130,19 @@ object TestConfig {
 
 
     object Browser {
-        const val SLOW_MO: Double = (1 * 1000).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
-        fun launchOptions(): BrowserType.LaunchOptions {
-            val isHeadless = System.getenv("HEADLESS")?.toBoolean()
+        val isHeadless: Boolean
+            get() = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
-                ?: false   //TODO default safe for CI is true
+                ?: true  // default to true (safe for CI)
 
+        // SLOW_MO is 0 in CI (headless) to avoid artificial delays causing TimeoutError
+        val SLOW_MO: Double
+            get() = if (isHeadless) 0.0 else (1 * 1000).toDouble()
+
+
+        fun launchOptions(): BrowserType.LaunchOptions {
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)

@@ -42,9 +42,9 @@ class GeneTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+        page.setDefaultTimeout(TestConfig.Browser.TIMEOUT)
         gutPage = performInitialNavigation()
     }
-
     @AfterAll
     fun tearDown() {
         context.close()
