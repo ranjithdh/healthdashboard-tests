@@ -325,7 +325,7 @@ class SymptomsPage(page: Page) : BasePage(page) {
         val subTitle = page.getByText("Select any symptoms you're")
         val symptomsCount = page.getByText("symptoms selected")
         val closeButton =
-            page.getByRole(AriaRole.BUTTON).filter(Locator.FilterOptions().setHasText(Pattern.compile("^$")))
+            page.locator("#scroll-inset-area").getByRole(AriaRole.BUTTON).filter( Locator.FilterOptions().setHasText(Pattern.compile("^$")))
         val submitSymptoms = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Submit Symptoms"))
         val components = listOf(title, subTitle, symptomsCount, closeButton, submitSymptoms)
         components.forEach { it.waitFor() }

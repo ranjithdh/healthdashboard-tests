@@ -155,7 +155,7 @@ class OtpPage(page: Page) : BasePage(page) {
         requestOtp()
         logger.info { "enterOtp($otp)" }
 
-        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        byRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
 
         //for flipboard url
 //        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
