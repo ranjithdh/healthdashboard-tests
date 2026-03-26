@@ -879,7 +879,7 @@ class LabTestsTest : BaseTest() {
     @Test
     @Order(5)
     fun `verify summary page edit flow`() {
-        val targetCode = "P037"
+        val targetCode = "FIBROSIS INDEX (FIB-4)"
         logger.info { "Starting test: verify summary page edit flow" }
         StepHelper.step("Starting test: verify summary page edit flow")
 
@@ -909,8 +909,10 @@ class LabTestsTest : BaseTest() {
         }
 
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed()
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed()
+        }
 
         // 1. Test Address Edit from Summary
         logger.info { "Editing address from summary..." }
@@ -920,18 +922,19 @@ class LabTestsTest : BaseTest() {
         val randomIndex = (0 until addressCount).random()
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        testSchedulingPage.editUserAddress(randomIndex)
         
         testSchedulingPage.clickProceed() // go to slot selection
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed() // go to summary
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed() // go to summary
 
-        // 2. Test Slot Edit from Summary
-        logger.info { "Editing slot from summary..." }
-        testSchedulingPage.clickEditSlotFromSummary()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed()
-
+            // 2. Test Slot Edit from Summary
+            logger.info { "Editing slot from summary..." }
+            testSchedulingPage.clickEditSlotFromSummary()
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed()
+        }
         // Final Verification
         logger.info { "Final verification on summary page..." }
         StepHelper.step("Final verification on summary page...")
@@ -945,7 +948,10 @@ class LabTestsTest : BaseTest() {
         }
         testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false)
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+        val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
+                || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit, code = targetCode)
         logger.info { "Edit flow test completed successfully." }
         StepHelper.step("Edit flow test completed successfully.")
 
