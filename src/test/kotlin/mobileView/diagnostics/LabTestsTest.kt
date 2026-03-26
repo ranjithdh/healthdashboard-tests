@@ -251,7 +251,7 @@ class LabTestsTest : BaseTest() {
         logger.info { "Navigating to diagnostics page and capturing API response..." }
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-        val targetCode = "OMEGA1003" //CORTISOL1004 "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "GUT10002" //CORTISOL1004 "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -705,7 +705,7 @@ class LabTestsTest : BaseTest() {
         val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
-        testSchedulingPage.proceedPayment(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit, code = targetCode)
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
@@ -871,7 +871,7 @@ class LabTestsTest : BaseTest() {
 
         // Finalize the order automation by calling the workflow API
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
-        testSchedulingPage.proceedPayment(false)
+        testSchedulingPage.proceedPayment(false, code = targetCode)
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }

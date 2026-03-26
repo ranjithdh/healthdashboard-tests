@@ -1071,7 +1071,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun captureLabTestDetails(code: String? = null) {
-        val codeToUse = code ?: capturedCode ?: return
+        val codeToUse = code
         logger.info { "Fetching Lab Test details for code: $codeToUse" }
         
         val response = page.request().get(
@@ -1133,13 +1133,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun proceedPayment(isKit: Boolean) {
+    fun proceedPayment(isKit: Boolean, code: String) {
         logger.info { "Proceeding Payment." }
         
         // Ensure product details are captured from Lab Test response
-        if (capturedProductId == null || capturedThyrocareProductId == null) {
-            captureLabTestDetails()
-        }
+//        if (capturedProductId == null || capturedThyrocareProductId == null) {
+            captureLabTestDetails(code = code)
+//        }
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
         val piiResponse = page.request().get(
             piiUrl,
