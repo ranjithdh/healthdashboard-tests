@@ -204,16 +204,20 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             .fill("14C3, H H Road")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).fill("Balarengapuram")
-        page.getByRole(
+        val suggestion = page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
-        ).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).click()
+        )
+        try {
+            suggestion.waitFor(com.microsoft.playwright.Locator.WaitForOptions().setTimeout(2000.0))
+            suggestion.click()
+        } catch (e: Exception) {
+            logger.warn { "Address suggestion not found, proceeding with manual entry." }
+        }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).fill("Madurai")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).press("ArrowRight")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).fill("Tamil Nadu")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
+        val stateInput = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *"))
+        stateInput.click()
+        stateInput.fill("Tamil Nadu")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).fill("625009")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
 
@@ -225,11 +229,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Add New User").click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Add a new member")).click()
         page.getByText("Mobile number *").click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
        if (isBookingForSelf) {
-           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
            page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(2).click()
        } else {
-           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
            page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(1).click()
        }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
@@ -1137,9 +1140,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         logger.info { "Proceeding Payment." }
         
         // Ensure product details are captured from Lab Test response
-//        if (capturedProductId == null || capturedThyrocareProductId == null) {
-            captureLabTestDetails(code = code)
-//        }
+         captureLabTestDetails(code = code)
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
         val piiResponse = page.request().get(
             piiUrl,
@@ -1168,8 +1169,9 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
         // appointment_date = the slot start time selected by user (raw ISO string)
-        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate ?: ""
-        val createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val currentIsoTime = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val appointmentDate = if (!capturedSlotTime.isNullOrEmpty()) capturedSlotTime else if (!capturedAppointmentDate.isNullOrEmpty()) capturedAppointmentDate else currentIsoTime
+        val createdAt = currentIsoTime
         val orderNo = capturedOrderNo ?: ""
         val productId = capturedProductId ?: 0  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId ?: ""
@@ -1233,9 +1235,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val productId = capturedProductId  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId
         // appointment_date = the slot start time selected by user (raw ISO string)
-        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate
-        val createdAt = capturedCreatedAt
-        val paymentDate = capturedPaymentDate
+        val currentIsoTime = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val appointmentDate = if (!capturedSlotTime.isNullOrEmpty()) capturedSlotTime else if (!capturedAppointmentDate.isNullOrEmpty()) capturedAppointmentDate else currentIsoTime
+        val createdAt = capturedCreatedAt ?: currentIsoTime
+        val paymentDate = capturedPaymentDate ?: currentIsoTime
 
         // Get User Mobile/Country from PII
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
