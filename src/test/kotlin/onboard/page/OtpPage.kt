@@ -154,11 +154,11 @@ class OtpPage(page: Page) : BasePage(page) {
         this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
+        val otpFetched = fetchedOtp ?: TestConfig.STATIC_OTP
 
-        byRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        val otpField =  page.getByTestId("otp-input")
 
-        //for flipboard url
-//        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        otpField.fill(otpFetched)
 
         return this
     }
