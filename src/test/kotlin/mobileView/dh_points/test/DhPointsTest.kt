@@ -108,7 +108,7 @@ class DhPointsTest : BaseTest() {
         val dynamicMobileNumber = "9" + (System.currentTimeMillis() % 1000000000).toString().padEnd(9, '0')
         val testUser = TestConfig.TestUsers.NEW_USER.copy(mobileNumber = dynamicMobileNumber)
         logger.info { "[STEP] Dynamic Mobile Number: $dynamicMobileNumber" }
-        TestConfig.TestUsers.EXISTING_USER = testUser
+//        TestConfig.TestUsers.EXISTING_USER = testUser
 
         // Step 2: Sign up new user
         StepHelper.step(DH_POINTS_SIGNUP)
