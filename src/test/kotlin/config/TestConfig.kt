@@ -174,12 +174,12 @@ object TestConfig {
             state = "TamilNadu",
             pinCode = "641005",
             country = "Finland",
-            countryCode = "+358"
+            countryCode = "+46"
         )
 
 
         var EXISTING_USER = TestUser(
-            mobileNumber = "7373791414",
+            mobileNumber = "7092424997",
             otp = "678901",
             country = "India",
             countryCode = "+91"
