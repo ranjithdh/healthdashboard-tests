@@ -88,14 +88,18 @@ class OtpPage(page: Page) : BasePage(page) {
                     response = response
                 )
 
+                logger.info { "[OTP-API] Response status: ${response.status()} for mobile=$mobileNumber" }
                 if (response.status() != 200) {
-                    logger.error { "OTP API returned status: ${response.status()}" }
+                    StepHelper.step("${StepHelper.OTP_API_FAILED} — status=${response.status()}, body=${response.text()}")
+                    logger.error { "[OTP-API] FAILED: status=${response.status()}, body=${response.text()}" }
                     return
                 }
 
                 val responseBody = response.text()
                 val responseObj = json.decodeFromString<OtpResponse>(responseBody)
                 fetchedOtp = responseObj.data.otp
+                StepHelper.step(StepHelper.OTP_API_SUCCESS)
+                logger.info { "[OTP-API] Successfully fetched OTP from API: $fetchedOtp" }
                 logFullApiCall("POST", TestConfig.APIs.GET_OTP, emptyMap(), requestJson, response)
             }
         } catch (e: Exception) {
@@ -152,10 +156,31 @@ class OtpPage(page: Page) : BasePage(page) {
         StepHelper.step(ENTER_OTP + otp)
         this.mobileNumber = mobileNumber
         this.countryCode = countryCode
-        requestOtp()
-        logger.info { "enterOtp($otp)" }
 
-        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        StepHelper.step("${StepHelper.OTP_API_REQUESTING}$mobileNumber (countryCode=$countryCode) | URL: ${page.url()}")
+        logger.info { "[OTP] Current page URL before OTP entry: ${page.url()}" }
+        logger.info { "[OTP] Requesting OTP via API for mobile=$mobileNumber, countryCode=$countryCode" }
+        requestOtp()
+
+        val otpToUse = fetchedOtp ?: TestConfig.STATIC_OTP
+        if (fetchedOtp != null) {
+            StepHelper.step(StepHelper.OTP_API_SUCCESS)
+        } else {
+            StepHelper.step("${StepHelper.OTP_API_FAILED} | using STATIC_OTP=${TestConfig.STATIC_OTP}")
+        }
+        logger.info { "[OTP] fetchedOtp=${fetchedOtp}, STATIC_OTP=${TestConfig.STATIC_OTP}, using OTP=$otpToUse" }
+
+        val otpInput = byRole(AriaRole.TEXTBOX)
+        if (otpInput.isVisible) {
+            StepHelper.step(StepHelper.OTP_INPUT_VISIBLE)
+        } else {
+            StepHelper.step("${StepHelper.OTP_INPUT_NOT_VISIBLE} | URL: ${page.url()}")
+        }
+        logger.info { "[OTP] OTP input visible=${otpInput.isVisible}" }
+        StepHelper.step("${StepHelper.OTP_FILLING}$otpToUse")
+        otpInput.fill(otpToUse)
+        StepHelper.step(StepHelper.OTP_FILLED)
+        logger.info { "[OTP] OTP field filled with: $otpToUse" }
 
         //for flipboard url
 //        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
@@ -332,20 +357,48 @@ class OtpPage(page: Page) : BasePage(page) {
         testUser: TestUser = TestConfig.TestUsers.EXISTING_USER
     ): SymptomsPage {
         StepHelper.step(ENTER_OTP_INSIGHTS)
+        StepHelper.step("$ENTER_OTP_INSIGHTS | mobile=${testUser.mobileNumber}, otp=$otp")
+        logger.info { "[InsightsNav] Starting enterOtpAndContinueToInsightsForWeb with otp=$otp, mobile=${testUser.mobileNumber}, countryCode=${testUser.countryCode}" }
+
         enterOtp(otp, testUser.mobileNumber, testUser.countryCode)
 
-        val homePage = HomePageWebsite(page)
-        homePage.waitFoWebPageHomePageConfirmation()
+        StepHelper.step("OTP entered | Current URL: ${page.url()}")
+        logger.info { "[InsightsNav] OTP entered. Current URL: ${page.url()}" }
 
-        // Create LabTestsPage instance BEFORE navigation to set up response listener
+        val homePage = HomePageWebsite(page)
+        StepHelper.step(StepHelper.HOME_PAGE_WAIT_START)
+        logger.info { "[InsightsNav] Waiting for home page confirmation (looking for 'Help' link)..." }
+        try {
+            homePage.waitFoWebPageHomePageConfirmation()
+            StepHelper.step("${StepHelper.HOME_PAGE_WAIT_DONE} | URL: ${page.url()}")
+            logger.info { "[InsightsNav] Home page confirmed. Current URL: ${page.url()}" }
+        } catch (e: Exception) {
+            StepHelper.step("${StepHelper.HOME_PAGE_WAIT_FAILED} | URL: ${page.url()} | title: ${page.title()}")
+            logger.error { "[InsightsNav] FAILED waiting for home page. Current URL: ${page.url()}" }
+            logger.error { "[InsightsNav] Page title: ${page.title()}" }
+            logger.error { "[InsightsNav] Exception: ${e.message}" }
+            throw e
+        }
+
         val symptomsPage = SymptomsPage(page)
 
-        // Navigate to diagnostics (API call happens during this navigation)
-        StepHelper.step("$NAVIGATE_TO: ${TestConfig.Urls.SYMPTOMS_PAGE_URL}")
+        StepHelper.step("$NAVIGATE_TO${TestConfig.Urls.SYMPTOMS_PAGE_URL}")
+        logger.info { "[InsightsNav] Navigating to symptoms page: ${TestConfig.Urls.SYMPTOMS_PAGE_URL}" }
         page.navigate(TestConfig.Urls.SYMPTOMS_PAGE_URL)
+        StepHelper.step("Navigation triggered | Current URL: ${page.url()}")
+        logger.info { "[InsightsNav] After navigate. Current URL: ${page.url()}" }
 
-        symptomsPage.waitForSymptomsPageConfirmation()
-
+        try {
+            symptomsPage.waitForSymptomsPageConfirmation()
+            StepHelper.step("Symptoms page confirmed | URL: ${page.url()}")
+            logger.info { "[InsightsNav] Symptoms page confirmed. Current URL: ${page.url()}" }
+        } catch (e: Exception) {
+            StepHelper.step("Symptoms page wait FAILED | URL: ${page.url()} | title: ${page.title()}")
+            logger.error { "[InsightsNav] FAILED waiting for symptoms page. Current URL: ${page.url()}" }
+            logger.error { "[InsightsNav] Page title: ${page.title()}" }
+            logger.error { "[InsightsNav] Exception: ${e.message}" }
+            throw e
+        }
 
         return symptomsPage
     }

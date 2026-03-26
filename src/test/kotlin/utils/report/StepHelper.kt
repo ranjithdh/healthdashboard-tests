@@ -192,6 +192,39 @@ object StepHelper {
     const val SUBMIT_SYMPTOMS = "Submit symptoms"
     const val RESET_SYMPTOMS = "Reset all symptoms"
 
+    // OTP Debug
+    const val OTP_API_REQUESTING = "OTP API: Requesting OTP for mobile: "
+    const val OTP_API_SUCCESS = "OTP API: Successfully fetched OTP from server"
+    const val OTP_API_FAILED = "OTP API: Request failed — falling back to STATIC_OTP"
+    const val OTP_INPUT_VISIBLE = "OTP: Input field visible on page"
+    const val OTP_INPUT_NOT_VISIBLE = "OTP: Input field NOT visible — may be on wrong page"
+    const val OTP_FILLING = "OTP: Filling input with OTP: "
+    const val OTP_FILLED = "OTP: Input filled successfully"
+
+    // Home page wait (web)
+    const val HOME_PAGE_WAIT_START = "HomePageWebsite: Waiting for 'Help' link to confirm home page"
+    const val HOME_PAGE_WAIT_DONE = "HomePageWebsite: Home page confirmed"
+    const val HOME_PAGE_WAIT_FAILED = "HomePageWebsite: FAILED — 'Help' link not found"
+
+    // SymptomsTest - Setup & Navigation
+    const val SYMPTOMS_SETUP_START = "SymptomsTest: Starting browser setup"
+    const val SYMPTOMS_BROWSER_LAUNCHED = "SymptomsTest: Browser launched"
+    const val SYMPTOMS_PAGE_CREATED = "SymptomsTest: New page created with viewport 1366x768"
+    const val SYMPTOMS_NAVIGATION_START = "SymptomsTest: Starting navigation → Login → OTP → Symptoms"
+    const val SYMPTOMS_STEP_1_START = "SymptomsTest Step 1 → Navigating to Login page"
+    const val SYMPTOMS_STEP_1_DONE = "SymptomsTest Step 1 → Login page loaded"
+    const val SYMPTOMS_STEP_2_START = "SymptomsTest Step 2 → Entering mobile number and continuing to OTP"
+    const val SYMPTOMS_STEP_2_DONE = "SymptomsTest Step 2 → OTP page reached"
+    const val SYMPTOMS_STEP_3_START = "SymptomsTest Step 3 → Entering OTP and navigating to Symptoms"
+    const val SYMPTOMS_STEP_3_DONE = "SymptomsTest Step 3 → Symptoms page reached"
+    const val SYMPTOMS_SETUP_COMPLETE = "SymptomsTest: Setup complete"
+
+    // SymptomsTest - Errors & Teardown
+    const val SYMPTOMS_SETUP_TIMEOUT_ERROR = "SymptomsTest: TimeoutError during setup"
+    const val SYMPTOMS_SETUP_UNEXPECTED_ERROR = "SymptomsTest: Unexpected error during setup"
+    const val SYMPTOMS_TEARDOWN_AFTER_FAILURE = "SymptomsTest: TearDown called after setup failure"
+    const val SYMPTOMS_TEARDOWN_COMPLETE = "SymptomsTest: Browser resources released"
+
     // website - General & LandingPage
     const val WAIT_WEBSITE_PAGE_LOAD = "Wait for website page load: "
     const val CLICK_HERO_BOOK_NOW = "Click Hero Book Now"

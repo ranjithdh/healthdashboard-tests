@@ -305,10 +305,11 @@ class SymptomsPage(page: Page) : BasePage(page) {
 
 
     fun waitForSymptomsPageConfirmation(): SymptomsPage {
-        StepHelper.step(WAIT_SYMPTOMS_PAGE_LOAD)
-        logger.info("Waiting for mobileView.home page confirmation...")
+        StepHelper.step("$WAIT_SYMPTOMS_PAGE_LOAD | expected: ${TestConfig.Urls.SYMPTOMS_PAGE_URL} | current: ${page.url()}")
+        logger.info("[SymptomsPage] Waiting for URL: ${TestConfig.Urls.SYMPTOMS_PAGE_URL}. Current URL: ${page.url()}")
         page.waitForURL(TestConfig.Urls.SYMPTOMS_PAGE_URL)
-
+        StepHelper.step("Symptoms page URL confirmed | URL: ${page.url()}")
+        logger.info("[SymptomsPage] Symptoms page URL confirmed. Current URL: ${page.url()}")
         return this
     }
 
