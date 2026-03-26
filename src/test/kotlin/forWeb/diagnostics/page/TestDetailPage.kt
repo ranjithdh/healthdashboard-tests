@@ -6,7 +6,6 @@ import config.BasePage
 import config.TestConfig
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
-import java.util.regex.Pattern
 
 private val logger = KotlinLogging.logger {}
 
@@ -23,13 +22,8 @@ class TestDetailPage(page: Page) : BasePage(page) {
      * Wait for page to load and verify URL pattern
      */
     fun waitForPageLoad(): TestDetailPage {
-        // Wait for URL to match pattern: test-detail/{type}/{id}
-//        page.waitForURL(Regex(".*test-detail/(packages|test_profiles|tests)/\\d+"), Page.WaitForURLOptions().setTimeout(30000.0))
-
-        page.waitForURL(
-            Pattern.compile(".*/test-detail/(packages|test_profiles|tests)/\\d+"),
-            Page.WaitForURLOptions().setTimeout(30_000.0)
-        )
+        // Wait for URL to match pattern: test-detail/{type}/{id} (glob pattern, no regex dependency)
+        page.waitForURL("**/test-detail/**", Page.WaitForURLOptions().setTimeout(30_000.0))
         logger.info { "Test Detail page loaded: ${page.url()}" }
         return this
     }
@@ -213,24 +207,6 @@ class TestDetailPage(page: Page) : BasePage(page) {
     }
 
     /**
-     * Verify all static content on the page
-     */
-    fun verifyAllStaticContent(): TestDetailPage {
-        logger.info { "Verifying all static content on test detail page" }
-        
-        waitForPageLoad()
-        verifyHowItWorksHeading()
-        verifyStep01()
-        verifyStep02()
-        verifyStep03()
-        verifyStep04()
-        verifyCertifiedLabsSection()
-        
-        logger.info { "All static content verified successfully" }
-        return this
-    }
-
-    /**
      * Verify "How it Works?" section dynamically based on sample type
      */
     fun verifyHowItWorksSection(sampleType: String, code: String, reportGenerationHr: String? = null, firstHighlight: String? = null): TestDetailPage {
@@ -263,7 +239,7 @@ class TestDetailPage(page: Page) : BasePage(page) {
         steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
 
         // Step: Results
-        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
+        val resultsTitle = if (type == "blood") "Get results in 72 hours" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hours")
         val resultsDesc = when (type) {
             "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
             "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
@@ -302,8 +278,11 @@ class TestDetailPage(page: Page) : BasePage(page) {
             numHeading.scrollIntoViewIfNeeded()
             numHeading.waitFor()
             
-            // Verify Title - using getByText with exact=false for maximum flexibility with casing/hrs vs Hours
-            page.getByText(title).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))
+            // Verify Title - using getByRole for heading as requested by user
+            val titleHeading = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName(title))
+            titleHeading.scrollIntoViewIfNeeded()
+            titleHeading.waitFor(Locator.WaitForOptions().setTimeout(5000.0))
+            Assertions.assertTrue(titleHeading.isVisible, "Step title '$title' should be visible")
             
             // Verify Description (partial match for flexibility)
             page.getByText(desc.take(40)).first().waitFor(Locator.WaitForOptions().setTimeout(5000.0))

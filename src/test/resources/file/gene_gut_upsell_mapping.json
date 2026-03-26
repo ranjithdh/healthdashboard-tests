@@ -1,0 +1,138 @@
+[
+  {
+    "gene_metric_id": "GN10084",
+    "gene_pgr": "Depression",
+    "gut_metric_id": "GT10128",
+    "gut": "Depression",
+    "gene_upsell": "See how your genes may be influencing your depression risk.",
+    "gut_upsell": "Inflammation in your gut also raises your depression risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10279",
+    "gene_pgr": "Rheumatoid Arthritis",
+    "gut_metric_id": "GT10131",
+    "gut": "Rheumatoid Arthritis",
+    "gene_upsell": "See how your genes may be influencing your rheumatoid arthritis risk.",
+    "gut_upsell": "Dysbiosis in your gut also contributes to rheumatoid arthritis risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10349",
+    "gene_pgr": "Anxiety",
+    "gut_metric_id": "GT10129",
+    "gut": "Anxiety",
+    "gene_upsell": "See how your genes may be influencing your anxiety risk.",
+    "gut_upsell": "Dysbiosis in your gut also affects your anxiety risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10077",
+    "gene_pgr": "Coronary Artery Disease",
+    "gut_metric_id": "GT10132",
+    "gut": "Atherosclerosis",
+    "gene_upsell": "See how your genes may be shaping your heart disease risk.",
+    "gut_upsell": "Inflammation in your gut also impacts your risk for cardiovascular disease. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10064",
+    "gene_pgr": "Chronic Kidney Disease (CKD)",
+    "gut_metric_id": "GT10133",
+    "gut": "Chronic Kidney Disease",
+    "gene_upsell": "See how your genes may be impacting your kidney health.",
+    "gut_upsell": "Toxins in your gut also increase your risk for kidney disease. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10330",
+    "gene_pgr": "Vitamin B12",
+    "gut_metric_id": "GT10018",
+    "gut": "Vitamin B12",
+    "gene_upsell": "See how your genes may be affecting your B12 metabolism.",
+    "gut_upsell": "Malabsorption in your gut also affects your B12 status. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10015",
+    "gene_pgr": "Alzheimer's Disease",
+    "gut_metric_id": "GT10107",
+    "gut": "Acetylcholine",
+    "gene_upsell": "See how your genes may be influencing your Alzheimer's risk.",
+    "gut_upsell": "Low acetylcholine in your gut also raises your Alzheimer's risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10234",
+    "gene_pgr": "Parkinson's",
+    "gut_metric_id": "GT10105",
+    "gut": "Dopamine",
+    "gene_upsell": "See how your genes may be influencing your Parkinson’s risk.",
+    "gut_upsell": "Low dopamine in your gut also raises your risk for Parkinson’s disease. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10084",
+    "gene_pgr": "Depression",
+    "gut_metric_id": "GT10104",
+    "gut": "Serotonin",
+    "gene_upsell": "See how your genes may be influencing your depression risk.",
+    "gut_upsell": "Low serotonin in your gut also raises your risk for depression. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10046",
+    "gene_pgr": "Obesity",
+    "gut_metric_id": "GT10116",
+    "gut": "Obesity",
+    "gene_upsell": "See how your genes may be influencing your weight.",
+    "gut_upsell": "Dysbiosis in your gut also raises your obesity risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10353",
+    "gene_pgr": "Colorectal Cancer",
+    "gut_metric_id": "GT10118",
+    "gut": "Colorectal Neoplasm",
+    "gene_upsell": "See how your genes may be influencing your colorectal cancer risk.",
+    "gut_upsell": "Any abnormal growth in the colon or rectum raises your colorectal cancer risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10079",
+    "gene_pgr": "Crohn's Disease",
+    "gut_metric_id": "GT10120",
+    "gut": "Crohns Disease",
+    "gene_upsell": "See how your genes may be influencing your Crohn’s disease risk.",
+    "gut_upsell": "Issues with your gut barrier also contribute to your Crohn’s disease risk. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10381",
+    "gene_pgr": "Muscle Performance",
+    "gut_metric_id": "GT10122",
+    "gut": "Muscle Strength",
+    "gene_upsell": "See how your genes may be influencing your muscle potential.",
+    "gut_upsell": "Low nutrient absorption in your gut also affects your muscle strength. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10320",
+    "gene_pgr": "Type 2 Diabetes",
+    "gut_metric_id": "GT10126",
+    "gut": "Diabetes Mellitus Type 2",
+    "gene_upsell": "See how your genes may be influencing your blood sugar control.",
+    "gut_upsell": "A lack of good bacteria in your gut may lower butyrate and impair glucose control. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10367",
+    "gene_pgr": "Blood Pressure",
+    "gut_metric_id": "GT10127",
+    "gut": "Hypertension",
+    "gene_upsell": "See how your genes may be influencing your blood pressure.",
+    "gut_upsell": "Inflammation in your gut also drives your risk for hypertension. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10291",
+    "gene_pgr": "Sleep Duration",
+    "gut_metric_id": "GT10125",
+    "gut": "Sleep",
+    "gene_upsell": "See how your genes may be influencing your sleep duration.",
+    "gut_upsell": "Dysbiosis in your gut shortens your sleep duration. Get a gut test to find out."
+  },
+  {
+    "gene_metric_id": "GN10372",
+    "gene_pgr": "Sleep Depth",
+    "gut_metric_id": "GT10125",
+    "gut": "Sleep",
+    "gene_upsell": "See how your genes may be affecting your sleep quality.",
+    "gut_upsell": "Microbial imbalance in your gut also lowers your sleep quality. Get a gut test to find out."
+  }
+]

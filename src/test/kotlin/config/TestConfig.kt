@@ -6,6 +6,11 @@ import com.microsoft.playwright.BrowserType
 object TestConfig {
     val isStaging: Boolean = true
     var ACCESS_TOKEN = ""
+    var USER_ID = ""
+    var USER_NAME = ""
+    var TOTAL_AMOUNT = ""
+    var COUPON_CODE = ""
+    var DISCOUNT_AMOUNT = ""
 
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
@@ -21,28 +26,26 @@ object TestConfig {
 
     object Urls {
         private const val STG_BASE = "https://app.stg.deepholistics.com/"
+        private const val FLIPBOARD_BASE_URL = "https://human-token-visualizer-gowthaman-stg--developers48.replit.app/"
         private const val PROD_BASE = "https://app.deepholistics.com/"
-
         val BASE_URL: String = if (isStaging) STG_BASE else PROD_BASE
 
-        // const val BASE_URL: String = "https://app.stg.deepholistics.com/"
-
         val DIAGNOSTICS_PATH = "${BASE_URL}diagnostics"
-
         val SERVICES_URL = "${BASE_URL}services"
-
 
         val LOGIN_URL = "${BASE_URL}login?utm_source=testing_internal"
         val DIAGNOSTICS_URL: String = "${BASE_URL}diagnostics"
 
         val PROFILE_PAGE_URL: String = "${BASE_URL}profile"
         val HEALTH_DATA_URL = "${BASE_URL}health-data"
+        val BIOMARKERS_URL = "${BASE_URL}biomarkers"
 
         val HOME_PAGE_URL = "${BASE_URL}home"
         val WEBSITE_HOME_PAGE_URL =
             if (isStaging) "https://app.stg.deepholistics.com" else "https://app.deepholistics.com"
         val PROFILE_URL = "${BASE_URL}profile"
 
+        val BASELINE_SCORE_URL = "${BASE_URL}baseline-score"
 
         const val WEBSITE_BASE_URL: String = "https://www.deepholistics.com/"
         const val HOW_IT_WORKS: String = "${WEBSITE_BASE_URL}how-it-works"
@@ -67,11 +70,17 @@ object TestConfig {
         const val BLOOD_HEALTH_DETAIL: String = "${WEBSITE_BASE_URL}add-on-test/blood-health"
 
 
-        const val SIGNUP_VIA_WEBSITE = "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
+        const val SIGNUP_VIA_WEBSITE =
+            "https://app.deepholistics.com/login?mode=signup&utm_source=testing_internal&via=website"
         const val LOGIN_VIA_WEBSITE = "https://app.deepholistics.com/login?utm_source=testing_internal&via=website"
         val SYMPTOMS_PAGE_URL: String = "${BASE_URL}insights"
 
         val TRACK_RESULT = "${BASE_URL}order/"
+        val RECOMMENDATIONS_URL = "${BASE_URL}recommendations"
+
+        val TEST_DETAIL_URL = "${BASE_URL}test-detail"
+
+
     }
 
     object APIs {
@@ -81,7 +90,8 @@ object TestConfig {
         val BASE_URL: String = if (isStaging) STG_API else PROD_API
 
         //  const val BASE_URL: String = "https://api.stg.dh.deepholistics.com"
-        val API_SLOTS_AVAILABILITY = "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
+        const val API_SLOTS_AVAILABILITY =
+            "https://api.stg.dh.deepholistics.com/v3/diagnostics/slots-availability?platform=web"
         val SERVICE_SEARCH_API_URL = "$BASE_URL/v4/human-token/market-place/products"
         val LAB_TEST_API_URL: String = "$BASE_URL/v4/human-token/lab-test"
         val API_ADDRESS = "$BASE_URL/v4/human-token/market-place/address"
@@ -93,8 +103,29 @@ object TestConfig {
         val API_VERIFY_OTP = "$BASE_URL/v4/human-token/lead/verify-otp"
         val API_SYMPTOMS_LIST = "$BASE_URL/v4/human-token/health-data/symptom/list"
         val API_HOME = "$BASE_URL/v4/human-token/market-place/home"
+        val BLOOD_DATA_REPORTS = "$BASE_URL/v4/human-token/blood-data-reports"
+        val PROFILE_LIST = "$BASE_URL/v4/human-token/lead/profiles"
+        val PROFILE_DETAIL = "$BASE_URL/v4/human-token/lead/profile/"
         val HEALTH_DATA = "$BASE_URL/v4/human-token/health-data?metrics[]=blood"
         val GET_OTP = "$BASE_URL/v1/user/mobile/get/otp"
+        val API_RECOMMENDATION = "$BASE_URL/v4/human-token/recommendation"
+        val API_GOAL = "$BASE_URL/v2/ai-coach/program/goal"
+        val API_USERS = "$BASE_URL/v4/human-token/users"
+        val BASELINE_SCORE_API_URL = "$BASE_URL/v4/human-token/health-data/baseline-score"
+
+        const val FLIP_BOARD_TAGS = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/tags"
+        const val FLIP_BOARD_ARTICLES = "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/for-you/"
+        const val FLIP_BOARD_UNREAD_COUNT= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/unread-count/"
+        const val FLIP_BOARD_TOPICS= "https://api.aic.stg.dh.deepholistics.com/flipboards/api/v1/topics/"
+
+        val API_WALLET = "$BASE_URL/v4/human-token/user/wallet"
+        val API_GUT = "$BASE_URL/v4/human-token/health-data/gut"
+        val API_GENE = "$BASE_URL/v4/human-token/health-data/gene"
+        val API_GUT_DETAILS = "$BASE_URL/v4/human-token/health-data/gut/metric"
+        val API_GENE_DETAILS = "$BASE_URL/v4/human-token/health-data/gene/metric"
+        const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
+        const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
+            "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
     }
 
 
@@ -114,15 +145,11 @@ object TestConfig {
     }
 
     object Viewports {
-        // Mobile devices
         val MOBILE_PORTRAIT = Viewport(390, 844, "iPhone 13", true)
-        val MOBILE_LANDSCAPE = Viewport(844, 390, "iPhone 13 Landscape", true)
         val ANDROID = Viewport(412, 915, "Pixel 5", true)
 
-        // Tablets
         val TABLET_PORTRAIT = Viewport(768, 1024, "iPad", true)
 
-        // Desktop
         val DESKTOP_HD = Viewport(1280, 720, "Desktop HD", false)
         val DESKTOP_FHD = Viewport(1920, 1080, "Desktop Full HD", false)
 
@@ -131,7 +158,7 @@ object TestConfig {
 
     object TestUsers {
         val NEW_USER = TestUser(
-            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998195",
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998394",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -151,17 +178,18 @@ object TestConfig {
         )
 
 
-        /*val EXISTING_USER = TestUser(
-                    mobileNumber = System.getenv("EXISTING_USER_MOBILE") ?: "9677004512",
-                    otp = System.getenv("EXISTING_USER_OTP") ?: "678901",
-                    country = "India"
-                )*/
-        val EXISTING_USER = TestUser(
+        var EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901",
             country = "India",
             countryCode = "+91"
         )
+      /*  var EXISTING_USER = TestUser(
+            mobileNumber = "4573998384",//4573998394
+            otp = "678901",
+            country = "Finland",
+            countryCode = "+354"
+        )*/
 
     }
 
@@ -178,6 +206,7 @@ object TestConfig {
 
     object Coupons {
         const val VALID_COUPON = "D261C0"
+        const val FREE_COUPON = "NASH100"
         const val INVALID_COUPON = "INVALID123"
         const val DISCOUNT_AMOUNT = 1000f
     }

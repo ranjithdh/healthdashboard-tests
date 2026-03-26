@@ -1,20 +1,23 @@
 package onboard.page
 
+import com.microsoft.playwright.FrameLocator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
 import config.BasePage
 import config.TestConfig
+import io.qameta.allure.Step
 import kotlinx.serialization.json.*
 import mobileView.home.HomePage
 import utils.DateHelper
+import utils.DhPointsStore
 import utils.SignupDataStore
 import utils.json.json
 import utils.logger.logger
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import io.qameta.allure.Step
+import java.util.regex.Pattern
 
 
 class OrderSummaryPage(page: Page) : BasePage(page) {
@@ -28,10 +31,11 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     }
 
 
-
     private fun monitorTraffic() {
         page.onResponse { response ->
-            if (response.url().contains("https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true") && response.status() == 200) {
+            if (response.url()
+                    .contains("https://api.stg.dh.deepholistics.com/v4/human-token/diagnostics/onboarding-addon?show_onboarding_addon=true") && response.status() == 200
+            ) {
                 try {
                     val responseBody = response.text()
                     if (!responseBody.isNullOrBlank()) {
@@ -78,11 +82,29 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
     @Step("Click Checkout")
     fun clickCheckout(): HomePage {
         logger.info { "clickCheckout()" }
-        page.getByRole(AriaRole.BUTTON,Page.GetByRoleOptions().setName("Checkout")).click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
 
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
 
+        return homePage
+    }
+
+    fun clickGooglePayUPI(): HomePage {
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Checkout")).click()
+        page.locator("iframe").contentFrame().getByTestId("contactNumber").click()
+        page.locator("iframe").contentFrame().getByTestId("contactNumber").fill("9797675737")
+        page.locator("iframe").contentFrame().getByRole(AriaRole.BUTTON, FrameLocator.GetByRoleOptions().setName("Continue")).click()
+        page.locator("iframe").contentFrame().getByTestId("UPI - Google Pay").click()
+
+        page.locator("iframe").contentFrame().getByPlaceholder("@okhdfcbank").fill("fhranjith17@okhdfcbank")
+        page.locator("iframe").contentFrame().getByPlaceholder("@okhdfcbank").press("Enter")
+
+        page.locator("iframe").contentFrame().getByTestId("fee-bearer-cta").waitFor()
+        page.locator("iframe").contentFrame().getByTestId("fee-bearer-cta").click()
+
+        val homePage = HomePage(page)
+        homePage.waitForMobileHomePageConfirmation()
         return homePage
     }
 
@@ -236,7 +258,8 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
             ?.withMinute(fastingSlotTime?.last()?.trim()?.toInt() ?: 0)?.withSecond(0)
 
         val appointmentUtcTime = DateHelper.localDateTimeToUtc(savedLocalDate)
-        val utcNow = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+        val utcNow =
+            ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
 
         val payload = buildJsonObject {
             put("is_user_present", false)
@@ -258,16 +281,19 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
                             thyrocareProductIds.add("OMEGA1003")
                             orderIds.add("VL192031")
                         }
+
                         lowerName.contains("cortisol") -> {
                             productIds.add(110)
                             thyrocareProductIds.add("CORTISOL1004")
                             orderIds.add("VL192029")
                         }
+
                         lowerName.contains("toxic metal") -> {
                             productIds.add(91)
                             thyrocareProductIds.add("P250")
                             orderIds.add("VL192032")
                         }
+
                         lowerName.contains("allergy") -> {
                             productIds.add(92)
                             thyrocareProductIds.add("TTGA")
@@ -360,5 +386,51 @@ class OrderSummaryPage(page: Page) : BasePage(page) {
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
         return homePage
+    }
+
+    fun checkTotalAmount(): OrderSummaryPage {
+        logger.info { "[PROCESS] Starting checkTotalAmount" }
+        // Give the UI more time to finish calculations after Apply Coupon
+        page.waitForTimeout(3000.0)
+
+        // Capture referral discount if present
+        try {
+            val discountText = page.locator("p, span, div")
+                .filter(com.microsoft.playwright.Locator.FilterOptions().setHasText(Pattern.compile("Referral discount.*₹[0-9,]+")))
+                .last()
+                .innerText()
+
+            val discountNumeric = discountText.replace(Regex("[^0-9]"), "")
+            logger.info { "!!! [SUCCESS] Captured dynamic discount: $discountNumeric from text: $discountText" }
+            TestConfig.DISCOUNT_AMOUNT = discountNumeric
+            // Persist to file so it survives across @Test methods
+            DhPointsStore.save(discountAmount = discountNumeric)
+        } catch (e: Exception) {
+            logger.info { "??? [INFO] Referral discount not found or could not be parsed: ${e.message}" }
+        }
+
+        // Capture total amount
+        try {
+            val totalLocator = page.locator("p, span, div, h1, h2, h3")
+                .filter(com.microsoft.playwright.Locator.FilterOptions().setHasText(Pattern.compile("Total.*₹[0-9,]+")))
+                .last()
+
+            val totalText = totalLocator.innerText()
+            val numericAmount = totalText.replace(Regex("[^0-9]"), "")
+
+            logger.info { "!!! [SUCCESS] Captured dynamic total amount: $numericAmount from text: $totalText" }
+            TestConfig.TOTAL_AMOUNT = numericAmount
+            // Persist to file so it survives across @Test methods
+            DhPointsStore.save(totalAmount = numericAmount)
+
+            totalLocator.click()
+        } catch (e: Exception) {
+            logger.error { "### [ERROR] Failed to capture total amount: ${e.message}" }
+        }
+
+        // Verify what was written to the file
+        logger.info { "[FILE-PERSISTED] Total: ${DhPointsStore.totalAmount}, Discount: ${DhPointsStore.discountAmount}, Coupon: ${DhPointsStore.couponCode}" }
+
+        return this
     }
 }

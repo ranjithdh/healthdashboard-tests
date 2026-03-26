@@ -3,11 +3,44 @@ package mobileView.diagnostics
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import config.BasePage
+import config.TestConfig
+import mobileView.actionPlan.page.ActionPlanPage
 import utils.report.StepHelper
 
 class TestDetailPage(page: Page) : BasePage(page) {
 
-    override val pageUrl = "" // URL might be dynamic, so leaving empty or generic
+    override val pageUrl = TestConfig.Urls.TEST_DETAIL_URL
+
+    private val backButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Back"))
+
+    fun waitForPageLoad(): TestDetailPage {
+        page.waitForURL("**/test-detail/**")
+        backButton.waitFor()
+        return this
+    }
+
+    fun waitGeneTabLoad(): TestDetailPage {
+        page.waitForURL("**/diagnostics?tab=genetics**")
+        backButton.waitFor()
+        return this
+    }
+
+    fun waitGutTabLoad(): TestDetailPage {
+        page.waitForURL("**/diagnostics?tab=gut-microbiome**")
+        backButton.waitFor()
+        return this
+    }
+
+    fun clickBackButton(): ActionPlanPage {
+        StepHelper.step("Clicking Back button on Test Detail page")
+        backButton.click()
+        return ActionPlanPage(page).waitForConfirmation()
+    }
+
+    fun clickBackButtonToHome() {
+        StepHelper.step("Clicking Back button on Test Detail page")
+        backButton.click()
+    }
 
     fun verifyHowItWorksSection() {
         StepHelper.step("${StepHelper.VERIFY_SECTION} How it Works?")

@@ -312,4 +312,27 @@ object QuestionSubType {
      * What is your waist circumference at its narrowest point (just above your hips)?
      */
     const val WAIST_CIRCUMFERENCE = "waist_circumference"
+
+    /**
+     * Question 53:
+     * Over the last 2 weeks, how often have you been bothered by little interest or pleasure in doing things?
+     */
+    const val METAL_INTEREST = "metal_interest"
+
+    /**
+     * Question 54:
+     * Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?
+     */
+    const val METAL_DEPRESSED = "metal_depressed"
+
+    /**
+     * Question 55:
+     * Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?
+     */
+    const val METAL_NERVOUS = "metal_nervous"    /**
+
+     * Question 56:
+     * Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?
+     */
+    const val METAL_WORRY ="metal_worry"
 }

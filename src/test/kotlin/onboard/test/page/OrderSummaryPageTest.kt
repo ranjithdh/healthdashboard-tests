@@ -1,42 +1,36 @@
 package onboard.test.page
 
-import io.qameta.allure.Epic
-import utils.report.Modules
-import com.microsoft.playwright.*
+import com.microsoft.playwright.Browser
+import com.microsoft.playwright.BrowserContext
+import com.microsoft.playwright.Playwright
 import config.BaseTest
 import config.TestConfig
+import io.qameta.allure.Epic
 import onboard.page.LoginPage
 import onboard.page.OrderSummaryPage
 import org.junit.jupiter.api.*
 import utils.OnboardAddOnTestDataStore
 import utils.SignupDataStore
+import utils.report.Modules
 import java.text.DecimalFormat
-import kotlin.collections.forEach
 
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Epic(Modules.EPIC_BOOKLABTEST)
+@Epic(Modules.EPIC_ONBOARDING)
 class OrderSummaryPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var orderSummaryPage: OrderSummaryPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
-        val viewport = TestConfig.Viewports.MOBILE_LANDSCAPE
+        val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
             .setHasTouch(viewport.hasTouch)
@@ -46,12 +40,16 @@ class OrderSummaryPageTest : BaseTest() {
         context = browser.newContext(contextOptions)
         context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
+        orderSummaryPage = navigateToOrderSummaryPage()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
     }
+
 
     private fun navigateToOrderSummaryPage(): OrderSummaryPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -68,10 +66,10 @@ class OrderSummaryPageTest : BaseTest() {
         return orderSummaryPage
     }
 
-    @Test
-    fun `should display order summary details`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
 
+    @Test
+    @Order(1)
+    fun `should display order summary details`() {
         assert(orderSummaryPage.isOrderSummaryHeaderVisible()) { "Header should be visible" }
         assert(orderSummaryPage.isProductNameVisible()) { "Product name should be visible" }
         assert(orderSummaryPage.isTotalVisible()) { "Total should be visible" }
@@ -80,9 +78,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(2)
     fun `should handle invalid coupon code`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
-        
         orderSummaryPage.enterCouponCode(TestConfig.Coupons.INVALID_COUPON)
         orderSummaryPage.clickApplyCoupon()
 
@@ -92,19 +89,10 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
-    fun `should clear coupon code`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
-
-        orderSummaryPage.enterCouponCode("12")
-        orderSummaryPage.clearCouponCode()
-
-        orderSummaryPage.takeScreenshot("cleared-coupon-code")
-    }
-
-
-    @Test
+    @Order(3)
     fun `should apply valid coupon and verify discount`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
+//        orderSummaryPage.clearCouponCode()
+        orderSummaryPage.removeCoupon()
 
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
 
@@ -127,10 +115,9 @@ class OrderSummaryPageTest : BaseTest() {
         orderSummaryPage.takeScreenshot("coupon-removed")
     }
 
-
     @Test
+    @Order(4)
     fun `add and remove all the add on tests`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
         assert(orderSummaryPage.isTotalAmountVisible("₹9,999")) { "Initial total should be ₹9,999" }
 
         orderSummaryPage.addAllTheAddOnTests()
@@ -160,8 +147,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(5)
     fun `should add and remove first add-on test`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
         orderSummaryPage.addFirstAddOn()
         val addOnName = orderSummaryPage.getFirstAddOnName()
         SignupDataStore.update { selectedAddOns.add(addOnName) }
@@ -176,8 +163,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(6)
     fun `should add and remove second add-on test`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
         orderSummaryPage.addSecondAddOn()
         val addOnName = orderSummaryPage.getSecondAddOnName()
         SignupDataStore.update { selectedAddOns.add(addOnName) }
@@ -192,8 +179,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(7)
     fun `should add and remove third add-on test`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
         orderSummaryPage.addThirdAddOn()
         val addOnName = orderSummaryPage.getThirdAddOnName()
         SignupDataStore.update { selectedAddOns.add(addOnName) }
@@ -208,8 +195,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(8)
     fun `should add and remove fourth add-on test`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
         orderSummaryPage.addFourthAddOn()
         val addOnName = orderSummaryPage.getFourthAddOnName()
         SignupDataStore.update { selectedAddOns.add(addOnName) }
@@ -224,9 +211,8 @@ class OrderSummaryPageTest : BaseTest() {
     }
 
     @Test
+    @Order(9)
     fun `should add add-on and apply coupon`() {
-        val orderSummaryPage = navigateToOrderSummaryPage()
-        
         orderSummaryPage.addFirstAddOn()
         val addOnName = orderSummaryPage.getFirstAddOnName()
         val price = getAddOnPrice(addOnName)

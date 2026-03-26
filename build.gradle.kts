@@ -36,6 +36,10 @@ dependencies {
     testImplementation("io.qameta.allure:allure-junit5:2.29.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
     agent("org.aspectj:aspectjweaver:1.9.22")
+
+
+    // PDF parsing
+    testImplementation("org.apache.pdfbox:pdfbox:3.0.3")
 }
 
 
@@ -64,7 +68,6 @@ tasks.withType<Test> {
     }
 }
 
-// Custom task to run only mobile tests
 tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
     filter {
@@ -72,7 +75,6 @@ tasks.register<Test>("mobileTests") {
     }
 }
 
-// Custom task to run only website tests
 tasks.register<Test>("websiteTests") {
     useJUnitPlatform()
     filter {
@@ -80,26 +82,6 @@ tasks.register<Test>("websiteTests") {
     }
 }
 
-// Custom task to run only desktop/app tests
-tasks.register<Test>("appTests") {
-    useJUnitPlatform()
-    filter {
-        includeTestsMatching("login.*")
-        includeTestsMatching("healthdata.*")
-        includeTestsMatching("mobileView.profile.*")
-        includeTestsMatching("webView.*")
-    }
-}
-
-// Custom task to run only login tests
-tasks.register<Test>("loginTests") {
-    useJUnitPlatform()
-    filter {
-        includeTestsMatching("login.*")
-    }
-}
-
-// Custom task to run only webView tests
 tasks.register<Test>("webViewTests") {
     useJUnitPlatform()
     filter {
@@ -107,7 +89,6 @@ tasks.register<Test>("webViewTests") {
     }
 }
 
-// Custom task to run only onboard tests
 tasks.register<Test>("onboardTests") {
     useJUnitPlatform()
     filter {
@@ -115,7 +96,6 @@ tasks.register<Test>("onboardTests") {
     }
 }
 
-// Install Playwright browsers
 tasks.register<Exec>("installPlaywright") {
     commandLine("npx", "playwright", "install", "--with-deps")
 }
@@ -131,7 +111,6 @@ allure {
     }
 }
 
-// Allure v3 tasks using npx
 tasks.register<Exec>("allure3Report") {
     group = "verification"
     description = "Generates Allure Report v3"
