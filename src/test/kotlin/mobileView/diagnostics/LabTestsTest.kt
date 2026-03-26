@@ -879,7 +879,34 @@ class LabTestsTest : BaseTest() {
     @Test
     @Order(5)
     fun `verify summary page edit flow`() {
-        val targetCode = "FIBROSIS INDEX (FIB-4)"
+
+        val resObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
+        val proList = resObj.data?.diagnostic_product_list
+            ?: throw AssertionError("diagnostic_product_list not found in API response")
+
+        val allItems = sequenceOf(
+            proList.packages,
+            proList.test_profiles,
+            proList.tests
+        ).filterNotNull().flatten()
+
+        val targetItem = allItems.filter { item ->
+            val (code, diKit, diOrder) = when (item) {
+                is model.LabTestPackage -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestProfile -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestItem -> Triple(item.code, item.di_kit, item.di_order)
+                else -> Triple(null, null, null)
+            }
+            diKit == null && diOrder == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            // here we have to check di_order as well like di_kit..
+        }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
+
+        val targetCode = when (targetItem) {
+            is model.LabTestPackage -> targetItem.code
+            is model.LabTestProfile -> targetItem.code
+            is model.LabTestItem -> targetItem.code
+            else -> null
+        } ?: throw AssertionError("Target item selected but code is null")
         logger.info { "Starting test: verify summary page edit flow" }
         StepHelper.step("Starting test: verify summary page edit flow")
 
