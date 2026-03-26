@@ -101,10 +101,10 @@ class LabTestsTest : BaseTest() {
 
             // Sample type logic as per user requirement
             val sampleType = when {
-                code.startsWith("CORTISOL") -> "At-Home Test Kit"
-                code.startsWith("OMEGA") -> "At-Home Test Kit"
-                safeRawSampleType.lowercase() == "saliva" -> "At-Home Test Kit"
-                safeRawSampleType.lowercase() == "stool" -> "At-Home Test Kit"
+                code.startsWith("CORTISOL") -> "At-Home Self-Collection Kit"
+                code.startsWith("OMEGA") -> "At-Home Self-Collection Kit"
+                code == "GENE10001" -> "At-Home Self-Collection Kit"
+                code == "GUT10002" -> "At-Home Self-Collection Kit"
                 else -> "Blood test"
             }
 
@@ -251,8 +251,7 @@ class LabTestsTest : BaseTest() {
         logger.info { "Navigating to diagnostics page and capturing API response..." }
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-
-        val targetCode = "DH_LONGEVITY_PANEL" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "OMEGA1003" //CORTISOL1004 "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -455,8 +454,10 @@ class LabTestsTest : BaseTest() {
         baseSteps.add(mapOf("title" to title1, "description" to desc1))
 
         // Item 2 (Base/Blood)
-        val title2 = highlightsList.getOrNull(3) ?: "Get Results in 72 Hours"
-        val desc2 = if (sampleType == "blood") {
+        val title2 = if (targetCode == "CORTISOL1004") "Get results in 3–5 days" else highlightsList.getOrNull(3) ?: "Get Results in 72 Hours"
+        val desc2 = if (targetCode == "CORTISOL1004") {
+            "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+        } else if (sampleType == "blood") {
             "Your sample is processed at a certified lab, and your report is ready online in  $reportGenHr."
         } else {
             getResultsDescription[sampleType] ?: ""

@@ -318,14 +318,19 @@ class LabTestsPage(page: Page) : BasePage(page) {
         steps.add(mapOf("title" to collectionTitle, "desc" to collectionDesc))
 
         // Step: Results
-        val resultsTitle = if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
-        val resultsDesc = when (type) {
-            "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
-            "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
-            "stool" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
-            "dried_blood_spot" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
-            "saliva_stress" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
-            else -> "Your sample is processed at a certified lab, and your report is ready online in 72 hours."
+//        Get results in 72 hours
+        val resultsTitle = if (code == "CORTISOL1004") "Get results in 3–5 days" else if(code == "OMEGA1003") "Get results in 7–10 days" else if (type == "blood") "Get results in 72 hrs" else (if (type == "saliva") "Get results in 3–4 weeks" else if (type == "stool") "Get results in 7–10 days" else "Get results in 72 hrs")
+        val resultsDesc = if (code == "CORTISOL1004") {
+            "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+        } else {
+            when (type) {
+                "blood" -> "Your sample is processed at a certified lab, and your report is ready online in ${reportGenerationHr ?: "72 hours"}."
+                "saliva" -> "Your sample is analysed in a certified lab, and your report goes live on your dashboard."
+                "stool" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+                "dried_blood_spot" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+                "saliva_stress" -> "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+                else -> "Your sample is processed at a certified lab, and your report is ready online in 72 hours."
+            }
         }
         steps.add(mapOf("title" to resultsTitle, "desc" to resultsDesc))
 
