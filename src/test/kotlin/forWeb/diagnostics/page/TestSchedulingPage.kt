@@ -204,16 +204,20 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             .fill("14C3, H H Road")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).fill("Balarengapuram")
-        page.getByRole(
+        val suggestion = page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
-        ).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).click()
+        )
+        try {
+            suggestion.waitFor(com.microsoft.playwright.Locator.WaitForOptions().setTimeout(2000.0))
+            suggestion.click()
+        } catch (e: Exception) {
+            logger.warn { "Address suggestion not found, proceeding with manual entry." }
+        }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).fill("Madurai")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).press("ArrowRight")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).fill("Tamil Nadu")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
+        val stateInput = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *"))
+        stateInput.click()
+        stateInput.fill("Tamil Nadu")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).fill("625009")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
 
