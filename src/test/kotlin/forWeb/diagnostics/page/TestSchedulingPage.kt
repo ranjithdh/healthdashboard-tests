@@ -173,8 +173,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     ) {
         val randomNum = (100..999).random()
         val finalMobile = mobileNumber ?: "7092424$randomNum" 
-        val finalNickName = nickName ?: "Seeni$randomNum"
-        val finalName = name ?: "SeeniV$randomNum"
+        val finalNickName = nickName ?: "Seeni"
+        val finalName = name ?: "Seeni"
         val finalEmail = email ?: "vseeni$randomNum@yopmail.com"
 
         logger.info { "Filling Add New User fields with dynamic number: $randomNum" }

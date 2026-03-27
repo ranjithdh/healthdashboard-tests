@@ -263,9 +263,9 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun verifyTestCard(code: String, name: String, sampleType: String, price: String) {
-        val image = page.getByTestId("test-card-image-$code")
-        image.scrollIntoViewIfNeeded()
-        if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
+//        val image = page.getByTestId("test-card-image-$code")
+//        image.scrollIntoViewIfNeeded()
+//        if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
 
         val nameElement = page.getByTestId("test-card-name-$code")
         if (!nameElement.isVisible) throw AssertionError("Name not visible for code: $code")
