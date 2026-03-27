@@ -151,7 +151,7 @@ class AddressPageTest : BaseTest() {
 
         addressPage.clearPinCode()
         assert(!addressPage.isContinueButtonEnabled()) { "Continue should be disabled when pincode is empty" }
-        addressPage.takeScreenshot("continue-disabled-empty-pincode")
+        addressPage.takeScreenshot("continue-disabled-when-pinCode-is-empty")
     }
 
     @Test
