@@ -53,7 +53,7 @@ class OrderSummaryPageTest : BaseTest() {
 
     private fun navigateToOrderSummaryPage(): OrderSummaryPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val testUser = TestConfig.TestUsers.NEW_USER
+        val testUser = TestConfig.TestUsers.ONBOARD_USER
 
         val orderSummaryPage = loginPage
             .enterMobileAndContinue(testUser)

@@ -66,7 +66,6 @@ class LoginPageTest : BaseTest() {
         context.close()
     }
 
-    // ---------------------- Page Visibility Tests ----------------------
 
     @Test
     fun `should display all required elements when login page loads`() {
@@ -88,7 +87,6 @@ class LoginPageTest : BaseTest() {
         loginPage.takeScreenshot("login-page-loaded-correctly")
     }
 
-    // ------------------------- Mobile Number Validation Tests ----------------------
 
     @Test
     fun `should keep Continue disabled when mobile number is empty`() {
@@ -157,7 +155,6 @@ class LoginPageTest : BaseTest() {
         loginPage.takeScreenshot("clear-and-reenter-number")
     }
 
-    // ----------------------- WhatsApp Checkbox Tests ----------------------
 
     @Test
     fun `should toggle WhatsApp checkbox correctly`() {

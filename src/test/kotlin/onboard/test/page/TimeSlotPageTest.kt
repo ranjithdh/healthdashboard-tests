@@ -51,7 +51,7 @@ class TimeSlotPageTest : BaseTest() {
 
     private fun navigateToTimeSlotPage(): TimeSlotPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val testUser = TestConfig.TestUsers.NEW_USER
+        val testUser = TestConfig.TestUsers.ONBOARD_USER
 
         return loginPage
             .enterMobileAndContinue(testUser)

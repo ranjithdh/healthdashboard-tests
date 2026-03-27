@@ -1,7 +1,9 @@
 package onboard.page
 
+import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
+import com.microsoft.playwright.options.ElementState
 import config.BasePage
 import config.TestConfig
 import config.TestUser
@@ -65,7 +67,7 @@ class LoginPage(page: Page) : BasePage(page) {
     fun enterMobileAndContinue(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): OtpPage {
         StepHelper.step(LOGIN_WITH_MOBILE_AND_CONTINUE)
         logger.info { "enterMobileAndContinue(${testUser.mobileNumber})" }
-        page.waitForTimeout(5000.0)
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE)
         selectCountryCode(testUser.country)
         enterMobileNumber(testUser.mobileNumber)
         clickContinue()

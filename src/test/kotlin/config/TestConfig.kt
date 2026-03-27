@@ -184,12 +184,28 @@ object TestConfig {
             country = "India",
             countryCode = "+91"
         )
-      /*  var EXISTING_USER = TestUser(
-            mobileNumber = "4573998384",//4573998394
-            otp = "678901",
+
+
+        //using this only for onboard validation test
+        val ONBOARD_USER = TestUser(
+            mobileNumber = "4573998650",
+            otp = System.getenv("TEST_USER_OTP") ?: "",
+            firstName = "ranjith",
+            email = "ranjithkumar.m@mysmitch.com",
+            gender = "Male",
+            height = "170",
+            weight = "60",
+            month = "2",
+            year = "1998",
+            day = "12",
+            flatHouseNo = "Flat 101",
+            address = "456 Main Road",
+            city = "Coimbatore",
+            state = "TamilNadu",
+            pinCode = "641005",
             country = "Finland",
-            countryCode = "+354"
-        )*/
+            countryCode = "+358"
+        )
 
     }
 

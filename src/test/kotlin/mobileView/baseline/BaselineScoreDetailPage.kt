@@ -178,8 +178,8 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
                 val younger = age - biologicalAge
                 description = "$younger years younger than your actual age"
             } else {
-                biologicalAge - age
-                description = "$biologicalAge years older than your actual age"
+               val older = biologicalAge - age
+                description = "$older years older than your actual age"
             }
         }
 
