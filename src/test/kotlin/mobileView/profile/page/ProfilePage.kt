@@ -6030,7 +6030,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val storedAnswer = answersStored[QuestionSubType.WAIST_CIRCUMFERENCE]?.answer as? String
         checkTextInput(storedAnswer, waistTextBox)
-       /* if (shouldClickComplete) {
+     /*   if (shouldClickComplete) {
             completeButton.click()
         }*/
     }
@@ -6132,6 +6132,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_56_checker(index: Int) {
         if (answersStored[QuestionSubType.METAL_WORRY] == null) return
         logQuestion("Checking: Cancer Status")
+        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
 
         listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
@@ -6158,6 +6159,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.METAL_WORRY]?.answer as? String, options)
+        if (shouldClickComplete) {
+            completeButton.click()
+        }
     }
 
     // --- Checker Helpers ---
