@@ -654,7 +654,7 @@ class GutPage(page: Page) : BasePage(page) {
             summaryMetricsList?.getOrNull(0)?.details?.filter { it.category == "short_description" }
                 ?.getOrNull(0)?.content
         val parameterTitle = page.getByTestId("parameter-title")
-        val descriptionUiElement = page.getByTestId("short-description-content")
+        val descriptionUiElement = page.getByTestId("gut-parameters-short-description") //short-description-content
 
         parameterTitle.waitFor()
         val actualTitleText = parameterTitle.innerText()
