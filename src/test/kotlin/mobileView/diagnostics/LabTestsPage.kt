@@ -163,7 +163,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
             com.microsoft.playwright.options.RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         if (response.status() == 200) {
             logger.info { "Successfully fetched blood reports alongside lab tests." }
@@ -180,7 +180,7 @@ class LabTestsPage(page: Page) : BasePage(page) {
             com.microsoft.playwright.options.RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         if (response.status() == 200) {
             logger.info { "Successfully fetched wallet data." }
