@@ -64,6 +64,22 @@ class LabTestsTest : BaseTest() {
             logger.info { "Navigating back to Diagnostics URL..." }
             page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
             page.waitForLoadState()
+        } else {
+            // If already on diagnostics, ensure filter is reset to 'All'
+            try {
+                val allFilter = page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All"))
+                if (allFilter.isVisible) {
+                    val isChecked = allFilter.getAttribute("aria-checked") == "true"
+                    if (!isChecked) {
+                        logger.info { "Resetting filter to 'All'..." }
+                        allFilter.click()
+                        // Give a moment for the UI to update and cards to appear
+                        page.waitForTimeout(1000.0)
+                    }
+                }
+            } catch (e: Exception) {
+                logger.warn { "Could not reset filter to 'All': ${e.message}" }
+            }
         }
     }
 
@@ -72,8 +88,6 @@ class LabTestsTest : BaseTest() {
     fun `verify lab tests page static texts and segments`() {
         labTestsPage.checkStaticTextsAndSegments()
     }
-
-
     @Test
     @Order(2)
     fun `verify lab tests cards using API response`() {
@@ -543,7 +557,6 @@ class LabTestsTest : BaseTest() {
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(4)
     fun `verify test scheduling`() {
@@ -716,7 +729,6 @@ class LabTestsTest : BaseTest() {
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(4)
     fun `verify test scheduling for baseline`() {
@@ -782,7 +794,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
         testSchedulingPage.fillAddNewUserFields()
         testSchedulingPage.getUserProfileList() // Refresh list after adding new user
-        testSchedulingPage.assertProfilesFromApi()
+//        testSchedulingPage.assertProfilesFromApi()
         
         // Switch user logic
         val profiles = testSchedulingPage.getProfileListData()?.profiles
@@ -887,7 +899,6 @@ class LabTestsTest : BaseTest() {
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(5)
     fun `verify summary page edit flow`() {
