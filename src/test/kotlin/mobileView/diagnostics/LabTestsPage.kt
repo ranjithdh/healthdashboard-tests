@@ -45,6 +45,8 @@ class LabTestsPage(page: Page) : BasePage(page) {
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gene")).click()
         StepHelper.step("Click Filter: Gut")
         page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("Gut")).click()
+        StepHelper.step("Restore Filter: All")
+        page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All")).click()
     }
 
     fun login() {
