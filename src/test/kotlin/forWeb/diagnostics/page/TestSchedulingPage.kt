@@ -755,7 +755,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean, sampleType: String? = null) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -809,13 +809,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
 
         // Slot verification
-        // Slot verification
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004", "DH_METABOLIC_PANEL", "DH_LONGEVITY_PANEL")) {
+        // Skip slot verification if sample type is one of the kit-based/self-collection types
+        val kitSampleTypes = setOf("saliva", "stool", "dried_blood_spot", "saliva_stress")
+        val isDualSlot = (targetCode == "DH_METABOLIC_PANEL" || targetCode == "DH_LONGEVITY_PANEL")
+        if (sampleType?.lowercase() !in kitSampleTypes && !isDualSlot) {
+            logger.info { "Verifying Single Slot Summary: Date: $selectedDateSummary, Time: $selectedTimeSummary" }
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()
             page.getByText("Selected time slot: $selectedTimeSummary").click()
         }
-        if (targetCode == "DH_METABOLIC_PANEL" || targetCode == "DH_LONGEVITY_PANEL") {
+        if (isDualSlot) {
             logger.info { "Verifying Dual Slot Summary: Date: $selectedDateSummary, Fasting: $selectedFastingTimeSummary, PostMeal: $selectedPostMealTimeSummary" }
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()

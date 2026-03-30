@@ -1,6 +1,7 @@
 package mobileView.service
 
 import com.microsoft.playwright.Locator
+import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
@@ -9,32 +10,32 @@ import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import onboard.page.LoginPage
-import model.ServiceResponse
 import model.ServiceProduct
+import model.ServiceResponse
 import model.profile.PiiUserResponse
 import mu.KotlinLogging
+import onboard.page.LoginPage
+import utils.LogFullApiCall
 import utils.Normalize.refactorTimeZone
 import utils.report.StepHelper
-import utils.report.StepHelper.VERIFY_SYMPTOMS_COUNT
-import utils.report.StepHelper.CLICK_SYMPTOM_MOBILE
-import utils.report.StepHelper.SELECT_ALL_SYMPTOMS
-import utils.report.StepHelper.SUBMIT_SYMPTOMS_MOBILE
-import utils.report.StepHelper.VERIFY_SYMPTOMS_FEEDBACK
-import utils.report.StepHelper.REPORT_SYMPTOMS_CLICK
-import utils.report.StepHelper.VERIFY_SYMPTOMS_DIALOG
-import utils.report.StepHelper.EXPAND_SYMPTOMS_SECTION
 import utils.report.StepHelper.CLICK_SCHEDULE_NOW
+import utils.report.StepHelper.CLICK_SYMPTOM_MOBILE
+import utils.report.StepHelper.EXPAND_SYMPTOMS_SECTION
 import utils.report.StepHelper.FETCH_SERVICE_DATA
 import utils.report.StepHelper.NAVIGATE_TO_SERVICES
+import utils.report.StepHelper.REPORT_SYMPTOMS_CLICK
+import utils.report.StepHelper.SELECT_ALL_SYMPTOMS
+import utils.report.StepHelper.SUBMIT_SYMPTOMS_MOBILE
 import utils.report.StepHelper.VERIFY_SERVICE_CARD
 import utils.report.StepHelper.VERIFY_STATIC_CONTENT
-import utils.LogFullApiCall
+import utils.report.StepHelper.VERIFY_SYMPTOMS_COUNT
+import utils.report.StepHelper.VERIFY_SYMPTOMS_DIALOG
+import utils.report.StepHelper.VERIFY_SYMPTOMS_FEEDBACK
 import utils.report.StepHelper.logApiResponse
 import webView.diagnostics.symptoms.model.SymptomsData
 import webView.diagnostics.symptoms.model.UserSymptomsResponse
 import java.text.NumberFormat
-import java.util.Locale
+import java.util.*
 import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -56,6 +57,7 @@ class ServicePage(page: Page) : BasePage(page) {
     private var serviceData: ServiceResponse? = null
     private var symptomsResponse: SymptomsData? = null
     var isSymptomsEmpty = false
+    var isQuestionerNotTaken = false
     init {
         monitorTraffic()
     }
@@ -477,9 +479,22 @@ class ServicePage(page: Page) : BasePage(page) {
     }
 
 
+    fun  questionerSetupVerification() {
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next")).click()
+        page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Book the consultation")).click()
+        page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("To get started answer a few")).click()
+    }
 
+    fun skipSymptom() {
+        logger.info { "Skip symptom" }
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Skip")).click()
+    }
 
-    fun dialogValidation() {
+    fun scheduleNowBtnClick() {
+        logger.info { "Schedule Now Button click" }
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+    }
+    fun symptomDialogValidation() {
         val title = page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Report Symptoms"))
         val subTitle = page.getByText("Select any symptoms you're")
         val symptomsCount = page.getByText("symptoms selected")
@@ -588,7 +603,6 @@ class ServicePage(page: Page) : BasePage(page) {
         page.getByText("Your questionnaire response")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Close")).click()
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
-        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Report Symptom")).click()
     }
     private fun monitorTraffic() {
         val symptomsList = { response: Response ->

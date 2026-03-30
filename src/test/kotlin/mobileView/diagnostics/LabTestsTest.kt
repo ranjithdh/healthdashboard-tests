@@ -698,7 +698,13 @@ class LabTestsTest : BaseTest() {
                 testSchedulingPage.clickProceed()
             }
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed, sampleType = sampleType)
         
         // Finalize the order automation by calling the workflow API
 
@@ -867,7 +873,13 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed, sampleType = sampleType)
 
         // Finalize the order automation by calling the workflow API
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
@@ -935,6 +947,12 @@ class LabTestsTest : BaseTest() {
             else -> throw RuntimeException("Unknown product type")
         }
 
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
         testSchedulingPage.clickProceed()
         if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
             testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
@@ -973,7 +991,7 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false, sampleType = sampleType)
         // Finalize the order automation by calling the workflow API
         val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"

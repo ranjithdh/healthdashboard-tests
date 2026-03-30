@@ -1,5 +1,6 @@
 package mobileView.diagnostics
 
+import ch.qos.logback.classic.Logger
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Response
@@ -263,9 +264,10 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun verifyTestCard(code: String, name: String, sampleType: String, price: String) {
-//        val image = page.getByTestId("test-card-image-$code")
-//        image.scrollIntoViewIfNeeded()
-//        if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
+        logger.info("Testing the $code card:name: $name, sampleType: $sampleType, price: $price")
+        val image = page.getByTestId("test-card-image-$code")
+        image.scrollIntoViewIfNeeded()
+        if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
 
         val nameElement = page.getByTestId("test-card-name-$code")
         if (!nameElement.isVisible) throw AssertionError("Name not visible for code: $code")

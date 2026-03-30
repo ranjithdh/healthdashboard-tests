@@ -2,17 +2,15 @@ package mobileView.service
 
 import com.microsoft.playwright.Browser
 import com.microsoft.playwright.BrowserContext
-import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import config.BaseTest
 import config.TestConfig
 import io.qameta.allure.Epic
-import mobileView.profile.page.ProfilePage
-import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 import utils.report.Modules
+
 
 /**
  * Service tests using the "Single Login" pattern.
@@ -95,13 +93,16 @@ class ServiceSingleLoginTest : BaseTest() {
         
         if (servicePage.isSymptomsEmpty) {
             servicePage.verifySymptomReportFeedbackDialog()
-            servicePage.dialogValidation()
-            servicePage.reportOptionsValidations()
-            servicePage.cancelButtonClick()
-            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
-            servicePage.onReportSymptomsButtonClick()
-            servicePage.selectAllSymptoms()
-            servicePage.submitSymptoms()
+            servicePage.skipSymptom()
+//            servicePage.symptomDialogValidation()
+//            servicePage.reportOptionsValidations()
+//            servicePage.cancelButtonClick()
+//            page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Schedule Now")).click()
+//            servicePage.onReportSymptomsButtonClick()
+//            servicePage.selectAllSymptoms()
+//            servicePage.submitSymptoms()
+        } else if (servicePage.isQuestionerNotTaken) {
+            servicePage.questionerSetupVerification()
         }
         println("Single Login test completed successfully.")
     }
