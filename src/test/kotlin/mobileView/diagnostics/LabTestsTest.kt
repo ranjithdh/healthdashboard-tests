@@ -37,7 +37,7 @@ class LabTestsTest : BaseTest() {
             .setHasTouch(viewport.hasTouch)
             .setIsMobile(viewport.isMobile)
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
-            .setTimezoneId("Asia/Kolkata")
+//            .setTimezoneId("Asia/Kolkata")
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
