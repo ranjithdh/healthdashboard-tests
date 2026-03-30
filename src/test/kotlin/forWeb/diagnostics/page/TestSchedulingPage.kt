@@ -550,7 +550,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Calcutta")
+                .setHeader("user_timezone", "Asia/Kolkata")
         )
         if (response.status() != 200) {
             throw RuntimeException("Failed to fetch PII data: ${response.status()} ${response.text()}")
