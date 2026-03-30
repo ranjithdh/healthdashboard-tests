@@ -6,6 +6,7 @@ import com.microsoft.playwright.Locator.FilterOptions
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
+import com.microsoft.playwright.options.WaitForSelectorState
 import config.BasePage
 import config.TestConfig
 import mobileView.actionPlan.model.*
@@ -550,7 +551,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         logger.info { "Food validation completed for type: $type" }
     }
 
-    private fun foodToolTipsValidation(
+ /*   private fun foodToolTipsValidation(
         type: String,
         foodList: Map<String?, List<FoodRecommendation>>?
     ) {
@@ -629,6 +630,129 @@ class ActionPlanPage(page: Page) : BasePage(page) {
                 }
             }
         }
+        logger.info { "Completed food tool tips validation: $type" }
+    }*/
+
+
+    private fun foodToolTipsValidation(
+        type: String,
+        foodList: Map<String?, List<FoodRecommendation>>?
+    ) {
+        logger.info { "Started food tool tips validation: $type" }
+
+        foodList?.forEach { (category, recommendation) ->
+            logger.info { "Validating food tool tips under category: $category (count=${recommendation.size})" }
+
+            recommendation.forEach { foodRecommendation ->
+                val food = foodRecommendation.food
+                val impactBiomarkers = foodRecommendation.impact_biomarkers
+                val suggestion = foodRecommendation.suggestion?.trim()?.lowercase()
+
+                val hasVisibleBiomarker = impactBiomarkers?.any { b ->
+                    if (b.category == question && suggestion == "eat") false
+                    else !b.inference.equals(optimal, ignoreCase = true) &&
+                            !b.inference.equals(normal, ignoreCase = true)
+                } ?: false
+
+                if (hasVisibleBiomarker) {
+                    val foodId = food?.food_id
+                    logger.info { "Validating tooltip for food item: id=$foodId" }
+
+                    val foodNameElement = page.getByTestId("food-name-${foodId}")
+                    val toolTip = page.getByTestId("food-tooltip-${foodId}")
+
+                    // ✅ Use JS scrollIntoView with block:'center' — works correctly
+                    //    on nested overflow-auto containers (not just the page scroll)
+                    //    Playwright's scrollIntoViewIfNeeded() only targets page scroll
+                    page.evaluate("""
+                    const el = document.querySelector('[data-testid="food-name-${foodId}"]');
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
+                    }
+                """.trimIndent())
+
+                    // ✅ Wait for scroll to fully settle in the inner container
+                    page.waitForTimeout(500.0)
+
+                    // ✅ Confirm element is stable and interactable
+                    foodNameElement.waitFor(
+                        Locator.WaitForOptions()
+                            .setState(WaitForSelectorState.VISIBLE)
+                            .setTimeout(5000.0)
+                    )
+
+                    // ✅ Click to open tooltip
+                    foodNameElement.click()
+
+                    // ✅ Wait for tooltip visibility
+                    toolTip.waitFor(
+                        Locator.WaitForOptions()
+                            .setState(WaitForSelectorState.VISIBLE)
+                            .setTimeout(5000.0)
+                    )
+
+                    assertTrue(
+                        toolTip.isVisible(),
+                        "Tooltip for food '$foodId' should be visible after click"
+                    )
+
+                    // Validate tooltip content
+                    impactBiomarkers
+                        ?.filter { b ->
+                            if (b.category == question && suggestion == "eat") false
+                            else !b.inference.equals(optimal, ignoreCase = true) &&
+                                    !b.inference.equals(normal, ignoreCase = true)
+                        }
+                        ?.forEachIndexed { index, impactBiomarker ->
+                            if (impactBiomarker.category == question) {
+                                val formattedReason = formatQuestionReason(
+                                    impactBiomarker.inference,
+                                    impactBiomarker.name
+                                )
+                                if (!formattedReason.isNullOrBlank()) {
+                                    val context = if (type == NutritionFoodType.LIMIT.type) {
+                                        "Limit this because"
+                                    } else {
+                                        "Avoid this because"
+                                    }
+                                    val expected = "$context $formattedReason"
+                                    val element = page
+                                        .getByTestId("food-tooltip-reason-$foodId-$index")
+                                        .first()
+
+                                    logger.info { "Tooltip reason — UI: '${element.innerText()}', Expected: '$expected'" }
+                                    assertEquals(
+                                        expected.normalizeForUiCompare(),
+                                        element.innerText().normalizeForUiCompare()
+                                    )
+                                }
+                            } else {
+                                val context = if (type == NutritionFoodType.LIMIT.type) {
+                                    "Limit this because your"
+                                } else {
+                                    "Avoid this because your"
+                                }
+                                val expected =
+                                    "$context ${impactBiomarker.name} is ${impactBiomarker.inference}"
+                                val element = page
+                                    .getByTestId("food-tooltip-biomarker-$foodId-$index")
+                                    .first()
+
+                                logger.info { "Tooltip biomarker — UI: '${element.innerText()}', Expected: '$expected'" }
+                                assertEquals(
+                                    expected.normalizeForUiCompare(),
+                                    element.innerText().normalizeForUiCompare()
+                                )
+                            }
+                        }
+
+                    // ✅ Dismiss tooltip and let animation complete
+                    foodNameElement.click()
+                    page.waitForTimeout(300.0)
+                }
+            }
+        }
+
         logger.info { "Completed food tool tips validation: $type" }
     }
 
@@ -802,6 +926,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             logger.info { "Search validation completed" }
         }
     }
+
 
     private fun validateSearchForType(
         foodRecommendations: List<FoodRecommendation>,
