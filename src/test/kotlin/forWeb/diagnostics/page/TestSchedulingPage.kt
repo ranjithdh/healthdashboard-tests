@@ -75,8 +75,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     private fun formatTime(isoTime: String): String {
         val instant = java.time.Instant.parse(isoTime)
-        val istZone = java.time.ZoneId.of("Asia/Kolkata")
-        val zonedDateTime = instant.atZone(istZone)
+        val systemZone = java.time.ZoneId.systemDefault()
+        val zonedDateTime = instant.atZone(systemZone)
         return zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
@@ -739,7 +739,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 //        Assertions.assertTrue(page.getByText(noteText).isVisible, "Dual slot note should be visible")
 
         // Capture times for summary verification
-        selectedDateSummary = java.time.Instant.parse(fastingSlot.start_time).atZone(java.time.ZoneId.of("Asia/Kolkata")).format(summaryDateFormatter)
+        selectedDateSummary = java.time.Instant.parse(fastingSlot.start_time).atZone(java.time.ZoneId.systemDefault()).format(summaryDateFormatter)
         selectedFastingTimeSummary = formatTime(fastingSlot.start_time!!)
         selectedPostMealTimeSummary = formatTime(postMealSlot.start_time!!)
         
@@ -750,8 +750,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // Parse ISO string and convert to IST (+5:30)
         // Format: 2026-02-06T05:00:00.000Z
         val instant = java.time.Instant.parse(startTimeIso)
-        val istZone = java.time.ZoneId.of("Asia/Kolkata")
-        val zonedDateTime = instant.atZone(istZone)
+        val zonedDateTime = instant.atZone(java.time.ZoneId.systemDefault())
 
         selectedDateSummary = zonedDateTime.format(summaryDateFormatter)
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
