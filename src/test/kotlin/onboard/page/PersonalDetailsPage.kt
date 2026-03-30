@@ -23,13 +23,13 @@ class PersonalDetailsPage(page: Page) : BasePage(page) {
     override val pageUrl = "/onboard"
 
     private val dateOfBirthLabel = byText("Date of Birth")
-    private val genderInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender"))
+    private val genderInput = byRole(AriaRole.COMBOBOX, Page.GetByRoleOptions().setName("Gender*"))
     private val heightInput = byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Height (cm)"))
     private val weightInput = byRole(AriaRole.SPINBUTTON, Page.GetByRoleOptions().setName("Weight (kg)"))
     private val continueButton = byRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue"))
 
     fun selectDateOfBirth(month: String, year: String, day: String): PersonalDetailsPage {
-        StepHelper.step(SELECT_DOB + month + "/" + day + "/" + year)
+        StepHelper.step("$SELECT_DOB$month/$day/$year")
         logger.info { "selectDateOfBirth($month/$day/$year)" }
         dateOfBirthLabel.click()
         page.getByLabel("Month:").selectOption(month)

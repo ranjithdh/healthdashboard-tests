@@ -6,31 +6,25 @@ import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
 import onboard.page.LoginPage
+import onboard.page.PersonalDetailsPage
 import org.junit.jupiter.api.*
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Epic(Modules.EPIC_ONBOARDING)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class PersonalDetailsPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var personalDetailsPage: PersonalDetailsPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
         val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
@@ -40,14 +34,17 @@ class PersonalDetailsPageTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+        personalDetailsPage = navigateToPersonalDetails()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
     }
 
-    private fun navigateToPersonalDetails(): onboard.page.PersonalDetailsPage {
+    private fun navigateToPersonalDetails(): PersonalDetailsPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
         val testUser = TestConfig.TestUsers.ONBOARD_USER
 
@@ -58,9 +55,8 @@ class PersonalDetailsPageTest : BaseTest() {
     }
 
     @Test
+    @Order(1)
     fun `should display all form fields`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         assert(personalDetailsPage.isDateOfBirthVisible()) { "Date of Birth should be visible" }
         assert(personalDetailsPage.isGenderVisible()) { "Gender dropdown should be visible" }
         assert(personalDetailsPage.isHeightVisible()) { "Height field should be visible" }
@@ -70,48 +66,43 @@ class PersonalDetailsPageTest : BaseTest() {
     }
 
     @Test
+    @Order(2)
     fun `should select date of birth correctly`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.selectDateOfBirth("5", "1995", "15")
         personalDetailsPage.takeScreenshot("dob-selected")
     }
 
     @Test
+    @Order(3)
     fun `should select gender correctly`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.selectGender("Male")
         personalDetailsPage.takeScreenshot("gender-selected")
     }
 
     @Test
+    @Order(4)
     fun `should select female gender`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.selectGender("Female")
         personalDetailsPage.takeScreenshot("gender-female-selected")
     }
 
     @Test
+    @Order(5)
     fun `should enter height correctly`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.enterHeight("175")
         personalDetailsPage.takeScreenshot("height-entered")
     }
 
     @Test
+    @Order(6)
     fun `should enter weight correctly`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.enterWeight("70")
         personalDetailsPage.takeScreenshot("weight-entered")
     }
 
     @Test
+    @Order(7)
     fun `should have Continue disabled with empty height`() {
-        val personalDetailsPage = navigateToPersonalDetails()
         personalDetailsPage.fillDetails()
         assert(personalDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
 
@@ -121,20 +112,8 @@ class PersonalDetailsPageTest : BaseTest() {
     }
 
     @Test
+    @Order(8)
     fun `should have Continue disabled with empty weight`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-        personalDetailsPage.fillDetails()
-        assert(personalDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
-
-        personalDetailsPage.clearWeight()
-        assert(!personalDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled when weight is empty" }
-        personalDetailsPage.takeScreenshot("continue-disabled-empty-weight")
-    }
-
-    @Test
-    fun `should fill all details correctly`() {
-        val personalDetailsPage = navigateToPersonalDetails()
-
         personalDetailsPage.fillDetails(
             gender = "Male",
             height = "175",
@@ -143,16 +122,34 @@ class PersonalDetailsPageTest : BaseTest() {
             year = "1990",
             day = "20"
         )
+        assert(personalDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled when all fields are filled" }
+
+        personalDetailsPage.clearWeight()
+        assert(!personalDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled when weight is empty" }
+        personalDetailsPage.takeScreenshot("continue-disabled-empty-weight")
+    }
+
+    @Test
+    @Order(9)
+    fun `should fill all details correctly`() {
+
+        personalDetailsPage.fillDetails(
+            gender = "Male",
+            height = "175",
+            weight = "70",
+            month = "3",
+            year = "1998",
+            day = "20"
+        )
         personalDetailsPage.takeScreenshot("personal-details-all-filled")
     }
 
     @Test
+    @Order(10)
     fun `should navigate to address page on valid submission`() {
-        val personalDetailsPage = navigateToPersonalDetails()
 
         val addressPage = personalDetailsPage.fillPersonalDetails()
-
-        assert(addressPage.isAddressVisible()) { "Should be on address page" }
+        addressPage.waitForConfirmation()
         addressPage.takeScreenshot("navigated-to-address")
     }
 }

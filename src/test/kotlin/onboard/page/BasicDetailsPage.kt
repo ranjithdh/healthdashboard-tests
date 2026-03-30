@@ -74,7 +74,7 @@ class BasicDetailsPage(page: Page) : BasePage(page) {
 
     fun fillBasicDetails(): PersonalDetailsPage {
         StepHelper.step(FILL_BASIC_DETAILS_CONTINUE)
-        val testUser: TestUser = TestConfig.TestUsers.NEW_USER
+        val testUser: TestUser = TestConfig.TestUsers.ONBOARD_USER
         
         logger.info { "fillBasicDetails()" }
         fillDetails(testUser.firstName, testUser.email)

@@ -5,6 +5,7 @@ import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
+import onboard.page.BasicDetailsPage
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
@@ -16,21 +17,13 @@ class BasicDetailsPageTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var basicDetailsPage: BasicDetailsPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
         val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
@@ -40,12 +33,17 @@ class BasicDetailsPageTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+
+        basicDetailsPage = navigateToBasicDetailsPage()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
     }
+
 
     private fun navigateToBasicDetailsPage(): onboard.page.BasicDetailsPage {
         val loginPage = LoginPage(page).navigate() as LoginPage
@@ -58,7 +56,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should display all form fields`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
 
         assert(basicDetailsPage.isFirstNameVisible()) { "First name field should be visible" }
         assert(basicDetailsPage.isEmailVisible()) { "Email field should be visible" }
@@ -70,7 +67,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should fill first name correctly`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
 
         basicDetailsPage.enterFirstName("DH")
 //        assert(!basicDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
@@ -78,17 +74,9 @@ class BasicDetailsPageTest : BaseTest() {
         basicDetailsPage.takeScreenshot("first-name-filled")
     }
 
-    @Test
-    fun `should fill last name correctly`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
-        basicDetailsPage.takeScreenshot("last-name-filled")
-    }
 
     @Test
     fun `should fill email correctly`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
         basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
 //        assert(!basicDetailsPage.isContinueButtonEnabled()) { "Continue should be disabled with empty fields" }
 
@@ -97,8 +85,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should fill all details correctly`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
         basicDetailsPage.fillDetails("John", "john.doe@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
 
@@ -107,8 +93,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should have Continue disabled with empty firstName`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
         basicDetailsPage.enterFirstName("DH")
         basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
@@ -121,8 +105,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should have Continue disabled with empty email`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
         basicDetailsPage.enterFirstName("DH")
         basicDetailsPage.enterEmail("dhdashboard.dh@test.com")
         assert(basicDetailsPage.isContinueButtonEnabled()) { "Continue should be enabled with all fields are filled" }
@@ -135,8 +117,6 @@ class BasicDetailsPageTest : BaseTest() {
 
     @Test
     fun `should navigate to personal details on valid submission`() {
-        val basicDetailsPage = navigateToBasicDetailsPage()
-
         val personalDetailsPage = basicDetailsPage
             .fillBasicDetails()
 

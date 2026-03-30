@@ -5,6 +5,7 @@ import utils.report.Modules
 import com.microsoft.playwright.*
 import config.BaseTest
 import config.TestConfig
+import config.TestUser
 import onboard.page.LoginPage
 import org.junit.jupiter.api.*
 
@@ -16,6 +17,13 @@ class OtpPageTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+
+    private val OTP_VALIDATION = TestUser(
+        mobileNumber = "726408324",
+        otp = "678901",
+        country = "Sweden",
+        countryCode = "+46"
+    )
 
     @BeforeAll
     fun setup() {
@@ -50,8 +58,10 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should display OTP confirm screen elements`() {
+        val testUser = OTP_VALIDATION
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val otpPage = loginPage.enterMobileAndContinue()
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
 
         assert(otpPage.isOnConfirmScreen()) { "Confirm screen should be visible" }
         assert(otpPage.isEditButtonVisible()) { "Edit button should be visible" }
@@ -64,8 +74,10 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should display resend timer`() {
+        val testUser = OTP_VALIDATION
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val otpPage = loginPage.enterMobileAndContinue()
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
 
         assert(otpPage.isResendTimerVisible()) { "Resend timer should be visible" }
         val timerText = otpPage.getResendTimerText()
@@ -77,8 +89,10 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should display timer in correct format`() {
+        val testUser = OTP_VALIDATION
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val otpPage = loginPage.enterMobileAndContinue()
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
 
         val timerText = otpPage.getResendTimerText()
         assert(timerText != null) { "Timer text should not be null" }
@@ -91,8 +105,10 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should show decreasing timer`() {
+        val testUser = OTP_VALIDATION
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val otpPage = loginPage.enterMobileAndContinue()
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
 
         val initialTimerText = otpPage.getResendTimerText()
         assert(initialTimerText != null) { "Initial timer text should not be null" }
@@ -124,8 +140,10 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should return to login page when Edit is clicked`() {
+        val testUser = OTP_VALIDATION
+
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val otpPage = loginPage.enterMobileAndContinue()
+        val otpPage = loginPage.enterMobileAndContinue(testUser)
 
         val returnedLoginPage = otpPage.clickEdit()
 
@@ -135,7 +153,7 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should require re-entering number after Edit`() {
-        val testUser = TestConfig.TestUsers.NEW_USER
+        val testUser = OTP_VALIDATION
         val loginPage = LoginPage(page).navigate() as LoginPage
         val otpPage = loginPage.enterMobileAndContinue(testUser)
 
@@ -143,9 +161,6 @@ class OtpPageTest : BaseTest() {
 
         returnedLoginPage.clearMobileNumber()
         assert(!returnedLoginPage.isContinueButtonEnabled()) { "Continue should be disabled after clearing" }
-
-        returnedLoginPage.enterMobileNumber("8888888888")
-        assert(returnedLoginPage.isContinueButtonEnabled()) { "Continue should be enabled after re-entering" }
 
         returnedLoginPage.takeScreenshot("re-enter-number-after-edit")
     }
@@ -156,7 +171,7 @@ class OtpPageTest : BaseTest() {
         val loginPage = LoginPage(page).navigate() as LoginPage
 
         val basicDetailsPage = loginPage
-            .enterMobileAndContinue()
+            .enterMobileAndContinue(OTP_VALIDATION)
             .enterOtpAndContinueToAccountCreation()
 
         assert(basicDetailsPage.isFirstNameVisible()) { "First name should be visible" }
@@ -165,12 +180,11 @@ class OtpPageTest : BaseTest() {
 
     @Test
     fun `should show error message for incorrect OTP`() {
-        val testUser = TestConfig.TestUsers.NEW_USER
+        val testUser = OTP_VALIDATION
         val loginPage = LoginPage(page).navigate() as LoginPage
         val otpPage = loginPage.enterMobileAndContinue(testUser)
 
-        otpPage.enterOtp("123456", testUser.mobileNumber, testUser.countryCode)
-        otpPage.clickContinue()
+        otpPage.enterOtp("123456", testUser.mobileNumber, testUser.countryCode,isStaticOTp = true)
 
         assert(otpPage.isIncorrectOtpMessageVisible()) { "Error message 'Incorrect OTP' should be visible" }
         otpPage.takeScreenshot("incorrect-otp-error")

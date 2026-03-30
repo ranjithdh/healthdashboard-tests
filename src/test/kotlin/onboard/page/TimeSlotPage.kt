@@ -341,15 +341,25 @@ class TimeSlotPage(page: Page) : BasePage(page) {
         return this
     }
 
-    fun selectCalendarDate(day: String): TimeSlotPage {
+    fun selectCalendarDate(day: String, useIndex: Boolean = false): TimeSlotPage {
         StepHelper.step(SELECT_CALENDAR_DATE + day)
         logger.info { "selectCalendarDate($day)" }
-        byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day)).first().click()
+        if (useIndex) {
+            byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day).setExact(true)).nth(1).click()
+        }else{
+            byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day).setExact(true)).first().click()
+        }
         return this
     }
 
-    fun isCalendarDateEnabled(day: String): Boolean {
-        return byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day)).first().isEnabled
+    fun isCalendarDateEnabled(day: String, useIndex: Boolean = false): Boolean {
+        return if (useIndex) {
+            logger.info { "useIndex.....isCalendarDateEnabled($day)" }
+            byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day).setExact(true)).nth(1).isEnabled
+        }else{
+            logger.info { "isCalendarDateEnabled($day)" }
+            byRole(AriaRole.GRIDCELL, Page.GetByRoleOptions().setName(day).setExact(true)).first().isEnabled
+        }
     }
 
     fun isSelectedDateTextVisible(dateText: String): Boolean {

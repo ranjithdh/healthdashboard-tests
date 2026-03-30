@@ -148,14 +148,18 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
 
-    fun enterOtp(otp: String, mobileNumber: String, countryCode: String): OtpPage {
+    fun enterOtp(otp: String, mobileNumber: String, countryCode: String,isStaticOTp: Boolean = false): OtpPage {
         StepHelper.step(ENTER_OTP + otp)
         this.mobileNumber = mobileNumber
         this.countryCode = countryCode
         requestOtp()
         logger.info { "enterOtp($otp)" }
 
-        byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        if (isStaticOTp) {
+            byRole(AriaRole.TEXTBOX).fill(otp)
+        }else{
+            byRole(AriaRole.TEXTBOX).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
+        }
 
         //for flipboard url
 //        page.getByRole(AriaRole.TEXTBOX).nth(1).fill(fetchedOtp ?: TestConfig.STATIC_OTP)
@@ -302,6 +306,7 @@ class OtpPage(page: Page) : BasePage(page) {
     }
 
     fun isIncorrectOtpMessageVisible(): Boolean {
+        page.getByText("Incorrect OTP").waitFor()
         return page.getByText("Incorrect OTP").isVisible
     }
 

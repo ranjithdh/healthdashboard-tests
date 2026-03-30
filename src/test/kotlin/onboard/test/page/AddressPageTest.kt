@@ -158,7 +158,7 @@ class AddressPageTest : BaseTest() {
     @Order(11)
     fun `should navigate to time slot page on valid submission`() {
 
-        val timeSlotPage = addressPage.fillAddressDetails(TestConfig.TestUsers.NEW_USER)
+        val timeSlotPage = addressPage.fillAddressDetails(TestConfig.TestUsers.ONBOARD_USER)
 
         timeSlotPage.waitForConfirmation()
 

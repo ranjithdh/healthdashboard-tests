@@ -188,7 +188,7 @@ object TestConfig {
 
         //using this only for onboard validation test
         val ONBOARD_USER = TestUser(
-            mobileNumber = "4573998650",
+            mobileNumber = "726408324",
             otp = System.getenv("TEST_USER_OTP") ?: "",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
@@ -204,7 +204,7 @@ object TestConfig {
             state = "TamilNadu",
             pinCode = "641005",
             country = "Finland",
-            countryCode = "+358"
+            countryCode = "+46"
         )
 
     }

@@ -18,21 +18,13 @@ class TimeSlotPageTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
+    private lateinit var timeSlotPage: TimeSlotPage
 
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
-    }
 
-    @AfterAll
-    fun tearDown() {
-        browser.close()
-        playwright.close()
-    }
-
-    @BeforeEach
-    fun createContext() {
         val viewport = TestConfig.Viewports.ANDROID
         val contextOptions = Browser.NewContextOptions()
             .setViewportSize(viewport.width, viewport.height)
@@ -42,11 +34,15 @@ class TimeSlotPageTest : BaseTest() {
 
         context = browser.newContext(contextOptions)
         page = context.newPage()
+
+        timeSlotPage = navigateToTimeSlotPage()
     }
 
-    @AfterEach
-    fun closeContext() {
+    @AfterAll
+    fun tearDown() {
         context.close()
+        browser.close()
+        playwright.close()
     }
 
     private fun navigateToTimeSlotPage(): TimeSlotPage {
@@ -63,8 +59,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should display available time slots`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-
         assert(timeSlotPage.hasAvailableSlots()) { "Should have available slots" }
         timeSlotPage.takeScreenshot("time-slots-available")
     }
@@ -72,15 +66,12 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should select morning slot successfully`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-
         timeSlotPage.selectMorningSlot()
         timeSlotPage.takeScreenshot("morning-slot-selected")
     }
 
     @Test
     fun `should select post meal slot successfully`() {
-        val timeSlotPage = navigateToTimeSlotPage()
         timeSlotPage.selectMorningSlot()
         timeSlotPage.selectPostMealSlot()
         timeSlotPage.takeScreenshot("post-meal-slot-selected")
@@ -88,8 +79,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should select multiple slots`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-
         timeSlotPage
             .selectMorningSlot()
             .selectPostMealSlot()
@@ -123,7 +112,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should verify post meal slots match api data`() {
-        val timeSlotPage = navigateToTimeSlotPage()
         val selectedSlotLabel = timeSlotPage.selectFirstAvailableFastingSlot()
         
         val expectedPostMealSlots = timeSlotPage.getExpectedPostMealSlots(selectedSlotLabel)
@@ -141,8 +129,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should verify slot duration is 30 minutes`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-        
         assert(timeSlotPage.validateFastingSlotDurations(30)) { 
             "Not all valid fasting slots (<= 11:30 AM) have a 30-minute duration" 
         }
@@ -152,8 +138,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should verify date selection and limits in date picker dialog`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-        
         timeSlotPage.openDatePicker()
         
         val today = java.time.LocalDate.now()
@@ -161,8 +145,9 @@ class TimeSlotPageTest : BaseTest() {
         for (i in 1..7) {
             val date = today.plusDays(i.toLong())
             val dayString = date.dayOfMonth.toString()
+            val useIndex = dayString == "1" || dayString == "2"
             logger.info("Checking enabled status for day: $dayString")
-            assert(timeSlotPage.isCalendarDateEnabled(dayString)) { "Date $dayString should be enabled" }
+            assert(timeSlotPage.isCalendarDateEnabled(dayString, useIndex)) { "Date $dayString should be enabled" }
         }
         
         val targetDate = today.plusDays(2)
@@ -170,8 +155,8 @@ class TimeSlotPageTest : BaseTest() {
         val expectedText = utils.DateHelper.formatDateWithOrdinal(targetDate)
         
         logger.info("Selecting date: $targetDayStr, expecting text: $expectedText")
-        
-        timeSlotPage.selectCalendarDate(targetDayStr)
+        val useIndex = targetDayStr == "1" || targetDayStr == "2"
+        timeSlotPage.selectCalendarDate(targetDayStr, useIndex)
         
         assert(timeSlotPage.isSelectedDateTextVisible(expectedText)) {
             "Selected date text '$expectedText' not visible" 
@@ -182,9 +167,6 @@ class TimeSlotPageTest : BaseTest() {
 
     @Test
     fun `should verify date selection and limits`() {
-        val timeSlotPage = navigateToTimeSlotPage()
-
-
         val today = java.time.LocalDate.now()
 
         for (i in 1..7) {
