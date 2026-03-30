@@ -18,9 +18,10 @@ import model.profile.ProfileDetailResponse
 import model.slot.SlotList
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import utils.LogFullApiCall.logFullApiCall
 import java.time.Period
 import java.time.ZonedDateTime
-import utils.LogFullApiCall.logFullApiCall
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -306,7 +307,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         
         if (response.status() != 200) {
@@ -545,12 +546,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     private fun getLeadId(): String {
         val url = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val timeZone = java.util.TimeZone.getDefault().id
         val response = page.request().get(
             url,
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Calcutta")
+                .setHeader("user_timezone", refactorTimeZone(timeZone))
         )
         if (response.status() != 200) {
             throw RuntimeException("Failed to fetch PII data: ${response.status()} ${response.text()}")
@@ -578,7 +580,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
                 .setHeader("Content-Type", "application/json")
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
                 .setData(payload)
         )
 
@@ -1019,7 +1021,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         if (response.status() != 200) {
             throw RuntimeException("Failed to fetch profile list: ${response.status()} ${response.text()}")
@@ -1040,7 +1042,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
 
         if (response.status() != 200) {
@@ -1085,7 +1087,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
 
         if (response.status() != 200) {
