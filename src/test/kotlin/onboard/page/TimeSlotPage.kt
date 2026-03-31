@@ -94,6 +94,8 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     fun selectMorningSlot(): TimeSlotPage {
         StepHelper.step(SELECT_MORNING_SLOT)
         val availableSlots = getAvailableFastingSlots()
+        logger.info { "availableMorningSlots: $availableSlots" }
+
         if (availableSlots.isNotEmpty()) {
             val slotName = availableSlots[0]
             logger.info { "selectMorningSlot: $slotName" }
@@ -265,6 +267,9 @@ class TimeSlotPage(page: Page) : BasePage(page) {
     }
 
     fun getAvailableFastingSlots(): List<String> {
+
+        logger.info { "getAvailableFastingSlots: ${slotData.slots}" }
+
         return slotData.slots?.filter { it.is_available == true }
             ?.map { formatSlotLabel(it.start_time!!, it.end_time!!) }
             ?: emptyList()
