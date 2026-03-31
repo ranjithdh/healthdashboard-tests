@@ -1159,7 +1159,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         healthMetricsEdit.waitFor()
 
         val bmi = calculateBMIValues(height.toFloat(), weight.toFloat())
-        val bmiStatus = bmiCategoryValues(bmi.toFloat())
+        val bmiStatus = bmiCategoryValues(bmi.toDouble())
 
         page.getByText("Height (cm):").waitFor()
         page.getByText("Weight (kg):").waitFor()
@@ -4632,7 +4632,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             QuestionSubType.METAL_WORRY,
             "Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?",
             "Several days",
-            shouldClickComplete
+            shouldClickComplete,
+            isLastQuestione = true,
+            completeButton = completeButton
         )
     }
 
@@ -6030,9 +6032,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val storedAnswer = answersStored[QuestionSubType.WAIST_CIRCUMFERENCE]?.answer as? String
         checkTextInput(storedAnswer, waistTextBox)
-       /* if (shouldClickComplete) {
-            completeButton.click()
-        }*/
+        /*   if (shouldClickComplete) {
+               completeButton.click()
+           }*/
     }
 
 
@@ -6132,6 +6134,7 @@ class ProfilePage(page: Page) : BasePage(page) {
     private fun question_56_checker(index: Int) {
         if (answersStored[QuestionSubType.METAL_WORRY] == null) return
         logQuestion("Checking: Cancer Status")
+        val completeButton = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Complete"))
         page.getByRole(AriaRole.PARAGRAPH).filter(FilterOptions().setHasText("Over the last 2 weeks, how")).waitFor()
 
         listOf("Not at all", "Several days", "More than half the days", "Nearly every day")
@@ -6158,6 +6161,9 @@ class ProfilePage(page: Page) : BasePage(page) {
         (options.values + questionerCount).forEach { it.waitFor() }
         assertProgressCount(index)
         checkSingleSelect(answersStored[QuestionSubType.METAL_WORRY]?.answer as? String, options)
+        if (shouldClickComplete) {
+            completeButton.click()
+        }
     }
 
     // --- Checker Helpers ---
@@ -6519,13 +6525,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         subType: String,
         question: String,
         answerLabel: String,
-        shouldClickComplete: Boolean
+        shouldClickComplete: Boolean,
+        isLastQuestione: Boolean = false,
+        completeButton: Locator? = null
     ) {
         StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabel)
         logAnswer(subType, question, answerLabel)
         if (shouldClickComplete) {
             if (!isButtonChecked(option)) {
                 option.click()
+            } else if (isLastQuestione && completeButton != null) {
+                completeButton?.click()
             }
         }
     }
