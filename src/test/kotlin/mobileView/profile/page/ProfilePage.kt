@@ -1159,7 +1159,7 @@ class ProfilePage(page: Page) : BasePage(page) {
         healthMetricsEdit.waitFor()
 
         val bmi = calculateBMIValues(height.toFloat(), weight.toFloat())
-        val bmiStatus = bmiCategoryValues(bmi.toFloat())
+        val bmiStatus = bmiCategoryValues(bmi.toDouble())
 
         page.getByText("Height (cm):").waitFor()
         page.getByText("Weight (kg):").waitFor()
