@@ -529,7 +529,6 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             if (avoidList.isNotEmpty()) {
                 foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
             }
-            page.getByRole(AriaRole.BUTTON).nth(1).click() //TODO need remove it
         }
     }
 

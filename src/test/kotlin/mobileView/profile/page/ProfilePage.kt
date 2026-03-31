@@ -4632,7 +4632,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             QuestionSubType.METAL_WORRY,
             "Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?",
             "Several days",
-            shouldClickComplete
+            shouldClickComplete,
+            isLastQuestione = true,
+            completeButton = completeButton
         )
     }
 
@@ -6030,9 +6032,9 @@ class ProfilePage(page: Page) : BasePage(page) {
 
         val storedAnswer = answersStored[QuestionSubType.WAIST_CIRCUMFERENCE]?.answer as? String
         checkTextInput(storedAnswer, waistTextBox)
-     /*   if (shouldClickComplete) {
-            completeButton.click()
-        }*/
+        /*   if (shouldClickComplete) {
+               completeButton.click()
+           }*/
     }
 
 
@@ -6523,13 +6525,17 @@ class ProfilePage(page: Page) : BasePage(page) {
         subType: String,
         question: String,
         answerLabel: String,
-        shouldClickComplete: Boolean
+        shouldClickComplete: Boolean,
+        isLastQuestione: Boolean = false,
+        completeButton: Locator? = null
     ) {
         StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabel)
         logAnswer(subType, question, answerLabel)
         if (shouldClickComplete) {
             if (!isButtonChecked(option)) {
                 option.click()
+            } else if (isLastQuestione && completeButton != null) {
+                completeButton?.click()
             }
         }
     }
