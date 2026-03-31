@@ -189,7 +189,7 @@ object TestConfig {
         //using this only for onboard validation test
         val ONBOARD_USER = TestUser(
             mobileNumber = "726408324",
-            otp = System.getenv("TEST_USER_OTP") ?: "",
+            otp ="678901",
             firstName = "ranjith",
             email = "ranjithkumar.m@mysmitch.com",
             gender = "Male",
