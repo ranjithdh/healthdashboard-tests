@@ -1,5 +1,6 @@
 package utils
 
+import utils.logger.logger
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -14,6 +15,7 @@ object DateHelper {
             val serverFormatter = DateTimeFormatter.ofPattern(SERVER_FORMAT)
             val utcDate = LocalDateTime.parse(utcTime, serverFormatter)
             val utcTimeStamp = ZonedDateTime.of(utcDate, ZoneId.of("UTC"))
+            logger.info { "TimeZone Default: ${ZoneId.systemDefault()}" }
             utcTimeStamp.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
         } else {
             LocalDateTime.now()

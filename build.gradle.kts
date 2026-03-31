@@ -61,6 +61,9 @@ tasks.withType<Test> {
     // Parallel execution
     systemProperty("junit.jupiter.execution.parallel.enabled", "true")
     systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+    
+    // Ensure both JVM and spawned Playwright browsers use IST natively for accurate slot labels
+    environment("TZ", "Asia/Kolkata")
 
     testLogging {
         events("passed", "skipped", "failed")
