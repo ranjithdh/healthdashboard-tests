@@ -254,6 +254,11 @@ class LabTestsPage(page: Page) : BasePage(page) {
 
     fun verifyTestCard(code: String) {
         val image = page.getByTestId("test-card-image-$code")
+        try {
+            image.waitFor(Locator.WaitForOptions().setTimeout(15000.0))
+        } catch (e: Exception) {
+            throw AssertionError("Image element not found within 15s for code: $code. ${e.message}")
+        }
         image.scrollIntoViewIfNeeded()
         if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
 
@@ -268,6 +273,11 @@ class LabTestsPage(page: Page) : BasePage(page) {
     fun verifyTestCard(code: String, name: String, sampleType: String, price: String) {
         logger.info("Testing the $code card:name: $name, sampleType: $sampleType, price: $price")
         val image = page.getByTestId("test-card-image-$code")
+        try {
+            image.waitFor(Locator.WaitForOptions().setTimeout(15000.0))
+        } catch (e: Exception) {
+            throw AssertionError("Image element not found within 15s for code: $code. ${e.message}")
+        }
         image.scrollIntoViewIfNeeded()
         if (!image.isVisible) throw AssertionError("Image not visible for code: $code")
 
@@ -393,7 +403,10 @@ class LabTestsPage(page: Page) : BasePage(page) {
     }
 
     fun isTestCardVisible(code: String): Boolean {
-        // Check if the card is visible by looking for the image element which is unique per card
-        return page.getByTestId("test-card-image-$code").isVisible
+        return try {
+            page.getByTestId("test-card-image-$code").isVisible
+        } catch (e: Exception) {
+            false
+        }
     }
 }
