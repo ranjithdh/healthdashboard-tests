@@ -580,7 +580,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
                 .setHeader("Content-Type", "application/json")
-                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
+//                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
+                .setHeader("user_timezone","Asia/Kolkata")
                 .setData(payload)
         )
 
