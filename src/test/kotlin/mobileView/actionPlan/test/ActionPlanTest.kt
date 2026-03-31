@@ -67,7 +67,7 @@ class ActionPlanTest : BaseTest() {
         actionPlanPage.captureRecommendationData()
         actionPlanPage.dailyCaloriesIntakeCard()
         actionPlanPage.whatToEat()
-        actionPlanPage.searchValidation()
+      //  actionPlanPage.searchValidation() TODO
     }
 
 

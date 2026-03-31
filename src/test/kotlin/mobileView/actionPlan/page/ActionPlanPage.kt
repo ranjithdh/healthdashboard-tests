@@ -529,10 +529,13 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             if (avoidList.isNotEmpty()) {
                 foodValidation(type = NutritionFoodType.AVOID.type, avoidList)
             }
+            page.getByRole(AriaRole.BUTTON).nth(1).click() //TODO need remove it
         }
     }
 
-    private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
+/*  TODO
+
+     private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
         val parentId = when (type) {
             NutritionFoodType.EAT.type -> "food-suggestion-section-eat"
             NutritionFoodType.LIMIT.type -> "food-suggestion-section-limit"
@@ -549,9 +552,10 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
 
         logger.info { "Food validation completed for type: $type" }
-    }
+    }*/
 
- /*   private fun foodToolTipsValidation(
+ /*   TODO
+ private fun foodToolTipsValidation(
         type: String,
         foodList: Map<String?, List<FoodRecommendation>>?
     ) {
@@ -872,7 +876,8 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun searchValidation() {
+ /* TODO
+ fun searchValidation() {
         val foodRecommendations = recommendationData?.food_recommendations
 
         foodRecommendations?.let {
@@ -925,10 +930,11 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             page.getByRole(AriaRole.BUTTON).nth(1).click()
             logger.info { "Search validation completed" }
         }
-    }
+    }*/
 
 
-    private fun validateSearchForType(
+ /*  TODO
+ private fun validateSearchForType(
         foodRecommendations: List<FoodRecommendation>,
         type: String,
         searchBox: Locator
@@ -967,7 +973,7 @@ class ActionPlanPage(page: Page) : BasePage(page) {
         foodValidation(type = type, foodList = tempMap)
 
         logger.info { "Search validation passed for type=$type" }
-    }
+    }*/
 
 
     /**-----------------Activity-----------------------*/
@@ -2270,5 +2276,154 @@ class ActionPlanPage(page: Page) : BasePage(page) {
             byTestId("download-report-button")
         }
         return download
+    }
+
+    fun searchValidation() {
+        val foodRecommendations = recommendationData?.food_recommendations
+
+        foodRecommendations?.let {
+
+            StepHelper.step(VALIDATING_SEARCH_FOOD_ITEMS)
+            logger.info { "Starting search validation" }
+
+            val searchBox = page.getByRole(
+                AriaRole.TEXTBOX,
+                Page.GetByRoleOptions().setName("Search food item")
+            )
+
+            // ✅ Reset scroll container to top before starting search validation
+            // This counters the scroll position left over from tooltip validation
+            page.evaluate("""
+            const scrollContainer = document.querySelector('.hide-scrollbar');
+            if (scrollContainer) scrollContainer.scrollTop = 0;
+        """.trimIndent())
+            page.waitForTimeout(300.0)
+
+            // First search with junk value to validate empty state
+            searchBox.fill("abcd123")
+            page.waitForTimeout(300.0)
+
+            val titleAvoid = page.getByTestId("food-suggestion-section-avoid")
+                .getByTestId("food-suggestion-title")
+            val titleLimit = page.getByTestId("food-suggestion-section-limit")
+                .getByTestId("food-suggestion-title")
+            val titleEat = page.getByTestId("food-suggestion-section-eat")
+                .getByTestId("food-suggestion-title")
+
+            val emptyEat = page.getByText("No foods found in Eat")
+            val emptyLimit = page.getByText("No foods found in Limit")
+            val emptyAvoid = page.getByText("No foods found in Avoid")
+
+            val foodSectionLocators = listOf(
+                searchBox,
+                emptyEat,
+                emptyLimit,
+                emptyAvoid,
+                titleAvoid,
+                titleLimit,
+                titleEat
+            )
+
+            foodSectionLocators.forEach { it.waitFor() }
+            logger.info { "Empty state validated successfully" }
+
+            if (foodRecommendations.isEmpty()) {
+                logger.warn { "No food recommendations available" }
+                return
+            }
+
+            validateSearchForType(foodRecommendations, NutritionFoodType.EAT.type, searchBox)
+            validateSearchForType(foodRecommendations, NutritionFoodType.LIMIT.type, searchBox)
+            validateSearchForType(foodRecommendations, NutritionFoodType.AVOID.type, searchBox)
+
+            page.getByRole(AriaRole.BUTTON).nth(1).click()
+            logger.info { "Search validation completed" }
+        }
+    }
+
+    private fun validateSearchForType(
+        foodRecommendations: List<FoodRecommendation>,
+        type: String,
+        searchBox: Locator
+    ) {
+        val filteredList = foodRecommendations
+            .filter { it.suggestion.equals(type, ignoreCase = true) }
+            .groupBy { it.food?.category }
+
+        if (filteredList.isEmpty()) {
+            logger.warn { "No food items found for type=$type" }
+            return
+        }
+
+        val singleItem = filteredList.entries.firstOrNull()
+        if (singleItem == null || singleItem.value.isEmpty()) {
+            logger.warn { "No valid category/item found for type=$type" }
+            return
+        }
+
+        val singleValue = singleItem.value.firstOrNull()
+        if (singleValue?.food?.name.isNullOrBlank()) {
+            logger.warn { "Food name is null/blank for type=$type" }
+            return
+        }
+
+        val foodName = singleValue?.food?.name
+        val foodId = singleValue?.food?.food_id
+
+        StepHelper.step("${SEARCH_FOOD_ITEM}: $foodName")
+        logger.info {
+            "Validating search for type=$type, category=${singleItem.key}, food=$foodName"
+        }
+
+        // ✅ Step 1: Reset scroll container to top before each search
+        //    so the filtered single result is always in view
+        page.evaluate("""
+        const scrollContainer = document.querySelector('.hide-scrollbar');
+        if (scrollContainer) scrollContainer.scrollTop = 0;
+    """.trimIndent())
+        page.waitForTimeout(200.0)
+
+        // ✅ Step 2: Fill search — triggers re-render with filtered results
+        searchBox.fill(foodName)
+
+        // ✅ Step 3: Wait for the specific food item to appear in the DOM
+        //    Don't rely on generic timeouts — wait for the exact element
+        val foodElement = page.getByTestId("food-name-${foodId}")
+        foodElement.waitFor(
+            Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE)
+                .setTimeout(5000.0)
+        )
+
+        // ✅ Step 4: JS scroll to bring it into the inner container's viewport
+        page.evaluate("""
+        const el = document.querySelector('[data-testid="food-name-${foodId}"]');
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
+    """.trimIndent())
+        page.waitForTimeout(300.0)
+
+        val tempMap = mapOf(singleItem.key to listOf(singleValue!!))
+        foodValidation(type = type, foodList = tempMap)
+
+        logger.info { "Search validation passed for type=$type" }
+    }
+
+    private fun foodValidation(type: String, foodList: Map<String?, List<FoodRecommendation>>?) {
+        val parentId = when (type) {
+            NutritionFoodType.EAT.type -> "food-suggestion-section-eat"
+            NutritionFoodType.LIMIT.type -> "food-suggestion-section-limit"
+            else -> "food-suggestion-section-avoid"
+        }
+
+        logger.info { "Validating food section: $type (parentId=$parentId)" }
+
+        categoryValidation(parentId, type, foodList)
+        foodNameValidation(type, foodList)
+
+        if (type == NutritionFoodType.LIMIT.type || type == NutritionFoodType.AVOID.type) {
+            foodToolTipsValidation(type, foodList)
+        }
+
+        logger.info { "Food validation completed for type: $type" }
     }
 }
