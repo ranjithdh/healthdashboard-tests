@@ -711,7 +711,7 @@ class ActionPlanAdminTest : BaseTest() {
                 if (dueDateRaw.isNotEmpty()) {
                     try {
                         val dateTime = java.time.OffsetDateTime.parse(dueDateRaw)
-                            .atZoneSameInstant(java.time.ZoneId.of("Asia/Kolkata"))
+                            .atZoneSameInstant(java.time.ZoneId.systemDefault())
                         val formattedDate = dateTime.format(java.time.format.DateTimeFormatter.ofPattern("MMMM d, yyyy"))
                         val expectedDueText = "Due on: $formattedDate"
                         logger.info { "Checking due date text: $expectedDueText" }

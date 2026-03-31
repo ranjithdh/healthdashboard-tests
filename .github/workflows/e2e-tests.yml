@@ -5,7 +5,7 @@ on:
     branches: [main,feature/action_plan,feature/test_profile]
   #  pull_request:
   #    types: [opened, synchronize, reopened]
-  #    branches: [main]
+  #    branches: [main, test-actionPlan]
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:

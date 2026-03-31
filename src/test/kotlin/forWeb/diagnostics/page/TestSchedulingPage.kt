@@ -18,9 +18,10 @@ import model.profile.ProfileDetailResponse
 import model.slot.SlotList
 import mu.KotlinLogging
 import org.junit.jupiter.api.Assertions
+import utils.LogFullApiCall.logFullApiCall
 import java.time.Period
 import java.time.ZonedDateTime
-import utils.LogFullApiCall.logFullApiCall
+import utils.Normalize.refactorTimeZone
 import utils.json.json
 import utils.logger.logger
 import utils.report.StepHelper
@@ -74,8 +75,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     private fun formatTime(isoTime: String): String {
         val instant = java.time.Instant.parse(isoTime)
-        val istZone = java.time.ZoneId.of("Asia/Kolkata")
-        val zonedDateTime = instant.atZone(istZone)
+        val systemZone = java.time.ZoneId.systemDefault()
+        val zonedDateTime = instant.atZone(systemZone)
         return zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
@@ -173,8 +174,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     ) {
         val randomNum = (100..999).random()
         val finalMobile = mobileNumber ?: "7092424$randomNum" 
-        val finalNickName = nickName ?: "Seeni$randomNum"
-        val finalName = name ?: "SeeniV$randomNum"
+        val finalNickName = nickName ?: "Seeni"
+        val finalName = name ?: "Seeni"
         val finalEmail = email ?: "vseeni$randomNum@yopmail.com"
 
         logger.info { "Filling Add New User fields with dynamic number: $randomNum" }
@@ -204,16 +205,20 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             .fill("14C3, H H Road")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).click()
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your street address")).fill("Balarengapuram")
-        page.getByRole(
+        val suggestion = page.getByRole(
             AriaRole.BUTTON,
             Page.GetByRoleOptions().setName("Balarengapuram, Madurai, Tamil Nadu, India").setExact(true)
-        ).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).click()
+        )
+        try {
+            suggestion.waitFor(com.microsoft.playwright.Locator.WaitForOptions().setTimeout(2000.0))
+            suggestion.click()
+        } catch (e: Exception) {
+            logger.warn { "Address suggestion not found, proceeding with manual entry." }
+        }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("city *")).fill("Madurai")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).click()
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).press("ArrowRight")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *")).fill("Tamil Nadu")
-        page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).click()
+        val stateInput = page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("State *"))
+        stateInput.click()
+        stateInput.fill("Tamil Nadu")
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Pin code *")).fill("625009")
         page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Continue")).click()
 
@@ -225,11 +230,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         page.getByText("Add New User").click()
         page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("Add a new member")).click()
         page.getByText("Mobile number *").click()
+        page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
        if (isBookingForSelf) {
-           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
            page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(2).click()
        } else {
-           page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("+")).click()
            page.getByText("India", Page.GetByTextOptions().setExact(true)).nth(1).click()
        }
         page.getByRole(AriaRole.TEXTBOX, Page.GetByRoleOptions().setName("Enter your mobile number")).click()
@@ -303,7 +307,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         
         if (response.status() != 200) {
@@ -542,12 +546,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 
     private fun getLeadId(): String {
         val url = TestConfig.APIs.API_ACCOUNT_INFORMATION
+        val timeZone = java.util.TimeZone.getDefault().id
         val response = page.request().get(
             url,
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Calcutta")
+                .setHeader("user_timezone", refactorTimeZone(timeZone))
         )
         if (response.status() != 200) {
             throw RuntimeException("Failed to fetch PII data: ${response.status()} ${response.text()}")
@@ -575,7 +580,8 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
                 .setHeader("Content-Type", "application/json")
-                .setHeader("user_timezone", "Asia/Kolkata")
+//                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
+                .setHeader("user_timezone","Asia/Kolkata")
                 .setData(payload)
         )
 
@@ -734,7 +740,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
 //        Assertions.assertTrue(page.getByText(noteText).isVisible, "Dual slot note should be visible")
 
         // Capture times for summary verification
-        selectedDateSummary = java.time.Instant.parse(fastingSlot.start_time).atZone(java.time.ZoneId.of("Asia/Kolkata")).format(summaryDateFormatter)
+        selectedDateSummary = java.time.Instant.parse(fastingSlot.start_time).atZone(java.time.ZoneId.systemDefault()).format(summaryDateFormatter)
         selectedFastingTimeSummary = formatTime(fastingSlot.start_time!!)
         selectedPostMealTimeSummary = formatTime(postMealSlot.start_time!!)
         
@@ -745,14 +751,13 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         // Parse ISO string and convert to IST (+5:30)
         // Format: 2026-02-06T05:00:00.000Z
         val instant = java.time.Instant.parse(startTimeIso)
-        val istZone = java.time.ZoneId.of("Asia/Kolkata")
-        val zonedDateTime = instant.atZone(istZone)
+        val zonedDateTime = instant.atZone(java.time.ZoneId.systemDefault())
 
         selectedDateSummary = zonedDateTime.format(summaryDateFormatter)
         selectedTimeSummary = zonedDateTime.format(DateTimeFormatter.ofPattern("hh:mm a"))
     }
 
-    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean) {
+    fun verifyOrderSummaryPage(expectedSubtotal: Double, expectedDiscount: Double, targetCode: String, isWalletUsed: Boolean, sampleType: String? = null) {
         StepHelper.step(VERIFY_ORDER_SUMMARY_PAGE)
         logger.info { "Verifying Order Summary Page" }
 
@@ -806,13 +811,16 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
 
         // Slot verification
-        // Slot verification
-        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004", "DH_METABOLIC_PANEL", "DH_LONGEVITY_PANEL")) {
+        // Skip slot verification if sample type is one of the kit-based/self-collection types
+        val kitSampleTypes = setOf("saliva", "stool", "dried_blood_spot", "saliva_stress")
+        val isDualSlot = (targetCode == "DH_METABOLIC_PANEL" || targetCode == "DH_LONGEVITY_PANEL")
+        if (sampleType?.lowercase() !in kitSampleTypes && !isDualSlot) {
+            logger.info { "Verifying Single Slot Summary: Date: $selectedDateSummary, Time: $selectedTimeSummary" }
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()
             page.getByText("Selected time slot: $selectedTimeSummary").click()
         }
-        if (targetCode == "DH_METABOLIC_PANEL" || targetCode == "DH_LONGEVITY_PANEL") {
+        if (isDualSlot) {
             logger.info { "Verifying Dual Slot Summary: Date: $selectedDateSummary, Fasting: $selectedFastingTimeSummary, PostMeal: $selectedPostMealTimeSummary" }
             page.getByText("Sample Collection Time Slot").click()
             page.getByText("Date: $selectedDateSummary").click()
@@ -1013,7 +1021,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
         if (response.status() != 200) {
             throw RuntimeException("Failed to fetch profile list: ${response.status()} ${response.text()}")
@@ -1034,7 +1042,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
 
         if (response.status() != 200) {
@@ -1071,7 +1079,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
     }
 
     fun captureLabTestDetails(code: String? = null) {
-        val codeToUse = code ?: capturedCode ?: return
+        val codeToUse = code
         logger.info { "Fetching Lab Test details for code: $codeToUse" }
         
         val response = page.request().get(
@@ -1079,7 +1087,7 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
 
         if (response.status() != 200) {
@@ -1133,13 +1141,11 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         }
     }
 
-    fun proceedPayment(isKit: Boolean) {
+    fun proceedPayment(isKit: Boolean, code: String) {
         logger.info { "Proceeding Payment." }
         
         // Ensure product details are captured from Lab Test response
-        if (capturedProductId == null || capturedThyrocareProductId == null) {
-            captureLabTestDetails()
-        }
+         captureLabTestDetails(code = code)
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION
         val piiResponse = page.request().get(
             piiUrl,
@@ -1168,8 +1174,9 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val automateUrl = "${TestConfig.APIs.BASE_URL}/v4/human-token/automate-order-workflow-v2"
 
         // appointment_date = the slot start time selected by user (raw ISO string)
-        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate ?: ""
-        val createdAt = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val currentIsoTime = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val appointmentDate = if (!capturedSlotTime.isNullOrEmpty()) capturedSlotTime else if (!capturedAppointmentDate.isNullOrEmpty()) capturedAppointmentDate else currentIsoTime
+        val createdAt = currentIsoTime
         val orderNo = capturedOrderNo ?: ""
         val productId = capturedProductId ?: 0  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId ?: ""
@@ -1233,9 +1240,10 @@ class TestSchedulingPage(page: Page) : BasePage(page) {
         val productId = capturedProductId  // numeric ID from meta_data.product_id
         val thyrocareProductId = capturedThyrocareProductId
         // appointment_date = the slot start time selected by user (raw ISO string)
-        val appointmentDate = capturedSlotTime ?: capturedAppointmentDate
-        val createdAt = capturedCreatedAt
-        val paymentDate = capturedPaymentDate
+        val currentIsoTime = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now())
+        val appointmentDate = if (!capturedSlotTime.isNullOrEmpty()) capturedSlotTime else if (!capturedAppointmentDate.isNullOrEmpty()) capturedAppointmentDate else currentIsoTime
+        val createdAt = capturedCreatedAt ?: currentIsoTime
+        val paymentDate = capturedPaymentDate ?: currentIsoTime
 
         // Get User Mobile/Country from PII
         val piiUrl = TestConfig.APIs.API_ACCOUNT_INFORMATION

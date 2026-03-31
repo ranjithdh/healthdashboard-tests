@@ -14,6 +14,7 @@ import onboard.page.OtpPage
 import utils.logger.logger
 import utils.report.StepHelper
 import java.util.regex.Pattern
+import utils.Normalize.refactorTimeZone
 import utils.json.json as jsonParser
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -77,7 +78,7 @@ class ActionPlanAdminPage(page: Page) : BasePage(page) {
             RequestOptions.create()
                 .setHeader("access_token", TestConfig.ACCESS_TOKEN)
                 .setHeader("client_id", TestConfig.CLIENT_ID)
-                .setHeader("user_timezone", "Asia/Kolkata")
+                .setHeader("user_timezone", refactorTimeZone(java.util.TimeZone.getDefault().id))
         )
 
         if (usersResponse.status() != 200) {

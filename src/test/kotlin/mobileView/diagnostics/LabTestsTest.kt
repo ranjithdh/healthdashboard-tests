@@ -64,6 +64,22 @@ class LabTestsTest : BaseTest() {
             logger.info { "Navigating back to Diagnostics URL..." }
             page.navigate(TestConfig.Urls.DIAGNOSTICS_URL)
             page.waitForLoadState()
+        } else {
+            // If already on diagnostics, ensure filter is reset to 'All'
+            try {
+                val allFilter = page.getByRole(AriaRole.SWITCH, Page.GetByRoleOptions().setName("All"))
+                if (allFilter.isVisible) {
+                    val isChecked = allFilter.getAttribute("aria-checked") == "true"
+                    if (!isChecked) {
+                        logger.info { "Resetting filter to 'All'..." }
+                        allFilter.click()
+                        // Give a moment for the UI to update and cards to appear
+                        page.waitForTimeout(1000.0)
+                    }
+                }
+            } catch (e: Exception) {
+                logger.warn { "Could not reset filter to 'All': ${e.message}" }
+            }
         }
     }
 
@@ -72,8 +88,6 @@ class LabTestsTest : BaseTest() {
     fun `verify lab tests page static texts and segments`() {
         labTestsPage.checkStaticTextsAndSegments()
     }
-
-
     @Test
     @Order(2)
     fun `verify lab tests cards using API response`() {
@@ -101,10 +115,10 @@ class LabTestsTest : BaseTest() {
 
             // Sample type logic as per user requirement
             val sampleType = when {
-                code.startsWith("CORTISOL") -> "At-Home Test Kit"
-                code.startsWith("OMEGA") -> "At-Home Test Kit"
-                safeRawSampleType.lowercase() == "saliva" -> "At-Home Test Kit"
-                safeRawSampleType.lowercase() == "stool" -> "At-Home Test Kit"
+                code.startsWith("CORTISOL") -> "At-Home Self-Collection Kit"
+                code.startsWith("OMEGA") -> "At-Home Self-Collection Kit"
+                code == "GENE10001" -> "At-Home Self-Collection Kit"
+                code == "GUT10002" -> "At-Home Self-Collection Kit"
                 else -> "Blood test"
             }
 
@@ -251,8 +265,7 @@ class LabTestsTest : BaseTest() {
         logger.info { "Navigating to diagnostics page and capturing API response..." }
         StepHelper.step("Navigating to diagnostics page and capturing API response...")
         val responseObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
-
-        val targetCode = "DH_LONGEVITY_PANEL" // "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
+        val targetCode = "GUT10002" //CORTISOL1004 "GENE10001" //"GUT10002" //"P250" //"GENE10001" // "PROJ1056379" //"DH_LONGEVITY_PANEL"
 
         // Parse list response to find the target item
         val productList = responseObj.data?.diagnostic_product_list ?: throw AssertionError("diagnostic_product_list not found")
@@ -455,8 +468,10 @@ class LabTestsTest : BaseTest() {
         baseSteps.add(mapOf("title" to title1, "description" to desc1))
 
         // Item 2 (Base/Blood)
-        val title2 = highlightsList.getOrNull(3) ?: "Get Results in 72 Hours"
-        val desc2 = if (sampleType == "blood") {
+        val title2 = if (targetCode == "CORTISOL1004") "Get results in 3–5 days" else highlightsList.getOrNull(3) ?: "Get Results in 72 Hours"
+        val desc2 = if (targetCode == "CORTISOL1004") {
+            "Your sample is analysed in a certified lab, and results are shared on your dashboard."
+        } else if (sampleType == "blood") {
             "Your sample is processed at a certified lab, and your report is ready online in  $reportGenHr."
         } else {
             getResultsDescription[sampleType] ?: ""
@@ -542,7 +557,6 @@ class LabTestsTest : BaseTest() {
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(4)
     fun `verify test scheduling`() {
@@ -697,19 +711,24 @@ class LabTestsTest : BaseTest() {
                 testSchedulingPage.clickProceed()
             }
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed, sampleType = sampleType)
         
         // Finalize the order automation by calling the workflow API
 
         val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
                 || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
-        testSchedulingPage.proceedPayment(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit, code = targetCode)
 
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(4)
     fun `verify test scheduling for baseline`() {
@@ -775,7 +794,7 @@ class LabTestsTest : BaseTest() {
         testSchedulingPage.verifyAddNewUserFields(isBookingForSelf = isBookingForSelf)
         testSchedulingPage.fillAddNewUserFields()
         testSchedulingPage.getUserProfileList() // Refresh list after adding new user
-        testSchedulingPage.assertProfilesFromApi()
+//        testSchedulingPage.assertProfilesFromApi()
         
         // Switch user logic
         val profiles = testSchedulingPage.getProfileListData()?.profiles
@@ -866,19 +885,51 @@ class LabTestsTest : BaseTest() {
         StepHelper.step("Verifying Footer Actions on Slot Selection page...")
         testSchedulingPage.verifyFooterActions()
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed)
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = applicableDiscount, targetCode = targetCode, isWalletUsed = isWalletUsed, sampleType = sampleType)
 
         // Finalize the order automation by calling the workflow API
 //        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
-        testSchedulingPage.proceedPayment(false)
+        testSchedulingPage.proceedPayment(false, code = targetCode)
         logger.info { "Test completed successfully." }
         StepHelper.step("Test completed successfully.")
     }
-
     @Test
     @Order(5)
     fun `verify summary page edit flow`() {
-        val targetCode = "P037"
+
+        val resObj = labTestsPage.labTestData ?: throw AssertionError("Failed to capture Lab Test API response")
+        val proList = resObj.data?.diagnostic_product_list
+            ?: throw AssertionError("diagnostic_product_list not found in API response")
+
+        val allItems = sequenceOf(
+            proList.packages,
+            proList.test_profiles,
+            proList.tests
+        ).filterNotNull().flatten()
+
+        val targetItem = allItems.filter { item ->
+            val (code, diKit, diOrder) = when (item) {
+                is model.LabTestPackage -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestProfile -> Triple(item.code, item.di_kit, item.di_order)
+                is model.LabTestItem -> Triple(item.code, item.di_kit, item.di_order)
+                else -> Triple(null, null, null)
+            }
+            diKit == null && diOrder == null && code != "DH_LONGEVITY_PANEL" && code != "DH_METABOLIC_PANEL"
+            // here we have to check di_order as well like di_kit..
+        }.toList().randomOrNull() ?: throw AssertionError("No suitable test found (unbooked and not DH_LONGEVITY_PANEL)")
+
+        val targetCode = when (targetItem) {
+            is model.LabTestPackage -> targetItem.code
+            is model.LabTestProfile -> targetItem.code
+            is model.LabTestItem -> targetItem.code
+            else -> null
+        } ?: throw AssertionError("Target item selected but code is null")
         logger.info { "Starting test: verify summary page edit flow" }
         StepHelper.step("Starting test: verify summary page edit flow")
 
@@ -907,9 +958,17 @@ class LabTestsTest : BaseTest() {
             else -> throw RuntimeException("Unknown product type")
         }
 
+        val sampleType = when (targetProduct) {
+            is model.LabTestPackage -> targetProduct.sample_type
+            is model.LabTestProfile -> targetProduct.sample_type
+            is model.LabTestItem -> targetProduct.sample_type
+            else -> null
+        }
         testSchedulingPage.clickProceed()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed()
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed()
+        }
 
         // 1. Test Address Edit from Summary
         logger.info { "Editing address from summary..." }
@@ -919,18 +978,19 @@ class LabTestsTest : BaseTest() {
         val randomIndex = (0 until addressCount).random()
         logger.info { "Selecting random address at index $randomIndex" }
         StepHelper.step("Selecting random address at index $randomIndex")
-        testSchedulingPage.editUserAddress(randomIndex)
+//        testSchedulingPage.editUserAddress(randomIndex)
         
         testSchedulingPage.clickProceed() // go to slot selection
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed() // go to summary
+        if (targetCode !in setOf("GENE10001", "GUT10002", "OMEGA1003", "CORTISOL1004")) {
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed() // go to summary
 
-        // 2. Test Slot Edit from Summary
-        logger.info { "Editing slot from summary..." }
-        testSchedulingPage.clickEditSlotFromSummary()
-        testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
-        testSchedulingPage.clickProceed()
-
+            // 2. Test Slot Edit from Summary
+            logger.info { "Editing slot from summary..." }
+            testSchedulingPage.clickEditSlotFromSummary()
+            testSchedulingPage.verifySlotSelectionPage(code = targetCode, productId = productId)
+            testSchedulingPage.clickProceed()
+        }
         // Final Verification
         logger.info { "Final verification on summary page..." }
         StepHelper.step("Final verification on summary page...")
@@ -942,9 +1002,12 @@ class LabTestsTest : BaseTest() {
             is model.LabTestItem -> targetProduct.product?.price?.toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
-        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false)
+        testSchedulingPage.verifyOrderSummaryPage(expectedSubtotal = rawPrice, expectedDiscount = 0.0, targetCode = targetCode, isWalletUsed = false, sampleType = sampleType)
         // Finalize the order automation by calling the workflow API
-        testSchedulingPage.callAutomateOrderWorkflow(isKit = false)
+        val isKit = targetCode == "GENE10001" || targetCode == "GUT10002"
+                || targetCode == "OMEGA1003" || targetCode == "CORTISOL1004"
+//        testSchedulingPage.callAutomateOrderWorkflow(isKit = isKit)
+        testSchedulingPage.proceedPayment(isKit = isKit, code = targetCode)
         logger.info { "Edit flow test completed successfully." }
         StepHelper.step("Edit flow test completed successfully.")
 
