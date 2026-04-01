@@ -226,7 +226,14 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): ProfilePage {
-        tonePreference.waitFor()
+        logger.info { "[ProfilePage] waitForConfirmation() - waiting for 'Tone Preference' element. Current URL: ${page.url()}" }
+        try {
+            tonePreference.waitFor()
+            logger.info { "[ProfilePage] waitForConfirmation() OK - 'Tone Preference' element visible. Current URL: ${page.url()}" }
+        } catch (e: Exception) {
+            logger.error { "[ProfilePage] waitForConfirmation() FAILED - 'Tone Preference' not found. Current URL: ${page.url()} | Error: ${e.message}" }
+            throw e
+        }
         return this
     }
 
