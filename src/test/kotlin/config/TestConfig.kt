@@ -133,6 +133,7 @@ object TestConfig {
         const val SLOW_MO: Double = (1 * 1000).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
+
         fun launchOptions(): BrowserType.LaunchOptions {
             val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
