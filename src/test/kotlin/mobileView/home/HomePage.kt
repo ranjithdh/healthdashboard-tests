@@ -75,8 +75,15 @@ class HomePage(page: Page) : BasePage(page) {
 
     fun waitForMobileHomePageConfirmation(): HomePage {
         StepHelper.step(WAIT_MOBILE_HOME_CONFIRMATION)
-        logger.info("Waiting for mobileView.home page confirmation...")
-        page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
+        logger.info("Waiting for mobileView.home page confirmation... Current URL: ${page.url()}")
+        logger.info("Expected URL: ${TestConfig.Urls.HOME_PAGE_URL}")
+        try {
+            page.waitForURL(TestConfig.Urls.HOME_PAGE_URL)
+            logger.info("Home page URL confirmed. Current URL: ${page.url()}")
+        } catch (e: Exception) {
+            logger.error("waitForMobileHomePageConfirmation FAILED. Current URL: ${page.url()} | Error: ${e.message}")
+            throw e
+        }
         return this
     }
 
@@ -205,11 +212,16 @@ class HomePage(page: Page) : BasePage(page) {
 
     fun clickAccountProfile(): ProfilePage {
         StepHelper.step(CLICK_ACCOUNT_PROFILE)
+        logger.info("clickAccountProfile() - clicking profile icon. Current URL: ${page.url()}")
         val profilePage = ProfilePage(page)
         profilePage.captureAddressData {
+            logger.info("clickAccountProfile() - firing profileImage.click()")
             profileImage.click()
+            logger.info("clickAccountProfile() - profile icon clicked. Current URL: ${page.url()}")
         }
+        logger.info("clickAccountProfile() - waiting for Profile page confirmation...")
         profilePage.waitForConfirmation()
+        logger.info("clickAccountProfile() - Profile page confirmed. Current URL: ${page.url()}")
         return profilePage
     }
 

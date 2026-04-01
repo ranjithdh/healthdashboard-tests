@@ -8,6 +8,7 @@ import com.microsoft.playwright.Request
 import com.microsoft.playwright.Response
 import com.microsoft.playwright.options.AriaRole
 import com.microsoft.playwright.options.RequestOptions
+import com.microsoft.playwright.options.WaitForSelectorState
 import config.BasePage
 import config.TestConfig
 import mobileView.profile.model.*
@@ -226,7 +227,14 @@ class ProfilePage(page: Page) : BasePage(page) {
     }
 
     fun waitForConfirmation(): ProfilePage {
-        tonePreference.waitFor()
+        logger.info { "[ProfilePage] waitForConfirmation() - waiting for 'Tone Preference' element. Current URL: ${page.url()}" }
+        try {
+            tonePreference.waitFor()
+            logger.info { "[ProfilePage] waitForConfirmation() OK - 'Tone Preference' element visible. Current URL: ${page.url()}" }
+        } catch (e: Exception) {
+            logger.error { "[ProfilePage] waitForConfirmation() FAILED - 'Tone Preference' not found. Current URL: ${page.url()} | Error: ${e.message}" }
+            throw e
+        }
         return this
     }
 
@@ -6436,7 +6444,7 @@ class ProfilePage(page: Page) : BasePage(page) {
 
     // --- Performance Helpers ---
 
-    private fun performSingleSelect(
+/*    private fun performSingleSelect(
         option: Locator,
         subType: String,
         question: String,
@@ -6451,7 +6459,33 @@ class ProfilePage(page: Page) : BasePage(page) {
         }
         logAnswer(subType, question, answerLabel)
         nextAction?.invoke()
+    }*/
+
+    private fun performSingleSelect(
+        option: Locator,
+        subType: String,
+        question: String,
+        answerLabel: String,
+        nextAction: (() -> Unit)? = null
+    ) {
+        StepHelper.step(ANSWER_QUESTION + question + ": " + answerLabel)
+        val progressBefore = questionerCount.innerText()
+        logger.info { "[performSingleSelect] Progress before click: '$progressBefore'" }
+        if (!isButtonChecked(option)) {
+            logger.info { "[performSingleSelect] Option not checked — clicking: '$answerLabel'" }
+            option.click()
+        } else {
+            logger.info { "[performSingleSelect] Option already checked — clicking nextButton" }
+            nextButton.click()
+        }
+        // Wait for progress counter to advance — reliable transition signal
+        // avoids DETACHED ambiguity when consecutive questions share identical button names
+        page.waitForCondition { questionerCount.innerText() != progressBefore }
+        logger.info { "[performSingleSelect] Progress advanced to: '${questionerCount.innerText()}'" }
+        logAnswer(subType, question, answerLabel)
+        nextAction?.invoke()
     }
+
 
     private fun performMultiSelect(
         options: List<Locator>,

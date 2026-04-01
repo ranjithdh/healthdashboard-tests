@@ -138,6 +138,7 @@ object TestConfig {
                 ?: System.getProperty("headless")?.toBoolean()
                 ?: false   //TODO default safe for CI is true
 
+
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)
@@ -178,8 +179,8 @@ object TestConfig {
         )
 
 
-        var EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",
+        val EXISTING_USER = TestUser(
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India",
             countryCode = "+91"
