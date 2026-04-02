@@ -145,11 +145,11 @@ class DhPointsTest : BaseTest() {
         // Step 6: Payment
         StepHelper.step(DH_POINTS_PAYMENT)
         logger.info { "[STEP] Proceed to payment in manually..." }
-//        orderSummaryPage.clickGooglePayUPI()
-        // Step 6: Verify blood test card
-//        StepHelper.step(DH_POINTS_VERIFY_BLOOD_TEST_CARD)
-//        logger.info { "[STEP] Verifying blood test booked card status..." }
-//        checkBloodTestBookedCardStatus(homePage)
+        orderSummaryPage.clickGooglePayUPI()
+//         Step 6: Verify blood test card
+        StepHelper.step(DH_POINTS_VERIFY_BLOOD_TEST_CARD)
+        logger.info { "[STEP] Verifying blood test booked card status..." }
+        homePage.checkBloodTestBookedCardStatus(homePage)
 
         // Step 7: Logout
         StepHelper.step(DH_POINTS_LOGOUT)
@@ -434,18 +434,4 @@ class DhPointsTest : BaseTest() {
 //        logger.info { "[PIPELINE] Response Body:   ${pipelineResponse.text()}" }
 //    }
 //
-//    private fun checkBloodTestBookedCardStatus(homePage: HomePage) {
-//        homePage.waitForBloodTestCardToLoad()
-//        assertTrue(homePage.isPhlebotomistAssignedTitleVisible())
-//        assertTrue(homePage.isPhlebotomistAssignedDateVisible())
-//
-//        assertTrue(homePage.isSampleCollectionTitleVisible())
-//        assertTrue(homePage.isSampleCollectionDateVisible())
-//
-//        assertTrue(homePage.isLabProcessingTitleVisible())
-//        assertTrue(homePage.isLabProcessingTimeVisible())
-//
-//        assertTrue(homePage.isDashBoardReadyToViewTitleVisible())
-//        assertTrue(homePage.isDashBoardReadyToViewDateVisible())
-//    }
 //}
