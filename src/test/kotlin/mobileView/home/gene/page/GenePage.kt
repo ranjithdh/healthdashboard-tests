@@ -34,6 +34,7 @@ import utils.report.StepHelper.FETCH_GENE_DATA
 import utils.report.StepHelper.FETCH_GUT_DATA
 import utils.report.StepHelper.FETCH_HEALTH_DATA
 import utils.report.StepHelper.VALIDATING_CONNECTED_BIOMARKERS_TAB
+import utils.report.StepHelper.VALIDATING_GENE_ITEM
 import utils.report.StepHelper.VALIDATING_GENE_LIST
 import utils.report.StepHelper.VALIDATING_WHAT_IT_MEANS_TAB
 import utils.report.StepHelper.logApiResponse
@@ -285,6 +286,7 @@ class GenePage(page: Page) : BasePage(page) {
     }
 
 
+    val TAG="GENE"
     /**------------Gene Details---------------*/
 
     fun geneDetailsValidation() {
@@ -301,14 +303,16 @@ class GenePage(page: Page) : BasePage(page) {
                 val geneItemList = geneListGroupByName[groupName]
 
                 geneItemList?.forEach { geneItem ->
+                    geneMetricData = null //TODO
+
                     val metricID = geneItem.metric?.metricId
-                    logger.info { "Validating details for Gene: ${geneItem.metric?.displayName} (ID: $metricID)" }
+                    StepHelper.step("$TAG ${geneItem.metric?.displayName} (ID: $metricID)") //TODO
 
                     val nameUiElement = page.getByTestId("gene-item-name-$metricID")
                     nameUiElement.click()
 
                     captureGeneDetails(listOf(metricID)) //API call
-
+                    StepHelper.step("$TAG geneMetricData $geneMetricData") //TODO
                     if (geneMetricData != null) {
                         validatingGeneDetails(geneMetricData)
                     }
@@ -744,7 +748,7 @@ class GenePage(page: Page) : BasePage(page) {
     private fun captureGeneDetails(metricIds: List<String?>) {
         try {
             val timeZone = java.util.TimeZone.getDefault().id
-
+            StepHelper.step("$TAG captureGeneDetails (ID: $metricIds)") //TODO
             val metricParams = metricIds.joinToString("&") { "metric_id[]=$it" }
 
 
@@ -762,12 +766,14 @@ class GenePage(page: Page) : BasePage(page) {
 
 
             if (response.status() != 200) {
+                StepHelper.step("$TAG API returned error status: ${response.status()}") //TODO
                 logger.error { "API returned error status: ${response.status()}" }
                 return
             }
 
             val responseBody = response.text()
             if (responseBody.isNullOrBlank()) {
+                StepHelper.step("$TAG API response body is empty") //TODO
                 logger.error { "API response body is empty" }
                 return
             }
@@ -776,11 +782,13 @@ class GenePage(page: Page) : BasePage(page) {
             val responseObj = json.decodeFromString<GeneMetricResponse>(responseBody)
 
             if (responseObj.status == "success") {
+                StepHelper.step("$TAG success") //TODO
                 geneMetricData = responseObj.data
                 logApiResponse(apiUrl, responseObj)
             }
 
         } catch (e: Exception) {
+            StepHelper.step("$TAG Failed to fetch account information: ${e.message}") //TODO
             logger.error { "Failed to fetch account information: ${e.message}" }
         }
     }
@@ -807,7 +815,7 @@ class GenePage(page: Page) : BasePage(page) {
     }
 
 
-   fun filterOptions() {
+    fun filterOptions() {
         StepHelper.step(StepHelper.VALIDATING_GENE_FILTER_OPTIONS)
         val geneList = geneDataWrapper?.gene?.data
 
