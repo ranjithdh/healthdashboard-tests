@@ -71,7 +71,7 @@ tasks.withType<Test> {
 tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
     filter {
-        includeTestsMatching("mobileView.home.profile.*")
+        includeTestsMatching("mobileView.*")
     }
 }
 
