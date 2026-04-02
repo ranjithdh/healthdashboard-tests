@@ -65,8 +65,9 @@ class ProfilePage(page: Page) : BasePage(page) {
     val tonePreferenceKeyList = listOf("doctor", "friend", "bio_hacker")
 
 
-    private val previousButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Previous"))
-    private val nextButton: Locator = page.getByRole(AriaRole.BUTTON, Page.GetByRoleOptions().setName("Next"))
+    private val questionerDialog: Locator = page.locator(".bg-zinc-900").first()
+    private val previousButton: Locator = questionerDialog.getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("Previous"))
+    private val nextButton: Locator = questionerDialog.getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("Next"))
     private val questionerCount = page.getByTestId("question-progress-counter-mobile")
     private val progressIndicator = page.getByTestId("question-progress-bar-indicate-mobile")
     private var exerciseType = ActivityLevel.SEDENTARY
@@ -1586,9 +1587,9 @@ class ProfilePage(page: Page) : BasePage(page) {
             )
 
         val previous =
-            page.getByRole(
+            questionerDialog.getByRole(
                 AriaRole.BUTTON,
-                Page.GetByRoleOptions().setName("Previous")
+                Locator.GetByRoleOptions().setName("Previous")
             )
 
         val experienceOptions = listOf(

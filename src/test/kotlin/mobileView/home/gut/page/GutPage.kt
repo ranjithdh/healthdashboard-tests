@@ -622,7 +622,11 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun detailsMetricsValidations(summaryMetricsList: List<GutMetricItem>?) {
-        summaryMetricsList?.forEachIndexed { index, metricsList ->
+        val validList = summaryMetricsList?.filter {
+            !it.summary?.inference.isNullOrBlank() &&
+                    !it.summary?.displayDescription.isNullOrBlank()
+        }
+        validList?.forEachIndexed { index, metricsList ->
 
             val inference = metricsList.summary?.inference
             val displayDescription = metricsList.summary?.displayDescription
