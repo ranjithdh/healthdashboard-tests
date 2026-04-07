@@ -139,6 +139,7 @@ object TestConfig {
                 ?: false   //TODO default safe for CI is true
 
 
+
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
                 .setSlowMo(SLOW_MO)
