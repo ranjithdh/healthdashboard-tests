@@ -58,9 +58,10 @@ tasks.withType<Test> {
     // Attach AspectJ Agent for Allure steps and attachments
     jvmArgs("-javaagent:${agent.singleFile}")
 
-    // Parallel execution
+    // Parallel execution — classes run sequentially, methods within a class run in order
     systemProperty("junit.jupiter.execution.parallel.enabled", "true")
     systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+    systemProperty("junit.jupiter.execution.parallel.mode.classes.default", "same_thread")
 
     testLogging {
         events("passed", "skipped", "failed")
