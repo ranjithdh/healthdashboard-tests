@@ -270,6 +270,7 @@ object StepHelper {
     const val VALIDATING_GENE_FILTER_OPTIONS = "Validating Gene Filter Options"
     const val VALIDATING_GENE_DETAILS = "Validating Gene Details"
     const val VALIDATING_GENE_EMPTY_VIEW = "Validating Gene Empty View"
+    const val VALIDATING_GENE_ITEM = "Validating Gene item: "
 
     //Blood
     const val FETCH_BLOOD_DATA = "Fetch Blood data"

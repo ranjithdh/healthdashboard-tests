@@ -131,13 +131,14 @@ object TestConfig {
 
 
     object Browser {
-        const val SLOW_MO: Double = (1 * 1000).toDouble()
+        const val SLOW_MO: Double = (1 * 500).toDouble()
         const val TIMEOUT: Double = 60000.toDouble()
 
         fun launchOptions(): BrowserType.LaunchOptions {
             val isHeadless = System.getenv("HEADLESS")?.toBoolean()
                 ?: System.getProperty("headless")?.toBoolean()
                 ?: false   //TODO default safe for CI is true
+
 
             return BrowserType.LaunchOptions()
                 .setHeadless(isHeadless)
@@ -197,8 +198,8 @@ object TestConfig {
             country = "Finland",
             countryCode = "+46"
         )
-        var EXISTING_USER = TestUser(
-            mobileNumber = "7092424997",
+        val EXISTING_USER = TestUser(
+            mobileNumber = "7373791414",
             otp = "678901",
             country = "India",
             countryCode = "+91"

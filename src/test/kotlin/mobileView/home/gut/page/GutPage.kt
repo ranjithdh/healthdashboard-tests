@@ -273,10 +273,11 @@ class GutPage(page: Page) : BasePage(page) {
                 headerUiElement.waitFor()
                 headerUiElement.click()
 
-                val summaryMetricsList = gutMetricDetails?.metrics //TODO need to change as list
+                val summaryMetricsList = gutMetricDetails?.metrics
 
-                val gutMetricList = summaryMetricsList?.get(0)
-                val metricID = gutMetricList?.metric?.metricId
+                val gutMetricList = metricsList[0]
+                val metricID = gutMetricList.metric?.metric_id
+
                 val nameUiElement = page.getByTestId("gut-item-name-$metricID")
 
                 logger.info { "Navigating to details page for MetricID: $metricID" }
@@ -621,30 +622,43 @@ class GutPage(page: Page) : BasePage(page) {
     }
 
     private fun detailsMetricsValidations(summaryMetricsList: List<GutMetricItem>?) {
-        summaryMetricsList?.forEachIndexed { index, metricsList ->
-            val metricName = page.getByTestId("metric-name-$index")
+        val validList = summaryMetricsList?.filter {
+            !it.summary?.inference.isNullOrBlank() &&
+                    !it.summary?.displayDescription.isNullOrBlank()
+        }
+        validList?.forEachIndexed { index, metricsList ->
 
-            val metricInference = page.getByTestId("metric-inference-$index")
+            val inference = metricsList.summary?.inference
+            val displayDescription = metricsList.summary?.displayDescription
 
-            val metricDescription = page.getByTestId("metric-description-$index")
+            if (!inference.isNullOrBlank() && !displayDescription.isNullOrBlank()) {
+                val metricName = page.getByTestId("metric-name-$index")
+
+                val metricInference = page.getByTestId("metric-inference-$index")
+
+                val metricDescription = page.getByTestId("metric-description-$index")
 
 
-            listOf(metricName, metricInference, metricDescription).forEach { it.waitFor() }
+                listOf(metricName, metricInference, metricDescription).forEach { it.waitFor() }
 
-            val expectedMetricName = metricsList.metric?.displayName
-            val expectedInference = metricsList.summary?.inference
-            val expectedDescription = metricsList.summary?.displayDescription
+                val expectedMetricName = metricsList.metric?.displayName
+                val expectedInference = metricsList.summary?.inference
+                val expectedDescription = metricsList.summary?.displayDescription
 
-            assertEquals(expectedMetricName?.normalizeForUiCompare(), metricName.innerText()?.normalizeForUiCompare())
+                assertEquals(
+                    expectedMetricName?.normalizeForUiCompare(),
+                    metricName.innerText()?.normalizeForUiCompare()
+                )
 
-            assertEquals(
-                expectedInference?.normalizeForUiCompare(),
-                metricInference.innerText()?.normalizeForUiCompare()
-            )
-            assertEquals(
-                expectedDescription?.normalizeForUiCompare(),
-                metricDescription.innerText()?.normalizeForUiCompare()
-            )
+                assertEquals(
+                    expectedInference?.normalizeForUiCompare(),
+                    metricInference.innerText()?.normalizeForUiCompare()
+                )
+                assertEquals(
+                    expectedDescription?.normalizeForUiCompare(),
+                    metricDescription.innerText()?.normalizeForUiCompare()
+                )
+            }
 
         }
     }

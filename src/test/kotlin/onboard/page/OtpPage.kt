@@ -204,9 +204,14 @@ class OtpPage(page: Page) : BasePage(page) {
 
     fun enterOtpAndContinueToHomePage(testUser: TestUser = TestConfig.TestUsers.EXISTING_USER): HomePage {
         StepHelper.step(ENTER_OTP_HOME)
+        logger.info { "[OtpPage] enterOtpAndContinueToHomePage() - entering OTP for mobile: ${testUser.mobileNumber}" }
         enterOtp(testUser.otp, testUser.mobileNumber, testUser.countryCode)
+        logger.info { "[OtpPage] OTP entered. Current URL: ${page.url()}" }
+
+        logger.info { "[OtpPage] Creating HomePage and waiting for home URL confirmation..." }
         val homePage = HomePage(page)
         homePage.waitForMobileHomePageConfirmation()
+        logger.info { "[OtpPage] Home page confirmed. Current URL: ${page.url()}" }
 
         return homePage
     }

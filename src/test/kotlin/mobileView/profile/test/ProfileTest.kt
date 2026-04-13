@@ -9,8 +9,11 @@ import io.qameta.allure.Epic
 import mobileView.profile.page.ProfilePage
 import onboard.page.LoginPage
 import model.profile.QuestionerMealType
+import mu.KotlinLogging
 import org.junit.jupiter.api.*
 import utils.report.Modules
+
+private val logger = KotlinLogging.logger {}
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -47,10 +50,26 @@ class ProfileTest : BaseTest() {
     }
 
     private fun performInitialNavigation(): ProfilePage {
+        logger.info { "[INIT] Step 1: Navigating to Login page..." }
         val loginPage = LoginPage(page).navigate() as LoginPage
-        val profilePage =
-            loginPage.enterMobileAndContinue().enterOtpAndContinueToHomePage()
-                .clickAccountProfile().waitForConfirmation()
+        logger.info { "[INIT] Step 1 OK: Login page loaded. Current URL: ${page.url()}" }
+
+        logger.info { "[INIT] Step 2: Entering mobile number and clicking Continue..." }
+        val otpPage = loginPage.enterMobileAndContinue()
+        logger.info { "[INIT] Step 2 OK: OTP screen reached. Current URL: ${page.url()}" }
+
+        logger.info { "[INIT] Step 3: Entering OTP and waiting for Home page..." }
+        val homePage = otpPage.enterOtpAndContinueToHomePage()
+        logger.info { "[INIT] Step 3 OK: Home page confirmed. Current URL: ${page.url()}" }
+
+        logger.info { "[INIT] Step 4: Clicking account profile icon..." }
+        val profilePage = homePage.clickAccountProfile()
+        logger.info { "[INIT] Step 4 OK: Profile page reached. Current URL: ${page.url()}" }
+
+        logger.info { "[INIT] Step 5: Waiting for Profile page confirmation (Tone Preference)..." }
+        profilePage.waitForConfirmation()
+        logger.info { "[INIT] Step 5 OK: Profile page fully loaded." }
+
         return profilePage
     }
 
