@@ -2,7 +2,7 @@ name: E2E Tests - Playwright + Kotlin
 
 on:
   push:
-    branches: [main,feature/action_plan,feature/test_profile]
+    branches: [main,feature/action_plan,feature/test_profile,testReportSeeni]
   #  pull_request:
   #    types: [opened, synchronize, reopened]
   #    branches: [main, test-actionPlan]
