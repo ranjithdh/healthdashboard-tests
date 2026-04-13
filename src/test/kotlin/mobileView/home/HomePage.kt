@@ -42,6 +42,7 @@ import utils.report.StepHelper.WAIT_MOBILE_HOME_CONFIRMATION
 import utils.report.StepHelper.logApiResponse
 import kotlin.math.roundToInt
 import java.util.regex.Pattern
+import kotlin.test.assertTrue
 
 
 data class FlipBoardResponse(
@@ -456,5 +457,18 @@ class HomePage(page: Page) : BasePage(page) {
         return this
     }
 
+     fun checkBloodTestBookedCardStatus(homePage: HomePage) {
+        homePage.waitForBloodTestCardToLoad()
+        assertTrue(homePage.isPhlebotomistAssignedTitleVisible())
+        assertTrue(homePage.isPhlebotomistAssignedDateVisible())
 
+        assertTrue(homePage.isSampleCollectionTitleVisible())
+        assertTrue(homePage.isSampleCollectionDateVisible())
+
+        assertTrue(homePage.isLabProcessingTitleVisible())
+        assertTrue(homePage.isLabProcessingTimeVisible())
+
+        assertTrue(homePage.isDashBoardReadyToViewTitleVisible())
+        assertTrue(homePage.isDashBoardReadyToViewDateVisible())
+    }
 }
