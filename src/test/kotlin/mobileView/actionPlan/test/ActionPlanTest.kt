@@ -14,6 +14,7 @@ import utils.report.Modules
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_ACTION_PLAN)
+@Tag("mobile")
 class ActionPlanTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser

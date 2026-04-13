@@ -23,6 +23,7 @@ import kotlin.collections.emptyList
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Epic(Modules.EPIC_HOME)
+@Tag("mobile")
 class FlipboardPageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

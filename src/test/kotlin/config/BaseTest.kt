@@ -8,6 +8,7 @@ abstract class BaseTest {
     // Each test class must override this
     protected lateinit var page: Page
 
+
     @RegisterExtension
     val screenshotExtension = ScreenshotOnTestCompletionExtension { page }
 }
