@@ -346,14 +346,14 @@ class HomePage(page: Page) : BasePage(page) {
         val actionPlan = ActionPlanPage(page)
         return actionPlan
     }
-    fun claimYourConsultCard(): HomePage  {
+    fun claimYourConsultCard() {
         StepHelper.step(DH_POINTS_CLAIM_CONSULT_CARD)
         logger.info { "[STEP] Clicking 'Claim Your Consultation' card..." }
 //        page.getByRole(AriaRole.IMG, Page.GetByRoleOptions().setName("free-consultation")).first().click()
         page.getByText("Claim your Consult").click()
         page.getByText("1-on-1 consult with our").click()
         page.getByTestId("button-book-consultation").click()
-        return HomePage(page)
+
     }
 
     fun consultationConfirmationCard(): ProfilePage {
@@ -443,7 +443,18 @@ class HomePage(page: Page) : BasePage(page) {
         return genePage
     }
 
-
+    fun refreshPage(): HomePage {
+        page.waitForTimeout(1000.0)
+        logger.info { "waiting for refresh page..." }
+        page.getByText("Data").click();
+        logger.info { "clicking data tab" }
+        page.getByText("Home").click();
+        logger.info { "clicking home tab" }
+        page.reload()
+        getExpectedAssignmentDateFromApi()
+        logger.info { "[REFRESH] Data refreshed" }
+        return this
+    }
 
 
 }
