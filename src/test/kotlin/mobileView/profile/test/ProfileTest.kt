@@ -18,7 +18,6 @@ private val logger = KotlinLogging.logger {}
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_PROFILE)
-@Tag("mobile")
 class ProfileTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser

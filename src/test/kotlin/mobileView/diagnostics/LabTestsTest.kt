@@ -19,7 +19,6 @@ import kotlin.math.ceil
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Execution(ExecutionMode.SAME_THREAD)
 @Epic(Modules.EPIC_BOOKLABTEST)
-@Tag("mobile")
 class LabTestsTest : BaseTest() {
 
     private lateinit var playwright: Playwright

@@ -43,7 +43,6 @@ import kotlin.test.assertTrue
 @Epic("DH Points")
 @Feature("DH Points E2E Flow")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Tag("mobile")
 class DhPointsTest : BaseTest() {
 
     private lateinit var playwright: Playwright

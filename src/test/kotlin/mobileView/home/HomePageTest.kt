@@ -18,7 +18,6 @@ import utils.report.Modules
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Epic(Modules.EPIC_HOME)
-@Tag("mobile")
 class HomePageTest : BaseTest() {
 
     private lateinit var playwright: Playwright

@@ -3,6 +3,9 @@ name: E2E Tests - Playwright + Kotlin
 on:
   push:
     branches: [main,feature/action_plan,feature/test_profile]
+  #  pull_request:
+  #    types: [opened, synchronize, reopened]
+  #    branches: [main, test-actionPlan]
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
@@ -24,11 +27,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   BASE_URL: https://app.stg.deepholistics.com/
   HEADLESS: true
 
 jobs:
+  # Mobile-only tests
   test-mobile:
     name: Mobile Tests
     runs-on: ubuntu-22.04
@@ -42,11 +45,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -54,8 +52,11 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Install Playwright
+      - name: Install Playwright browsers
         run: npx playwright@1.49.0 install --with-deps chromium webkit
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run mobile tests
         run: ./gradlew mobileTests
@@ -79,6 +80,72 @@ jobs:
             build/screenshots/
           retention-days: 30
 
+  #      - name: Send Slack Notification
+  #        uses: 8398a7/action-slack@v3
+  #        with:
+  #          status: ${{ job.status }}
+  #          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+  #          text: 'Mobile View Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+  #        env:
+  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #        if: always()
+
+  #  # Website-only tests
+  #  test-website:
+  #    name: Website Tests
+  #    runs-on: ubuntu-22.04
+  #    if: |
+  #      github.event_name == 'push' ||
+  #      github.event_name == 'pull_request' ||
+  #      github.event_name == 'schedule' ||
+  #      (github.event_name == 'workflow_dispatch' && (github.event.inputs.test_tags == 'All' || github.event.inputs.test_tags == 'Website'))
+  #
+  #    steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v4
+  #
+  #      - name: Set up JDK 17
+  #        uses: actions/setup-java@v4
+  #        with:
+  #          java-version: '17'
+  #          distribution: 'temurin'
+  #          cache: 'gradle'
+  #
+  #      - name: Install Playwright browsers
+  #        run: npx playwright@1.49.0 install --with-deps chromium
+  #
+  #      - name: Install Playwright dependencies
+  #        run: npx playwright@1.49.0 install-deps
+  #
+  #      - name: Run website tests
+  #        run: ./gradlew websiteTests
+  #
+  #      - name: Generate Allure report
+  #        if: always()
+  #        run: ./gradlew allure3Report -Penvironment=Website
+  #
+  #      - name: Upload results
+  #        uses: actions/upload-artifact@v4
+  #        if: always()
+  #        with:
+  #          name: website-test-results
+  #          path: |
+  #            build/reports/tests/
+  #            build/allure-report-v3/
+  #            build/screenshots/
+  #          retention-days: 30
+  #
+  #      - name: Send Slack Notification
+  #        uses: 8398a7/action-slack@v3
+  #        with:
+  #          status: ${{ job.status }}
+  #          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+  #          text: 'Website Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+  #        env:
+  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #        if: always()
+
+  # WebView-only tests
   test-webview:
     name: WebView Tests
     runs-on: ubuntu-22.04
@@ -92,11 +159,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -104,8 +166,11 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Install Playwright
+      - name: Install Playwright browsers
         run: npx playwright@1.49.0 install --with-deps chromium
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run WebView tests
         run: ./gradlew webViewTests
@@ -125,6 +190,17 @@ jobs:
             build/screenshots/
           retention-days: 30
 
+  #      - name: Send Slack Notification
+  #        uses: 8398a7/action-slack@v3
+  #        with:
+  #          status: ${{ job.status }}
+  #          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+  #          text: 'WebView Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+  #        env:
+  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #        if: always()
+
+  # Onboard-only tests
   test-onboard:
     name: Onboard Tests
     runs-on: ubuntu-22.04
@@ -138,11 +214,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -150,8 +221,11 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Install Playwright
+      - name: Install Playwright browsers
         run: npx playwright@1.49.0 install --with-deps chromium
+
+      - name: Install Playwright dependencies
+        run: npx playwright@1.49.0 install-deps
 
       - name: Run onboard tests
         run: ./gradlew onboardTests
@@ -172,3 +246,13 @@ jobs:
             build/allure-report-v3/
             build/screenshots/
           retention-days: 30
+
+#      - name: Send Slack Notification
+#        uses: 8398a7/action-slack@v3
+#        with:
+#          status: ${{ job.status }}
+#          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+#          text: 'Onboard Tests finished with status: ${{ job.status }}.\nReport and Artifacts: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        if: always()
