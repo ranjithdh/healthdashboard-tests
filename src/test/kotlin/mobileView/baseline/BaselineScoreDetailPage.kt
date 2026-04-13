@@ -10,6 +10,7 @@ import model.baseline.BaselineScoreDetailResponse
 import model.healthdata.Range
 import utils.DateHelper
 import utils.logger.logger
+import utils.report.StepHelper
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
@@ -36,16 +37,19 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
     }
 
     fun isBaselineScoreTitleVisible(): Boolean {
+        StepHelper.step("Verify Baseline Score title is visible")
         val locator = page.locator("h1").filter(Locator.FilterOptions().setHasText("Baseline Score")).first()
         locator.waitFor()
         return locator.isVisible
     }
 
     fun isBetaTagVisible(): Boolean {
+        StepHelper.step("Verify Beta tag is visible")
         return page.getByText("Beta").isVisible
     }
 
     fun isLastUpdatedTimeVisible(): Boolean {
+        StepHelper.step("Verify last updated time is visible")
         val lastUpdatedTime = baselineScoreDetailResponse?.data?.trend_history?.last()
         val localTime = DateHelper.utcToLocalDateTime(lastUpdatedTime?.calculated_at)
 
@@ -58,12 +62,14 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
 
 
     fun isBaseLineScoreIsMatching(): Boolean {
+        StepHelper.step("Verify baseline score value matches API response")
         val score = baselineScoreDetailResponse?.data?.score_details?.normalized_baseline_score?.roundToInt().toString()
         return page.locator("span").filter(FilterOptions().setHasText(score)).isVisible &&
                 page.getByText("of 100").isVisible
     }
 
     fun isBaseLineScoreStatusMatching(): Boolean {
+        StepHelper.step("Verify baseline score status matches API response")
         val status = findScoreRange(
             normalizedScore = baselineScoreDetailResponse?.data?.score_details?.normalized_baseline_score ?: 0.0,
             ranges = baselineScoreDetailResponse?.data?.score_details?.ranges ?: emptyList()
@@ -73,6 +79,7 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
     }
 
     fun isScoreRangeElementsVisible(): Boolean {
+        StepHelper.step("Verify score range elements are visible")
         return page.getByText("Score Range").isVisible
                 && page.getByText("50").isVisible
                 && page.getByRole(AriaRole.PARAGRAPH)
@@ -82,31 +89,39 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
     }
 
     fun isBaselineScoreDescriptionMatching(): Boolean {
+        StepHelper.step("Verify baseline score description matches API response")
         return page.getByText(baselineScoreDetailResponse?.data?.score_details?.baseline_score_description).isVisible
     }
 
 
     fun isWhatNeedsAttentionTitleAndDescriptionVisible(): Boolean {
+        StepHelper.step(StepHelper.VERIFY_SECTION + "What Needs Attention")
+        StepHelper.step("Verify 'What needs attention' heading is visible")
+        StepHelper.step("Verify negative contributors description text is visible")
         return page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What needs attention")).isVisible
                 && page.getByText("Biomarkers contributing negatively to your score, listed by priority.").isVisible
     }
 
     fun clickViewAllNegativeContributors() {
+        StepHelper.step("Click 'View All' for negative contributors")
         page.locator("#nagative_contributors")
             .getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("View All")).click()
     }
 
     fun clickViewLessNegativeContributors() {
+        StepHelper.step("Click 'View Less' for negative contributors")
         page.locator("#nagative_contributors")
             .getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("View Less")).click()
     }
 
     fun clickViewAllPositiveContributors() {
+        StepHelper.step("Click 'View All' for positive contributors")
         page.locator("#positive_contributors")
             .getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("View All")).click()
     }
 
     fun clickViewLessPositiveContributors() {
+        StepHelper.step("Click 'View Less' for positive contributors")
         page.locator("#positive_contributors")
             .getByRole(AriaRole.BUTTON, Locator.GetByRoleOptions().setName("View Less")).click()
     }
@@ -117,6 +132,7 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
         unit: String,
         inference: String
     ): Boolean {
+        StepHelper.step("Verify contributor details: $displayName")
         val formattedValue = formatContributorValue(currentValue)
 
         var isVisible = page.getByText(displayName, Page.GetByTextOptions().setExact(true)).first().isVisible &&
@@ -160,6 +176,7 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
 
 
     fun verifyWhatIsBaselineScoreSection(): Boolean {
+        StepHelper.step(StepHelper.VERIFY_SECTION + "What is Baseline Score")
         return page.getByRole(AriaRole.HEADING, Page.GetByRoleOptions().setName("What is Baseline Score")).isVisible
                 && page.getByText("The Baseline Score is Deep Holistics’ proprietary health score, developed through clinical research, systems-based analysis, and years of preventive health insight.").isVisible
                 && page.getByText("Instead of looking at individual markers in isolation, it brings together data across key body systems to reflect how your body is actually functioning today.").isVisible
@@ -168,6 +185,7 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
 
 
     fun verifyBiologicalAgeSection(): Boolean {
+        StepHelper.step(StepHelper.VERIFY_SECTION + "Biological Age")
         val age = baselineScoreDetailResponse?.data?.age
         val biologicalAge = baselineScoreDetailResponse?.data?.biological_age
 
@@ -195,6 +213,7 @@ class BaselineScoreDetailPage(page: Page) : BasePage(page) {
 
 
     fun isDisclaimerVisible(): Boolean {
+        StepHelper.step("Verify disclaimer text is visible")
         return page.getByText("Disclaimer:").isVisible
                 && page.getByText(" These insights are informational only and not a substitute for medical advice. Please consult a qualified healthcare professional before taking any clinical or significant lifestyle actions.").isVisible
     }

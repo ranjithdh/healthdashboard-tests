@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.serialization") version "1.9.21"
-    id("io.qameta.allure") version "2.12.0"
+    id("io.qameta.allure") version "2.13.0"
 }
 
 group = "com.deepholistics"
