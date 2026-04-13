@@ -74,6 +74,7 @@ tasks.register<Test>("mobileTests") {
     filter {
         includeTestsMatching("mobileView.*")
     }
+    finalizedBy("allure3Report")
 }
 
 tasks.register<Test>("websiteTests") {
@@ -81,6 +82,7 @@ tasks.register<Test>("websiteTests") {
     filter {
         includeTestsMatching("website.*")
     }
+    finalizedBy("allure3Report")
 }
 
 tasks.register<Test>("webViewTests") {
@@ -88,6 +90,7 @@ tasks.register<Test>("webViewTests") {
     filter {
         includeTestsMatching("webView.*")
     }
+    finalizedBy("allure3Report")
 }
 
 tasks.register<Test>("onboardTests") {
@@ -95,6 +98,7 @@ tasks.register<Test>("onboardTests") {
     filter {
         includeTestsMatching("onboard.*")
     }
+    finalizedBy("allure3Report")
 }
 
 tasks.register<Exec>("installPlaywright") {
