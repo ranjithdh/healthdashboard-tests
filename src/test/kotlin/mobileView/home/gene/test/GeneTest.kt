@@ -23,6 +23,7 @@ import kotlin.test.Test
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_GENE)
+@Tag("mobile")
 class GeneTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser

@@ -20,6 +20,7 @@ import utils.report.Modules
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_CONSULTATIONS)
 @DisplayName("Service Tests - Single Login Pattern")
+@Tag("mobile")
 class ServiceSingleLoginTest : BaseTest() {
 
     private lateinit var playwright: Playwright

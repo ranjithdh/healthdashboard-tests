@@ -69,10 +69,16 @@ tasks.withType<Test> {
     }
 }
 
-tasks.register<Test>("mobileTests") {
+/*tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
     filter {
         includeTestsMatching("mobileView.*")
+    }
+}*/
+
+tasks.register<Test>("mobileTests") {
+    useJUnitPlatform {
+        includeTags("mobile")
     }
 }
 
