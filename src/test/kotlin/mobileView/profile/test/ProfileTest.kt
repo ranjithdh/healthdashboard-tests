@@ -26,6 +26,7 @@ class ProfileTest : BaseTest() {
 
     @BeforeAll
     fun setup() {
+
         playwright = Playwright.create()
         browser = playwright.chromium().launch(TestConfig.Browser.launchOptions())
 
