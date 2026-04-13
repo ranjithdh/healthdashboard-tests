@@ -116,11 +116,32 @@ allure {
     }
 }
 
+// Resolve npx: check system PATH first, then local install
+fun findNpx(): String {
+    // Check if npx is on system PATH
+    try {
+        val process = ProcessBuilder("which", "npx").start()
+        val result = process.inputStream.bufferedReader().readText().trim()
+        if (process.waitFor() == 0 && result.isNotEmpty()) return result
+    } catch (_: Exception) {}
+    // Fallback to local Node.js install
+    val localNpx = file("${System.getProperty("user.home")}/local/node/bin/npx")
+    if (localNpx.exists()) return localNpx.absolutePath
+    return "npx" // Let it fail with a clear error if truly not found
+}
+
 tasks.register<Exec>("allure3Report") {
     group = "verification"
     description = "Generates Allure Report v3"
 
     val env = project.findProperty("environment") ?: "Local"
+    val npxPath = findNpx()
+
+    // Ensure node is on PATH for npx to work
+    val localNodeBin = file("${System.getProperty("user.home")}/local/node/bin")
+    if (localNodeBin.exists()) {
+        environment("PATH", "${localNodeBin.absolutePath}:${System.getenv("PATH")}")
+    }
 
     doFirst {
         val resultsDir = file("build/allure-results")
@@ -138,7 +159,7 @@ tasks.register<Exec>("allure3Report") {
     }
 
     commandLine(
-        "npx",
+        npxPath,
         "allure",
         "generate",
         "--config",
@@ -152,5 +173,12 @@ tasks.register<Exec>("allure3Report") {
 tasks.register<Exec>("allure3Serve") {
     group = "verification"
     description = "Serves Allure Report v3"
-    commandLine("npx", "allure", "serve", "build/allure-results")
+
+    val npxPath = findNpx()
+    val localNodeBin = file("${System.getProperty("user.home")}/local/node/bin")
+    if (localNodeBin.exists()) {
+        environment("PATH", "${localNodeBin.absolutePath}:${System.getenv("PATH")}")
+    }
+
+    commandLine(npxPath, "allure", "serve", "build/allure-results")
 }
