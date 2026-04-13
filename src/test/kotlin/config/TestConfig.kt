@@ -11,7 +11,7 @@ object TestConfig {
     var TOTAL_AMOUNT = ""
     var COUPON_CODE = ""
     var DISCOUNT_AMOUNT = ""
-
+    const val DH_POINTS_PROD_USER_ID = 145
     const val STG_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"
     const val PROD_CLIENT_ID = "qXsGPcHJkb9MTwD5fNFpzRrngjtvy4dW"//TODO need get prod client id
 
@@ -126,6 +126,7 @@ object TestConfig {
         const val API_ACTION_PLAN_USER_DATA = "https://dh-stg-action-plan-generator.replit.app/api/dh/user-data"
         const val API_ACTION_PLAN_USER_RECOMMENDATIONS =
             "https://dh-stg-action-plan-generator.replit.app/api/dh/user-recommendations"
+        val API_TRIGGER_PIPELINE = "$BASE_URL/v4/human-token/blood-data/trigger-pipeline"
     }
 
 
@@ -177,7 +178,25 @@ object TestConfig {
             countryCode = "+46"
         )
 
-
+        val DH_POINTS_GENERATE_USER = TestUser(
+            mobileNumber = System.getenv("TEST_USER_MOBILE") ?: "4573998394",
+            otp = System.getenv("TEST_USER_OTP") ?: "",
+            firstName = "Seeni",
+            email = "seenivasan.v@mysmitch.com",
+            gender = "Male",
+            height = "190",
+            weight = "90",
+            month = "9",
+            year = "1998",
+            day = "21",
+            flatHouseNo = "Flat 101",
+            address = "456 Main Road",
+            city = "Coimbatore",
+            state = "TamilNadu",
+            pinCode = "641005",
+            country = "Finland",
+            countryCode = "+46"
+        )
         var EXISTING_USER = TestUser(
             mobileNumber = "7092424997",
             otp = "678901",
