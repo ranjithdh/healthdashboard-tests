@@ -198,6 +198,7 @@ object TestConfig {
             country = "Finland",
             countryCode = "+46"
         )
+
         val EXISTING_USER = TestUser(
             mobileNumber = "7373791414",
             otp = "678901",
