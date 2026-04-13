@@ -25,6 +25,7 @@ class ProfileTest : BaseTest() {
     private lateinit var context: BrowserContext
     private lateinit var profilePage: ProfilePage
 
+
     @BeforeAll
     fun setup() {
         playwright = Playwright.create()
