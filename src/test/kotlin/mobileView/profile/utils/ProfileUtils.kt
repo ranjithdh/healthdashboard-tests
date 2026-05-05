@@ -86,7 +86,7 @@ object ProfileUtils {
     fun bmiCategoryValues(bmi: Double): String {
         return when {
             bmi < 18 -> "Unusual BMI. Re-check entered values."
-            bmi < 18.5 -> "Underweight"
+          //  bmi < 18.5 -> "Underweight"
             bmi < 25 -> "Normal"
             bmi < 30 -> "Overweight"
             else -> "Obese"

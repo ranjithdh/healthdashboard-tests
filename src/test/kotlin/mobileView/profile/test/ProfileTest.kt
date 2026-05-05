@@ -18,11 +18,14 @@ private val logger = KotlinLogging.logger {}
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @Epic(Modules.EPIC_PROFILE)
+@Tag("mobile")
 class ProfileTest : BaseTest() {
     private lateinit var playwright: Playwright
     private lateinit var browser: Browser
     private lateinit var context: BrowserContext
     private lateinit var profilePage: ProfilePage
+
+
 
     @BeforeAll
     fun setup() {
@@ -37,7 +40,7 @@ class ProfileTest : BaseTest() {
             .setDeviceScaleFactor(viewport.deviceScaleFactor)
 
         context = browser.newContext(contextOptions)
-        // context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
+        context.setDefaultTimeout(TestConfig.Browser.TIMEOUT * 2)
         page = context.newPage()
         profilePage = performInitialNavigation()
     }

@@ -6,7 +6,6 @@ import config.BasePage
 import config.TestConfig
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import utils.api.ApiLogger
 
 class DhPointsPage(page: Page) : BasePage(page) {
 
@@ -40,7 +39,7 @@ class DhPointsPage(page: Page) : BasePage(page) {
             "user_timezone" to "Asia/Calcutta"
         )
 
-        ApiLogger.logRequest(url, "POST", headers, payload)
+      //  ApiLogger.logRequest(url, "POST", headers, payload)
 
         val startTime = System.currentTimeMillis()
         val requestOptions = RequestOptions.create()
@@ -51,7 +50,7 @@ class DhPointsPage(page: Page) : BasePage(page) {
         val endTime = System.currentTimeMillis()
         val responseText = response.text()
         
-        ApiLogger.logResponse(response.status(), responseText, endTime - startTime, url)
+      //  ApiLogger.logResponse(response.status(), responseText, endTime - startTime, url)
 
         if (response.status() != 200) {
             throw RuntimeException("Failed to trigger blood-data pipeline: ${response.status()} $responseText")

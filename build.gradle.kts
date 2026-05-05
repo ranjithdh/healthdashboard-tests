@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.9.21"
     kotlin("plugin.serialization") version "1.9.21"
-    id("io.qameta.allure") version "2.12.0"
+    id("io.qameta.allure") version "3.0.0"
 }
 
 group = "com.deepholistics"
@@ -69,10 +69,16 @@ tasks.withType<Test> {
     }
 }
 
-tasks.register<Test>("mobileTests") {
+/*tasks.register<Test>("mobileTests") {
     useJUnitPlatform()
     filter {
         includeTestsMatching("mobileView.*")
+    }
+}*/
+
+tasks.register<Test>("mobileTests") {
+    useJUnitPlatform {
+        includeTags("mobile")
     }
 }
 
@@ -135,7 +141,7 @@ tasks.register<Exec>("allure3Report") {
 
     commandLine(
         "npx",
-        "allure",
+        "allure@3.3.1",
         "generate",
         "--config",
         "allurerc.mjs",
@@ -148,5 +154,5 @@ tasks.register<Exec>("allure3Report") {
 tasks.register<Exec>("allure3Serve") {
     group = "verification"
     description = "Serves Allure Report v3"
-    commandLine("npx", "allure", "serve", "build/allure-results")
+    commandLine("npx", "allure@3.3.1", "serve", "--config", "allurerc.mjs", "build/allure-results")
 }
